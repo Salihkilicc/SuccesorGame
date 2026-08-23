@@ -1390,7 +1390,23 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   modernCard: {
-    backgroundColor: 'transparent',
+    // ------------------------------------------------------------------
+    //  THE GROUND UNDER THE CARD, SO ITS SHADOW CAN BE CACHED
+    // ------------------------------------------------------------------
+    //  It was `transparent`, and iOS cannot compute a shadow from a layer it
+    //  has to rasterise first - reported twice per render as
+    //  "BVLinearGradient has a shadow set but cannot calculate shadow
+    //  efficiently".
+    //
+    //  Only the FIRST gradient stop is translucent here: the card runs
+    //  rgba(255,255,255,0.48) into #1C242C at 20% and stays opaque from
+    //  there. So this colour is visible in one place, the top edge, where
+    //  the wallpaper used to show through a white haze and now the ground
+    //  does. That is the whole visual change and it makes the edge
+    //  consistent between the two cards, which sit at different heights over
+    //  different parts of the photograph.
+    // ------------------------------------------------------------------
+    backgroundColor: theme.colors.background,
     borderRadius: 33,
     borderWidth: 0,
     shadowColor: '#CFD0D2',

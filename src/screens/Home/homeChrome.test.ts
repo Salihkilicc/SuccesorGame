@@ -64,12 +64,34 @@ describe('the gradients that carry a shadow', () => {
         // computed from its bounds - the whole thing is rasterised every frame
         // to find its own silhouette. The colour is the one the gradient
         // starts from, so nothing changes on screen.
-        for (const name of ['avatarCircle']) {
-            expect(blockOf(name)).toContain('shadowColor');
-            expect(blockOf(name)).toContain('backgroundColor');
+        for (const name of ['avatarCircle', 'modernCard']) {
+            const block = blockOf(name);
+            expect(block).toContain('shadowColor');
+            // `backgroundColor: 'transparent'` contains the word and is the
+            // exact thing this is about, so the assertion has to be that it
+            // is a COLOUR. The first version of this test passed against
+            // transparent, which is the bug wearing the fix's clothes.
+            expect(block).toMatch(/backgroundColor:\s*(?!'transparent')/);
+            expect(block).not.toMatch(/backgroundColor:\s*'transparent'/);
         }
         // The per-tile one is inline, because the colour is the item's own.
         expect(src()).toMatch(/backgroundColor: item\.gradient\[0\]/);
+    });
+
+    it('and the one that stays uncached is the one that cannot be fixed', () => {
+        // The nav bar is glass on purpose - every stop between 0.4 and 0.5
+        // alpha - so a background colour would take the effect away. What is
+        // left to control is the RADIUS: the blur is recomputed from the
+        // alpha mask every frame and the work scales with how far it spreads.
+        // It is also the only uncached shadow drawn on EVERY screen.
+        const bar = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'navigation', 'components', 'CrystalNavBar.tsx'),
+            'utf8',
+        );
+        const start = bar.indexOf('\n    blurContainer: {');
+        const block = bar.slice(start, bar.indexOf('\n    },', start));
+        const radius = Number(block.match(/shadowRadius:\s*(\d+)/)?.[1]);
+        expect(radius).toBeLessThanOrEqual(10);
     });
 
     it('and the tiles are honest about being solid colours', () => {

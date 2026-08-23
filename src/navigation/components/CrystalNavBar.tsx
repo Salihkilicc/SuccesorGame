@@ -299,10 +299,32 @@ const styles = StyleSheet.create({
     blurContainer: {
         borderRadius: 20,
         overflow: 'hidden',
+        // ------------------------------------------------------------------
+        //  A NARROWER GLOW, BECAUSE THIS ONE IS ON SCREEN ALWAYS
+        // ------------------------------------------------------------------
+        //  From the device log, on every render:
+        //
+        //      (ADVICE) BVLinearGradient has a shadow set but cannot
+        //               calculate shadow efficiently.
+        //
+        //  iOS can cache a shadow when it knows the layer is opaque. This bar
+        //  is deliberately glass - all four gradient stops are between 0.4 and
+        //  0.5 alpha - so it cannot be given a background colour without
+        //  taking the effect away, which is the one fix that would have been
+        //  free elsewhere. See the app tiles in HomeScreen for that version.
+        //
+        //  What is left is the RADIUS. The blur is recomputed from the alpha
+        //  mask every frame and the work scales with how far it spreads, so 20
+        //  is the expensive part rather than the shadow existing. Eight keeps
+        //  a glow and costs a fraction of it.
+        //
+        //  This is the one uncached shadow that is drawn on every screen in
+        //  the game rather than on one of them.
+        // ------------------------------------------------------------------
         shadowColor: "#CFD0D2",
-        shadowOffset: { width: 0, height: 10 },
+        shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.6,
-        shadowRadius: 20,
+        shadowRadius: 8,
         elevation: 15,
         borderWidth: 1.5,
         borderColor: 'rgba(255,255,255,0.15)',
