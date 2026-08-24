@@ -30,7 +30,7 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
         <View style={styles.container}>
             <View style={styles.sectionHeaderRow}>
                 <Text style={styles.sectionTitle}>DYNASTY & SUCCESSION</Text>
-                <Text style={styles.countText}>{children.length} Heirs</Text>
+                <Text style={styles.countText}>{children.length} Successors</Text>
             </View>
 
             {children.length === 0 ? (
@@ -72,7 +72,7 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
                                     </Text>
                                     {isSuccessor && (
                                         <View style={styles.heirTag}>
-                                            <Text style={styles.heirTagText}>HEIR</Text>
+                                            <Text style={styles.heirTagText}>SUCCESSOR</Text>
                                         </View>
                                     )}
                                 </View>

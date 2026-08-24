@@ -15,7 +15,7 @@ import { useIdentityStore } from '../../../core/store/useIdentityStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
-import { useFamilyStore, Child, PartnerProfile } from '../../../core/store/useFamilyStore';
+import { useFamilyStore, Child, PartnerProfile, FALLBACK_CHILD_NAME } from '../../../core/store/useFamilyStore';
 import { useLuxoNetStore } from '../../../core/store/useLuxoNetStore';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { formatPrestigeScore } from '../../shopping/data/shoppingRegistry';
@@ -68,7 +68,7 @@ export const useProfileLogic = () => {
     const children = useMemo(() => {
         return family.children.map((c) => {
             if (!c.name.endsWith('Hale')) {
-                const firstName = c.name.split(' ')[0] || 'Heir';
+                const firstName = c.name.split(' ')[0] || FALLBACK_CHILD_NAME;
                 return { ...c, name: `${firstName} Hale` };
             }
             return c;
@@ -221,7 +221,7 @@ export const useProfileLogic = () => {
         const targetChild = family.children.find((c) => c.id === childId);
         if (targetChild) {
             family.designateSuccessor(childId);
-            setActionFeedback(`${targetChild.name} is now the primary heir.`);
+            setActionFeedback(`${targetChild.name} is now the primary successor.`);
             setTimeout(() => setActionFeedback(null), 3000);
         }
     }, [family]);

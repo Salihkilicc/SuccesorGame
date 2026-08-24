@@ -335,8 +335,8 @@ export const handleChildBirth = (
     playerStore.updateCore('happiness', Math.min(100, playerStore.core.happiness + 20));
     playerStore.updateCore('stress', Math.max(0, playerStore.core.stress - 5));
 
-    const headline = `Dynasty Heir Born: ${ceo} and ${partnerName} welcome ${cleanChildName}.`;
-    const newsBody = `${company} leadership marks a momentous personal milestone as ${ceo} and ${partnerName} announce the birth of newborn heir ${cleanChildName} into the Hale family legacy.`;
+    const headline = `Dynasty Successor Born: ${ceo} and ${partnerName} welcome ${cleanChildName}.`;
+    const newsBody = `${company} leadership marks a momentous personal milestone as ${ceo} and ${partnerName} announce the birth of newborn successor ${cleanChildName} into the Hale family legacy.`;
 
     const newsPayload: NewsPayload = {
         type: 'player',

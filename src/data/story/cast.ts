@@ -102,7 +102,7 @@ export const CAST: Cast = {
     //  See data/story/heirs.ts for why none of those scenes says a name.
     heir: {
         id: 'heir',
-        name: 'Your Heir',
+        name: 'Your Successor',
         role: 'Successor',
         // Message only. A child does not write to their parent on letterhead.
         channels: 'message',

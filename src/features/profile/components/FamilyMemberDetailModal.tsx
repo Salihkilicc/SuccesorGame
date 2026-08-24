@@ -130,7 +130,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                 ) : (
                                     isDesignatedSuccessor && (
                                         <View style={styles.primaryHeirBadge}>
-                                            <Text style={styles.primaryHeirText}>PRIMARY HEIR</Text>
+                                            <Text style={styles.primaryHeirText}>PRIMARY SUCCESSOR</Text>
                                         </View>
                                     )
                                 )}
@@ -371,7 +371,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                                 }}
                                             >
                                                 <MaterialCommunityIcons name="crown" size={18} color="#FBBF24" />
-                                                <Text style={styles.btnAmberText}>Designate as Primary Heir</Text>
+                                                <Text style={styles.btnAmberText}>Designate as Primary Successor</Text>
                                             </Pressable>
                                         )}
                                     </View>

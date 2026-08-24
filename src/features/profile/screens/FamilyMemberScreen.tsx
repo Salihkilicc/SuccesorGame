@@ -23,7 +23,7 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
-import { useFamilyStore } from '../../../core/store/useFamilyStore';
+import { useFamilyStore, FALLBACK_CHILD_NAME } from '../../../core/store/useFamilyStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import {
@@ -61,10 +61,12 @@ export const FamilyMemberScreen: React.FC = () => {
         ? child.id === family.designatedSuccessorId
         : false;
 
-    const rawName = paramName || (isPartner ? partner?.name || 'Partner' : child?.name || 'Heir');
+    // "Successor" rather than "Heir" throughout, and see FALLBACK_CHILD_NAME
+    // in useFamilyStore for why an unnamed child gets a word at all.
+    const rawName = paramName || (isPartner ? partner?.name || 'Partner' : child?.name || FALLBACK_CHILD_NAME);
     const name = useMemo(() => {
         if (!isPartner) {
-            const firstName = rawName.split(' ')[0] || 'Heir';
+            const firstName = rawName.split(' ')[0] || FALLBACK_CHILD_NAME;
             return `${firstName} Hale`;
         }
         return rawName;
@@ -105,7 +107,7 @@ export const FamilyMemberScreen: React.FC = () => {
         family.designateSuccessor(targetChildId);
         Alert.alert(
             'Succession Declared',
-            `${name} has been designated as the primary heir to the Hale dynasty.`,
+            `${name} has been designated as the primary successor to the Hale dynasty.`,
         );
     };
 
@@ -246,7 +248,7 @@ export const FamilyMemberScreen: React.FC = () => {
             },
             relationshipWithPlayer: 100,
             isSuccessorCandidate: false,
-            traits: ['Newborn Heir'],
+            traits: ['Newborn Successor'],
             allowance: 0,
         });
 
@@ -332,7 +334,7 @@ export const FamilyMemberScreen: React.FC = () => {
                             isDesignatedSuccessor && (
                                 <View style={styles.heirBadge}>
                                     <MaterialCommunityIcons name="crown" size={14} color="#FBBF24" />
-                                    <Text style={styles.heirBadgeText}>HEIR</Text>
+                                    <Text style={styles.heirBadgeText}>SUCCESSOR</Text>
                                 </View>
                             )
                         )}
@@ -458,7 +460,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                             color="#05A8F6"
                                         />
                                         <Text style={styles.btnSurfaceText}>
-                                            Have a Baby / Dynasty Heir
+                                            Have a Baby / Dynasty Successor
                                         </Text>
                                     </Pressable>
                                 )}
@@ -560,7 +562,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                             color="#FBBF24"
                                         />
                                         <Text style={styles.btnAmberText}>
-                                            Designate as Primary Heir
+                                            Designate as Primary Successor
                                         </Text>
                                     </Pressable>
                                 ) : (
@@ -571,7 +573,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                             color="#FBBF24"
                                         />
                                         <Text style={styles.activeSuccessorText}>
-                                            Designated Primary Heir to the Hale Empire
+                                            Designated Primary Successor to the Hale Empire
                                         </Text>
                                     </View>
                                 )}

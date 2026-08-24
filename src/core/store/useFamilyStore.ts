@@ -219,6 +219,30 @@ export const PROPOSAL_REFUSAL_COST = 4;
  */
 export const FORCED_PRENUP_CLASSES: SocialClass[] = ['Royalty', 'BillionaireHeir'];
 
+/**
+ * What a child is called before anybody has named them.
+ *
+ * ---------------------------------------------------------------------------
+ *  THE WORD, AND WHY IT IS SUCCESSOR
+ * ---------------------------------------------------------------------------
+ *  One relationship, two words. The CODE said successor everywhere -
+ *  `designatedSuccessorId`, `successorFor`, `planSuccession`, the cast role -
+ *  and the SCREENS said heir: a HEIR badge, "Designate as Primary Heir",
+ *  "Dynasty Heir Born". The player only ever reads the second set, so the game
+ *  called it a thing its own source does not call it, and did so in a game
+ *  named Succesor.
+ *
+ *  So: successor everywhere the player can see. The other sense of the word
+ *  stays - `BillionaireHeir` as a social class, "Heir/Heiress" as a job at a
+ *  nightclub, "Billionaire Industrial Heir" on a partner - because that means
+ *  somebody who INHERITED, which is a fact about a stranger and not a role in
+ *  your company.
+ *
+ *  Held here rather than typed into each screen so the next unnamed child
+ *  cannot be called something else again.
+ */
+export const FALLBACK_CHILD_NAME = 'Successor';
+
 // ============================================================================
 //  A NEW GAME HAS NO FAMILY IN IT
 // ============================================================================
@@ -538,9 +562,9 @@ export const useFamilyStore = create<FamilyStore>()(
             addChild: (childData) => {
                 const id = 'id' in childData && childData.id ? childData.id : generateId('child');
                 // Ensure dynasty surname is always 'Hale'
-                let formattedName = childData.name ? childData.name.trim() : 'Heir';
+                let formattedName = childData.name ? childData.name.trim() : FALLBACK_CHILD_NAME;
                 if (!formattedName.endsWith('Hale')) {
-                    const firstName = formattedName.split(' ')[0] || 'Heir';
+                    const firstName = formattedName.split(' ')[0] || FALLBACK_CHILD_NAME;
                     formattedName = `${firstName} Hale`;
                 }
 
@@ -735,7 +759,7 @@ export const useFamilyStore = create<FamilyStore>()(
 
                 if (state && Array.isArray(state.children)) {
                     state.children = state.children.map((c) => {
-                        const firstName = c.name.split(' ')[0] || 'Heir';
+                        const firstName = c.name.split(' ')[0] || FALLBACK_CHILD_NAME;
                         return { ...c, name: `${firstName} Hale` };
                     });
                 }
