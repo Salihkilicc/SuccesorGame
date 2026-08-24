@@ -295,3 +295,53 @@ describe('the quarter has an allowance', () => {
         expect(st().bankReputation(NaN)).toBe(0);
     });
 });
+
+describe('the bar counts towards the last room', () => {
+    const fsb = require('fs');
+    const pathb = require('path');
+    const readB = (...p: string[]) => fsb.readFileSync(pathb.join(__dirname, ...p), 'utf8');
+
+    it('in the lobby AND on every game screen', () => {
+        // Reported as "hala 700". CasinoScreen had one copy of the number and
+        // CasinoHeader had another, so fixing the lobby left every table
+        // still counting towards a figure that matches no room.
+        for (const f of [
+            ['screens', 'CasinoScreen.tsx'],
+            ['components', 'CasinoHeader.tsx'],
+        ]) {
+            const src = readB(...f)
+                .split('\n')
+                .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+                .join('\n');
+            expect(src).toContain('CASINO_LADDER_TOP');
+            expect(src).not.toMatch(/\/ 700/);
+        }
+    });
+});
+
+describe('the slots screen', () => {
+    const fss = require('fs');
+    const paths = require('path');
+    // JSX block comments too: the note explaining why the ScrollView went
+    // away contains the word ScrollView, and its continuation lines start
+    // with neither a slash nor a star.
+    const src: string = fss.readFileSync(
+        paths.join(__dirname, 'screens', 'SlotsGameScreen.tsx'), 'utf8')
+        .replace(/\{?\/\*[\s\S]*?\*\/\}?/g, '')
+        .split('\n')
+        .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+        .join('\n');
+
+    it('does not scroll, so the button is never below the fold', () => {
+        // A ScrollView is what put SPIN under the tab bar: the content is
+        // taller than the space, so at rest the control the screen exists for
+        // was hidden and had to be scrolled up to.
+        expect(src).not.toMatch(/<ScrollView/);
+        expect(src).not.toMatch(/ScrollView,/);
+    });
+
+    it('and keeps the controls clear of the nav bar', () => {
+        expect(src).toMatch(/paddingBottom: NAV_BAR_CLEARANCE/);
+        expect(src).toMatch(/justifyContent: 'space-between'/);
+    });
+});

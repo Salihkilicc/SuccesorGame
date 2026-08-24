@@ -44,6 +44,8 @@
 //  because a machine that is simply better makes the other two furniture.
 // ============================================================================
 
+import { palette } from '../../../core/theme';
+
 export type SlotVariant = 'ticker' | 'boardroom' | 'dynasty';
 
 export type SlotSymbol = {
@@ -53,6 +55,29 @@ export type SlotSymbol = {
     icon: string;
     /** What three of them pay, as a multiple of the stake. */
     payout: number;
+    /**
+     * The colour it is drawn in, from the palette.
+     *
+     * ------------------------------------------------------------------
+     *  COLOUR IS THE PAYOUT TABLE, DRAWN
+     * ------------------------------------------------------------------
+     *  Every symbol on a reel used to be tinted with the ROOM's colour, so
+     *  five different things arrived in one colour and a machine read as a
+     *  column of identical blue shapes. Reported as "daha renkli".
+     *
+     *  More colours would fix the look and waste the opportunity. These
+     *  climb with the payout - grey at the bottom, orange and violet at the
+     *  top - so a player learns what a good symbol looks like before they
+     *  have read a single number, and a near miss on the crown is visible
+     *  from across the reel.
+     *
+     *  Green and red are absent on purpose. They mean profit and loss in
+     *  this game and the amount that floats up after a spin is already
+     *  using them; a symbol that looked like a signal would be worse than
+     *  a symbol with no colour at all. See core/theme.ts.
+     * ------------------------------------------------------------------
+     */
+    colour: string;
 };
 
 export type SlotConfig = {
@@ -88,7 +113,9 @@ export type SlotConfig = {
  */
 export const TARGET_RTP = 0.94;
 
-const sym = (id: string, icon: string, payout: number): SlotSymbol => ({ id, icon, payout });
+const sym = (
+    id: string, icon: string, payout: number, colour: string,
+): SlotSymbol => ({ id, icon, payout, colour });
 
 export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
     // ------------------------------------------------------------------
@@ -102,12 +129,15 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         title: 'The Ticker',
         icon: 'chart-line',
         subtitle: 'Small print, small margins, all night long',
+        //  Icons the rest of the game already uses: `bank` and
+        //  `rocket-launch-outline` are both from core/market/companyVisuals,
+        //  which is where every company on the stock screen gets its face.
         symbols: [
-            sym('bear', 'trending-down', 3),
-            sym('bull', 'trending-up', 4),
-            sym('chart', 'chart-line-variant', 5),
-            sym('bell', 'bell-ring-outline', 6),
-            sym('ipo', 'rocket-launch-outline', 9),
+            sym('bear', 'trending-down', 3, palette.grey),
+            sym('bull', 'trending-up', 4, palette.greyLight),
+            sym('bell', 'bell-ring-outline', 5, palette.blueLight),
+            sym('vault', 'bank', 6, palette.orangeMuted),
+            sym('ipo', 'rocket-launch-outline', 9, palette.violet),
         ],
         twoKindMultiplier: 1.5,
         jackpotOdds: 0.11,
@@ -123,11 +153,11 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         icon: 'gavel',
         subtitle: 'Motions carried, seats taken, minutes kept',
         symbols: [
-            sym('minutes', 'file-document-outline', 4),
-            sym('seat', 'seat-outline', 6),
-            sym('gavel', 'gavel', 8),
-            sym('seal', 'seal-variant', 11),
-            sym('signature', 'draw-pen', 16),
+            sym('minutes', 'file-document-outline', 4, palette.grey),
+            sym('seat', 'seat-outline', 6, palette.greyLight),
+            sym('gavel', 'gavel', 8, palette.blueLight),
+            sym('seal', 'seal-variant', 11, palette.orangeMuted),
+            sym('signature', 'fountain-pen-tip', 16, palette.orange),
         ],
         twoKindMultiplier: 1.4,
         jackpotOdds: 0.06,
@@ -147,12 +177,15 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         title: 'The Dynasty',
         icon: 'crown',
         subtitle: 'Rings, wills, and the name on the building',
+        //  `castle` is the fairytale venue from the proposal sheet and
+        //  `crown` is the London casino's own emblem, so the two most
+        //  valuable faces in the game are things the player has already met.
         symbols: [
-            sym('cradle', 'baby-carriage', 8),
-            sym('ring', 'ring', 14),
-            sym('will', 'scroll', 22),
-            sym('estate', 'home-city-outline', 40),
-            sym('crown', 'crown', 100),
+            sym('cradle', 'baby-carriage', 8, palette.grey),
+            sym('ring', 'ring', 14, palette.greyLight),
+            sym('will', 'scroll', 22, palette.blueLight),
+            sym('estate', 'castle', 40, palette.violet),
+            sym('crown', 'crown', 100, palette.orange),
         ],
         twoKindMultiplier: 1.2,
         jackpotOdds: 0.018,
@@ -165,6 +198,10 @@ export const VARIANTS: readonly SlotVariant[] = ['ticker', 'boardroom', 'dynasty
 
 /** Every icon name a machine can show, for the reel strip. */
 export const iconStrip = (config: SlotConfig): string[] => config.symbols.map(s => s.icon);
+
+/** What colour an icon is drawn in. Falls back to plain white. */
+export const colourOfIcon = (config: SlotConfig, icon: string): string =>
+    config.symbols.find(s => s.icon === icon)?.colour ?? '#FFFFFF';
 
 /** The symbol behind an icon name, for turning a landed reel into money. */
 export const symbolByIcon = (config: SlotConfig, icon: string): SlotSymbol | undefined =>

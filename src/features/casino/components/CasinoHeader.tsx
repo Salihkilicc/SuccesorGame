@@ -7,6 +7,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { CasinoLocation } from '../data/casinoData';
 import { theme } from '../../../core/theme';
 import { formatCompact } from '../../../core/utils';
+import { CASINO_LADDER_TOP } from '../data/casinoData';
 
 interface CasinoHeaderProps {
   location: CasinoLocation;
@@ -34,7 +35,15 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
     return 'Member';
   };
 
-  const repProgress = Math.min(reputation / 700, 1);
+  // ----------------------------------------------------------------------
+  //  THE SECOND COPY OF THE SAME 700
+  // ----------------------------------------------------------------------
+  //  CasinoScreen had one and this had another, so fixing the lobby left
+  //  every game screen still counting towards a number that matches no room.
+  //  Reported as "hala 700". One fact, one place - CASINO_LADDER_TOP is the
+  //  last room's requirement and moves with it.
+  // ----------------------------------------------------------------------
+  const repProgress = Math.min(reputation / CASINO_LADDER_TOP, 1);
   const rankName = getReputationRank(reputation);
 
   return (
@@ -113,7 +122,7 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
               </Text>
             </View>
             <Text style={styles.repNumbersText}>
-              {reputation.toFixed(0)} <Text style={{ color: theme.colors.textMuted }}>/ 700 REP</Text>
+              {reputation.toFixed(0)} <Text style={{ color: theme.colors.textMuted }}>/ {CASINO_LADDER_TOP} REP</Text>
             </Text>
           </View>
           <View style={styles.repTrack}>

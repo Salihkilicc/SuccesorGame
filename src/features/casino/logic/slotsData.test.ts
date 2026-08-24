@@ -33,6 +33,7 @@ import {
     miniOdds,
     isBalanced,
     iconStrip,
+    colourOfIcon,
     symbolByIcon,
     type SlotVariant,
 } from './slotsData';
@@ -210,5 +211,72 @@ describe('the payouts themselves', () => {
     it('and the mean is what a jackpot is worth on average', () => {
         expect(meanJackpot(SLOT_CONFIG.ticker)).toBeCloseTo((3 + 4 + 5 + 6 + 9) / 5, 6);
         expect(meanJackpot({ ...SLOT_CONFIG.ticker, symbols: [] })).toBe(0);
+    });
+});
+
+
+// ============================================================================
+//  AND THE COLOUR, WHICH IS THE PAYOUT TABLE DRAWN
+// ============================================================================
+//
+//  Every symbol on a reel was tinted with the ROOM's colour, so five
+//  different things arrived in one colour and a machine read as a column of
+//  identical shapes. Reported as "daha renkli".
+//
+//  More colours alone would have fixed the look and wasted the chance. They
+//  climb with the payout, so a player learns what a good face looks like
+//  before they have read a number and a near miss on the crown is visible
+//  from across the reel.
+// ============================================================================
+
+import { palette, theme } from '../../../core/theme';
+
+describe('the colours', () => {
+    it('are a different one for every face on a machine', () => {
+        for (const v of VARIANTS) {
+            const colours = SLOT_CONFIG[v].symbols.map(s => s.colour);
+            expect(new Set(colours).size).toBe(colours.length);
+        }
+    });
+
+    it('and they come from the palette rather than from a hex somebody liked', () => {
+        const known = new Set(Object.values(palette) as string[]);
+        for (const v of VARIANTS) {
+            for (const s of SLOT_CONFIG[v].symbols) {
+                expect(known.has(s.colour)).toBe(true);
+            }
+        }
+    });
+
+    it('and they are never the profit or the loss colour', () => {
+        // Those two mean money in and money out, and the amount that floats
+        // up after a spin is already using them. A symbol that looked like a
+        // signal would be worse than a symbol with no colour at all.
+        for (const v of VARIANTS) {
+            for (const s of SLOT_CONFIG[v].symbols) {
+                expect(s.colour).not.toBe(theme.colors.success);
+                expect(s.colour).not.toBe(theme.colors.danger);
+            }
+        }
+    });
+
+    it('and the reel can look one up, with a fallback that is still visible', () => {
+        const c = SLOT_CONFIG.dynasty;
+        expect(colourOfIcon(c, 'crown')).toBe(palette.orange);
+        // A strip entry with no symbol behind it draws white rather than
+        // nothing, because an invisible reel is worse than a wrong colour.
+        expect(colourOfIcon(c, 'not-a-symbol')).toBe('#FFFFFF');
+    });
+});
+
+describe('the icons come from the rest of the game', () => {
+    it('so the player has met the important ones before', () => {
+        // `bank` and `rocket-launch-outline` are how companies are drawn on
+        // the stock screen, `castle` is the fairytale venue on the proposal
+        // sheet, and `crown` is the London casino's own emblem.
+        const all = VARIANTS.flatMap(v => iconStrip(SLOT_CONFIG[v]));
+        for (const shared of ['bank', 'rocket-launch-outline', 'castle', 'crown']) {
+            expect(all).toContain(shared);
+        }
     });
 });

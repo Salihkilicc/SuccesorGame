@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { Pressable, ScrollView, StyleSheet, Text, View, Dimensions, Animated, Easing } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Dimensions, Animated, Easing } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppScreen from '../../../components/layout/AppScreen';
 import { theme } from '../../../core/theme';
@@ -15,7 +15,7 @@ import { CASINO_LOCATIONS } from '../data/casinoData';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
-import { iconStrip } from '../logic/slotsData';
+import { iconStrip, colourOfIcon } from '../logic/slotsData';
 
 const { width } = Dimensions.get('window');
 
@@ -77,7 +77,21 @@ const SlotsGameScreen = () => {
         onHide={actions.hideResult}
       />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      {/* ------------------------------------------------------------------
+          A SLOT MACHINE DOES NOT SCROLL
+
+          This was a ScrollView, which is what put the SPIN button under the
+          nav bar: the content is taller than the space, so at rest the
+          control the whole screen exists for was hidden behind the tab bar
+          and had to be scrolled up to. Reported as "tab bar ile cakisiyor"
+          and "kaymasin".
+
+          A fixed column instead. The machine takes the middle and gives up
+          height when there is not enough; the controls are pinned above
+          NAV_BAR_CLEARANCE and cannot move. Nothing on this screen is ever
+          out of reach.
+         ------------------------------------------------------------------ */}
+      <View style={styles.content}>
 
         {/* INFO ROW */}
         <View style={styles.infoRow}>
@@ -95,6 +109,7 @@ const SlotsGameScreen = () => {
                 key={colIdx}
                 index={colIdx}
                 finalSymbol={colSymbols[1]}
+                colourOf={(icon) => colourOfIcon(state.config, icon)}
                 tint={currentLocation.theme.primary}
                 isSpinning={state.isSpinning}
                 delay={colIdx * 300} // Staggered stop
@@ -137,7 +152,7 @@ const SlotsGameScreen = () => {
           </View>
         </View>
 
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -147,7 +162,13 @@ export default SlotsGameScreen;
 // STYLES
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
+  content: {
+    flex: 1,
+    padding: theme.spacing.lg,
+    // The nav bar's height, so the controls sit above it rather than under.
+    paddingBottom: NAV_BAR_CLEARANCE,
+    justifyContent: 'space-between',
+  },
 
   infoRow: {
     flexDirection: 'row',
@@ -175,7 +196,9 @@ const styles = StyleSheet.create({
   machineContainer: {
     backgroundColor: '#434B50',
     borderRadius: 24,
-    padding: 20,
+    // 20 -> 14, for the same reason the bet card shrank: the column has a
+    // fixed height now and every point here is a point the controls need.
+    padding: 14,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -209,16 +232,19 @@ const styles = StyleSheet.create({
   },
 
   controlsSection: {
-    gap: 24,
-    marginTop: 12
+    // Tighter than the 24 it was: that gap plus the chip selector was what
+    // pushed the SPIN row off the bottom in the first place.
+    gap: 14,
   },
   bottomControls: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#434B50',
-    padding: 16,
-    borderRadius: 24,
+    // 16 -> 12. The card is the last thing between the reels and the nav
+    // bar and it was the tallest thing it did not need to be.
+    padding: 12,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)'
   },

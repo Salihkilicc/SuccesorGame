@@ -18,14 +18,27 @@ import { View, StyleSheet, Animated, Easing } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 
-const SYMBOL_HEIGHT = 80;
+// 80 -> 64. Three of these is the height of the machine, so the twenty four
+// points saved here are twenty four the SPIN button gets back. See
+// screens/SlotsGameScreen.tsx, which no longer scrolls.
+const SYMBOL_HEIGHT = 64;
 
 interface ReelProps {
     /** MaterialCommunityIcons names. */
     symbols: string[];
     /** The icon name this reel comes to rest on. */
     finalSymbol: string;
-    /** The room's colour, so a reel looks like where it is. */
+    /**
+     * What colour to draw an icon in.
+     *
+     * A FUNCTION rather than one tint, which is the whole change: every
+     * symbol on the strip used to arrive in the room's single colour, so a
+     * machine read as a column of identical shapes. The colour climbs with
+     * the payout now - see logic/slotsData.ts - so the reel teaches the
+     * table without anybody reading it.
+     */
+    colourOf?: (icon: string) => string;
+    /** The room's colour, for the payline rule. */
     tint?: string;
     isSpinning: boolean;
     delay: number;
@@ -35,7 +48,7 @@ interface ReelProps {
 /** If a machine hands over nothing, show that rather than another game. */
 const MOCK_STRIP = ['help-circle-outline'];
 
-export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, tint }: ReelProps) => {
+export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf, tint }: ReelProps) => {
     // Fallback if symbols is empty
     const stripSymbols = symbols && symbols.length > 0 ? symbols : MOCK_STRIP;
 
@@ -90,21 +103,35 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, tint }: R
                         <MaterialCommunityIcons
                             name={sym}
                             size={38}
-                            color={tint ?? theme.colors.textPrimary}
+                            color={colourOf?.(sym) ?? theme.colors.textPrimary}
                         />
                     </View>
                 ))}
             </Animated.View>
 
-            <View style={styles.shadeTop} />
-            <View style={styles.shadeBottom} />
+            <View style={styles.shadeTop} pointerEvents="none" />
+            <View style={styles.shadeBottom} pointerEvents="none" />
+
+            {/* ----------------------------------------------------------
+                THE LINE THAT PAYS
+
+                Three rows were drawn identically, so the row that decides
+                the money looked exactly like the two that decorate it. A
+                player could not tell where to look. This is a hairline
+                either side of the middle band, in the room's colour, so
+                the payline reads as the payline.
+               ---------------------------------------------------------- */}
+            <View
+                pointerEvents="none"
+                style={[styles.payline, { borderColor: tint ?? theme.colors.border }]}
+            />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     reelContainer: {
-        width: 80,
+        width: 72,
         height: SYMBOL_HEIGHT * 3, // Show 3 symbols
         overflow: 'hidden',
         backgroundColor: '#434B50',
@@ -121,6 +148,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     // `symbol` was a 40pt font size. The icon carries its own size now.
+    payline: {
+        position: 'absolute',
+        top: SYMBOL_HEIGHT,
+        height: SYMBOL_HEIGHT,
+        left: 0,
+        right: 0,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        // No fill: a tinted band would sit under the icons and fight the
+        // colour they are carrying. Two lines say the same thing.
+        backgroundColor: 'transparent',
+    },
     shadeTop: {
         position: 'absolute',
         top: 0,
