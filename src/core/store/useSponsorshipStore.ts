@@ -16,7 +16,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
-import { offerById, nextOffer, droughtPenalty, type SponsorOffer } from '../market/sponsorship';
+import { offerById, nextOffer, droughtPenalty, sponsorGlow, type SponsorOffer } from '../market/sponsorship';
 
 export interface ActiveSponsorship {
     offerId: string;
@@ -47,6 +47,14 @@ type Store = SponsorshipState & {
     advance: (quarters?: number) => { cost: number; brand: number };
     /** Ceiling points currently owed to the drought. */
     penalty: () => number;
+    /**
+     * Brand points the live deal is adding to the EQUILIBRIUM right now.
+     *
+     * Full size on the quarter it was signed, nothing by the end of the term.
+     * See core/market/sponsorship.ts for why it moves the destination rather
+     * than the value.
+     */
+    glow: () => number;
     reset: () => void;
 };
 
@@ -103,13 +111,39 @@ export const useSponsorshipStore = create<Store>()(
                     quartersWithout: left > 0 ? 0 : Math.max(0, n - paid),
                 });
 
+                // ------------------------------------------------------------
+                //  THE BRAND HALF IS SHELVED
+                // ------------------------------------------------------------
+                //  `brand: offer.brandPerQuarter * paid` went into
+                //  gameSink().brand(), which adds to the brand VALUE - and the
+                //  walk in advanceCategoryBrand pulls a value addition back out
+                //  with a half life of about four quarters. Measured: the
+                //  largest deal in the game, 384 million over sixteen quarters,
+                //  was down to +9 points eight quarters after it ended.
+                //
+                //  A deal lifts the EQUILIBRIUM now, through `glow()` above.
+                //  The cost half is unchanged: the money is still paid every
+                //  quarter of the term.
+                // ------------------------------------------------------------
                 return {
                     cost: offer.quarterlyCost * paid,
-                    brand: offer.brandPerQuarter * paid,
+                    brand: 0,
                 };
             },
 
             penalty: () => (get().active ? 0 : droughtPenalty(get().quartersWithout)),
+
+            glow: () => {
+                const { active } = get();
+                if (!active) return 0;
+                const offer = offerById(active.offerId);
+                if (!offer) return 0;
+                // Read BEFORE `advance` decrements, so the quarter a deal is
+                // signed sees the whole thing. See the tick: the brand loop
+                // runs long before the sponsorship quarter is closed.
+                const elapsed = offer.quarters - active.quartersLeft;
+                return sponsorGlow(offer, elapsed);
+            },
 
             reset: () => set({ ...initialSponsorshipState, _hasHydrated: true }),
         }),

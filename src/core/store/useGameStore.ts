@@ -1465,6 +1465,22 @@ export const useGameStore = create<GameStore>()(
         const nextByCategory: Record<string, number> = { ...prevByCategory };
         const marketingDeltaTotal = marketingBrand.newBrand - brandValueIndexPrev;
 
+        // ------------------------------------------------------------------
+        //  WHAT THE NAME ON THE STADIUM IS WORTH THIS QUARTER
+        // ------------------------------------------------------------------
+        //  Full size the quarter it was signed, nothing by the end of the
+        //  term, and the bill arrives every quarter in between. Read here
+        //  rather than in the sponsorship block below, because that block runs
+        //  after the brand is settled and would be a quarter late.
+        // ------------------------------------------------------------------
+        const sponsorLift = (() => {
+          try {
+            return require('./useSponsorshipStore').useSponsorshipStore.getState().glow();
+          } catch {
+            return 0;
+          }
+        })();
+
         activeCategories.forEach(cat => {
           const shareHere = realizedShareOf(cat);
           // Marketing effect is split across categories by their share of sales.
@@ -1476,6 +1492,11 @@ export const useGameStore = create<GameStore>()(
             servedRatio: servedRatioOf(cat),
             marketingDelta: marketingDeltaTotal * weightHere,
             acquisitionGain: (acquisitionGainByCategory[cat] || 0),
+            // The name on the stadium raises the level this category is
+            // walking towards, for as long as the glow lasts. Split the same
+            // way marketing is, because a sponsorship is company-wide and a
+            // category's share of it is its share of the sales.
+            equilibriumBonus: sponsorLift * weightHere,
           });
           nextByCategory[cat] = r.newBrand;
           nextFloors[cat] = earnedFloor(prevFloors[cat], r.newBrand);

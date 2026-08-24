@@ -288,3 +288,59 @@ describe('a sponsorship letter expires', () => {
         expect(sweep).toBeLessThan(send);
     });
 });
+
+// ============================================================================
+//  AND THAT THE TICK READS THE GLOW RATHER THAN THE OLD DRIP
+// ============================================================================
+//
+//  The half that no pure module can see, and the half that was wrong for the
+//  whole life of the feature: the arithmetic was fine and the door it went
+//  through was the one that leaks.
+// ============================================================================
+
+describe('the quarter and the sponsorship', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const codeOf = (...p: string[]): string =>
+        fs.readFileSync(path.join(__dirname, ...p), 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .split('\n')
+            .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+            .join('\n');
+
+    const TICK = codeOf('..', 'store', 'useGameStore.ts');
+    const STORE = codeOf('..', 'store', 'useSponsorshipStore.ts');
+
+    it('feeds the brand walk a moved destination', () => {
+        expect(TICK).toMatch(/equilibriumBonus: sponsorLift \* weightHere/);
+        expect(TICK).toMatch(/\.glow\(\)/);
+    });
+
+    it('and reads it BEFORE the term is decremented', () => {
+        // The brand loop runs long before the sponsorship quarter is closed.
+        // Reading the glow in that later block would be a quarter late and the
+        // quarter a deal is signed would be worth nothing.
+        const brandAt = TICK.indexOf('equilibriumBonus: sponsorLift');
+        const advanceAt = TICK.indexOf('sponsorship.getState().advance(');
+        expect(brandAt).toBeGreaterThan(-1);
+        expect(advanceAt).toBeGreaterThan(brandAt);
+    });
+
+    it('while the old drip is shelved rather than deleted', () => {
+        // `brand: offer.brandPerQuarter * paid` went to gameSink().brand(),
+        // which adds to the VALUE and is pulled straight back out.
+        expect(STORE).toMatch(/brand: 0,/);
+        expect(STORE).not.toMatch(/brand: offer\.brandPerQuarter \* paid/);
+        expect(fs.readFileSync(path.join(__dirname, '..', 'store', 'useSponsorshipStore.ts'), 'utf8'))
+            .toContain('brandPerQuarter');
+    });
+
+    it('and the letter says what it costs in total and what it does', () => {
+        // The button used to read "Sign it - 24,000,000 a quarter" with no
+        // term beside it and no idea what the name was worth. A decision
+        // taken blind is not a decision.
+        const mail = codeOf('..', '..', 'features', 'os', 'screens', 'MailDetailScreen.tsx');
+        expect(mail).toMatch(/sponsorPeak\(sponsorOffer\)/);
+        expect(mail).toMatch(/quarterlyCost \* sponsorOffer\.quarters/);
+    });
+});

@@ -52,7 +52,19 @@ export interface SponsorOffer {
     pitch: string;
     /** Paid every quarter for the term. */
     quarterlyCost: number;
-    /** Added to brand every quarter for the term. */
+    /**
+     * SHELVED as the thing that drives the effect, kept as authored data.
+     *
+     * It used to be added to the brand VALUE every quarter, which the walk in
+     * advanceCategoryBrand pulled straight back out. `sponsorPeak` sizes a
+     * deal off what it COSTS now, which is what was asked for and is harder to
+     * game than a hand-tuned figure.
+     *
+     * Not removed, because it is the only place anybody wrote down how much
+     * NOISE each of these thirty things makes as opposed to what it charges -
+     * the polar programme is quiet for its price and the arena is loud for
+     * its - and that is worth keeping for whoever wants a second axis.
+     */
     brandPerQuarter: number;
     /** How many quarters it runs. */
     quarters: number;
@@ -219,6 +231,111 @@ export const SPONSOR_OFFERS: SponsorOffer[] = [
         'Two thousand four hundred seats and the best acoustic in the world, which is a sentence three cities are currently arguing about. Ours is the true one.',
         7_400_000, 4.8),
 ];
+
+// ============================================================================
+//  WHAT SIGNING ONE ACTUALLY DOES
+// ============================================================================
+//
+//  It used to add `brandPerQuarter` to the brand VALUE every quarter of the
+//  term, through gameSink().brand(). Reported as "hic kalici degil, 2 quarter
+//  suruyor sonra etkisi bitiyor", and the measurement agrees:
+//
+//      a one-off +10 of brand, at an 8% share
+//        q1 +8.3    q2 +6.9    q3 +5.7    q4 +4.8    q6 +3.3
+//
+//  Brand walks towards `share x BRAND_POINTS_PER_SHARE` at a quarter to a
+//  third of the gap per tick, so anything added to the VALUE is pulled back
+//  out with a half life of about four quarters. The largest deal in the game
+//  costs 384 million over sixteen quarters, peaks at +39 brand points, and is
+//  down to +9 eight quarters after it ends.
+//
+//  ---------------------------------------------------------------------------
+//  AND THIS FILE ALREADY KNEW
+//  ---------------------------------------------------------------------------
+//  Read the drought note at the top: the penalty was written as a CEILING
+//  penalty rather than a per-quarter subtraction, for exactly this reason,
+//  with the measurement quoted. So the thing that punishes you was built to
+//  stick and the thing you paid for was not. One file, one page apart.
+//
+//  ---------------------------------------------------------------------------
+//  A SPLASH THAT FADES, NOT A DRIP THAT LEAKS
+//  ---------------------------------------------------------------------------
+//  Asked for directly: "sure boyunca 30 artirirsa her quarter op olur ... en
+//  buyugu ilk 40 artirdi sonra 16 quarterda azalarak gitsin".
+//
+//  Which is also how it works. A naming rights announcement is an event: the
+//  photographs run, everybody mentions it, and eighteen months later it is the
+//  name of the building and nobody thinks about it. So the deal lands at its
+//  full size on the quarter it is signed and fades to nothing across its term,
+//  and the money keeps being paid the whole way - which is what makes renewing
+//  a decision rather than a formality.
+//
+//  IT SHIFTS THE EQUILIBRIUM, not the value. A ceiling is the right instrument
+//  for the drought because a ceiling can only hold you down; it cannot lift
+//  anybody. Moving the target that brand walks towards is a lift that stays
+//  put while it lasts, instead of being eaten by the same mean reversion that
+//  made the old version pointless.
+// ============================================================================
+
+/**
+ * What the largest contract in the game is worth at the moment of signing.
+ *
+ * Forty brand points, which is a little over nine on the 0-100 index. Chosen
+ * against the alternative rather than in the abstract: the old drip settled at
+ * roughly fifty points for the same deal, so this is a nerf as well as a
+ * reshape, and it is meant to be. "Cok etkilemesin."
+ */
+export const SPONSOR_PEAK_POINTS = 40;
+
+/**
+ * The peak is sized by MONEY, and sized by its square root.
+ *
+ * Straight proportion does not work here: the biggest contract costs five
+ * hundred times the smallest, so a linear scale would make every local deal
+ * worth a rounding error and there would be no reason to read the letter. The
+ * square root gives 1.0 for a village boxing club, 8 for a national series and
+ * 40 for the continental championship, which is a spread somebody can feel at
+ * every size of company.
+ */
+export const totalContractValue = (offer: SponsorOffer): number =>
+    Math.max(0, offer.quarterlyCost) * Math.max(1, offer.quarters);
+
+/** The dearest contract on the list, so the scale has a top. */
+export const maxContractValue = (): number =>
+    Math.max(...SPONSOR_OFFERS.map(totalContractValue));
+
+/**
+ * What a deal is worth on the quarter it is signed, in brand points.
+ *
+ * Added to the EQUILIBRIUM rather than to the value. See the note above.
+ */
+export const sponsorPeak = (offer: SponsorOffer): number => {
+    const top = maxContractValue();
+    if (!(top > 0)) return 0;
+    return SPONSOR_PEAK_POINTS * Math.sqrt(totalContractValue(offer) / top);
+};
+
+/**
+ * And what is left of it after `quartersElapsed` of the term.
+ *
+ * Linear to nothing at the end of the term, which is the shape that was asked
+ * for and also the legible one: a player can be told "it fades over the four
+ * years" and check it. A curve would be truer to how attention actually decays
+ * and impossible to read off a screen.
+ *
+ * The money is paid every quarter regardless. That asymmetry IS the mechanic:
+ * the back half of a long contract is expensive and quiet, which is what makes
+ * signing a ten year deal a commitment rather than a purchase.
+ */
+export const sponsorGlow = (
+    offer: SponsorOffer,
+    quartersElapsed: number,
+): number => {
+    const term = Math.max(1, offer.quarters);
+    const elapsed = Math.max(0, Math.min(term, quartersElapsed || 0));
+    const remaining = (term - elapsed) / term;
+    return sponsorPeak(offer) * remaining;
+};
 
 export const offersInTier = (tier: SponsorTier): SponsorOffer[] =>
     SPONSOR_OFFERS.filter(o => o.tier === tier);

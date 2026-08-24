@@ -24,7 +24,7 @@ import { readStanding } from '../../../core/story/world';
 import { HOSTILE_MULTIPLE } from '../../../core/market/mergers';
 import { canAccept, priceFor } from '../../../core/market/negotiation';
 import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
-import { offerById } from '../../../core/market/sponsorship';
+import { offerById, sponsorPeak } from '../../../core/market/sponsorship';
 import { formatMoney } from '../../../core/utils';
 import AnimatedBubble from '../../../components/story/AnimatedBubble';
 
@@ -357,6 +357,18 @@ const MailDetailScreen = () => {
                                 Sign it — {formatMoney(sponsorOffer.quarterlyCost)} a quarter
                             </Text>
                         </Pressable>
+                        {/* What it costs in total and what it does, because the
+                            button alone made this a decision taken blind: a
+                            price per quarter with no term next to it and no
+                            idea what the name is worth. See
+                            core/market/sponsorship.ts - the lift arrives whole
+                            and fades across the term. */}
+                        <Text style={styles.sponsorTerms}>
+                            {`${sponsorOffer.quarters} quarters · ${formatMoney(sponsorOffer.quarterlyCost * sponsorOffer.quarters)} in all`}
+                        </Text>
+                        <Text style={styles.sponsorTerms}>
+                            {`Lifts the brand about ${Math.round(sponsorPeak(sponsorOffer))} points at once, fading to nothing by the end of the term`}
+                        </Text>
                         <Pressable style={styles.option} onPress={() => navigation.goBack()}>
                             <Text style={styles.optionText}>Not this one.</Text>
                         </Pressable>
@@ -442,6 +454,14 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: 1,
+    },
+    // The two lines under the sign button. Muted, because they are the terms
+    // rather than the offer, and the offer is the letter above.
+    sponsorTerms: {
+        color: theme.colors.textMuted,
+        fontSize: 12,
+        lineHeight: 17,
+        marginTop: 6,
     },
     option: {
         backgroundColor: theme.colors.surfaceRaised,

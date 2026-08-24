@@ -456,6 +456,18 @@ export interface CategoryBrandInput {
     acquisitionGain?: number;
     /** Negative news, in points */
     shock?: number;
+    /**
+     * Points added to the LEVEL brand is walking towards, not to brand itself.
+     *
+     * Sponsorship, and the reason it is here rather than folded into
+     * `marketingDelta`: anything added to the VALUE is pulled straight back
+     * out by the walk below, with a half life of about four quarters. Moving
+     * the destination is a lift that holds while it lasts.
+     *
+     * See core/market/sponsorship.ts, which measured what the old way was
+     * worth and found it was worth almost nothing.
+     */
+    equilibriumBonus?: number;
 }
 
 /**
@@ -473,7 +485,8 @@ export const advanceCategoryBrand = (input: CategoryBrandInput): {
     sources: { label: string; amount: number }[];
 } => {
     const current = Math.max(0, input.current || 0);
-    const equilibrium = brandEquilibrium(input.share);
+    const equilibrium = brandEquilibrium(input.share)
+        + Math.max(0, input.equilibriumBonus || 0);
     const served = Math.max(0, Math.min(1, input.servedRatio ?? 1));
     const sources: { label: string; amount: number }[] = [];
 
