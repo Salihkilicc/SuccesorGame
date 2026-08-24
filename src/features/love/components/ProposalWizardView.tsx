@@ -1,6 +1,31 @@
+// src/features/love/components/ProposalWizardView.tsx
+//
+// ============================================================================
+//  ASKING SOMEBODY TO MARRY YOU
+// ============================================================================
+//
+//  WHAT WAS WRONG, and it was the same fault three times over.
+//
+//  THE VENUE WAS A CAROUSEL. Twelve places behind a prev and a next arrow, so
+//  reaching the last one took eleven taps and no two were ever on screen
+//  together - which is the one thing a list of prices is for. You could not
+//  see that the yacht is fifteen thousand for fifteen per cent while the
+//  billboard is a hundred thousand for thirty, which is the only interesting
+//  decision on the page.
+//
+//  THE SYMBOLS WERE EMOJI. Eight of them, at sizes up to sixty points, in a
+//  typeface and a colour nothing in the theme chose, beside text that obeys
+//  both. Half the arrows had already been fixed to icons and the other half
+//  had not, which is how a screen ends up looking like two screens.
+//
+//  AND THE RESULT USED THE PROFIT COLOURS. Green for a yes and red for a no,
+//  in a game where those two mean money in and money out and nothing else -
+//  see rule 3 in core/theme.ts. Getting married is not a quarter.
+// ============================================================================
+
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { PROPOSAL_LOCATIONS } from '../data/loveConstants';
@@ -24,7 +49,11 @@ interface Props {
     feedback: string | null;
 
     // Handlers
-    onCycleLocation: (direction: 'prev' | 'next') => void;
+    /**
+     * SHELVED, with the carousel it drove:
+     *   onCycleLocation: (direction: 'prev' | 'next') => void;
+     */
+    onPickLocation: (index: number) => void;
     onSelectRing: (instanceId: string) => void;
     onSetIsPickingRing: (isPicking: boolean) => void;
     onStartProposal: () => void;
@@ -42,7 +71,7 @@ const ProposalWizardView: React.FC<Props> = ({
     ownedRings,
     money,
     feedback,
-    onCycleLocation,
+    onPickLocation,
     onSelectRing,
     onSetIsPickingRing,
     onStartProposal,
@@ -60,9 +89,24 @@ const ProposalWizardView: React.FC<Props> = ({
         const isSuccess = proposalResult.success;
         return (
             <View style={{ alignItems: 'center', gap: 16, padding: 16, width: '100%' }}>
-                <Text style={{ fontSize: 60 }}>{isSuccess ? '💍' : '💔'}</Text>
-                <Text style={[styles.modalSubtitle, { fontSize: 22, color: isSuccess ? theme.colors.success : theme.colors.danger }]}>
-                    {isSuccess ? 'JUST MARRIED!' : 'REJECTED'}
+                {/* ------------------------------------------------------
+                    NOT THE PROFIT COLOURS, AND NOT A SIXTY POINT EMOJI
+
+                    It was green for yes and red for no, in a game where
+                    those two mean money in and money out and nothing else -
+                    rule 3 in core/theme.ts. Getting married is not a
+                    quarter. The word carries it, and the icon says which
+                    without borrowing a meaning from the balance sheet.
+                   ------------------------------------------------------ */}
+                <View style={styles.resultBadge}>
+                    <MaterialCommunityIcons
+                        name={isSuccess ? 'ring' : 'heart-broken-outline'}
+                        size={34}
+                        color={theme.colors.textPrimary}
+                    />
+                </View>
+                <Text style={[styles.modalSubtitle, { fontSize: 22, color: theme.colors.textPrimary }]}>
+                    {isSuccess ? 'JUST MARRIED' : 'REJECTED'}
                 </Text>
                 <Text style={{ color: theme.colors.textPrimary, textAlign: 'center', fontSize: 15, lineHeight: 22 }}>
                     {proposalResult.message}
@@ -88,7 +132,6 @@ const ProposalWizardView: React.FC<Props> = ({
         return (
             <View style={{ gap: 16, padding: 10 }}>
                 <Text style={styles.modalSubtitle}>{t('love.sheSaidYesKindOf')}</Text>
-                <Text style={{ fontSize: 50, textAlign: 'center' }}>😲</Text>
 
                 <Text style={{ color: theme.colors.textSecondary, textAlign: 'center' }}>
                     She is emotional and waiting for the ring. This is your moment.
@@ -99,16 +142,35 @@ const ProposalWizardView: React.FC<Props> = ({
                 </Text>
 
                 <Pressable
-                    style={[styles.actionButton, { backgroundColor: theme.colors.destructive }]}
+                    style={[styles.actionButton, styles.choiceRow, { backgroundColor: theme.colors.surfaceHigh }]}
                     onPress={() => onDecidePrenup(true)}>
-                    <Text style={[styles.actionButtonText, { color: '#FFFFFF' }]}>📝 Sign Prenup (Risk)</Text>
+                    <MaterialCommunityIcons
+                        name="file-document-edit-outline" size={20}
+                        color={theme.colors.textPrimary}
+                    />
+                    <View style={{ flex: 1 }}>
+                        <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>Sign a prenup</Text>
+                        <Text style={styles.choiceNote}>Protects what you built. She will notice.</Text>
+                    </View>
                 </Pressable>
 
                 <Pressable
-                    style={[styles.actionButton, { backgroundColor: theme.colors.accent }]}
+                    style={[styles.actionButton, styles.choiceRow, { backgroundColor: theme.colors.accent }]}
                     onPress={() => onDecidePrenup(false)}>
-                    {/* `onLight` again. Same fill, same rule. */}
-                    <Text style={[styles.actionButtonText, { color: theme.colors.onLight }]}>❤️ No Prenup (Trust)</Text>
+                    {/* `onLight`. `accent` is a LIGHT fill and white on it
+                        measures 2.65 - see core/theme.ts rule 1. */}
+                    <MaterialCommunityIcons
+                        name="hand-heart-outline" size={20}
+                        color={theme.colors.onLight}
+                    />
+                    <View style={{ flex: 1 }}>
+                        <Text style={[styles.actionButtonText, { color: theme.colors.onLight, fontWeight: '700' }]}>
+                            No prenup
+                        </Text>
+                        <Text style={[styles.choiceNote, { color: theme.colors.onLight, opacity: 0.75 }]}>
+                            Everything you own is half hers from today.
+                        </Text>
+                    </View>
                 </Pressable>
 
                 <Pressable style={styles.cancelButton} onPress={onClose}>
@@ -140,7 +202,9 @@ const ProposalWizardView: React.FC<Props> = ({
                         }}
                     >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                            <Text style={{ fontSize: 22 }}>💍</Text>
+                            <MaterialCommunityIcons
+                                name="ring" size={20} color={theme.colors.textMuted}
+                            />
                             <View>
                                 <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>{ring.name}</Text>
                                 <Text style={{ color: theme.colors.textSecondary, fontSize: 12, marginTop: 2 }}>
@@ -149,7 +213,9 @@ const ProposalWizardView: React.FC<Props> = ({
                             </View>
                         </View>
                         {ring.instanceId === selectedRingInstanceId && (
-                            <Text style={{ color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' }}>✓</Text>
+                            <MaterialCommunityIcons
+                                name="check" size={18} color={theme.colors.primary}
+                            />
                         )}
                     </Pressable>
                 ))}
@@ -165,31 +231,63 @@ const ProposalWizardView: React.FC<Props> = ({
         <View style={{ gap: 16 }}>
             <Text style={styles.modalSubtitle}>{t('love.planProposal')}</Text>
 
-            {/* Location Picker */}
-            <View style={styles.locationPicker}>
-                {/* An ICON rather than the character. A bare arrow glyph
-                    renders at whatever the system font decides, does not
-                    inherit the app's icon weight, and reads as text to a
-                    screen reader. Every other back control in this app is a
-                    MaterialCommunityIcon. */}
-                <Pressable onPress={() => onCycleLocation('prev')} style={styles.arrowButton}>
-                    <MaterialCommunityIcons
-                        name="chevron-left" size={22} color={theme.colors.textPrimary}
-                    />
-                </Pressable>
-                <View style={styles.locationInfo}>
-                    <Text style={styles.locationName}>{location.name}</Text>
-                    <Text style={[styles.locationCost, !canAfford && { color: theme.colors.danger }]}>
-                        ${location.cost.toLocaleString()}
-                    </Text>
-                    <Text style={styles.locationBonus}>
-                        Success Bonus: +{location.bonus}%
-                    </Text>
-                </View>
-                <Pressable onPress={() => onCycleLocation('next')} style={styles.arrowButton}>
-                    <Text style={styles.arrowText}>→</Text>
-                </Pressable>
-            </View>
+            {/* ------------------------------------------------------------
+                A LIST, BECAUSE THE PRICES ARE THE DECISION
+
+                SHELVED, the carousel this replaces: two arrow buttons and
+                one venue at a time, cycling through twelve. Reaching the
+                last took eleven taps and no two were ever side by side,
+                so the only thing worth comparing - fifteen thousand for
+                fifteen per cent against a hundred thousand for thirty -
+                could not be compared.
+
+                    <View style={styles.locationPicker}>
+                        <Pressable onPress={() => onCycleLocation('prev')} ...>
+                        <View style={styles.locationInfo}> ... </View>
+                        <Pressable onPress={() => onCycleLocation('next')} ...>
+                    </View>
+
+                The ones you cannot afford stay on the list, dimmed. A row
+                that vanishes teaches nothing and a price you cannot see is
+                not a thing to grow towards - same argument as the
+                financing routes on the acquisition screen.
+               ------------------------------------------------------------ */}
+            <Text style={styles.modalSubtitle}>Where</Text>
+            <ScrollView style={styles.venueList} nestedScrollEnabled>
+                {PROPOSAL_LOCATIONS.map((place, index) => {
+                    const affordable = money >= place.cost;
+                    const chosen = index === selectedLocationIndex;
+                    return (
+                        <Pressable
+                            key={place.id}
+                            disabled={!affordable}
+                            onPress={() => onPickLocation(index)}
+                            style={[
+                                styles.venueRow,
+                                chosen && styles.venueRowChosen,
+                                !affordable && styles.venueRowOff,
+                            ]}>
+                            <MaterialCommunityIcons
+                                name={place.icon}
+                                size={19}
+                                color={chosen ? theme.colors.primary : theme.colors.textMuted}
+                            />
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.venueName} numberOfLines={1}>{place.name}</Text>
+                                <Text style={styles.venueMeta}>
+                                    {place.cost === 0 ? 'Costs nothing' : `$${place.cost.toLocaleString()}`}
+                                    {place.bonus > 0 ? `   ·   +${place.bonus}% she says yes` : ''}
+                                </Text>
+                            </View>
+                            {chosen && (
+                                <MaterialCommunityIcons
+                                    name="check" size={17} color={theme.colors.primary}
+                                />
+                            )}
+                        </Pressable>
+                    );
+                })}
+            </ScrollView>
 
             {/* Ring Check */}
             <View style={[styles.actionButton, {
@@ -198,15 +296,23 @@ const ProposalWizardView: React.FC<Props> = ({
             }]}>
                 {ownedRings.length === 0 ? (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <Text style={{ fontSize: 18 }}>💍</Text>
-                        <Text style={[styles.actionButtonText, { color: theme.colors.danger }]}>{t('love.noRing')}</Text>
+                        <MaterialCommunityIcons
+                            name="ring" size={18} color={theme.colors.textMuted}
+                        />
+                        {/* Not the loss colour. Owning no ring is a thing to
+                            go and fix, not a loss - rule 3 in core/theme.ts. */}
+                        <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>
+                            {t('love.noRing')}
+                        </Text>
                     </View>
                 ) : (
                     <Pressable
                         style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}
                         onPress={() => onSetIsPickingRing(true)}
                     >
-                        <Text style={{ fontSize: 18 }}>💍</Text>
+                        <MaterialCommunityIcons
+                            name="ring" size={18} color={theme.colors.textMuted}
+                        />
                         <View>
                             <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>
                                 {selectedRing?.name ?? 'Ring Selected'}
@@ -267,47 +373,50 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: 15,
     },
-    locationPicker: {
+    // ----------------------------------------------------------------------
+    //  THE VENUE LIST
+    // ----------------------------------------------------------------------
+    //  Capped in height rather than allowed to run: twelve rows would push the
+    //  ring and the propose button off a phone, and the two of them are what
+    //  the screen is FOR. The list scrolls inside its own box.
+    //
+    //  SHELVED with the carousel: locationPicker, arrowButton, arrowText,
+    //  locationInfo, locationName, locationCost, locationBonus.
+    // ----------------------------------------------------------------------
+    venueList: { maxHeight: 218 },
+    venueRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: theme.colors.card,
-        borderRadius: 12,
-        padding: 8,
+        gap: 10,
+        paddingVertical: 9,
+        paddingHorizontal: 11,
+        borderRadius: 10,
+        marginBottom: 5,
+        backgroundColor: theme.colors.surface,
+        borderWidth: 1,
+        borderColor: 'transparent',
+    },
+    venueRowChosen: {
+        backgroundColor: theme.colors.surfaceHigh,
+        borderColor: theme.colors.primary,
+    },
+    // Dimmed by the surface. Nothing here is a profit or a loss.
+    venueRowOff: { opacity: 0.42 },
+    venueName: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '700' },
+    venueMeta: { color: theme.colors.textSecondary, fontSize: 11.5, marginTop: 2 },
+
+    resultBadge: {
+        width: 62,
+        height: 62,
+        borderRadius: 31,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.surfaceHigh,
         borderWidth: 1,
         borderColor: theme.colors.border,
     },
-    arrowButton: {
-        padding: 12,
-        backgroundColor: theme.colors.cardSoft,
-        borderRadius: 8,
-    },
-    arrowText: {
-        color: theme.colors.textPrimary,
-        fontSize: 18,
-        fontWeight: '700',
-    },
-    locationInfo: {
-        alignItems: 'center',
-        gap: 4,
-        flex: 1,
-    },
-    locationName: {
-        color: theme.colors.textPrimary,
-        fontSize: 16,
-        fontWeight: '700',
-        textAlign: 'center',
-    },
-    locationCost: {
-        color: theme.colors.textSecondary,
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    locationBonus: {
-        color: theme.colors.textPrimary,
-        fontSize: 12,
-        fontWeight: '600',
-    },
+    choiceRow: { justifyContent: 'flex-start', gap: 12 },
+    choiceNote: { color: theme.colors.textSecondary, fontSize: 11.5, marginTop: 2, lineHeight: 16 },
     smallButton: {
         backgroundColor: theme.colors.accent,
         paddingHorizontal: 12,

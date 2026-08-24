@@ -141,14 +141,22 @@ export const FamilyMemberScreen: React.FC = () => {
         setIsProposalWizardVisible(true);
     };
 
-    const handleCycleLocation = (direction: 'prev' | 'next') => {
-        const { PROPOSAL_LOCATIONS } = require('../../love/data/loveConstants');
-        if (direction === 'prev') {
-            setSelectedLocationIndex((prev) => (prev === 0 ? PROPOSAL_LOCATIONS.length - 1 : prev - 1));
-        } else {
-            setSelectedLocationIndex((prev) => (prev === PROPOSAL_LOCATIONS.length - 1 ? 0 : prev + 1));
-        }
-    };
+    // ------------------------------------------------------------------
+    //  SHELVED: THE CAROUSEL
+    // ------------------------------------------------------------------
+    //  The wizard shows all twelve venues as a list now and reports the one
+    //  that was tapped, so there is nothing to cycle. See the note in
+    //  ProposalWizardView for why one at a time was the wrong shape.
+    //
+    //  const handleCycleLocation = (direction: 'prev' | 'next') => {
+    //      const { PROPOSAL_LOCATIONS } = require('../../love/data/loveConstants');
+    //      if (direction === 'prev') {
+    //          setSelectedLocationIndex((prev) => (prev === 0 ? PROPOSAL_LOCATIONS.length - 1 : prev - 1));
+    //      } else {
+    //          setSelectedLocationIndex((prev) => (prev === PROPOSAL_LOCATIONS.length - 1 ? 0 : prev + 1));
+    //      }
+    //  };
+    // ------------------------------------------------------------------
 
     const handleStartProposal = () => {
         const { PROPOSAL_LOCATIONS } = require('../../love/data/loveConstants');
@@ -605,7 +613,7 @@ export const FamilyMemberScreen: React.FC = () => {
                             ownedRings={ownedRings}
                             money={player.core.money}
                             feedback={proposalFeedback}
-                            onCycleLocation={handleCycleLocation}
+                            onPickLocation={setSelectedLocationIndex}
                             onSelectRing={setSelectedRingInstanceId}
                             onSetIsPickingRing={setIsPickingRing}
                             onStartProposal={handleStartProposal}
@@ -632,14 +640,32 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
     },
+    // ----------------------------------------------------------------------
+    //  THE SHEET THE PROPOSAL IS ASKED IN
+    // ----------------------------------------------------------------------
+    //  Tokens rather than two raw values that happened to match the theme on
+    //  the day they were typed. `#434B50` is `surfaceRaised` and the border
+    //  was the primary blue at 30%, which the palette audit cannot resolve
+    //  and therefore could not check the text on.
+    //
+    //  It stays a MODAL rather than becoming a route, and that is the rule
+    //  this codebase settled on: a route is a PLACE and a modal is a
+    //  DECISION. Asking somebody to marry you is the second kind - it has an
+    //  answer and then it is over, like the IPO and the plant rebuild.
+    //
+    //  Capped in height because the venue list can be twelve rows: the sheet
+    //  stops growing and the list scrolls inside it, so the propose button
+    //  never leaves the screen.
+    // ----------------------------------------------------------------------
     modalCard: {
         width: '100%',
         maxWidth: 400,
-        backgroundColor: '#434B50',
-        borderRadius: 24,
+        maxHeight: '88%',
+        backgroundColor: theme.colors.surfaceRaised,
+        borderRadius: theme.radius.lg,
         padding: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(5,168,246,0.3)',
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.border,
     },
     scrollContent: {
         paddingHorizontal: 16,

@@ -561,7 +561,7 @@ const LoveScreen = () => {
           ownedRings={ownedRings}
           money={money}
           feedback={feedback}
-          onCycleLocation={handleCycleLocation}
+          onPickLocation={setSelectedLocationIndex}
           onSelectRing={setSelectedRingInstanceId}
           onSetIsPickingRing={setIsPickingRing}
           onStartProposal={handleStartProposal}
