@@ -68,7 +68,7 @@ import ComposeOfferScreen from '../features/os/screens/ComposeOfferScreen';
 import SettingsScreen from '../features/os/screens/SettingsScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import FamilyMemberScreen from '../features/profile/screens/FamilyMemberScreen';
-import CrystalNavBar from './components/CrystalNavBar';
+import CrystalNavBar, { type NavTab } from './components/CrystalNavBar';
 import { rootNavigationRef } from './navigationRef';
 import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
@@ -96,24 +96,46 @@ const COMPANY_ROUTES = new Set([
     'BorrowLoan', 'RepayDebt',
 ]);
 
-const navTabFor = (route?: string): 'Life' | 'Home' | 'Company' | 'Love' => {
+/** Where messages live, so standing in one lights the tab that goes there. */
+const MESSAGE_ROUTES = new Set(['Messages', 'MessageThread', 'Mail', 'MailDetail']);
+
+/**
+ * The profile, and the pages reached from inside it.
+ *
+ * `Life`, `LifeHome`, `Belongings`, `Shopping` and `Cart` used to map to a
+ * 'Life' tab that no longer exists - the module is shelved and the bar has had
+ * no Life item since. They map here because Profile is where the relationship
+ * system went, and because a route that maps to a tab the bar cannot light
+ * leaves the bar showing nothing at all.
+ */
+const PROFILE_ROUTES = new Set([
+    'Profile', 'FamilyMember', 'DNA',
+    'Life', 'LifeHome', 'Belongings', 'Shopping', 'Cart',
+]);
+
+/**
+ * Which tab the bar should light, for the route the player is standing on.
+ *
+ * ---------------------------------------------------------------------------
+ *  IT ANSWERED IN A VOCABULARY THE BAR DOES NOT SPEAK
+ * ---------------------------------------------------------------------------
+ *  This returned 'Life' | 'Home' | 'Company' | 'Love'. The bar's items are
+ *  Home, MESSAGES, Company and PROFILE. Two of the four answers named tabs
+ *  that do not exist, and two of the four tabs had no answer at all.
+ *
+ *  So standing in Messages fell through to the default and lit HOME, which is
+ *  what was reported. Profile fell to 'Life' and lit nothing, which is the
+ *  same bug being quieter about it.
+ *
+ *  The return type is the bar's own now - see NavTab in CrystalNavBar - so the
+ *  two cannot name different things, and the test alongside walks every item
+ *  the bar has against what this returns.
+ */
+const navTabFor = (route?: string): NavTab => {
     if (!route) return 'Home';
     if (COMPANY_ROUTES.has(route)) return 'Company';
-    if (
-        route === 'Life' ||
-        route === 'LifeHome' ||
-        route === 'Profile' ||
-        route === 'FamilyMember' ||
-        route === 'Belongings' ||
-        route === 'Shopping' ||
-        route === 'Cart'
-    )
-        return 'Life';
-    // 'Love' and 'LoveHome' used to map here. The screen is shelved and the
-    // relationship system lives inside Profile now - see the note on
-    // LoveScreen.tsx - so those routes no longer exist and Profile already
-    // maps to 'Life' above.
-    //
+    if (MESSAGE_ROUTES.has(route)) return 'Messages';
+    if (PROFILE_ROUTES.has(route)) return 'Profile';
     // `Dashboard` reaches this line and that is deliberate rather than an
     // omission: the swipe tab was renamed to end the `Home > Home` collision
     // (see the note above SwipeTabParamList) and the BAR still calls its

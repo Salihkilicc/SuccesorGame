@@ -1125,6 +1125,8 @@ export const en: Record<string, string> = {
     'company.industrial': 'Industrial',
     'company.investInFutureGrowth': 'Invest in future growth',
     'company.keepBuilding': 'Keep building',
+    'company.cancelUpgrade': 'Stop the work',
+    'company.confirm': 'Confirm',
     'company.launchIpo': 'Launch IPO',
     'company.manageSubsidiaries': 'Manage subsidiaries',
     'company.notNow': 'Not now',
@@ -1452,6 +1454,8 @@ export const en: Record<string, string> = {
     'alert.cannotHost': 'Cannot host',
     'alert.cannotLaunchIpo': 'Cannot Launch IPO',
     'alert.cannotStart': 'Cannot start',
+    'alert.cancelUpgrade': 'Stop the upgrade?',
+    'alert.theConstructionWillBeStopped': 'The work stops and what you have spent does not come back. The plant returns to the tier it was on.',
     'alert.cannotUnlock': 'Cannot Unlock',
     'alert.companyValuationMustBeGreater': 'Company valuation must be greater than $0.',
     'alert.cutPay': 'Cut pay?',
@@ -1491,7 +1495,9 @@ export const en: Record<string, string> = {
 
     // ---- veri katmani (kademe, kredi, fason, kurul) ----
     'data.brand.anotherProfitableQuarter': 'Another profitable quarter',
+    'data.brand.badNews': 'Bad news',
     'data.brand.brandsYouAcquired': 'Brands you acquired',
+    'data.brand.marketShareLabel': 'Market share',
     'data.brand.marketingQuality': 'Marketing & quality',
     'data.capacity.aCityBuiltAroundProduction': 'A city built around production. Housing, training, research, all of it yours.',
     'data.capacity.aPlantThatRetoolsItself': 'A plant that retools itself for whatever the market wants next.',

@@ -28,7 +28,7 @@ const { width } = Dimensions.get('window');
 export const NAV_BAR_CLEARANCE = (Platform.OS === 'ios' ? 36 : 24) + 78 + 8;
 
 interface CrystalNavBarProps {
-    activeTab: 'Life' | 'Home' | 'Company' | 'Love';
+    activeTab: NavTab;
     variant: 'light' | 'dark';
     hideDots?: boolean;
     onTabPress?: (targetScreen: string) => void;
@@ -85,6 +85,28 @@ const NAV_ITEMS: Array<{
     ];
 
 const ACTIVE_NAV_ITEMS = NAV_ITEMS.filter(i => !i.feature || FEATURES[i.feature]);
+
+/**
+ * The four the bar can actually light.
+ *
+ * ---------------------------------------------------------------------------
+ *  IT WAS 'Life' | 'Home' | 'Company' | 'Love' AND NONE OF THAT WAS TRUE
+ * ---------------------------------------------------------------------------
+ *  The bar's items are Home, Messages, Company and Profile. The type it was
+ *  handed listed Life and Love, which no item has claimed since Contacts was
+ *  shelved, and did NOT list Messages or Profile, which two of the four items
+ *  answer to.
+ *
+ *  So `navTabFor` had nothing to return for either of them and they fell to
+ *  its default: standing in Messages lit HOME. Reported as exactly that.
+ *  Profile was worse and quieter - it mapped to 'Life', which nothing lights,
+ *  so the bar showed no tab at all and nobody noticed, because a bar with
+ *  nothing lit reads as a bar you have not looked at.
+ *
+ *  Exported so the mapping and the items cannot drift again, and so the test
+ *  alongside can walk one against the other.
+ */
+export type NavTab = 'Home' | 'Messages' | 'Company' | 'Profile';
 
 const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideDots, onTabPress }) => {
     const navigation = useNavigation<any>();

@@ -51,11 +51,23 @@ import { planSuccession, type SuccessionPlan } from './succession';
  */
 const postFirstLetter = (plan: SuccessionPlan) => {
     const sibling = plan.siblings[0];
-    const conversation = sibling
-        ? SUCCESSION_CONVERSATIONS.sibling
-        : SUCCESSION_CONVERSATIONS.alone;
 
-    const from = sibling
+    // ------------------------------------------------------------------
+    //  THE HELD ONE COMES FIRST, BECAUSE IT IS THE BIGGER FACT
+    // ------------------------------------------------------------------
+    //  A sixteen year old walking into a company somebody else has been
+    //  running for years is not "you have a sibling on the register", even
+    //  when they do. The register is the second thing they need to know and
+    //  they can read it off the board screen; who has been signing things is
+    //  the thing only a person can tell them.
+    // ------------------------------------------------------------------
+    const conversation = plan.yearsHeld > 0
+        ? SUCCESSION_CONVERSATIONS.held
+        : sibling
+            ? SUCCESSION_CONVERSATIONS.sibling
+            : SUCCESSION_CONVERSATIONS.alone;
+
+    const from = (sibling && plan.yearsHeld === 0)
         ? { id: sibling.id, name: sibling.name, role: 'Your family' }
         : { id: 'cfo', name: CAST.cfo?.name ?? 'The CFO', role: CAST.cfo?.role ?? 'CFO' };
 
@@ -127,6 +139,24 @@ export const runSuccession = (): SuccessionPlan | null => {
         gender: plan.ceo.gender,
     });
     useGameStore.setState({ age: plan.ceo.age } as never);
+
+    // ------------------------------------------------------------------
+    //  AND THE YEARS THE CHAIR STOOD EMPTY
+    // ------------------------------------------------------------------
+    //  Zero in the ordinary case. Above zero when the only heir was a child:
+    //  the company was held until they turned sixteen, and the calendar has
+    //  to move with them or the family reads as having been frozen.
+    //
+    //  The siblings age here rather than in `planSuccession`, because that
+    //  file is pure and this is the one that owns what a store looks like
+    //  afterwards. Their SHARES are unaffected - the estate was divided on
+    //  the day of the death, whatever year the new one starts reading it.
+    // ------------------------------------------------------------------
+    if (plan.yearsHeld > 0) {
+        useGameStore.setState(g => ({
+            currentMonth: (g.currentMonth ?? 1) + plan.yearsHeld * 12,
+        }) as never);
+    }
 
     // ------------------------------------------------------------------
     //  2. AND YOU HAVE WHAT YOU INHERITED, WHICH IS NOT WHAT YOU HAD

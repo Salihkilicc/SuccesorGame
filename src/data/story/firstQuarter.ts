@@ -157,8 +157,75 @@ export const successionAlone: Conversation = {
     ],
 };
 
+/**
+ * And the one for an heir who was a child when it fell to them.
+ *
+ * ---------------------------------------------------------------------------
+ *  THE YEARS ARE NOT IN THE WRITING, AND THAT IS ON PURPOSE
+ * ---------------------------------------------------------------------------
+ *  It could be one year or sixteen. A Conversation is STATIC DATA - the rule
+ *  the whole story system is built on - so a scene cannot say "eleven years"
+ *  without the number arriving from somewhere, and the mechanism for that
+ *  (a token in data/i18n/storyText.ts) exists for figures the player needs in
+ *  order to decide something.
+ *
+ *  This is not one of those. What the heir needs to know is that the company
+ *  was run by somebody else and that person has opinions about how it went.
+ *  "Since your father" is true at any length and is the better sentence.
+ *
+ *  He is not warm about it. He kept it alive and he is handing it to a
+ *  sixteen year old, and both of those are in the way he says good morning.
+ */
+export const successionHeld: Conversation = {
+    id: 'succession-held',
+    channel: 'message',
+    from: 'cfo',
+    start: 'open',
+    nodes: [
+        {
+            id: 'open',
+            speaker: 'cfo',
+            text: 'Good morning. I have had your father\'s office repainted, which I mention because it is the only thing I changed that you might notice.\n\nI have been running this company since he died and I have been running it the way I thought he would want, which is not the same as the way I would want. That stops today.',
+            choices: [
+                { text: 'Thank you for holding it.', next: 'thanks' },
+                { text: 'Why did you not take it yourself?', next: 'whyNot' },
+            ],
+        },
+
+        {
+            id: 'thanks',
+            speaker: 'cfo',
+            text: 'I did not hold it for you. I held it because it employs fourteen hundred people and somebody had to sign things.\n\nBut you are welcome, and I would rather you said it than not.',
+            choices: [
+                {
+                    text: 'Understood.',
+                    effects: [{ kind: 'dial', dial: 'cfoTrust', delta: 4 }],
+                },
+            ],
+        },
+
+        {
+            id: 'whyNot',
+            speaker: 'cfo',
+            text: 'Because it is not mine. That is the entire answer and I am aware it sounds like a smaller one than it is.\n\nThere were two years where the board would have let me and I would rather you heard that from me than from one of them.',
+            choices: [
+                {
+                    text: 'Then I owe you.',
+                    effects: [{ kind: 'dial', dial: 'cfoTrust', delta: 6 }],
+                },
+                {
+                    text: 'They will tell me anyway.',
+                    effects: [{ kind: 'dial', dial: 'cfoTrust', delta: -2 }],
+                },
+            ],
+        },
+    ],
+};
+
 /** Keyed by whether there is anybody else holding stock. */
 export const SUCCESSION_CONVERSATIONS = {
     sibling: successionSibling,
     alone: successionAlone,
+    /** The chair stood empty until the heir came of age. See runSuccession. */
+    held: successionHeld,
 } as const;

@@ -1120,6 +1120,8 @@ export const tr: Record<string, string> = {
     'company.industrial': 'Sanayi',
     'company.investInFutureGrowth': 'Gelecekteki büyümeye yatırım yap',
     'company.keepBuilding': 'İnşaata devam et',
+    'company.cancelUpgrade': 'İşi durdur',
+    'company.confirm': 'Onayla',
     'company.launchIpo': 'Halka Arzı Başlat',
     'company.manageSubsidiaries': 'İştirakleri yönet',
     'company.notNow': 'Şimdi değil',
@@ -1448,6 +1450,8 @@ export const tr: Record<string, string> = {
     'alert.cannotHost': 'Düzenlenemiyor',
     'alert.cannotLaunchIpo': 'Halka Arz Yapılamıyor',
     'alert.cannotStart': 'Başlatılamıyor',
+    'alert.cancelUpgrade': 'Yükseltme durdurulsun mu?',
+    'alert.theConstructionWillBeStopped': 'İş durur ve harcadığın geri gelmez. Tesis bulunduğu kademeye döner.',
     'alert.cannotUnlock': 'Açılamıyor',
     'alert.companyValuationMustBeGreater': 'Şirket değerlemesi $0\'dan büyük olmalı.',
     'alert.cutPay': 'Maaşı düşür?',
@@ -1488,7 +1492,9 @@ export const tr: Record<string, string> = {
 
     // ---- veri katmani (kademe, kredi, fason, kurul) ----
     'data.brand.anotherProfitableQuarter': 'Bir kârlı çeyrek daha',
+    'data.brand.badNews': 'Kötü haber',
     'data.brand.brandsYouAcquired': 'Satın aldığın markalar',
+    'data.brand.marketShareLabel': 'Pazar payı',
     'data.brand.marketingQuality': 'Pazarlama ve kalite',
     'data.capacity.aCityBuiltAroundProduction': 'Üretim etrafında kurulmuş bir şehir. Konut, eğitim, araştırma, hepsi senin.',
     'data.capacity.aPlantThatRetoolsItself': 'Pazarın bir sonraki isteğine göre kendini yeniden kuran bir tesis.',

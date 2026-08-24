@@ -378,7 +378,7 @@ const symbolOptedOut = (name, f) =>
 const todos = [];
 const isTodo = f => /@orphan-todo\s/.test(body.get(f));
 
-const problems = { components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [], exits: [], story: [] };
+const problems = { i18n: [], components: [], storeActions: [], engineExports: [], statsFields: [], hooks: [], frozenText: [], newGame: [], palette: [], contrast: [], stringGuards: [], exits: [], story: [] };
 
 // --- 0) Hooks below an early return ----------------------------------------
 //  React counts hooks per render and refuses a mismatch. A component that
@@ -531,6 +531,45 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
             problems.frozenText.push(`${rel(f)}:${i + 1}  ${line.trim().slice(0, 60)}`);
         }
     });
+}
+
+// --- 0b2) Translation keys nothing defines ----------------------------------
+//  `t()` RETURNS THE KEY when it cannot find one, so a missing translation is
+//  not a crash and not a blank - it is the literal string `company.confirm`
+//  drawn on a button, in the middle of a screen that otherwise looks finished.
+//
+//  This is the third time. `company.research` rendered as itself on the home
+//  card, behind a `|| 'R&D Points'` fallback that could never run because the
+//  key it was guarding was already a truthy string. Then the facility upgrade
+//  dialog offered `company.confirm` and `company.cancelUpgrade`. Both were
+//  found by playing, which is the expensive way to find a spelling mistake.
+//
+//  Keys built by concatenation - `t('data.trait.' + m.trait)` - cannot be
+//  checked from here and are skipped rather than guessed at: the rule reports
+//  only literal keys, and a literal key is the kind that gets typed wrong.
+{
+    const en = read(path.join(SRC, 'core', 'i18n', 'en.ts'));
+    const defined = new Set([...en.matchAll(/^\s*'([^']+)':/gm)].map(m => m[1]));
+
+    for (const f of files.filter(f => !/\/i18n\//.test(f) && !isDisabled(f))) {
+        const lines = read(f).split('\n');
+        let inBlockComment = false;
+        lines.forEach((line, i) => {
+            // Shelved code is kept rather than deleted in this codebase, so a
+            // dead key inside a comment is a record rather than a fault - the
+            // four `gameover.*` keys are exactly that.
+            if (/\/\*/.test(line)) inBlockComment = true;
+            const wasComment = inBlockComment;
+            if (/\*\//.test(line)) inBlockComment = false;
+            if (wasComment || /^\s*(\/\/|\*)/.test(line)) return;
+
+            for (const m of line.matchAll(/\bt\(\s*'([^']+)'\s*[,)]/g)) {
+                if (!defined.has(m[1])) {
+                    problems.i18n.push(`${rel(f)}:${i + 1}  ${m[1]}`);
+                }
+            }
+        });
+    }
 }
 
 // --- 0c) Persisted stores a new game does not clear --------------------------
@@ -1626,6 +1665,8 @@ total += section('Persisted stores a new game does not clear', problems.newGame,
     'Old data walks into the next game. Both halves are needed: the disk key and the in-memory reset.');
 total += section('Translations frozen at module load', problems.frozenText,
     'Evaluated once on import, so they never follow a language change. Use a getter.');
+total += section('Translation keys nothing defines', problems.i18n,
+    't() returns the key when it cannot find one, so this is the literal string on the screen.');
 total += section('Hooks called after an early return', problems.hooks,
     'React will crash with "Rendered more hooks than during the previous render".');
 total += section('Renders as a bare text node', problems.stringGuards,

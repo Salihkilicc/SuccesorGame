@@ -107,9 +107,22 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
     //
     //  Measured rather than guessed at, because the next screen to put
     //  something there will have a different width and a second magic number
-    //  would be the same bug again. The title keeps its optical centre: the
-    //  same gutter goes on BOTH sides, so it shrinks symmetrically rather
-    //  than sliding left.
+    //  would be the same bug again.
+    //
+    //  ---------------------------------------------------------------------
+    //  AND EACH SIDE RESERVES ONLY WHAT IT NEEDS
+    //  ---------------------------------------------------------------------
+    //  The first version put the SAME gutter on both, to keep the title
+    //  optically centred. It is centred and it is tiny: the tech tree's right
+    //  accessory is an info dot beside a two line balance, so "Future
+    //  Technologies" was being squeezed into what was left after paying for
+    //  that width TWICE. Reported as the title being too small, and asked for
+    //  in exactly these words - grow it leftward.
+    //
+    //  So the left pays for the back button and the right pays for whatever
+    //  is actually there. The title still centres inside the space it is
+    //  given, which on a screen with a wide accessory sits left of the middle
+    //  - which is the point.
     // ------------------------------------------------------------------
     const [rightWidth, setRightWidth] = useState(0);
     const navigation = useNavigation<any>();
@@ -133,7 +146,10 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
             <View
                 style={[
                     styles.center,
-                    { paddingHorizontal: Math.max(HEADER_BACK_SIZE, rightWidth) + theme.spacing.sm },
+                    {
+                        paddingLeft: HEADER_BACK_SIZE + theme.spacing.sm,
+                        paddingRight: rightWidth + theme.spacing.sm,
+                    },
                     !right && { transform: [{ translateX: TITLE_NUDGE }] },
                 ]}>
                 <Text
@@ -193,9 +209,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        // The gutter is applied at the call site from the MEASURED width of
-        // whatever is on the right - see the note in the component. This is
-        // the floor, for the case where there is nothing there at all.
+        // Each gutter is applied at the call site: the left from the back
+        // button, the right from the MEASURED width of the accessory - see
+        // the note in the component. This is the floor, for the case where
+        // there is nothing on the right at all.
         paddingHorizontal: HEADER_BACK_SIZE + theme.spacing.sm,
     },
     title: {

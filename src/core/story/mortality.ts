@@ -161,6 +161,8 @@ export const successorFor = (
     designatedSuccessorId: string | null,
 ): Candidate | null => {
     const grown = children.filter(c => (c?.age ?? 0) >= SUCCESSION_AGE);
+    // Nobody old enough TODAY. Not the end of the line - see `heirInWaiting`,
+    // which is what planSuccession asks next.
     if (grown.length === 0) return null;
 
     const named = designatedSuccessorId
@@ -179,4 +181,50 @@ export const successorFor = (
 
     // Everybody is old. Whoever has the most time.
     return grown.reduce((youngest, c) => (c.age < youngest.age ? c : youngest), grown[0]);
+};
+
+// ============================================================================
+//  AND IF THE ONLY HEIR IS A CHILD
+// ============================================================================
+//
+//  `successorFor` answering null used to end the run: `diedWithoutAnHeir`, the
+//  same ending as dying with nobody at all. Which is not the same thing and
+//  reads as a punishment for the timing of a death rather than for anything
+//  the player did - a founder who had a son at eighty gets the barren ending.
+//
+//  Reported as "heir kac yasinda olsa da gecilmeli". So a family with a child
+//  in it always continues, and the years it takes are simply skipped: the
+//  company is held until the eldest turns sixteen, and the game resumes on the
+//  morning they take the chair.
+//
+//  WHY THE ELDEST rather than the named one. Being named is a reward and it is
+//  honoured everywhere else - see `successorFor` above, where it wins even at
+//  seventy. Here it would cost the family a decade for a preference, because
+//  the eldest is by definition the one who arrives soonest. The named heir
+//  inherits their share either way; what they do not get is to make everybody
+//  wait.
+//
+//  NO CAP ON THE WAIT, deliberately. A limit puts the dead end back for
+//  exactly the case this exists to remove, and a newborn is the case that
+//  needs it most.
+// ============================================================================
+
+/** Who takes over eventually, and how long the chair stays empty. */
+export type HeirInWaiting = {
+    heir: Candidate;
+    /** Whole years until they reach SUCCESSION_AGE. Always at least one. */
+    years: number;
+};
+
+export const heirInWaiting = (
+    children: readonly Candidate[],
+): HeirInWaiting | null => {
+    const young = children.filter(c => Number.isFinite(c?.age));
+    if (young.length === 0) return null;
+
+    // The eldest, because they are the shortest wait. Ties go to the first
+    // written down, like everywhere else in this file.
+    const eldest = young.reduce((oldest, c) => (c.age > oldest.age ? c : oldest), young[0]);
+    const years = Math.max(1, Math.ceil(SUCCESSION_AGE - eldest.age));
+    return { heir: eldest, years };
 };

@@ -47,7 +47,7 @@
 // ============================================================================
 
 import { divideEstate, type Estate, type Survivor } from './inheritance';
-import { successorFor } from './mortality';
+import { successorFor, heirInWaiting, SUCCESSION_AGE } from './mortality';
 
 /** Only what the plan needs, so this is testable without a Child. */
 export type Heir = {
@@ -86,6 +86,14 @@ export type SuccessionPlan = {
     /** Kept as a person in the new family. Holds no stock, by design. */
     survivingParent: { name: string; age: number } | null;
     generation: number;
+    /**
+     * Years the chair stood empty before this one could take it.
+     *
+     * Zero in the ordinary case. Above zero when the only heir was a child:
+     * the company is held, the clock skips, and everybody in the family is
+     * that many years older on the other side of it. See `heirInWaiting`.
+     */
+    yearsHeld: number;
 };
 
 /**
@@ -124,11 +132,25 @@ export const firstNameOf = (fullName: string, lastName: string): string => {
  * two would drift.
  */
 export const planSuccession = (input: SuccessionInput): SuccessionPlan | null => {
-    const heir = successorFor(
-        input.children.map(c => ({ id: c.id, age: c.age })),
-        input.designatedSuccessorId,
-    );
+    const candidates = input.children.map(c => ({ id: c.id, age: c.age }));
+    const now = successorFor(candidates, input.designatedSuccessorId);
+
+    // ------------------------------------------------------------------
+    //  NOBODY OLD ENOUGH TODAY IS NOT NOBODY
+    // ------------------------------------------------------------------
+    //  It used to be: `successorFor` returned null and the run ended on
+    //  `diedWithoutAnHeir`, the same ending as dying with no family at all.
+    //  A founder who had a son at eighty got the barren ending, which reads
+    //  as a punishment for the timing of a death.
+    //
+    //  The company is held instead, and the years are skipped. See the note
+    //  above `heirInWaiting`.
+    // ------------------------------------------------------------------
+    const waiting = now ? null : heirInWaiting(candidates);
+    const heir = now ?? waiting?.heir ?? null;
     if (!heir) return null;
+
+    const yearsHeld = waiting?.years ?? 0;
 
     const child = input.children.find(c => c.id === heir.id);
     if (!child) return null;
@@ -151,7 +173,10 @@ export const planSuccession = (input: SuccessionInput): SuccessionPlan | null =>
             // surname in the first name field and the home screen rendered
             // "Elena Hale Hale".
             firstName: firstNameOf(child.name, input.lastName),
-            age: child.age,
+            // Sixteen on the day they take it, whatever they were on the day
+            // it fell to them. `yearsHeld` is what the rest of the family
+            // ages by - see runSuccession.
+            age: yearsHeld > 0 ? SUCCESSION_AGE : child.age,
             gender: child.gender === 'Female' ? 'female' : 'male',
         },
         cash: mine?.cash ?? 0,
@@ -167,8 +192,14 @@ export const planSuccession = (input: SuccessionInput): SuccessionPlan | null =>
             // Somebody who inherited no stock is not a shareholder, and seating
             // them would put a director on the board with nothing to vote.
             .filter(s => s.shares > 0),
-        survivingParent: input.survivingParent,
+        survivingParent: input.survivingParent
+            ? {
+                ...input.survivingParent,
+                age: input.survivingParent.age + yearsHeld,
+            }
+            : null,
         generation: input.generation + 1,
+        yearsHeld,
     };
 };
 

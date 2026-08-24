@@ -97,10 +97,14 @@ describe('the screen header', () => {
         expect(src()).toMatch(/setRightWidth/);
     });
 
-    it('and keeps the title optically centred by padding both sides', () => {
-        // The same gutter on both, so a long title shrinks symmetrically
-        // rather than sliding left into the back button.
-        expect(src()).toMatch(/paddingHorizontal:\s*Math\.max\(HEADER_BACK_SIZE, rightWidth\)/);
+    it('and each side reserves only what it needs', () => {
+        // The first version put the same gutter on both, which kept the title
+        // centred and made it tiny: a long one paid for the accessory width
+        // TWICE. The left pays for the back button, the right pays for what
+        // is actually there.
+        expect(src()).toMatch(/paddingLeft: HEADER_BACK_SIZE \+ theme\.spacing\.sm/);
+        expect(src()).toMatch(/paddingRight: rightWidth \+ theme\.spacing\.sm/);
+        expect(src()).not.toMatch(/paddingHorizontal:\s*Math\.max\(HEADER_BACK_SIZE/);
     });
 });
 

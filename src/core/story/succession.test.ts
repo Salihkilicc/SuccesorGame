@@ -90,11 +90,50 @@ describe('the plan', () => {
         expect(planSuccession(input({ generation: 4 }))!.generation).toBe(5);
     });
 
-    it('and is null when nobody can take over', () => {
+    it('and is null only when there is nobody at all', () => {
         // Not a failure. It is the diedWithoutAnHeir branch, and the closing
         // screen simply does not offer the button.
-        expect(planSuccession(input({ children: [heir('a', 'A Child', 9)] }))).toBeNull();
+        //
+        // A CHILD IS NOT NOBODY, and it used to be. A founder who had a son
+        // at eighty got the same ending as one who had no family, which reads
+        // as a punishment for the timing of a death. Reported as "heir kac
+        // yasinda olsa da gecilmeli".
         expect(planSuccession(input({ children: [] }))).toBeNull();
+    });
+
+    it('while a child waits, and the years are skipped', () => {
+        const plan = planSuccession(input({ children: [heir('a', 'A Child', 9)] }))!;
+        expect(plan).not.toBeNull();
+        // Sixteen on the day they take it, whatever they were on the day it
+        // fell to them.
+        expect(plan.ceo.age).toBe(16);
+        expect(plan.yearsHeld).toBe(7);
+    });
+
+    it('and the family ages with them', () => {
+        // Otherwise the mother is the age she was at the funeral and the
+        // heir has grown up beside a photograph.
+        const before = input({ children: [heir('a', 'A Child', 9)] });
+        const plan = planSuccession(before)!;
+        expect(plan.survivingParent!.age)
+            .toBe(before.survivingParent!.age + plan.yearsHeld);
+    });
+
+    it('and it is the ELDEST who waits, not the named one', () => {
+        // Being named wins everywhere else in this system, including at
+        // seventy. Here it would cost the family years for a preference: the
+        // eldest is by definition the shortest wait. The named heir still
+        // inherits their share.
+        const plan = planSuccession(input({
+            children: [heir('young', 'Young', 4), heir('older', 'Older', 12)],
+            designatedSuccessorId: 'young',
+        }))!;
+        expect(plan.ceo.id).toBe('older');
+        expect(plan.yearsHeld).toBe(4);
+    });
+
+    it('and an ordinary succession waits no time at all', () => {
+        expect(planSuccession(input())!.yearsHeld).toBe(0);
     });
 
     it('and does not re-decide who the heir is', () => {
@@ -333,14 +372,36 @@ describe('handing the company over', () => {
         expect(useMessageStore.getState().threads.length).toBeGreaterThan(0);
     });
 
-    it('and there is nothing to hand over when nobody is of age', () => {
+    it('and a child takes over once the years have been skipped', () => {
         useFamilyStore.setState({
             children: [{ id: 'a', name: 'A Child', age: 9, gender: 'Male', stats: {} }],
             designatedSuccessorId: null,
         } as never);
+        const month = useGameStore.getState().currentMonth;
+
+        const plan = runSuccession();
+        expect(plan).not.toBeNull();
+        expect(plan!.yearsHeld).toBe(7);
+        // The calendar moves with them, or the family reads as frozen.
+        expect(useGameStore.getState().currentMonth).toBe(month + 7 * 12);
+        expect(useGameStore.getState().age).toBe(16);
+        // And the run is running again.
+        expect(useStoryStore.getState().ending).toBeNull();
+    });
+
+    it('and the letter is from the person who was holding it', () => {
+        useFamilyStore.setState({
+            children: [{ id: 'a', name: 'A Child', age: 9, gender: 'Male', stats: {} }],
+            designatedSuccessorId: null,
+        } as never);
+        runSuccession();
+        const thread = useMessageStore.getState().threads[0];
+        expect(thread.id).toBe('cfo');
+    });
+
+    it('while nobody at all still ends it', () => {
+        useFamilyStore.setState({ children: [], designatedSuccessorId: null } as never);
         expect(runSuccession()).toBeNull();
-        // And crucially the run is still over, rather than continuing with
-        // nobody in the chair.
         expect(useStoryStore.getState().ending).toBe('diedInOffice');
     });
 });
