@@ -555,8 +555,24 @@ const HomeScreen = () => {
                 <Text style={styles.sectionTitle}>{t('home.overview')}</Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
+              {/* ------------------------------------------------------
+                  THE WHITE BANDS
+
+                  These four stops were
+                    rgba(255,255,255,0.48) -> #1C242C -> #1C242C -> #CFD0D2
+                  at 0, 0.2, 0.8 and 1, which put a bright band down the LEFT
+                  edge of the card and a light grey one down the RIGHT.
+
+                  Not only a smear: the labels are left aligned and the
+                  figures right aligned, so white text was landing on a
+                  near-white ground at both ends of every row.
+
+                  The gradient itself stays, because the note on modernCard
+                  below depends on the first stop being opaque. Only the
+                  colours change.
+                 ------------------------------------------------------ */}
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#1C242C', '#1C242C', '#CFD0D2']}
+                colors={['#1C242C', '#1C242C', '#1C242C', '#1C242C']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -589,7 +605,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.48)', '#1C242C', '#1C242C', '#CFD0D2']}
+                colors={['#1C242C', '#1C242C', '#1C242C', '#1C242C']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -994,10 +1010,13 @@ const styles = StyleSheet.create({
   },
   widgetCard: {
     flex: 1,
-    paddingVertical: 32,
+    // 32 -> 20 and the minimum below it comes down with it. Four rows of
+    // text do not need a card this tall, and the two of them together were
+    // pushing the app icons to the bottom edge of the screen.
+    paddingVertical: 20,
     paddingHorizontal: 12,
     justifyContent: 'space-between',
-    minHeight: 250,
+    minHeight: 200,
   },
   widgetRowBetween: {
     flexDirection: 'column',
@@ -1086,7 +1105,7 @@ const styles = StyleSheet.create({
   },
   statusCardAdjuster: {
     justifyContent: 'flex-start',
-    paddingTop: 30,
+    paddingTop: 16,
     gap: theme.spacing.xl || 24,
   },
   card: {
@@ -1398,13 +1417,11 @@ const styles = StyleSheet.create({
     //  "BVLinearGradient has a shadow set but cannot calculate shadow
     //  efficiently".
     //
-    //  Only the FIRST gradient stop is translucent here: the card runs
-    //  rgba(255,255,255,0.48) into #1C242C at 20% and stays opaque from
-    //  there. So this colour is visible in one place, the top edge, where
-    //  the wallpaper used to show through a white haze and now the ground
-    //  does. That is the whole visual change and it makes the edge
-    //  consistent between the two cards, which sit at different heights over
-    //  different parts of the photograph.
+    //  It used to say that only the FIRST gradient stop was translucent,
+    //  which stopped being true when the white bands came off - every stop
+    //  is #1C242C now. This colour is what the gradient is made of rather
+    //  than what shows through it, and the shadow can still be cached
+    //  because the layer is opaque all the way across.
     // ------------------------------------------------------------------
     backgroundColor: theme.colors.background,
     borderRadius: 33,
