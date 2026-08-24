@@ -583,24 +583,34 @@ const HomeScreen = () => {
                   "buyumedi".
 
                   Six stops instead of four. The light HOLDS across the outer
-                  fifth of each side, then falls to the dark between 44% and
-                  56%. That is a band you can see rather than a ramp that
-                  starts fading immediately, and it grows without the peak
-                  going up - which is what lets it stay at sixteen after
-                  "parlakligi azaltsan azicik".
+                  38% of each side and only gives way across the middle few
+                  per cent, so roughly three quarters of the card is lit. That
+                  is a band you can see rather than a ramp that starts fading
+                  immediately.
+
+                  AND IT DOES COVER, which was the other half of the doubt -
+                  "kenarlari birakiyor mu". The gradient IS the card: it
+                  carries `styles.card` itself, it is `flex: 1`, nothing
+                  insets it and nothing is drawn over it. It runs edge to
+                  edge. What was missing was never coverage, it was that the
+                  lit part was too narrow and too faint to read as an effect.
+
+                  Thirteen per cent, down from sixteen. Widening it adds
+                  strength on its own, so the peak comes down as it grows -
+                  "yanlarda kalsin da daha az etki".
 
                   The figures are not written here as hexes on purpose - the
                   palette audit reads hexes out of comments too.
                  ------------------------------------------------------ */}
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
                   '#1C242C', '#1C242C',
-                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
                 ]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.22, 0.44, 0.56, 0.78, 1]}
+                locations={[0, 0.38, 0.47, 0.53, 0.62, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -631,13 +641,13 @@ const HomeScreen = () => {
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
                   '#1C242C', '#1C242C',
-                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
                 ]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.22, 0.44, 0.56, 0.78, 1]}
+                locations={[0, 0.38, 0.47, 0.53, 0.62, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (

@@ -53,7 +53,7 @@ describe('the two widget cards', () => {
         // down over the first rows - which is what lets it be a gloss rather
         // than a hairline.
         const src = code();
-        expect(src).toMatch(/'rgba\(255,255,255,0\.16\)', 'rgba\(255,255,255,0\.16\)',\s*\n\s*'#1C242C', '#1C242C',/);
+        expect(src).toMatch(/'rgba\(255,255,255,0\.13\)', 'rgba\(255,255,255,0\.13\)',\s*\n\s*'#1C242C', '#1C242C',/);
         // What it replaced: 48% white and a #CFD0D2 stop. Those are fills.
         // Scoped to a gradient STOP: the same string is a chevron colour and
         // a label colour elsewhere in this file, and neither is a ground.
@@ -81,19 +81,27 @@ describe('the two widget cards', () => {
         //  more of the card makes it gentler at every point - fainter, not
         //  bigger. Reported both times as "buyumedi".
         //
-        //  Six stops: the light holds across the outer fifth of each side
-        //  and then falls to the dark across the middle. That grows the
-        //  visible band without raising the peak.
+        //  Six stops: the light holds across the outer 38% of each side and
+        //  only gives way across the middle few per cent, so roughly three
+        //  quarters of the card is lit. That grows the visible band while
+        //  the peak comes DOWN.
         // ----------------------------------------------------------------
         const src = code();
-        expect(src).toMatch(/locations=\{\[0, 0\.22, 0\.44, 0\.56, 0\.78, 1\]\}/);
+        expect(src).toMatch(/locations=\{\[0, 0\.38, 0\.47, 0\.53, 0\.62, 1\]\}/);
 
         // The shape that cannot hold anything: four stops, so every point
         // between the edge and the middle is already fading.
         expect(src).not.toMatch(/locations=\{\[0, 0\.\d+, 0\.\d+, 1\]\}/);
 
-        const stops = src.match(/locations=\{\[([^\]]+)\]\}/)?.[1].split(',') ?? [];
+        const stops = (src.match(/locations=\{\[([^\]]+)\]\}/)?.[1] ?? '')
+            .split(',').map(Number);
         expect(stops.length).toBeGreaterThanOrEqual(6);
+
+        // The plateau is what makes it visible, so measure it rather than
+        // trusting the numbers: the lit run at each edge has to be a real
+        // fraction of the card, not a rim.
+        expect(stops[1]).toBeGreaterThanOrEqual(0.3);
+        expect(1 - stops[4]).toBeGreaterThanOrEqual(0.3);
     });
 
     it('and both of them, not just the one that was open', () => {
@@ -101,7 +109,7 @@ describe('the two widget cards', () => {
         // reading the other as done is how the casino's 700 survived a
         // whole commit.
         const src = code();
-        const sheen = src.match(/locations=\{\[0, 0\.22, 0\.44, 0\.56, 0\.78, 1\]\}/g) ?? [];
+        const sheen = src.match(/locations=\{\[0, 0\.38, 0\.47, 0\.53, 0\.62, 1\]\}/g) ?? [];
         expect(sheen).toHaveLength(2);
     });
 
@@ -113,6 +121,30 @@ describe('the two widget cards', () => {
         expect(src).not.toMatch(/widgetCard: \{[\s\S]{0,400}minHeight: 250/);
         expect(src).toMatch(/widgetCard: \{[\s\S]{0,400}minHeight: 200/);
         expect(src).not.toMatch(/statusCardAdjuster: \{[\s\S]{0,200}paddingTop: 30/);
+    });
+});
+
+describe('and it covers the card, which was the doubt', () => {
+    it('because the gradient IS the card rather than a layer inside it', () => {
+        // "Kenarlari birakiyor mu, tam kaplamiyor mu." It carries
+        // `styles.card` itself and is `flex: 1`, so there is no inset layer
+        // and nothing between it and the corners - it runs edge to edge.
+        // What was missing was never coverage; the lit part was too narrow
+        // and too faint to read as an effect.
+        const src = code();
+        expect(src).toMatch(/<LinearGradient[\s\S]{0,600}style=\{\[styles\.card, styles\.widgetCard, styles\.modernCard/);
+        expect(src).toMatch(/widgetCard: \{\s*\n\s*flex: 1,/);
+    });
+
+    it('and it spans the whole width rather than part of it', () => {
+        // start 0 to end 1. A gradient from 0.1 to 0.9 would leave the very
+        // edges flat and is exactly the shape the doubt describes.
+        const src = code();
+        expect(src).toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}\s*\n\s*end=\{\{ x: 1, y: 0\.5 \}\}/);
+        const stops = (src.match(/locations=\{\[([^\]]+)\]\}/)?.[1] ?? '')
+            .split(',').map(Number);
+        expect(stops[0]).toBe(0);
+        expect(stops[stops.length - 1]).toBe(1);
     });
 });
 
@@ -168,7 +200,7 @@ describe('what the bands were hiding', () => {
         // was reverted.
         const src = code();
         expect(src).toMatch(/modernCard: \{[\s\S]{0,1600}backgroundColor: '#1C242C'/);
-        expect(src).toMatch(/colors=\{\[\s*\n?\s*'rgba\(255,255,255,0\.16\)'/);
+        expect(src).toMatch(/colors=\{\[\s*\n?\s*'rgba\(255,255,255,0\.13\)'/);
     });
 
     it('and the sheen it needs is bright enough to BE an edge', () => {
@@ -185,7 +217,7 @@ describe('what the bands were hiding', () => {
         const alpha = Number(
             src.match(/colors=\{\[\s*\n?\s*'rgba\(255,255,255,([0-9.]+)\)'/)?.[1],
         );
-        expect(alpha).toBeGreaterThanOrEqual(0.14);
+        expect(alpha).toBeGreaterThanOrEqual(0.10);
         expect(alpha).toBeLessThanOrEqual(0.24);
     });
 
