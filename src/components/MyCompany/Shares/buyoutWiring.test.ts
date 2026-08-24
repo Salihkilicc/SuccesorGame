@@ -56,7 +56,11 @@ const purchaseBody = (src: string): string => {
 };
 
 const MEMBER_SCREEN = ['components', 'MyCompany', 'Shares', 'MemberInteractionModal.tsx'];
+const PROFILE_SCREEN = ['components', 'MyCompany', 'Shares', 'ShareholderProfileModal.tsx'];
 const STORE = ['features', 'shareholders', 'stores', 'useShareholderStore.ts'];
+
+/** Both screens that can buy a holding. The second one kept getting missed. */
+const BUYING_SCREENS = [MEMBER_SCREEN, PROFILE_SCREEN];
 
 describe('the offer screen', () => {
     it('compares a total against a total', () => {
@@ -134,5 +138,67 @@ describe('the buyout result type', () => {
         const src = read(...STORE);
         expect(src).toMatch(/askingPricePerShare: number/);
         expect(src).toMatch(/askingTotal: number/);
+    });
+});
+
+
+// ============================================================================
+//  THE THREE THAT GOT THROUGH
+// ============================================================================
+//
+//  Found by reading rather than by any test, one commit after the routes
+//  landed, and all three in the same blind spot: the store and the pure module
+//  were covered and neither SCREEN was opened.
+//
+//    THE WALLET GUARD SURVIVED. `handleMakeOffer` still began with
+//    `if (money < offerPrice) return`, so a successor with a big stake and no
+//    cash could choose "company buys it back", press the button, and be told
+//    they had insufficient funds - about money that was never going to be
+//    spent. The whole point of the commit, defeated by a line above it.
+//
+//    THE SECOND SCREEN CAPPED AT FIFTY. ShareholderProfileModal buys holdings
+//    too, and its premium stepper stopped at 50 while a sibling asks 70. That
+//    was harmless while every offer was accepted regardless of price, and
+//    became "you can no longer buy out any of your family from this screen"
+//    the moment the ask started being enforced.
+//
+//    AND THE LIKELIHOOD BAR STILL GUESSED. Both screens drew it from the
+//    premium alone, so it read "Very interested" at fifty per cent to
+//    somebody asking seventy. The one copy of the decision the player
+//    actually looks at.
+// ============================================================================
+
+describe('both screens that can buy a holding', () => {
+    it.each(BUYING_SCREENS.map(p => [p.join('/'), p]))(
+        'can reach the dearest ask in the game, in %s',
+        (_label, p) => {
+            const src = code(...(p as string[]));
+            expect(src).toMatch(/MAX_ASK_PREMIUM/);
+            // The two ceilings that were typed by hand.
+            expect(src).not.toMatch(/Math\.min\(100, prev \+ delta\)/);
+            expect(src).not.toMatch(/Math\.min\(50, newValue\)/);
+        },
+    );
+
+    it.each(BUYING_SCREENS.map(p => [p.join('/'), p]))(
+        'and works the odds off the asking price rather than the premium, in %s',
+        (_label, p) => {
+            const src = code(...(p as string[]));
+            expect(src).toMatch(/acceptanceChance\(/);
+            // The shape of every hand-rolled copy: a bonus for clearing 20%.
+            expect(src).not.toMatch(/offerPremium > 20\) chance = Math\.min\(100, chance \+ 30\)/);
+        },
+    );
+});
+
+describe('the offer handler', () => {
+    it('does not gate the company routes on the player\'s wallet', () => {
+        const src = code(...MEMBER_SCREEN);
+        const handler = src.slice(
+            src.indexOf('const handleMakeOffer'),
+            src.indexOf('const adjustPremium'),
+        );
+        expect(handler).not.toMatch(/if \(money < offerPrice\)/);
+        expect(handler).toMatch(/routeQuotes\[route\]/);
     });
 });

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import { buyoutAsk, acceptanceChance, MAX_ASK_PREMIUM } from '../../../core/market/buyout';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useEquityStore } from '../../../features/finance/stores/useEquityStore';
@@ -137,12 +138,27 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         });
     };
 
+    // ----------------------------------------------------------------------
+    //  THE CEILING HAD TO CLEAR THE ASK
+    // ----------------------------------------------------------------------
+    //  This stopped at 50 while a holder can ask for 150: reluctance reaches
+    //  100 per cent at zero trust and a Shark adds half again. It did not
+    //  matter while every offer was accepted regardless of price - but the
+    //  moment the asking price started being enforced, this screen could no
+    //  longer buy out anybody who wanted more than fifty, which includes
+    //  every sibling a succession produces (trust 40, Conservative, asks 70).
+    //
+    //  Missed on the pass that fixed the same ceiling in
+    //  MemberInteractionModal, because that pass never opened this file.
+    //  See core/market/buyout.ts, MAX_ASK_PREMIUM.
+    // ----------------------------------------------------------------------
+    const PREMIUM_CEILING = Math.round(MAX_ASK_PREMIUM * 100) + 20;
+
     const handleStepperChange = (direction: 'up' | 'down') => {
         const step = 5;
         const newValue = direction === 'up' ? offerPremium + step : offerPremium - step;
 
-        // Clamp between -20% and 50%
-        const clampedValue = Math.max(-20, Math.min(50, newValue));
+        const clampedValue = Math.max(-20, Math.min(PREMIUM_CEILING, newValue));
         setOfferPremium(clampedValue);
     };
 
@@ -245,12 +261,24 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
         return t('mem.happy');
     };
 
+    // ----------------------------------------------------------------------
+    //  AND THE ODDS COME FROM THE RULE RATHER THAN FROM A COPY OF IT
+    // ----------------------------------------------------------------------
+    //  This was a fourth hand-written version of a decision that lives in
+    //  core/market/buyout.ts: trust plus a bonus for any premium over twenty,
+    //  with no idea what the holder was actually asking. It told the player
+    //  they had a forty per cent chance against a price they had not met, and
+    //  the store then refused outright.
+    // ----------------------------------------------------------------------
     const calculateSuccessChance = () => {
         if (!member) return 0;
-        let chance = member.trust;
-        if (offerPremium < 0) chance = 0;
-        else if (offerPremium > 20) chance = Math.min(100, chance + 30);
-        return Math.max(0, Math.min(100, chance));
+        const ask = buyoutAsk(
+            { trust: member.trust, trait: member.trait, shareCount },
+            stockPrice,
+            member.name,
+        );
+        if (!ask.canSell) return 0;
+        return Math.round(acceptanceChance(calculateOfferPrice(), ask.askTotal) * 100);
     };
 
     const calculateOfferPrice = () => {

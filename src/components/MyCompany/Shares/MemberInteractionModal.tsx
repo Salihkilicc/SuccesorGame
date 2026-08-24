@@ -335,32 +335,58 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         interestRate: 0.08,
     });
 
-    const getLikelihoodColor = () => {
-        if (offerPremium < 0) return '#FF8A8A'; // Insulted
-        if (offerPremium < 20) return '#FF8A8A'; // Hesitant
-        return '#CFD0D2'; // Interested
-    };
+    // ----------------------------------------------------------------------
+    //  THE BAR READS THE ASKING PRICE, LIKE EVERYTHING ELSE NOW
+    // ----------------------------------------------------------------------
+    //  These three used to work off `offerPremium` alone, so the bar said
+    //  "Very interested" at fifty per cent to a holder who wanted seventy, and
+    //  "Hesitant" at thirty to a Loyalist who would have taken the market
+    //  price. It was the last copy of a decision that is supposed to live in
+    //  one place - see core/market/buyout.ts - and it was the copy the player
+    //  actually looked at.
+    // ----------------------------------------------------------------------
+    const askTotal = calculateBuyoutPrice(member.id, companySharePrice)?.askingTotal ?? 0;
+    const likelihood = acceptanceChance(offerPrice, askTotal);
+
+    const getLikelihoodColor = () =>
+        likelihood <= 0 ? '#FF8A8A' : theme.colors.textPrimary;
 
     const getLikelihoodLabel = () => {
-        if (offerPremium < 0) return t('mem.insulted');
-        if (offerPremium < 20) return t('mem.hesitant');
-        if (offerPremium < 50) return t('mem.interested');
-        return t('mem.veryInterested');
+        if (likelihood <= 0) return t('mem.insulted');
+        if (likelihood >= 1) return t('mem.veryInterested');
+        return t('mem.interested');
     };
 
-    const getLikelihoodWidth = (): string => {
-        // Map premium to percentage width
-        const span = PREMIUM_CEILING + 20;
-        const normalized = Math.max(0, Math.min(span, offerPremium + 20));
-        const percentage = (normalized / span) * 100;
-        return `${percentage}%`;
-    };
+    const getLikelihoodWidth = (): string => `${Math.round(likelihood * 100)}%`;
 
     const handleMakeOffer = () => {
-        if (money < offerPrice) {
+        // ------------------------------------------------------------------
+        //  YOUR WALLET IS NOT THE ONLY PURSE ANY MORE
+        // ------------------------------------------------------------------
+        //  SHELVED, and it is worth saying exactly what this line did after
+        //  the routes landed. It turned the treasury and the loan off for the
+        //  one player they were written for: a successor with a big stake and
+        //  no cash could pick "company buys it back", press the button, and be
+        //  told they had insufficient funds - about money that was never going
+        //  to be spent.
+        //
+        //      if (money < offerPrice) {
+        //          setPanel({
+        //              title: t('alert.insufficientFunds'),
+        //              summary: t('mem.needForOffer', { v1: formatMoney(offerPrice) }),
+        //              confirmLabel: 'OK',
+        //          });
+        //          return;
+        //      }
+        //
+        //  `routeQuotes[route].feasible` answers this properly, per purse, and
+        //  the button below is already disabled on it.
+        // ------------------------------------------------------------------
+        const affordability = routeQuotes[route];
+        if (!affordability.feasible) {
             setPanel({
                 title: t('alert.insufficientFunds'),
-                summary: t('mem.needForOffer', { v1: formatMoney(offerPrice) }),
+                summary: affordability.reason || t('mem.needForOffer', { v1: formatMoney(offerPrice) }),
                 confirmLabel: 'OK',
             });
             return;
