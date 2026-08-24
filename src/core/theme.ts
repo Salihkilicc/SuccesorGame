@@ -437,3 +437,48 @@ export const avatarTintFor = (name: string): string => {
     }
     return tints[Math.abs(hash) % tints.length];
 };
+
+// ============================================================================
+//  WHAT COLOUR A GLYPH GOES ON A FILL
+// ============================================================================
+//
+//  `onLight` has been the answer since the palette was written - black on any
+//  light fill - and the rule has been applied by hand every time, which means
+//  it has been missed by hand too. The home screen drew every app tile's icon
+//  in `#FFFFFF` regardless of the tile, so Mail and News were white glyphs on
+//  #CFD0D2: a contrast ratio of about 1.4 against a floor of 3.
+//
+//  The audit could not catch it. `scripts/reachability.js` reads
+//  `backgroundColor` off a stylesheet, and those tiles take their fill from an
+//  inline `item.gradient[0]`, so the ground was never a literal it could see.
+//
+//  So the rule becomes a function. Anything that paints on a fill it does not
+//  control asks this instead of guessing.
+// ============================================================================
+
+/** Relative luminance, sRGB, the WCAG definition. */
+const luminance = (hex: string): number => {
+    const clean = (hex || '').replace('#', '');
+    if (clean.length < 6) return 0;
+    const channel = (h: string): number => {
+        const c = parseInt(h, 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * channel(clean.slice(0, 2))
+        + 0.7152 * channel(clean.slice(2, 4))
+        + 0.0722 * channel(clean.slice(4, 6));
+};
+
+/**
+ * Black or white, whichever can actually be read on this fill.
+ *
+ * Agrees with the palette by construction rather than by coincidence: the
+ * primary blue resolves to black, which is exactly what `primaryText` above
+ * already says by hand.
+ */
+export const glyphOn = (fill: string): string => {
+    const l = luminance(fill);
+    // Contrast against white is (1.05)/(l+0.05); against black it is
+    // (l+0.05)/0.05. They cross at l = 0.179.
+    return l > 0.179 ? theme.colors.onLight : theme.colors.textPrimary;
+};
