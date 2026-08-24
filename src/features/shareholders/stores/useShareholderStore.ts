@@ -1986,8 +1986,26 @@ export const useShareholderStore = create<ShareholderState>()(
             runNoConfidence: (ctx, quarter = 0) => {
                 const { members, playerShareCount, totalShares } = get();
                 const gov: GovMember[] = members.map(toGov);
-                const currentMonth = ctx.currentMonth ?? (quarter > 0 ? quarter * 3 : 0);
-                const enrichedCtx = { ...ctx, quarter, currentMonth };
+                // ------------------------------------------------------------
+                //  THE THIRD CLOCK
+                // ------------------------------------------------------------
+                //  This used to SYNTHESISE a month here:
+                //
+                //      const currentMonth = ctx.currentMonth ?? (quarter > 0 ? quarter * 3 : 0);
+                //      const enrichedCtx = { ...ctx, quarter, currentMonth };
+                //
+                //  so the grace period could be decided by a month invented on
+                //  this line out of a quarter the caller had itself derived
+                //  from a field that wraps to 1-12. Three clocks, two
+                //  conversions, and every one of them able to hold the founder
+                //  protection open forever on its own.
+                //
+                //  One number now, counted in quarters, passed straight
+                //  through. `quarter` is that same count, so the cooldown
+                //  below is measured on a clock that actually advances - it
+                //  used to compare against a value that never passed four.
+                // ------------------------------------------------------------
+                const enrichedCtx = { ...ctx, elapsedQuarters: ctx.elapsedQuarters ?? quarter };
                 const check = checkNoConfidence(gov, get().getPlayerOwnershipPercent(), enrichedCtx);
                 set({ noConfidenceLevel: check.conditionsMet });
 

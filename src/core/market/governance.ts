@@ -265,10 +265,31 @@ export interface CompanyContext {
     lossStreak: number;
     /** Hisse fiyati zirveye gore nerede (0-1) */
     priceVsPeak: number;
-    /** Mevcut oyun ayi (1..n) */
-    currentMonth?: number;
-    /** Mevcut mutlak ceyrek (1..n) */
-    quarter?: number;
+    // ------------------------------------------------------------------
+    //  ONE CLOCK, AND IT SAYS ITS UNIT
+    // ------------------------------------------------------------------
+    //  SHELVED:
+    //      currentMonth?: number;   // "Mevcut oyun ayi (1..n)"
+    //      quarter?: number;        // "Mevcut mutlak ceyrek (1..n)"
+    //
+    //  Two clocks in different units, OR'd together in the grace check
+    //  below, so EITHER could keep the founder protected. And the comments
+    //  were wrong about both: `useGameStore.currentMonth` wraps to 1-12
+    //  every year, it does not run 1..n, so it never passed 48 and the
+    //  quarter derived from it never passed 4. The four year protection
+    //  never expired.
+    //
+    //  useGameStore documents the same trap forty lines from where it
+    //  built this context - the period label "read Q2 Year 1 nearly
+    //  forever" for exactly this reason - and nobody connected the two.
+    // ------------------------------------------------------------------
+    /**
+     * Quarters since the run began, counting up and never wrapping.
+     *
+     * Derived from `age`, which is the field that actually counts elapsed
+     * time. See `currentQuarter` in core/story/world.ts.
+     */
+    elapsedQuarters?: number;
 }
 
 // ----------------------------------------------------------------------------
@@ -851,10 +872,25 @@ export const checkNoConfidence = (
 ): NoConfidenceCheck => {
     const reasons: string[] = [];
 
-    // GRACE PERIOD (ilk 4 sene - 48 ay / 16 ceyrek):
-    // Sirket baslangicta yatirim ve olceklenme doneminde oldugundan kurul kurucuyu atamaz.
-    const inGracePeriod = (ctx.currentMonth !== undefined && ctx.currentMonth <= FOUNDER_GRACE_PERIOD_MONTHS) ||
-                          (ctx.quarter !== undefined && ctx.quarter <= FOUNDER_GRACE_PERIOD_QUARTERS);
+    // ------------------------------------------------------------------
+    //  GRACE PERIOD - the first four years, and ONLY the first four years
+    // ------------------------------------------------------------------
+    //  A company spends its opening years in research, plant and headcount,
+    //  so it runs at a loss and the board cannot remove the founder for it.
+    //
+    //  This was an OR of two clocks in different units:
+    //
+    //      currentMonth <= 48  ||  quarter <= 16
+    //
+    //  which meant either one could keep the protection alive on its own.
+    //  And `currentMonth` WRAPS to 1-12, so it never reached 48, and the
+    //  quarter computed from it never reached 16. Both halves were
+    //  permanently true and the board could never depose anybody.
+    //
+    //  One clock, named for its unit, that counts up and does not wrap.
+    // ------------------------------------------------------------------
+    const inGracePeriod = ctx.elapsedQuarters !== undefined
+        && ctx.elapsedQuarters <= FOUNDER_GRACE_PERIOD_QUARTERS;
 
     // 1) KONTROL — cogunluktaysan kimse seni indiremez. Matematiksel.
     const lostControl = playerOwnershipPercent < CONTROL_THRESHOLD;

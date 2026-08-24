@@ -1952,15 +1952,28 @@ export const useGameStore = create<GameStore>()(
           const priceHist = useEquityStore.getState().priceHistory || [];
           const peak = priceHist.length ? Math.max(...priceHist, newSharePrice) : newSharePrice;
           const currentMonthVal = get().currentMonth;
-          const absoluteQuarter = Math.ceil(currentMonthVal / 3);
+          // ------------------------------------------------------------
+          //  ELAPSED QUARTERS, FROM THE FIELD THAT COUNTS THEM
+          // ------------------------------------------------------------
+          //  This was `Math.ceil(currentMonth / 3)`, and `currentMonth`
+          //  wraps to 1-12 every year - the same trap the period label
+          //  forty lines up already documents. So it never exceeded 4, the
+          //  board's four year founder protection never expired, and the
+          //  CEO could not be removed at any point in a run.
+          //
+          //  `age` is what actually counts years. Same derivation as
+          //  `currentQuarter` in core/story/world.ts.
+          // ------------------------------------------------------------
+          const elapsedQuarters =
+            Math.max(0, get().age - initialGameState.age) * 4
+            + Math.floor(((currentMonthVal - 1) % 12) / 3) + 1;
           const boardCtx = {
             profitable: netProfit > 0,
             leverage: assessment.leverage === Infinity ? 99 : assessment.leverage,
             inBreach: assessment.inBreach,
             lossStreak: netProfit > 0 ? 0 : ((stats as any).lossStreak || 0) + 1,
             priceVsPeak: peak > 0 ? newSharePrice / peak : 1,
-            currentMonth: currentMonthVal,
-            quarter: absoluteQuarter,
+            elapsedQuarters,
           };
 
           const events: { kind: string; magnitude: number; label: string }[] = [];
@@ -2154,7 +2167,7 @@ export const useGameStore = create<GameStore>()(
             }
           } catch (e) { console.warn('[Board] demand review failed', e); }
 
-          const nc = shStore.getState().runNoConfidence(boardCtx, absoluteQuarter);
+          const nc = shStore.getState().runNoConfidence(boardCtx, elapsedQuarters);
           if (nc.called) {
             useStatsStore.getState().update({
               distressMessage: nc.result?.summary,

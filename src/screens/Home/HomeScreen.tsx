@@ -832,25 +832,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: theme.spacing.lg,
-    gap: theme.spacing.md,
+    gap: 8,
     // Clear of the nav bar. The old 160 was there so a scrolling page could
     // reach its end; nothing scrolls now.
     paddingBottom: 110,
     // ------------------------------------------------------------------
-    //  THE WHOLE PAGE, A FEW POINTS HIGHER
+    //  THE WHOLE PAGE, PULLED UPWARD FOR BREATHING ROOM
     // ------------------------------------------------------------------
-    //  The wordmark, the gear and the player card sat a touch low against
-    //  the status bar. A translate rather than trimming the brand's own
-    //  marginTop: this container centres its children, so taking eight
-    //  points off the first child's margin moves the group up by four and
-    //  changes the gap under the wordmark as a side effect. A transform
-    //  moves everything by exactly the number written here and leaves every
-    //  spacing relationship inside the page alone.
-    //
-    //  Six points. Enough to read as deliberate, small enough that nobody
-    //  who has not been told will notice.
-    // ------------------------------------------------------------------
-    transform: [{ translateY: -6 }],
+    transform: [{ translateY: -14 }],
   },
   // ── Premium Header Card ──
   headerCard: {
@@ -858,9 +847,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.09)',
-    padding: 14,
-    gap: 12,
-    marginBottom: 4,
+    padding: 10,
+    gap: 8,
+    marginBottom: 2,
     shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
@@ -985,13 +974,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     width: '100%',
-    marginTop: 6,
+    marginTop: 2,
   },
   nextMonthContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
+    paddingVertical: 11,
     paddingHorizontal: 14,
     gap: 8,
   },
@@ -1039,7 +1028,7 @@ const styles = StyleSheet.create({
   },
   widgetsContainer: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: 10,
     alignItems: 'stretch',
   },
   widgetColumn: {
@@ -1047,27 +1036,30 @@ const styles = StyleSheet.create({
   },
   widgetCard: {
     flex: 1,
-    // 32 -> 20 and the minimum below it comes down with it. Four rows of
-    // text do not need a card this tall, and the two of them together were
-    // pushing the app icons to the bottom edge of the screen.
-    paddingVertical: 20,
-    paddingHorizontal: 12,
-    justifyContent: 'space-between',
+    paddingTop: 16,
+    paddingBottom: 14,
+    paddingHorizontal: 14,
+    justifyContent: 'flex-start',
+    gap: 12,
     minHeight: 200,
   },
   widgetRowBetween: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    marginBottom: theme.spacing.sm,
+    gap: 2,
   },
   widgetLabel: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.typography.caption,
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   widgetValue: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.caption + 2,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
   appsSection: {
     marginTop: theme.spacing.sm,
@@ -1124,7 +1116,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   widgetStatusRow: {
-    marginBottom: theme.spacing.xs,
+    gap: 2,
   },
   statusValueContainer: {
     flexDirection: 'row',
@@ -1133,7 +1125,8 @@ const styles = StyleSheet.create({
   },
   widgetStatusText: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.caption + 1,
+    fontSize: 14,
+    fontWeight: '700',
     marginTop: 0,
   },
   statusDeltaText: {
@@ -1143,7 +1136,9 @@ const styles = StyleSheet.create({
   statusCardAdjuster: {
     justifyContent: 'flex-start',
     paddingTop: 16,
-    gap: theme.spacing.xl || 24,
+    paddingBottom: 14,
+    paddingHorizontal: 14,
+    gap: 12,
   },
   card: {
     backgroundColor: '#434B50',
@@ -1425,8 +1420,8 @@ const styles = StyleSheet.create({
   //    color: theme.colors.onLight, fontWeight: '800', fontSize: 16,
   //  },
   brandContainer: {
-    marginTop: 8,
-    marginBottom: 4,
+    marginTop: 2,
+    marginBottom: 2,
     paddingHorizontal: 4,
     flexDirection: 'row',
     alignItems: 'center',
