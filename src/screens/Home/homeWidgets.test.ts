@@ -80,9 +80,13 @@ describe('the two widget cards', () => {
         }
     });
 
-    it('and the sheen is bright at the corner and gone by two thirds', () => {
+    it('and the rake only hints, because the rim is the effect', () => {
+        // "Tam okunmuyor, az vermeli." The rake crosses the TOP LEFT corner,
+        // which is exactly where the first label sits, so any argument about
+        // the contrast being technically fine loses to the person who cannot
+        // read it. Eight per cent, down from sixteen.
         const src = code();
-        expect(src).toMatch(/'rgba\(255,255,255,0\.16\)',\s*\n\s*'rgba\(255,255,255,0\.06\)',/);
+        expect(src).toMatch(/'rgba\(255,255,255,0\.08\)',\s*\n\s*'rgba\(255,255,255,0\.03\)',/);
         // Nowhere near the 48% that made a near-white ground and broke the
         // text. Scoped to a gradient STOP: the same rgba is a chevron colour
         // and a label colour elsewhere in this file.
@@ -127,6 +131,30 @@ describe('and it covers the card, which was the doubt', () => {
         const stops = (src.match(/locations=\{\[0, 0\.3, 0\.68, 1\]\}/)?.[0] ?? '');
         expect(stops).toBeTruthy();
         expect(src).toMatch(/modernCard: \{[\s\S]{0,2000}borderColor:/);
+    });
+});
+
+describe('the fourth row', () => {
+    it('is shelved, because a card with room for three had four', () => {
+        // Expenses was arriving cut in half at the bottom edge - "yarim
+        // gozukuyor zaten". A figure you can only half read is worse than
+        // one you are not shown, because the reader spends a moment deciding
+        // whether they misread it. The number is on the financial report,
+        // which this card is a tap away from.
+        const src = code();
+        expect(src).not.toMatch(/home\.expenses/);
+        expect(src).not.toMatch(/finances\.totalExpenses/);
+    });
+
+    it('and it is commented rather than deleted', () => {
+        expect(read()).toContain('home.expenses');
+    });
+
+    it('and the three that stay are the ones that were readable', () => {
+        const src = code();
+        for (const key of ['home.netWorth', 'home.cash', 'home.income']) {
+            expect(src).toContain(key);
+        }
     });
 });
 
@@ -182,7 +210,7 @@ describe('what the bands were hiding', () => {
         // was reverted.
         const src = code();
         expect(src).toMatch(/modernCard: \{[\s\S]{0,1600}backgroundColor: '#1C242C'/);
-        expect(src).toMatch(/colors=\{\[\s*\n\s*'rgba\(255,255,255,0\.16\)',/);
+        expect(src).toMatch(/colors=\{\[\s*\n\s*'rgba\(255,255,255,0\.08\)',/);
     });
 
     it('and the sheen it needs is bright enough to BE an edge', () => {
@@ -199,8 +227,11 @@ describe('what the bands were hiding', () => {
         const alpha = Number(
             src.match(/colors=\{\[\s*\n\s*'rgba\(255,255,255,([0-9.]+)\)',\s*\n\s*'rgba/)?.[1],
         );
-        expect(alpha).toBeGreaterThanOrEqual(0.10);
-        expect(alpha).toBeLessThanOrEqual(0.24);
+        // The floor came down when the rim took over as the effect: the
+        // rake is a hint now, and the thing that must not happen is it
+        // getting bright enough to fight the label it crosses.
+        expect(alpha).toBeGreaterThan(0);
+        expect(alpha).toBeLessThanOrEqual(0.12);
     });
 
     it('and that the shadow behind it was light grey', () => {

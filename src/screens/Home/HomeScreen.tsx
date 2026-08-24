@@ -576,14 +576,17 @@ const HomeScreen = () => {
                   left-to-right symmetry reads as a painted stripe, which is
                   what all four previous attempts were.
 
-                  Still nowhere near the old 48% - that made a near-white
-                  ground and broke the text. Sixteen at the corner is about
-                  ten to one under white type.
+                  AND IT IS EIGHT PER CENT, not sixteen. "Tam okunmuyor,
+                  az vermeli" - the rake crosses the top left corner, which
+                  is exactly where the first label sits, so any argument
+                  about the contrast being technically fine loses to the
+                  person who cannot read it. The rim is the effect; the rake
+                  only has to hint at where the light is coming from.
                  ------------------------------------------------------ */}
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.16)',
-                  'rgba(255,255,255,0.06)',
+                  'rgba(255,255,255,0.08)',
+                  'rgba(255,255,255,0.03)',
                   '#1C242C',
                   '#1C242C',
                 ]}
@@ -606,12 +609,27 @@ const HomeScreen = () => {
                     {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
                   </Text>
                 </View>
-                <View style={[styles.widgetRowBetween, { marginBottom: 0 }]}>
-                  <Text style={styles.widgetLabel}>{t('home.expenses')}</Text>
-                  <Text style={[styles.widgetValue, { color: theme.colors.danger }]} numberOfLines={1} adjustsFontSizeToFit>
-                    {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
-                  </Text>
-                </View>
+                {/* ------------------------------------------------------
+                    EXPENSES IS SHELVED
+
+                    It was the fourth row on a card that only has room for
+                    three, so it was arriving cut in half at the bottom
+                    edge - "yarim gozukuyor zaten". A figure you can only
+                    half read is worse than one you are not shown, because
+                    the reader spends a moment deciding whether they misread
+                    it.
+
+                    The number itself is not going anywhere: it is on the
+                    financial report, which is where the whole breakdown
+                    lives and which this card is a tap away from.
+
+                      <View style={[styles.widgetRowBetween, { marginBottom: 0 }]}>
+                        <Text style={styles.widgetLabel}>{t('home.expenses')}</Text>
+                        <Text style={[styles.widgetValue, { color: theme.colors.danger }]} numberOfLines={1} adjustsFontSizeToFit>
+                          {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
+                        </Text>
+                      </View>
+                   ------------------------------------------------------ */}
               </LinearGradient>
             </TouchableOpacity>
 
@@ -620,8 +638,8 @@ const HomeScreen = () => {
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.16)',
-                  'rgba(255,255,255,0.06)',
+                  'rgba(255,255,255,0.08)',
+                  'rgba(255,255,255,0.03)',
                   '#1C242C',
                   '#1C242C',
                 ]}
