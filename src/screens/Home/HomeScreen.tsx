@@ -575,25 +575,32 @@ const HomeScreen = () => {
                   Once the alpha is right, sideways is simply the better look,
                   which is what the original was reaching for.
 
-                  It covers properly now as well: light at both ends and dark
-                  only across the middle tenth, 45% to 55%. The original lit
-                  the outer fifth and nothing else, which is where "efekt
-                  kucuk kaliyor, tam kaplamali" came from; a wider wash also
-                  sits better, because a narrow one reads as two stripes
-                  rather than as light falling on a surface.
+                  AND IT NEEDS A PLATEAU, not a longer ramp. This is the one
+                  I got wrong twice. With two stops the light is at full
+                  strength only at the very edge and decays from there, so
+                  spreading it over more of the card makes it GENTLER at every
+                  point - fainter, not bigger. Reported both times as
+                  "buyumedi".
 
-                  Sixteen rather than twenty. Widening it makes it stronger
-                  even at the same alpha - there is simply more of it - so the
-                  two moves are one adjustment.
+                  Six stops instead of four. The light HOLDS across the outer
+                  fifth of each side, then falls to the dark between 44% and
+                  56%. That is a band you can see rather than a ramp that
+                  starts fading immediately, and it grows without the peak
+                  going up - which is what lets it stay at sixteen after
+                  "parlakligi azaltsan azicik".
 
                   The figures are not written here as hexes on purpose - the
                   palette audit reads hexes out of comments too.
                  ------------------------------------------------------ */}
               <LinearGradient
-                colors={['rgba(255,255,255,0.16)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.16)']}
+                colors={[
+                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                  '#1C242C', '#1C242C',
+                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                ]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.45, 0.55, 1]}
+                locations={[0, 0.22, 0.44, 0.56, 0.78, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -623,10 +630,14 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.16)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.16)']}
+                colors={[
+                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                  '#1C242C', '#1C242C',
+                  'rgba(255,255,255,0.16)', 'rgba(255,255,255,0.16)',
+                ]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.45, 0.55, 1]}
+                locations={[0, 0.22, 0.44, 0.56, 0.78, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (
