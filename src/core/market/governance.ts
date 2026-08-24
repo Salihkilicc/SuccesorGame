@@ -236,6 +236,7 @@ export type BoardEventKind =
     | 'quarter_loss'      // zararli ceyrek
     | 'covenant_breach'   // sozlesme ihlali
     | 'rating_downgrade'  // not dususu
+    | 'ceo_pay'           // patron kendine zam yapti
     | 'promise_kept'
     | 'promise_broken';
 
@@ -286,7 +287,7 @@ export interface CompanyContext {
 // ----------------------------------------------------------------------------
 const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
     Conservative: {
-        dividend: 1.0, buyback: 0.5, dilution: -0.9, ipo: -0.3,
+        ceo_pay: -0.7, dividend: 1.0, buyback: 0.5, dilution: -0.9, ipo: -0.3,
         acquisition: -0.6, divestiture: 0.3, debt_taken: -0.8,
         mezzanine_taken: -1.0, shark_loan: -1.0, layoffs: 0.2,
         capex: -0.4, outsourcing: 0.1, hold_cash: 0.8,
@@ -294,7 +295,7 @@ const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
         covenant_breach: -1.0, rating_downgrade: -1.0,
     },
     Aggressive: {
-        dividend: -0.6, buyback: -0.2, dilution: 0.5, ipo: 0.6,
+        ceo_pay: -0.2, dividend: -0.6, buyback: -0.2, dilution: 0.5, ipo: 0.6,
         acquisition: 1.0, divestiture: -0.5, debt_taken: 0.4,
         mezzanine_taken: 0.2, shark_loan: -0.4, layoffs: 0.5,
         capex: 0.7, outsourcing: 0.4, hold_cash: -1.0,
@@ -302,7 +303,7 @@ const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
         covenant_breach: -0.5, rating_downgrade: -0.4,
     },
     Visionary: {
-        dividend: -0.5, buyback: -0.6, dilution: 0.3, ipo: 0.4,
+        ceo_pay: -0.5, dividend: -0.5, buyback: -0.6, dilution: 0.3, ipo: 0.4,
         acquisition: 0.9, divestiture: -0.6, debt_taken: 0.1,
         mezzanine_taken: 0.0, shark_loan: -0.6, layoffs: -0.3,
         capex: 1.0, outsourcing: -0.5, hold_cash: -0.7,
@@ -310,7 +311,7 @@ const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
         covenant_breach: -0.6, rating_downgrade: -0.5,
     },
     Shark: {
-        dividend: -0.2, buyback: 0.6, dilution: 0.4, ipo: 0.8,
+        ceo_pay: 0.4, dividend: -0.2, buyback: 0.6, dilution: 0.4, ipo: 0.8,
         acquisition: 0.6, divestiture: 0.5, debt_taken: 0.5,
         mezzanine_taken: 0.6, shark_loan: 0.3, layoffs: 0.7,
         capex: -0.2, outsourcing: 0.6, hold_cash: -0.9,
@@ -318,7 +319,7 @@ const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
         covenant_breach: -0.2, rating_downgrade: -0.2,
     },
     Loyalist: {
-        dividend: 0.3, buyback: 0.2, dilution: -0.3, ipo: 0.1,
+        ceo_pay: 0.3, dividend: 0.3, buyback: 0.2, dilution: -0.3, ipo: 0.1,
         acquisition: 0.2, divestiture: -0.1, debt_taken: -0.2,
         mezzanine_taken: -0.4, shark_loan: -0.7, layoffs: -0.4,
         capex: 0.3, outsourcing: -0.2, hold_cash: 0.0,
@@ -326,7 +327,7 @@ const STANCE: Record<TraitType, Partial<Record<BoardEventKind, number>>> = {
         covenant_breach: -0.5, rating_downgrade: -0.4,
     },
     Snake: {
-        dividend: 0.1, buyback: 0.2, dilution: 0.3, ipo: 0.4,
+        ceo_pay: 0.2, dividend: 0.1, buyback: 0.2, dilution: 0.3, ipo: 0.4,
         acquisition: 0.1, divestiture: 0.4, debt_taken: 0.3,
         mezzanine_taken: 0.7, shark_loan: 0.6, layoffs: 0.4,
         capex: -0.3, outsourcing: 0.4, hold_cash: -0.3,
@@ -466,6 +467,14 @@ const clamp01 = (v: number) => Math.max(0, Math.min(1, v || 0));
 // ============================================================================
 
 export type ProposalKind =
+    // ------------------------------------------------------------------
+    //  `pay` is the CEO asking for a rise, and it is here rather than in a
+    //  system of its own for one reason: a salary the player controls is a
+    //  pipe from company money to personal money, and company money is the
+    //  thing this file exists to put a vote in front of. See
+    //  core/market/ceoPay.ts, loophole 3.
+    // ------------------------------------------------------------------
+    | 'pay'
     | 'acquisition'
     | 'debt'
     | 'mezzanine'
@@ -593,6 +602,7 @@ const proposalStance = (trait: TraitType, p: Proposal): number => {
         ipo: 'ipo',
         capex: 'capex',
         divestiture: 'divestiture',
+        pay: 'ceo_pay',
     };
     let s = STANCE[trait]?.[map[p.kind]] ?? 0;
     // Dusmanca devralma herkesi tedirgin eder: pahali, dagitici, riskli.

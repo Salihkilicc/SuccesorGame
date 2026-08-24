@@ -29,6 +29,16 @@ import InfoTooltipModal from './InfoTooltipModal';
 import { StatRow, DetailLine, DetailRule, DetailNote, RowGroup } from '../../common/Disclosure';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
+import {
+    decidePay,
+    payCeiling,
+    payAsShareOfRevenue,
+    CEO_BASE_SALARY_QUARTERLY,
+    PAY_VOTE_MULTIPLE,
+    PAY_CHANGE_COOLDOWN,
+} from '../../../core/market/ceoPay';
+import { currentQuarter } from '../../../core/story/world';
+import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 
@@ -119,6 +129,69 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
         onConfirm?: () => void;
         tone?: 'default' | 'danger';
     }>(null);
+
+    // ======================================================================
+    //  YOUR OWN PAY
+    // ======================================================================
+    //  Three choices rather than a number field, and each one shows what it
+    //  costs before it is picked. A free entry box invites the player to type
+    //  the treasury and be told no; these are the three answers that exist.
+    //
+    //  The ceiling is a share of TRAILING revenue, so it is a number the
+    //  player has already earned rather than one they can conjure. Every rule
+    //  behind it is in core/market/ceoPay.ts, written one per loophole.
+    // ======================================================================
+    const ceoPay = stats.ceoPayQuarterly ?? CEO_BASE_SALARY_QUARTERLY;
+    const ttmRevenueForPay = trailingTotal(stats.revenueHistory ?? []);
+    const payMax = payCeiling(ttmRevenueForPay);
+    // When they may next change it. Shown rather than only enforced: "no" with
+    // no date on it reads as broken, which is how the old contract presets and
+    // the old friendly-acquisition lock both went wrong.
+    const quartersSincePayChange =
+        currentQuarter() - (stats.ceoPaySetQuarter ?? -PAY_CHANGE_COOLDOWN);
+    const payLockedFor = Math.max(0, PAY_CHANGE_COOLDOWN - quartersSincePayChange);
+
+    const openPayPanel = () => {
+        const options: { label: string; amount: number }[] = [
+            { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY },
+            { label: 'A real rise', amount: Math.min(payMax, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2) },
+            { label: 'Everything the company can carry', amount: payMax },
+        ];
+
+        setPanel({
+            title: 'Your pay',
+            summary: `You take ${formatMoney(ceoPay)} a quarter, and the company pays it. `
+                + `The most it can carry is ${formatMoney(payMax)}, which is two per cent of what it sells.`,
+            lines: options.map(o => {
+                const d = decidePay({
+                    amount: o.amount,
+                    current: ceoPay,
+                    trailingAnnualRevenue: ttmRevenueForPay,
+                    quartersSinceChange: quartersSincePayChange,
+                });
+                const share = payAsShareOfRevenue(d.granted, ttmRevenueForPay);
+                return {
+                    label: o.label,
+                    value: `${formatMoney(d.granted)}${d.needsVote ? ' · board votes' : ''}`
+                        + (share > 0 ? ` · ${(share * 100).toFixed(1)}% of sales` : ''),
+                } as ConfirmLine;
+            }),
+            note: payLockedFor > 0
+                ? `Pay is set once a year. ${payLockedFor} more ${payLockedFor === 1 ? 'quarter' : 'quarters'} before it can rise again. A cut still takes effect at once.`
+                : 'A rise is set once a year and costs trust with every director, '
+                    + 'whether or not they approve it. A cut takes effect at once and costs nothing.',
+            confirmLabel: 'Ask for the maximum',
+            onConfirm: () => {
+                const r = useCorporateFinanceStore.getState().requestCeoPay(payMax);
+                setPanel({
+                    title: r.ok ? 'Set' : 'Not this year',
+                    summary: r.message,
+                    confirmLabel: 'OK',
+                    tone: r.ok ? 'default' : 'danger',
+                });
+            },
+        });
+    };
 
     const handleStockSplit = () => {
         if (stockPrice <= 1000) {
@@ -429,6 +502,33 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 </Text>
                             </View>
                             <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
+                        </TouchableOpacity>
+
+                        {/* ------------------------------------------------
+                            WHAT YOU PAY YOURSELF
+
+                            Here rather than on a screen of its own because it
+                            belongs with the other four: every row on this page
+                            moves money between the company and its owners, and
+                            this is the one that moves it to you. See
+                            core/market/ceoPay.ts for why it is not simply a
+                            number field.
+                           ------------------------------------------------ */}
+                        <TouchableOpacity
+                            style={styles.actionRow}
+                            onPress={openPayPanel}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.actionIconBox, { backgroundColor: theme.colors.surfaceRaised, borderWidth: 1, borderColor: theme.colors.border }]}>
+                                <MaterialCommunityIcons name="account-tie" size={24} color={theme.colors.textPrimary} />
+                            </View>
+                            <View style={styles.actionContent}>
+                                <Text style={styles.actionTitle}>Your pay</Text>
+                                <Text style={styles.actionDescription}>
+                                    {`${formatMoney(ceoPay)} a quarter · the board may cap it at ${formatMoney(payMax)}`}
+                                </Text>
+                            </View>
+                            <Text style={styles.actionArrow}>›</Text>
                         </TouchableOpacity>
 
                         <View style={{ height: 40 }} />

@@ -84,6 +84,14 @@ export const PORTFOLIO_YIELD_QUARTERLY = {
 export type PersonalIncomeInput = {
     /** From the education system. 1.0 with no degree. */
     educationMultiplier: number;
+    /**
+     * What the player has set their own pay to, per QUARTER.
+     *
+     * Omitted means the base. It is passed in rather than read here because
+     * whether the player may set it at all is a board decision, and this file
+     * has no business knowing about boards. See core/market/ceoPay.ts.
+     */
+    ceoPayQuarterly?: number;
     /** Dividends and coupons, per QUARTER, already summed. */
     portfolioIncomeQuarterly: number;
 };
@@ -125,7 +133,10 @@ export const personalQuarter = (
         ? Math.max(0, income.educationMultiplier)
         : 1;
 
-    const salary = CEO_BASE_SALARY_QUARTERLY * multiplier;
+    const basePay = Number.isFinite(income?.ceoPayQuarterly)
+        ? Math.max(0, income!.ceoPayQuarterly!)
+        : CEO_BASE_SALARY_QUARTERLY;
+    const salary = basePay * multiplier;
     const portfolioIncome = Math.max(0, income?.portfolioIncomeQuarterly || 0);
     const totalIncome = salary + portfolioIncome;
 

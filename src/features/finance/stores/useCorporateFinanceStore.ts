@@ -38,6 +38,11 @@ import { directorFromAcquisition } from '../../../core/market/governance';
 import { boardWillSell } from '../../../core/market/mergers';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { formatMoney } from '../../../core/utils';
+import { decidePay, PAY_CHANGE_COOLDOWN } from '../../../core/market/ceoPay';
+import { CEO_BASE_SALARY_QUARTERLY } from '../../../core/market/personalEconomy';
+import { trailingTotal } from '../../../core/market/equity';
+import { currentQuarter } from '../../../core/story/world';
+import type { ProposalKind } from '../../../core/market/governance';
 
 /**
  * CORPORATE FINANCE STORE
@@ -131,6 +136,8 @@ export interface CorporateFinanceState {
     serviceDebtQuarter: (quarters: number) => { interest: number; principal: number; total: number };
     getDistress: () => DistressState;
     advanceDistress: () => DistressState;
+    /** Ask for a rise. See core/market/ceoPay.ts for every rule this obeys. */
+    requestCeoPay: (amount: number) => { ok: boolean; message: string; granted: number };
     takeLoan: (
         amount: number,
         valuation: number,
@@ -294,8 +301,34 @@ const RISK_THRESHOLD = 0.5; // 50% triggers market penalty
  *
  *  Donen deger `null` ise karar serbest; degilse oylama sonucudur.
  */
+/**
+ * What asking for a rise costs the room, whether or not they said yes.
+ *
+ * Every member, not just the ones who voted against: a board that approved
+ * your rise because the numbers were good still watched you ask for it.
+ */
+const applyPayTrustCost = (cost: number): void => {
+    if (!(cost > 0)) return;
+    try {
+        const sh = require('../../shareholders/stores/useShareholderStore').useShareholderStore;
+        sh.setState((st: any) => ({
+            members: st.members.map((m: any) => ({
+                ...m,
+                trust: Math.max(0, m.trust - cost),
+                isHostile: m.trust - cost < 20,
+            })),
+        }));
+        sh.getState().recalculateBoardMood();
+    } catch (err) {
+        console.warn('[ceoPay] could not charge trust', err);
+    }
+};
+
 export const boardGate = (
-    kind: 'acquisition' | 'debt' | 'mezzanine' | 'dilution' | 'ipo' | 'dividend' | 'buyback' | 'capex' | 'divestiture',
+    // The list used to be spelled out here, which meant governance could gain
+    // a proposal kind that this gate silently could not put to a vote. It is
+    // the type now, so the two cannot drift.
+    kind: ProposalKind,
     amount: number,
     title: string,
     hostile = false,
@@ -506,6 +539,72 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
              * Kapasite artik DEGERLEMEDEN degil KAZANCTAN turetiliyor:
              * bankalar nakit akisina borc verir, hayale degil.
              */
+            // ================================================================
+            //  THE CEO ASKS FOR A RISE
+            // ================================================================
+            //  Here rather than in useStatsStore, and that is the whole point:
+            //  this is where `boardGate` lives. A salary the player can write
+            //  into a field is a pipe from company money to personal money,
+            //  and it would route straight around the vote that every other
+            //  use of company money has to pass. See core/market/ceoPay.ts,
+            //  loophole 3.
+            //
+            //  ORDER MATTERS and it is the same order as the buyout: work out
+            //  what is even allowed, then ask the room, then move anything.
+            // ================================================================
+            requestCeoPay: (amount: number) => {
+                const stats = useStatsStore.getState();
+                const quarter = currentQuarter();
+
+                const decision = decidePay({
+                    amount,
+                    current: stats.ceoPayQuarterly ?? CEO_BASE_SALARY_QUARTERLY,
+                    trailingAnnualRevenue: trailingTotal(stats.revenueHistory ?? []),
+                    quartersSinceChange: quarter - (stats.ceoPaySetQuarter ?? -PAY_CHANGE_COOLDOWN),
+                });
+
+                if (decision.blocked) {
+                    return { ok: false, message: decision.blocked, granted: decision.granted };
+                }
+
+                if (decision.needsVote) {
+                    const gate = boardGate(
+                        'pay',
+                        decision.granted * 4,
+                        `CEO pay: ${formatMoney(decision.granted)} a quarter`,
+                    );
+                    if (gate.needed && !gate.passed) {
+                        // ----------------------------------------------------
+                        //  A REFUSAL STILL COSTS
+                        // ----------------------------------------------------
+                        //  Otherwise the optimal play is to ask for the
+                        //  ceiling every year and pocket the ones that happen
+                        //  to pass. They watched you ask.
+                        // ----------------------------------------------------
+                        applyPayTrustCost(decision.trustCost);
+                        return {
+                            ok: false,
+                            message: `The board turned it down. ${gate.reason}`,
+                            granted: stats.ceoPayQuarterly ?? CEO_BASE_SALARY_QUARTERLY,
+                        };
+                    }
+                }
+
+                applyPayTrustCost(decision.trustCost);
+                useStatsStore.getState().update({
+                    ceoPayQuarterly: decision.granted,
+                    ceoPaySetQuarter: quarter,
+                });
+
+                return {
+                    ok: true,
+                    message: decision.capped
+                        ? `Set to ${formatMoney(decision.granted)}, the most the company can carry.`
+                        : `Set to ${formatMoney(decision.granted)} a quarter.`,
+                    granted: decision.granted,
+                };
+            },
+
             takeLoan: (amount, _valuation, loanType, _baseRate, addCashFn) => {
                 const a = get().getAssessment();
                 const distress = get().getDistress();

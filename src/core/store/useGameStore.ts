@@ -22,7 +22,7 @@ import { advanceCompetitors } from '../market/competitors';
 import {
   BONUS_PERIOD_QUARTERS, EMPTY_ACCRUAL, accrueCeoBonus, type BonusAccrual,
 } from '../market/compensation';
-import { asMonthly } from '../market/personalEconomy';
+import { asMonthly, CEO_BASE_SALARY_QUARTERLY } from '../market/personalEconomy';
 import { updateReachIndex } from '../market/attraction';
 import {
   availableStandardUnits,
@@ -1250,8 +1250,26 @@ export const useGameStore = create<GameStore>()(
         // Anapara geri odemesi kardan degil NAKITTEN cikar — bilanco
         // hareketidir, gider degildir. Gider yazsaydik kari iki kez
         // dusurmus olurduk.
+        // ------------------------------------------------------------------
+        //  AND THE CEO IS PAID BY THE COMPANY, NOT BY NOBODY
+        // ------------------------------------------------------------------
+        //  The founder's salary used to arrive from the life economy with no
+        //  corresponding debit anywhere - money created rather than moved.
+        //  That was survivable while it was a constant. It is not survivable
+        //  the moment the player can set it, because then the field is a
+        //  button that prints cash.
+        //
+        //  Struck against capital rather than against profit, exactly like
+        //  the CEO bonus above it and for the same reason: `personalQuarter`
+        //  already credits the personal side, and running it through
+        //  netProfit as well would count one salary twice.
+        //  See core/market/ceoPay.ts.
+        // ------------------------------------------------------------------
+        const ceoPayThisTick =
+          Math.max(0, stats.ceoPayQuarterly ?? CEO_BASE_SALARY_QUARTERLY) * Math.max(1, quarters);
+
         const newCompanyCapital =
-          (stats.companyCapital || 0) + netProfit - principalRepaid - bonus.paid;
+          (stats.companyCapital || 0) + netProfit - principalRepaid - bonus.paid - ceoPayThisTick;
 
         // 7. PLAYER FINANCIALS (Using Quarterly Economy Engine)
         // Calculate quarterly finances once and apply to player cash

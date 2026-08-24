@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { CEO_BASE_SALARY_QUARTERLY } from '../market/personalEconomy';
+import { PAY_CHANGE_COOLDOWN } from '../market/ceoPay';
 import { BRAND_INDEX_SCALE } from '../market/brand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,6 +50,8 @@ export type StatKey =
   | 'incomingHires'
   | 'avgTenureQuarters'
   | 'salaryRatio'
+  | 'ceoPayQuarterly'
+  | 'ceoPaySetQuarter'
   | 'stockSplitCount';
 
 export interface Shareholder {
@@ -139,6 +143,19 @@ export type StatsState = Record<StatKey, number> & {
    * degildi ve ekranda yanlis gider gosteriyordu.
    */
   salaryRatio: number;
+  // ------------------------------------------------------------------
+  //  WHAT THE PLAYER PAYS THEMSELVES
+  // ------------------------------------------------------------------
+  //  `salaryRatio` above decides what every employee is paid and nothing
+  //  decided what the founder was paid. Set through
+  //  useCorporateFinanceStore.requestCeoPay, which is where the board gate
+  //  is - see core/market/ceoPay.ts for why it cannot simply be a field
+  //  anybody writes.
+  // ------------------------------------------------------------------
+  /** Per QUARTER, like everything in personalEconomy. */
+  ceoPayQuarterly: number;
+  /** The quarter the last change landed, for the once-a-year cooldown. */
+  ceoPaySetQuarter: number;
   techLevels: TechLevels;
   acquisitions: Acquisitions;
   subsidiaryStates: Record<string, SubsidiaryState>; // Track subsidiary performance
@@ -328,6 +345,8 @@ export const initialStatsState: StatsState = {
   employeeCount: START_EMPLOYEES,
   employeeMorale: 75,
   salaryRatio: 1.0,
+  ceoPayQuarterly: CEO_BASE_SALARY_QUARTERLY,
+  ceoPaySetQuarter: -PAY_CHANGE_COOLDOWN,
 
   // ESKI ALAN — gercek kapasite artik kademeden turetiliyor
   // (core/market/capacity.ts). Sadece eski ekranlar patlamasin diye duruyor.

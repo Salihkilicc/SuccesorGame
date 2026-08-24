@@ -72,7 +72,12 @@ export const calculateQuarterlyFinances = (
     }
 
     const q = personalQuarter(
-        { educationMultiplier, portfolioIncomeQuarterly: dividendIncome },
+        {
+            educationMultiplier,
+            portfolioIncomeQuarterly: dividendIncome,
+            // What the board let the player award themselves. See ceoPay.ts.
+            ceoPayQuarterly: statsState?.ceoPayQuarterly,
+        },
         { educationCostQuarterly: educationCost, partnerCostQuarterly: partnerQuarterlyCost },
     );
 
