@@ -556,38 +556,37 @@ const HomeScreen = () => {
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               {/* ------------------------------------------------------
-                  THE SHEEN, AND WHY IT RUNS DOWNWARDS
+                  THE SHEEN COMES FROM BOTH SIDES
 
-                  There was a gloss here and it was thrown away with the
-                  problem rather than separately from it. Asked for back:
-                  "o kartlara beyaz sanki parlaklik varmis gibi efekt ekle".
+                  It ran sideways originally, I moved it to the top edge, and
+                  that was the wrong call twice over: it is not what was asked
+                  for, and the reasoning behind it was wrong.
 
-                  Two things were wrong with the old one and only one of
-                  them was the white.
+                  I had said the direction was the fault - light on the left
+                  and right is light behind the labels and the figures. The
+                  FAULT WAS THE ALPHA. Forty eight per cent white with a light
+                  grey stop at the far end makes a near-white ground, and
+                  white text on that is unreadable whichever way the gradient
+                  runs. Twenty per cent over the dark card lands about two
+                  steps up the surface ladder, where white text still reads at
+                  better than nine to one - so it can sit under a whole row
+                  and cost nothing.
 
-                  IT RAN SIDEWAYS. Start (0, 0.5) to end (1, 0.5), so the
-                  light was on the LEFT and RIGHT edges - which is exactly
-                  where the labels and the figures are, left aligned and
-                  right aligned. Vertical puts the light on the top edge,
-                  where there is twenty points of padding and no text.
+                  Once the alpha is right, sideways is simply the better look,
+                  which is what the original was reaching for.
 
-                  AND IT WAS 48% WHITE, plus a #CFD0D2 stop at the far side.
-                  That is a fill, not a sheen. Twelve per cent of white over
-                  the card lifts it by about one step of the surface ladder,
-                  and white text on THAT still reads at better than seven to
-                  one - so the gloss can overlap a row without costing
-                  anything. The figure is not written here as a hex on
-                  purpose: the palette audit reads hexes out of comments too,
-                  and a number in prose is not a colour anybody can use.
+                  It covers properly now as well: light at both ends, dark
+                  from 35% to 65%. The old one only lit the outer fifth, which
+                  is where "efekt kucuk kaliyor" came from.
 
-                  Faded out by 28%, so on a 200 tall card it is gone about
-                  fifteen points below where the first row starts.
+                  The figures are not written here as hexes on purpose - the
+                  palette audit reads hexes out of comments too.
                  ------------------------------------------------------ */}
               <LinearGradient
-                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C']}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-                locations={[0, 0.45, 1]}
+                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.20)']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                locations={[0, 0.35, 0.65, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -617,10 +616,10 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C']}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-                locations={[0, 0.45, 1]}
+                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.20)']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                locations={[0, 0.35, 0.65, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (

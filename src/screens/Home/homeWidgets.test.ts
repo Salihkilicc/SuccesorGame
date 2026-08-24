@@ -53,7 +53,7 @@ describe('the two widget cards', () => {
         // down over the first rows - which is what lets it be a gloss rather
         // than a hairline.
         const src = code();
-        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C'\]\}/);
+        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C', 'rgba\(255,255,255,0\.20\)'\]\}/);
         // What it replaced: 48% white and a #CFD0D2 stop. Those are fills.
         // Scoped to a gradient STOP: the same string is a chevron colour and
         // a label colour elsewhere in this file, and neither is a ground.
@@ -61,20 +61,24 @@ describe('the two widget cards', () => {
         expect(src).not.toMatch(/'#1C242C', '#1C242C', '#CFD0D2'/);
     });
 
-    it('and it runs DOWNWARDS, which is the half that was actually wrong', () => {
-        // The old one went start (0, 0.5) to end (1, 0.5) - light on the
-        // left and right edges, which is exactly where the labels and the
-        // figures are. Vertical puts it on the top edge, where there is
-        // padding and no text.
+    it('and it comes from BOTH SIDES, which is what was asked for', () => {
+        // I moved this to the top edge and argued that the direction was the
+        // fault. It was not: the fault was 48% white with a light grey stop
+        // at the far end, which makes a near-white ground whichever way the
+        // gradient runs. At 20% over the dark card it is nine to one, so
+        // sideways is safe and it is the better look.
         const src = code();
-        expect(src).toMatch(/start=\{\{ x: 0\.5, y: 0 \}\}\s*\n\s*end=\{\{ x: 0\.5, y: 1 \}\}/);
-        expect(src).not.toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}/);
+        expect(src).toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}\s*\n\s*end=\{\{ x: 1, y: 0\.5 \}\}/);
+        expect(src).not.toMatch(/start=\{\{ x: 0\.5, y: 0 \}\}/);
     });
 
-    it('and it is big enough to read as a gloss', () => {
-        // 28% was a hairline. Reported as "efekt kucuk kaliyor".
+    it('and it covers, rather than edging', () => {
+        // The original lit only the outer fifth - 0, 0.2, 0.8, 1 - which is
+        // where "efekt kucuk kaliyor, tam kaplamali" came from. Dark only
+        // between 35% and 65% now, so most of the card carries some of it.
         const src = code();
-        expect(src).toMatch(/locations=\{\[0, 0\.45, 1\]\}/);
+        expect(src).toMatch(/locations=\{\[0, 0\.35, 0\.65, 1\]\}/);
+        expect(src).not.toMatch(/locations=\{\[0, 0\.2, 0\.8, 1\]\}/);
     });
 
     it('and both of them, not just the one that was open', () => {
@@ -82,10 +86,8 @@ describe('the two widget cards', () => {
         // reading the other as done is how the casino's 700 survived a
         // whole commit.
         const src = code();
-        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C'\]\}/g) ?? [];
+        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C', 'rgba\(255,255,255,0\.20\)'\]\}/g) ?? [];
         expect(sheen).toHaveLength(2);
-        const vertical = src.match(/start=\{\{ x: 0\.5, y: 0 \}\}/g) ?? [];
-        expect(vertical.length).toBeGreaterThanOrEqual(2);
     });
 
     it('and are shorter than they were', () => {
@@ -152,6 +154,13 @@ describe('what the bands were hiding', () => {
         const src = code();
         expect(src).toMatch(/modernCard: \{[\s\S]{0,1600}backgroundColor: '#1C242C'/);
         expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)'/);
+    });
+
+    it('and the sheen it needs is bright enough to BE an edge', () => {
+        // Twenty per cent, not the twelve it was cut to. The whole reason the
+        // dark card works is that both of its sides are lit.
+        const src = code();
+        expect(src).not.toMatch(/colors=\{\['rgba\(255,255,255,0\.1\d\)'/);
     });
 
     it('and that the shadow behind it was light grey', () => {
