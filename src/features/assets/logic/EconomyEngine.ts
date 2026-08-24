@@ -5,6 +5,8 @@ import {
     PERSONAL_TAX_RATE,
     MONTHS_PER_QUARTER,
 } from '../../../core/market/personalEconomy';
+import { payCeiling } from '../../../core/market/ceoPay';
+import { trailingTotal } from '../../../core/market/equity';
 
 export const calculateQuarterlyFinances = (
     userState: any,
@@ -75,8 +77,12 @@ export const calculateQuarterlyFinances = (
         {
             educationMultiplier,
             portfolioIncomeQuarterly: dividendIncome,
-            // What the board let the player award themselves. See ceoPay.ts.
+            // What the board let the player award themselves, and the roof
+            // that number was measured against. Both, because education
+            // multiplies the first by up to six and would otherwise carry it
+            // straight through the second. See ceoPay.ts.
             ceoPayQuarterly: statsState?.ceoPayQuarterly,
+            payCeilingQuarterly: payCeiling(trailingTotal(statsState?.revenueHistory ?? [])),
         },
         { educationCostQuarterly: educationCost, partnerCostQuarterly: partnerQuarterlyCost },
     );

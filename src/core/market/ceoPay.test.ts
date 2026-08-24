@@ -27,6 +27,7 @@ import {
     CEO_BASE_SALARY_QUARTERLY,
 } from './ceoPay';
 import { CEO_BONUS_RATE } from './compensation';
+import { personalQuarter } from './personalEconomy';
 
 /** A real company: 400m a year of revenue. */
 const REVENUE = 400_000_000;
@@ -205,5 +206,102 @@ describe('and the ordinary case', () => {
         expect(d.needsVote).toBe(false);
         expect(d.trustCost).toBe(0);
         expect(d.blocked).toBeNull();
+    });
+});
+
+
+// ============================================================================
+//  AND THE TWO THAT GOT THROUGH THE FIRST TIME
+// ============================================================================
+//
+//  Both found by reading the finished code rather than by any of the eighteen
+//  rules above, and both reopen a hole that was supposed to be shut. The
+//  lesson is the same one as the buyout screens: the pure module was tested
+//  and the things AROUND it were not.
+// ============================================================================
+
+describe('LOOPHOLE 1, through the side door', () => {
+    it('is not reopened by a degree', () => {
+        // ----------------------------------------------------------------
+        //  A CAPPED NUMBER MULTIPLIED AFTERWARDS IS NOT CAPPED
+        // ----------------------------------------------------------------
+        //  `salaryMultiplier()` returns up to SIX - two for an undergraduate
+        //  degree, two for a master's, one and a half for a doctorate - and
+        //  the personal economy multiplied the salary by it AFTER the board
+        //  had approved a figure.
+        //
+        //  Measured, not guessed: a ceiling of 2,000,000 paid 12,000,000.
+        //  Twelve per cent of revenue where the rule says two, on a number
+        //  the board had signed off at two million.
+        //
+        //  A degree gets you TO the number faster. It does not raise the roof.
+        // ----------------------------------------------------------------
+        const ceiling = payCeiling(400_000_000);
+        const paid = personalQuarter(
+            {
+                educationMultiplier: 6,
+                ceoPayQuarterly: ceiling,
+                payCeilingQuarterly: ceiling,
+                portfolioIncomeQuarterly: 0,
+            },
+            { educationCostQuarterly: 0, partnerCostQuarterly: 0 },
+        ).salary;
+        expect(paid).toBe(ceiling);
+    });
+
+    it('while a degree still helps anybody below the roof', () => {
+        const ceiling = payCeiling(400_000_000);
+        const paid = personalQuarter(
+            {
+                educationMultiplier: 2,
+                ceoPayQuarterly: CEO_BASE_SALARY_QUARTERLY,
+                payCeilingQuarterly: ceiling,
+                portfolioIncomeQuarterly: 0,
+            },
+            { educationCostQuarterly: 0, partnerCostQuarterly: 0 },
+        ).salary;
+        expect(paid).toBe(CEO_BASE_SALARY_QUARTERLY * 2);
+    });
+
+    it('and a ceiling that FALLS pulls the salary down with it', () => {
+        // The same fix covers this. A ceiling only checked on the way in
+        // stops applying the moment revenue drops, so a company whose sales
+        // collapsed would go on paying the salary of the company it was.
+        const paid = personalQuarter(
+            {
+                educationMultiplier: 1,
+                ceoPayQuarterly: 2_000_000,
+                payCeilingQuarterly: payCeiling(0),
+                portfolioIncomeQuarterly: 0,
+            },
+            { educationCostQuarterly: 0, partnerCostQuarterly: 0 },
+        ).salary;
+        expect(paid).toBe(CEO_BASE_SALARY_QUARTERLY);
+    });
+});
+
+describe('and the clock across a succession', () => {
+    it('cannot end up counting backwards', () => {
+        // ----------------------------------------------------------------
+        //  `currentQuarter()` is derived from `age - initialGameState.age`,
+        //  and a successor takes the chair at SIXTEEN against a starting age
+        //  of twenty, so the counter collapses to almost nothing. With the
+        //  parent's `ceoPaySetQuarter` still in the store - a number from a
+        //  life that ran for decades - `quartersSinceChange` comes out
+        //  NEGATIVE and the new player is told to wait a hundred and twenty
+        //  quarters before they may set their own pay.
+        //
+        //  runSuccession resets both fields. This is the rule that says a
+        //  negative gap can never mean "blocked forever" even if one slips
+        //  through again.
+        // ----------------------------------------------------------------
+        const d = decidePay({
+            amount: CEO_BASE_SALARY_QUARTERLY * 2,
+            current: CEO_BASE_SALARY_QUARTERLY,
+            trailingAnnualRevenue: 400_000_000,
+            quartersSinceChange: -118,
+        });
+        expect(d.blocked).not.toBeNull();
+        expect(d.blocked).not.toMatch(/1[0-9][0-9] more/);
     });
 });

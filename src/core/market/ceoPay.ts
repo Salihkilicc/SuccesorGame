@@ -170,8 +170,22 @@ export const decidePay = (req: PayRequest): PayDecision => {
     // immediate: nobody games the system by paying themselves less, and a
     // player who wants to put money back into a dying company should not be
     // told to wait a year for permission.
-    if (isRise && (req?.quartersSinceChange ?? 0) < PAY_CHANGE_COOLDOWN) {
-        const wait = PAY_CHANGE_COOLDOWN - (req?.quartersSinceChange ?? 0);
+    // ----------------------------------------------------------------------
+    //  A GAP CANNOT BE NEGATIVE, WHATEVER THE CALLER BELIEVES
+    // ----------------------------------------------------------------------
+    //  `currentQuarter()` is derived from `age - initialGameState.age`, and a
+    //  successor takes the chair at sixteen against a starting age of twenty,
+    //  so the counter collapses. With a `ceoPaySetQuarter` left over from a
+    //  life that ran for decades the subtraction goes NEGATIVE, and the wait
+    //  it produces is a hundred and twenty quarters rather than four.
+    //
+    //  runSuccession resets both fields, which is the real fix. This is the
+    //  belt: the worst a bad clock can ever cost is one full cooldown.
+    // ----------------------------------------------------------------------
+    const sinceChange = Math.max(0, req?.quartersSinceChange ?? 0);
+
+    if (isRise && sinceChange < PAY_CHANGE_COOLDOWN) {
+        const wait = PAY_CHANGE_COOLDOWN - sinceChange;
         return {
             requested: asked,
             granted: current,

@@ -92,6 +92,25 @@ export type PersonalIncomeInput = {
      * has no business knowing about boards. See core/market/ceoPay.ts.
      */
     ceoPayQuarterly?: number;
+    /**
+     * The most the company can carry, per QUARTER. From ceoPay.payCeiling.
+     *
+     * Passed in and applied HERE rather than only at the moment the pay is
+     * set, for two reasons that are really one:
+     *
+     *   Education multiplies the salary, and it multiplies by up to SIX. A
+     *   capped number multiplied afterwards is not capped, so a player with
+     *   all three degrees sitting at the ceiling was paid six times what the
+     *   board had approved - twelve per cent of revenue instead of two.
+     *
+     *   And a ceiling only checked on the way in is a ceiling that stops
+     *   applying the moment revenue falls. A company whose sales collapse
+     *   would go on paying the salary of the company it used to be.
+     *
+     * Omitted means uncapped, which is what the tests of the life economy
+     * alone want.
+     */
+    payCeilingQuarterly?: number;
     /** Dividends and coupons, per QUARTER, already summed. */
     portfolioIncomeQuarterly: number;
 };
@@ -136,7 +155,12 @@ export const personalQuarter = (
     const basePay = Number.isFinite(income?.ceoPayQuarterly)
         ? Math.max(0, income!.ceoPayQuarterly!)
         : CEO_BASE_SALARY_QUARTERLY;
-    const salary = basePay * multiplier;
+    // A degree gets you TO the number faster. It does not raise the roof.
+    const uncapped = basePay * multiplier;
+    const ceiling = Number.isFinite(income?.payCeilingQuarterly)
+        ? Math.max(0, income!.payCeilingQuarterly!)
+        : Infinity;
+    const salary = Math.min(uncapped, ceiling);
     const portfolioIncome = Math.max(0, income?.portfolioIncomeQuarterly || 0);
     const totalIncome = salary + portfolioIncome;
 

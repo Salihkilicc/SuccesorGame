@@ -190,3 +190,42 @@ describe('the money is moved rather than made', () => {
         expect(engine).toMatch(/ceoPayQuarterly: statsState\?\.ceoPayQuarterly/);
     });
 });
+
+
+describe('a succession does not carry the last CEO\'s package', () => {
+    const codeOf = (...p: string[]): string => {
+        const fs = require('fs');
+        const path = require('path');
+        return fs.readFileSync(path.join(__dirname, ...p), 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .split('\n')
+            .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+            .join('\n');
+    };
+
+    it('so the new one starts on the founder\'s wage', () => {
+        // The board approved a salary for a PERSON, not for a chair. A
+        // successor walking into a parent's maximum package would be paid the
+        // ceiling from their first morning without ever asking anybody, which
+        // is the one thing the vote exists to prevent.
+        const src = codeOf('..', '..', '..', 'core', 'story', 'runSuccession.ts');
+        expect(src).toMatch(/ceoPayQuarterly: CEO_BASE_SALARY_QUARTERLY/);
+    });
+
+    it('and the clock is reset with it', () => {
+        // Otherwise `quartersSinceChange` goes negative - see ceoPay.test.ts -
+        // and the successor is told to wait a hundred and twenty quarters.
+        const src = codeOf('..', '..', '..', 'core', 'story', 'runSuccession.ts');
+        expect(src).toMatch(/ceoPaySetQuarter: currentQuarter\(\) - PAY_CHANGE_COOLDOWN/);
+    });
+});
+
+describe('the engine passes the roof as well as the number', () => {
+    it('or a degree would carry the salary straight through it', () => {
+        const fs = require('fs');
+        const path = require('path');
+        const src: string = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'assets', 'logic', 'EconomyEngine.ts'), 'utf8');
+        expect(src).toMatch(/payCeilingQuarterly: payCeiling\(/);
+    });
+});

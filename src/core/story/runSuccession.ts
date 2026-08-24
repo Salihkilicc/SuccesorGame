@@ -30,6 +30,9 @@ import { useStatsStore } from '../store/useStatsStore';
 import { useFamilyStore } from '../store/useFamilyStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { useMessageStore } from '../store/useMessageStore';
+import { CEO_BASE_SALARY_QUARTERLY } from '../market/personalEconomy';
+import { PAY_CHANGE_COOLDOWN } from '../market/ceoPay';
+import { currentQuarter } from './world';
 import { useMailStore } from '../store/useMailStore';
 import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
 import { CAST } from '../../data/story/cast';
@@ -166,7 +169,31 @@ export const runSuccession = (): SuccessionPlan | null => {
     //  chief executive's private fortune would have inherited nothing and
     //  the siblings would have inherited from a man who still had it.
     // ------------------------------------------------------------------
-    useStatsStore.setState({ money: plan.cash } as never);
+    // ------------------------------------------------------------------
+    //  AND THE NEW CHIEF EXECUTIVE IS ON THE FOUNDER'S WAGE
+    // ------------------------------------------------------------------
+    //  Two things, and the second is a bug rather than a decision.
+    //
+    //  THE PACKAGE DOES NOT INHERIT. The board approved a salary for a
+    //  person, not for a chair. A successor who walked into a parent's
+    //  maximum package would be paid the ceiling from their first morning
+    //  without ever having asked anybody, which is the whole point of
+    //  ceoPay.ts arriving through a vote.
+    //
+    //  AND THE CLOCK HAS TO BE RESET, because `currentQuarter()` is derived
+    //  from `age - initialGameState.age` and the new player is SIXTEEN
+    //  against a starting age of twenty. So the counter collapses to nearly
+    //  zero while `ceoPaySetQuarter` still holds the number from a life that
+    //  ran for decades. `quartersSinceChange` comes out NEGATIVE, and the
+    //  successor is told to wait a hundred and twenty quarters before they
+    //  may set their own pay. Found by reading rather than by playing, which
+    //  is the only way anybody was ever going to find it.
+    // ------------------------------------------------------------------
+    useStatsStore.setState({
+        money: plan.cash,
+        ceoPayQuarterly: CEO_BASE_SALARY_QUARTERLY,
+        ceoPaySetQuarter: currentQuarter() - PAY_CHANGE_COOLDOWN,
+    } as never);
 
     // ------------------------------------------------------------------
     //  3. THE SIBLINGS ARRIVE ON THE REGISTER
