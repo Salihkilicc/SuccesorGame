@@ -575,18 +575,25 @@ const HomeScreen = () => {
                   Once the alpha is right, sideways is simply the better look,
                   which is what the original was reaching for.
 
-                  It covers properly now as well: light at both ends, dark
-                  from 35% to 65%. The old one only lit the outer fifth, which
-                  is where "efekt kucuk kaliyor" came from.
+                  It covers properly now as well: light at both ends and dark
+                  only across the middle tenth, 45% to 55%. The original lit
+                  the outer fifth and nothing else, which is where "efekt
+                  kucuk kaliyor, tam kaplamali" came from; a wider wash also
+                  sits better, because a narrow one reads as two stripes
+                  rather than as light falling on a surface.
+
+                  Sixteen rather than twenty. Widening it makes it stronger
+                  even at the same alpha - there is simply more of it - so the
+                  two moves are one adjustment.
 
                   The figures are not written here as hexes on purpose - the
                   palette audit reads hexes out of comments too.
                  ------------------------------------------------------ */}
               <LinearGradient
-                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.20)']}
+                colors={['rgba(255,255,255,0.16)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.16)']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.35, 0.65, 1]}
+                locations={[0, 0.45, 0.55, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -616,10 +623,10 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.20)']}
+                colors={['rgba(255,255,255,0.16)', '#1C242C', '#1C242C', 'rgba(255,255,255,0.16)']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.35, 0.65, 1]}
+                locations={[0, 0.45, 0.55, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (

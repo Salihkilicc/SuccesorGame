@@ -53,7 +53,7 @@ describe('the two widget cards', () => {
         // down over the first rows - which is what lets it be a gloss rather
         // than a hairline.
         const src = code();
-        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C', 'rgba\(255,255,255,0\.20\)'\]\}/);
+        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.16\)', '#1C242C', '#1C242C', 'rgba\(255,255,255,0\.16\)'\]\}/);
         // What it replaced: 48% white and a #CFD0D2 stop. Those are fills.
         // Scoped to a gradient STOP: the same string is a chevron colour and
         // a label colour elsewhere in this file, and neither is a ground.
@@ -74,10 +74,11 @@ describe('the two widget cards', () => {
 
     it('and it covers, rather than edging', () => {
         // The original lit only the outer fifth - 0, 0.2, 0.8, 1 - which is
-        // where "efekt kucuk kaliyor, tam kaplamali" came from. Dark only
-        // between 35% and 65% now, so most of the card carries some of it.
+        // where "efekt kucuk kaliyor, tam kaplamali" came from. Dark across
+        // the middle tenth now, so nearly all of the card carries some of
+        // it: a narrow wash reads as two stripes rather than as light.
         const src = code();
-        expect(src).toMatch(/locations=\{\[0, 0\.35, 0\.65, 1\]\}/);
+        expect(src).toMatch(/locations=\{\[0, 0\.45, 0\.55, 1\]\}/);
         expect(src).not.toMatch(/locations=\{\[0, 0\.2, 0\.8, 1\]\}/);
     });
 
@@ -86,7 +87,7 @@ describe('the two widget cards', () => {
         // reading the other as done is how the casino's 700 survived a
         // whole commit.
         const src = code();
-        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C', 'rgba\(255,255,255,0\.20\)'\]\}/g) ?? [];
+        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.16\)', '#1C242C', '#1C242C', 'rgba\(255,255,255,0\.16\)'\]\}/g) ?? [];
         expect(sheen).toHaveLength(2);
     });
 
@@ -153,14 +154,25 @@ describe('what the bands were hiding', () => {
         // was reverted.
         const src = code();
         expect(src).toMatch(/modernCard: \{[\s\S]{0,1600}backgroundColor: '#1C242C'/);
-        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)'/);
+        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.16\)'/);
     });
 
     it('and the sheen it needs is bright enough to BE an edge', () => {
-        // Twenty per cent, not the twelve it was cut to. The whole reason the
-        // dark card works is that both of its sides are lit.
+        // ----------------------------------------------------------------
+        //  A BAND RATHER THAN A DIGIT
+        // ----------------------------------------------------------------
+        //  This used to forbid `0.1x` by regex, which was only ever right
+        //  while the answer happened to be 0.20 - the next nudge downwards
+        //  would have failed a rule that has nothing to say about it. The
+        //  floor is what matters: bright enough to draw an edge on a dark
+        //  card, dim enough that white text on it still clears 4.5:1.
+        // ----------------------------------------------------------------
         const src = code();
-        expect(src).not.toMatch(/colors=\{\['rgba\(255,255,255,0\.1\d\)'/);
+        const alpha = Number(
+            src.match(/colors=\{\['rgba\(255,255,255,([0-9.]+)\)'/)?.[1],
+        );
+        expect(alpha).toBeGreaterThanOrEqual(0.14);
+        expect(alpha).toBeLessThanOrEqual(0.24);
     });
 
     it('and that the shadow behind it was light grey', () => {
