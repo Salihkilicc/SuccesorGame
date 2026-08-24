@@ -22,6 +22,7 @@ import { advanceCompetitors } from '../market/competitors';
 import {
   BONUS_PERIOD_QUARTERS, EMPTY_ACCRUAL, accrueCeoBonus, type BonusAccrual,
 } from '../market/compensation';
+import { asMonthly } from '../market/personalEconomy';
 import { updateReachIndex } from '../market/attraction';
 import {
   availableStandardUnits,
@@ -327,9 +328,26 @@ export const useGameStore = create<GameStore>()(
         const { products } = useProductStore.getState();
         const { researcherCount } = useLaboratoryStore.getState();
 
-        // CRITICAL FIX: Default salary if not set
-        const baseSalary = stats.monthlyIncome || 5000;
-        const baseExpenses = stats.monthlyExpenses || 2000;
+        // ------------------------------------------------------------------
+        //  THE SALARY THAT COPIED ITSELF
+        // ------------------------------------------------------------------
+        //  SHELVED:
+        //      const baseSalary = stats.monthlyIncome || 5000;
+        //      const baseExpenses = stats.monthlyExpenses || 2000;
+        //
+        //  These read a store field, handed it out as `playerIncome`, and
+        //  wrote the SAME value back at the bottom of the tick. A number that
+        //  copied itself forever, defaulting to a third figure nobody had
+        //  reconciled with the other two: the store said 8,000, this line said
+        //  5,000, and EconomyEngine paid 45,000 a QUARTER, which is the only
+        //  one that ever moved money.
+        //
+        //  So the player had a salary they could see the name of and never the
+        //  amount of. The real figures are computed below, once, from
+        //  `quarterlyReport`, and written into the fields at the bottom so the
+        //  names finally mean what they say.
+        //  See core/market/personalEconomy.ts.
+        // ------------------------------------------------------------------
 
         // 2. DYNAMIC PRODUCT FINANCIALS (Per Quarter)
         // Calculate quarters passed (assuming 3 months = 1 quarter)
@@ -1846,8 +1864,10 @@ export const useGameStore = create<GameStore>()(
         useStatsStore.getState().update({
           companyCapital: newCompanyCapital,
           money: newPlayerCash,
-          monthlyIncome: baseSalary,
-          monthlyExpenses: baseExpenses,
+          // The figures the engine actually collected this quarter, as a
+          // MONTHLY rate, because that is what these two fields are called.
+          monthlyIncome: asMonthly(quarterlyReport.totalIncome),
+          monthlyExpenses: asMonthly(quarterlyReport.totalExpenses),
           companyValue: valuation,
           companySharePrice: newSharePrice,
           previousSharePrice: prevPrice,
@@ -2653,8 +2673,8 @@ export const useGameStore = create<GameStore>()(
             // Diğerleri (Stats store'dan veya hesaplamadan)
             // Ayni degerleme — `sermaye * 1.5` kalintisi temizlendi.
             playerNetWorth: newPlayerCash + valuation * (ownership / 100),
-            playerIncome: baseSalary,
-            playerExpenses: baseExpenses,
+            playerIncome: asMonthly(quarterlyReport.totalIncome),
+            playerExpenses: asMonthly(quarterlyReport.totalExpenses),
             companyValuation: valuation,
             productBreakdown: productBreakdownList
           }

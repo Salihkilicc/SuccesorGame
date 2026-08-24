@@ -1,4 +1,10 @@
 import { FinancialReport, BreakdownItem } from '../types/economyTypes';
+import {
+    personalQuarter,
+    PORTFOLIO_YIELD_QUARTERLY,
+    PERSONAL_TAX_RATE,
+    MONTHS_PER_QUARTER,
+} from '../../../core/market/personalEconomy';
 
 export const calculateQuarterlyFinances = (
     userState: any,
@@ -6,14 +12,16 @@ export const calculateQuarterlyFinances = (
     statsState: any
 ): FinancialReport => {
 
-    // 1. Calculate Income with Education Multiplier
-    const baseSalary = 45000; // Base quarterly salary
-
-    // Get Education Salary Multiplier from new system
+    // ----------------------------------------------------------------------
+    //  THE NUMBERS MOVED OUT
+    // ----------------------------------------------------------------------
+    //  45,000 / 20,000 / 10,000 / 20% were typed here, and useStatsStore held
+    //  a DIFFERENT salary under the name `monthlyIncome`. See
+    //  core/market/personalEconomy.ts for what that cost and why every
+    //  constant there says whether it is monthly or quarterly.
+    // ----------------------------------------------------------------------
     const { useEducationSystem } = require('../../life/components/Education/store/useEducationSystem');
     const educationMultiplier = useEducationSystem.getState().salaryMultiplier();
-
-    const salaryQuarterly = baseSalary * educationMultiplier;
 
     let dividendIncome = 0;
 
@@ -27,8 +35,7 @@ export const calculateQuarterlyFinances = (
             portfolioValue += val;
 
             if (h.type === 'stock') {
-                // Simple 0.5% quarterly dividend for stocks
-                dividendIncome += val * 0.005;
+                dividendIncome += val * PORTFOLIO_YIELD_QUARTERLY.stock;
             } else if (h.type === 'bond') {
                 // Bonds pay coupons based on Face Value, not current price/cost
                 // Assuming h has faceValue and couponRate attached, OR we need to look it up?
@@ -48,8 +55,7 @@ export const calculateQuarterlyFinances = (
                     dividendIncome += annualCoupon / 4;
                 }
             } else if (h.type === 'fund') {
-                // Funds pay small distributions (0.3% quarterly)
-                dividendIncome += val * 0.003;
+                dividendIncome += val * PORTFOLIO_YIELD_QUARTERLY.fund;
             }
             // Crypto pays 0 (unless staking is added later)
         });
@@ -58,26 +64,24 @@ export const calculateQuarterlyFinances = (
     // Business Profit (Placeholder)
     const businessProfit = 0;
 
-    const totalIncome = salaryQuarterly + dividendIncome + businessProfit;
-
-    // 2. Calculate Expenses
-    const housingCost = 20000;
-    const lifestyleCost = 10000;
-
-    // Education Cost (Tuition) - Get from new system
     const educationCost = useEducationSystem.getState().getCurrentQuarterlyCost();
-
-
-
-    const tax = totalIncome * 0.20; // 20% Tax
 
     let partnerQuarterlyCost = 0;
     if (userState.partner && userState.partner.finances) {
-        // Assume monthlyCost is stored, convert to Quarterly (x3)
-        partnerQuarterlyCost = (userState.partner.finances.monthlyCost || 0) * 3;
+        partnerQuarterlyCost = (userState.partner.finances.monthlyCost || 0) * MONTHS_PER_QUARTER;
     }
 
-    const totalExpenses = housingCost + lifestyleCost + partnerQuarterlyCost + educationCost + tax;
+    const q = personalQuarter(
+        { educationMultiplier, portfolioIncomeQuarterly: dividendIncome },
+        { educationCostQuarterly: educationCost, partnerCostQuarterly: partnerQuarterlyCost },
+    );
+
+    const salaryQuarterly = q.salary;
+    const totalIncome = q.totalIncome + businessProfit;
+    const housingCost = q.housing;
+    const lifestyleCost = q.lifestyle;
+    const tax = q.tax;
+    const totalExpenses = q.totalExpenses;
 
     // 3. Prepare Assets Breakdown
     const cash = statsState?.money || 0;
@@ -105,7 +109,7 @@ export const calculateQuarterlyFinances = (
             ...(businessProfit > 0 ? [{ id: 'business', label: 'Business Profit', amount: businessProfit, type: 'income' as const }] : [])
         ],
         expenseBreakdown: [
-            { id: 'tax', label: 'Tax (20%)', amount: tax, type: 'expense' },
+            { id: 'tax', label: `Tax (${Math.round(PERSONAL_TAX_RATE * 100)}%)`, amount: tax, type: 'expense' },
             { id: 'housing', label: 'Housing & Rent', amount: housingCost, type: 'expense' },
             { id: 'lifestyle', label: 'Personal/Lifestyle', amount: lifestyleCost, type: 'expense' },
             ...(educationCost > 0 ? [{ id: 'education', label: 'Tuition Fees', amount: educationCost, type: 'expense' as const }] : []),

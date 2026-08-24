@@ -357,6 +357,25 @@ export const useEquityStore = create<EquityState>()(
                         tax: 0, isAffordable: true,
                     };
                 }
+
+                // ----------------------------------------------------------
+                //  THE IPO GATE WAS DRAWN AND NOT ENFORCED
+                // ----------------------------------------------------------
+                //  ShareControlHub disables the dividend row while the
+                //  company is private and says "requires IPO". Nothing here
+                //  agreed: any caller reaching this function directly paid
+                //  out of a company with no float, to a register of one.
+                //
+                //  The same rule the acquisition screen already learned the
+                //  hard way: a disabled control is a drawing, and a drawing
+                //  is not a rule. See AcquisitionModal, friendlyLock.
+                // ----------------------------------------------------------
+                if (!useStatsStore.getState().isPublic) {
+                    return {
+                        totalRequired: 0, playerPortion: 0, playerGross: 0,
+                        tax: 0, isAffordable: false,
+                    };
+                }
                 const totalCost = amountPerShare * cap.totalShares;
                 const playerGross = amountPerShare * cap.playerShares;
 

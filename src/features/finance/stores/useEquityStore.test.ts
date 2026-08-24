@@ -165,6 +165,12 @@ describe('dividend', () => {
     it('costs the whole company to pay you your third of it', () => {
         // The cap table's whole point, in one number: at 35% you spend a
         // pound to put thirty-five pence in your own pocket, before tax.
+        //
+        // `isPublic` is set because a dividend now REQUIRES an IPO in the
+        // store rather than only on the screen - see the test below. This
+        // fixture was a private company paying a dividend, which the gate
+        // correctly refuses.
+        useStatsStore.setState({ isPublic: true } as any);
         s().syncStockPrice(50_000_000);
         const result = s().distributeDividend(0.10, () => { });
 
@@ -173,6 +179,25 @@ describe('dividend', () => {
         expect(result.playerGross / result.totalRequired).toBeCloseTo(0.35, 2);
         // And the taxman takes a cut of what reaches you.
         expect(result.playerPortion).toBeLessThanOrEqual(result.playerGross);
+    });
+
+    it('and refuses one from a private company, which the screen only drew', () => {
+        // ----------------------------------------------------------------
+        //  A DISABLED CONTROL IS A DRAWING, AND A DRAWING IS NOT A RULE
+        // ----------------------------------------------------------------
+        //  ShareControlHub disabled the dividend row while private and said
+        //  "requires IPO". The store agreed with none of it, so any caller
+        //  reaching this function directly paid a dividend out of a company
+        //  with no float, to a register of one. Same lesson the acquisition
+        //  screen learned with friendlyLock.
+        // ----------------------------------------------------------------
+        useStatsStore.setState({ isPublic: false } as any);
+        s().syncStockPrice(50_000_000);
+        let moved = 0;
+        const result = s().distributeDividend(0.10, (n) => { moved += n; });
+        expect(result.totalRequired).toBe(0);
+        expect(result.isAffordable).toBe(false);
+        expect(moved).toBe(0);
     });
 
     it('refuses a negative one, which used to be a money printer', () => {
