@@ -128,6 +128,18 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
         confirmLabel: string;
         onConfirm?: () => void;
         tone?: 'default' | 'danger';
+        /**
+         * A decision with more than two answers. ConfirmPanel has supported
+         * these all along; this state did not carry them, so every decision
+         * raised from this screen had to be squeezed into one confirm button.
+         * See openPayPanel.
+         */
+        choices?: {
+            label: string;
+            description?: string;
+            onPress: () => void;
+            disabled?: boolean;
+        }[];
     }>(null);
 
     // ======================================================================
@@ -151,7 +163,37 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
         currentQuarter() - (stats.ceoPaySetQuarter ?? -PAY_CHANGE_COOLDOWN);
     const payLockedFor = Math.max(0, PAY_CHANGE_COOLDOWN - quartersSincePayChange);
 
+    /** Ask for a number, then say what came of it. Shared by all three rows. */
+    const askForPay = (amount: number) => {
+        const r = useCorporateFinanceStore.getState().requestCeoPay(amount);
+        setPanel({
+            title: r.ok ? 'Set' : 'Not this year',
+            summary: r.message,
+            confirmLabel: 'OK',
+            tone: r.ok ? 'default' : 'danger',
+        });
+    };
+
     const openPayPanel = () => {
+        // ------------------------------------------------------------------
+        //  THREE ANSWERS, AND ALL THREE CAN BE GIVEN
+        // ------------------------------------------------------------------
+        //  This panel listed the three as `lines` - read only - under a single
+        //  button labelled "Ask for the maximum", so a player could see the
+        //  founder's wage and the middle step and take neither. The only move
+        //  available was the greediest one, which is the opposite of what a
+        //  panel built around a choice is for, and it made a pay CUT
+        //  unreachable from the screen although `decidePay` allows one at any
+        //  time and charges nothing for it.
+        //
+        //  `choices` already existed for exactly this - the acquisition panel
+        //  pays in cash, debt or stock the same way - so this is the shape the
+        //  screen should have had, not a new mechanism.
+        //
+        //  Nothing is filtered out. A row that cannot be taken is shown greyed
+        //  with the reason underneath, which is the rule the acquisition panel
+        //  learned the hard way: a missing button teaches nothing.
+        // ------------------------------------------------------------------
         const options: { label: string; amount: number }[] = [
             { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY },
             { label: 'A real rise', amount: Math.min(payMax, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2) },
@@ -162,7 +204,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
             title: 'Your pay',
             summary: `You take ${formatMoney(ceoPay)} a quarter, and the company pays it. `
                 + `The most it can carry is ${formatMoney(payMax)}, which is two per cent of what it sells.`,
-            lines: options.map(o => {
+            choices: options.map(o => {
                 const d = decidePay({
                     amount: o.amount,
                     current: ceoPay,
@@ -170,26 +212,41 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                     quartersSinceChange: quartersSincePayChange,
                 });
                 const share = payAsShareOfRevenue(d.granted, ttmRevenueForPay);
+                const isCut = d.granted < ceoPay;
+                const unchanged = d.granted === ceoPay;
+
+                // The description carries the WHY, because it is also what a
+                // greyed row has to explain.
+                const detail = d.blocked
+                    ? d.blocked
+                    : unchanged
+                        ? 'What you already take.'
+                        : [
+                            `${formatMoney(d.granted)} a quarter`,
+                            share > 0 ? `${(share * 100).toFixed(1)}% of sales` : '',
+                            d.needsVote ? 'the board votes on this' : 'no vote needed',
+                            isCut
+                                ? 'a cut costs nothing and takes effect at once'
+                                : d.trustCost > 0
+                                    ? `costs every director ${d.trustCost} trust`
+                                    : 'costs no trust',
+                        ].filter(Boolean).join(' · ');
+
                 return {
                     label: o.label,
-                    value: `${formatMoney(d.granted)}${d.needsVote ? ' · board votes' : ''}`
-                        + (share > 0 ? ` · ${(share * 100).toFixed(1)}% of sales` : ''),
-                } as ConfirmLine;
+                    description: detail,
+                    disabled: !!d.blocked || unchanged,
+                    onPress: () => askForPay(o.amount),
+                };
             }),
             note: payLockedFor > 0
                 ? `Pay is set once a year. ${payLockedFor} more ${payLockedFor === 1 ? 'quarter' : 'quarters'} before it can rise again. A cut still takes effect at once.`
                 : 'A rise is set once a year and costs trust with every director, '
                     + 'whether or not they approve it. A cut takes effect at once and costs nothing.',
-            confirmLabel: 'Ask for the maximum',
-            onConfirm: () => {
-                const r = useCorporateFinanceStore.getState().requestCeoPay(payMax);
-                setPanel({
-                    title: r.ok ? 'Set' : 'Not this year',
-                    summary: r.message,
-                    confirmLabel: 'OK',
-                    tone: r.ok ? 'default' : 'danger',
-                });
-            },
+            // Unused while `choices` is present - the choices ARE the answer -
+            // but ConfirmPanel takes it as required, and the cancel row is
+            // what closes this one.
+            confirmLabel: 'Close',
         });
     };
 
@@ -542,6 +599,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         title={panel?.title || ''}
                         summary={panel?.summary}
                         lines={panel?.lines}
+                        choices={panel?.choices}
                         note={panel?.note}
                         tone={panel?.tone}
                         confirmLabel={panel?.confirmLabel || 'OK'}
