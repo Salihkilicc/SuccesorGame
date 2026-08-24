@@ -46,71 +46,54 @@ const code = () => read()
     .join('\n');
 
 describe('the two widget cards', () => {
-    it('have a sheen, and it is a sheen rather than a fill', () => {
-        // Asked for at "en az 20%". Twenty per cent of white over the dark
-        // card lands about two steps up the surface ladder and white text on
-        // it still reads at better than nine to one, so the gloss can run
-        // down over the first rows - which is what lets it be a gloss rather
-        // than a hairline.
+    // The gradient's own fingerprint. There are four other LinearGradients on
+    // this screen and none of them uses these stops, so this is how the two
+    // cards are picked out without counting every gradient in the file.
+    const CARD_STOPS = /locations=\{\[0, 0\.3, 0\.68, 1\]\}/g;
+
+    it('are lit by their RIM, which is a different technique', () => {
+        // ----------------------------------------------------------------
+        //  FOUR ROUNDS OF MOVING THE SAME NUMBERS
+        // ----------------------------------------------------------------
+        //  Direction, alpha, ramp, plateau - and it never landed. A wash
+        //  behind the text can only ever be a paler rectangle, however wide
+        //  it is, which is why widening it kept not helping.
+        //
+        //  A card looks lit BY ITS EDGE. The rim is on `modernCard` and it
+        //  is the change; the gradient is now the supporting half.
+        // ----------------------------------------------------------------
         const src = code();
-        expect(src).toMatch(/'rgba\(255,255,255,0\.13\)', 'rgba\(255,255,255,0\.13\)',\s*\n\s*'#1C242C', '#1C242C',/);
-        // What it replaced: 48% white and a #CFD0D2 stop. Those are fills.
-        // Scoped to a gradient STOP: the same string is a chevron colour and
-        // a label colour elsewhere in this file, and neither is a ground.
+        expect(src).toMatch(/modernCard: \{[\s\S]{0,2000}borderWidth: 1,\s*\n\s*borderColor: 'rgba\(255,255,255,0\.\d+\)'/);
+        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,2000}borderWidth: 0,/);
+    });
+
+    it('and raked corner to corner rather than side to side', () => {
+        // A diagonal reads as light falling on a surface. Left-to-right
+        // symmetry reads as a painted stripe, which is what every previous
+        // attempt was - including the one I argued for.
+        const src = code();
+        const cards = src.match(/<LinearGradient[\s\S]{0,700}?locations=\{\[0, 0\.3, 0\.68, 1\]\}/g) ?? [];
+        expect(cards).toHaveLength(2);
+        for (const c of cards) {
+            expect(c).toMatch(/start=\{\{ x: 0, y: 0 \}\}/);
+            expect(c).toMatch(/end=\{\{ x: 1, y: 1 \}\}/);
+        }
+    });
+
+    it('and the sheen is bright at the corner and gone by two thirds', () => {
+        const src = code();
+        expect(src).toMatch(/'rgba\(255,255,255,0\.16\)',\s*\n\s*'rgba\(255,255,255,0\.06\)',/);
+        // Nowhere near the 48% that made a near-white ground and broke the
+        // text. Scoped to a gradient STOP: the same rgba is a chevron colour
+        // and a label colour elsewhere in this file.
         expect(src).not.toMatch(/colors=\{\['rgba\(255,255,255,0\.48\)'/);
         expect(src).not.toMatch(/'#1C242C', '#1C242C', '#CFD0D2'/);
     });
 
-    it('and it comes from BOTH SIDES, which is what was asked for', () => {
-        // I moved this to the top edge and argued that the direction was the
-        // fault. It was not: the fault was 48% white with a light grey stop
-        // at the far end, which makes a near-white ground whichever way the
-        // gradient runs. At 20% over the dark card it is nine to one, so
-        // sideways is safe and it is the better look.
-        const src = code();
-        expect(src).toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}\s*\n\s*end=\{\{ x: 1, y: 0\.5 \}\}/);
-        expect(src).not.toMatch(/start=\{\{ x: 0\.5, y: 0 \}\}/);
-    });
-
-    it('and it HOLDS the light before it falls away', () => {
-        // ----------------------------------------------------------------
-        //  A PLATEAU, NOT A LONGER RAMP
-        // ----------------------------------------------------------------
-        //  Got wrong twice. With two stops the light is at full strength
-        //  only at the very edge and decays from there, so spreading it over
-        //  more of the card makes it gentler at every point - fainter, not
-        //  bigger. Reported both times as "buyumedi".
-        //
-        //  Six stops: the light holds across the outer 38% of each side and
-        //  only gives way across the middle few per cent, so roughly three
-        //  quarters of the card is lit. That grows the visible band while
-        //  the peak comes DOWN.
-        // ----------------------------------------------------------------
-        const src = code();
-        expect(src).toMatch(/locations=\{\[0, 0\.38, 0\.47, 0\.53, 0\.62, 1\]\}/);
-
-        // The shape that cannot hold anything: four stops, so every point
-        // between the edge and the middle is already fading.
-        expect(src).not.toMatch(/locations=\{\[0, 0\.\d+, 0\.\d+, 1\]\}/);
-
-        const stops = (src.match(/locations=\{\[([^\]]+)\]\}/)?.[1] ?? '')
-            .split(',').map(Number);
-        expect(stops.length).toBeGreaterThanOrEqual(6);
-
-        // The plateau is what makes it visible, so measure it rather than
-        // trusting the numbers: the lit run at each edge has to be a real
-        // fraction of the card, not a rim.
-        expect(stops[1]).toBeGreaterThanOrEqual(0.3);
-        expect(1 - stops[4]).toBeGreaterThanOrEqual(0.3);
-    });
-
     it('and both of them, not just the one that was open', () => {
-        // Two identical gradients, twenty lines apart. Fixing one and
-        // reading the other as done is how the casino's 700 survived a
-        // whole commit.
-        const src = code();
-        const sheen = src.match(/locations=\{\[0, 0\.38, 0\.47, 0\.53, 0\.62, 1\]\}/g) ?? [];
-        expect(sheen).toHaveLength(2);
+        // Two identical gradients, forty lines apart. Fixing one and reading
+        // the other as done is how the casino's 700 survived a whole commit.
+        expect(code().match(CARD_STOPS) ?? []).toHaveLength(2);
     });
 
     it('and are shorter than they were', () => {
@@ -136,15 +119,14 @@ describe('and it covers the card, which was the doubt', () => {
         expect(src).toMatch(/widgetCard: \{\s*\n\s*flex: 1,/);
     });
 
-    it('and it spans the whole width rather than part of it', () => {
-        // start 0 to end 1. A gradient from 0.1 to 0.9 would leave the very
-        // edges flat and is exactly the shape the doubt describes.
+    it('and it spans corner to corner rather than part of the way', () => {
+        // A gradient from 0.1 to 0.9 would leave the very edges flat and is
+        // exactly the shape the doubt describes. And the rim, which is the
+        // effect now, is a border - it cannot miss an edge by construction.
         const src = code();
-        expect(src).toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}\s*\n\s*end=\{\{ x: 1, y: 0\.5 \}\}/);
-        const stops = (src.match(/locations=\{\[([^\]]+)\]\}/)?.[1] ?? '')
-            .split(',').map(Number);
-        expect(stops[0]).toBe(0);
-        expect(stops[stops.length - 1]).toBe(1);
+        const stops = (src.match(/locations=\{\[0, 0\.3, 0\.68, 1\]\}/)?.[0] ?? '');
+        expect(stops).toBeTruthy();
+        expect(src).toMatch(/modernCard: \{[\s\S]{0,2000}borderColor:/);
     });
 });
 
@@ -200,7 +182,7 @@ describe('what the bands were hiding', () => {
         // was reverted.
         const src = code();
         expect(src).toMatch(/modernCard: \{[\s\S]{0,1600}backgroundColor: '#1C242C'/);
-        expect(src).toMatch(/colors=\{\[\s*\n?\s*'rgba\(255,255,255,0\.13\)'/);
+        expect(src).toMatch(/colors=\{\[\s*\n\s*'rgba\(255,255,255,0\.16\)',/);
     });
 
     it('and the sheen it needs is bright enough to BE an edge', () => {
@@ -215,7 +197,7 @@ describe('what the bands were hiding', () => {
         // ----------------------------------------------------------------
         const src = code();
         const alpha = Number(
-            src.match(/colors=\{\[\s*\n?\s*'rgba\(255,255,255,([0-9.]+)\)'/)?.[1],
+            src.match(/colors=\{\[\s*\n\s*'rgba\(255,255,255,([0-9.]+)\)',\s*\n\s*'rgba/)?.[1],
         );
         expect(alpha).toBeGreaterThanOrEqual(0.10);
         expect(alpha).toBeLessThanOrEqual(0.24);

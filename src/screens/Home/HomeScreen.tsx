@@ -556,61 +556,40 @@ const HomeScreen = () => {
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               {/* ------------------------------------------------------
-                  THE SHEEN COMES FROM BOTH SIDES
+                  A LIT RIM AND A RAKE, NOT A BAND
 
-                  It ran sideways originally, I moved it to the top edge, and
-                  that was the wrong call twice over: it is not what was asked
-                  for, and the reasoning behind it was wrong.
+                  Four rounds of moving the same numbers - direction, alpha,
+                  ramp, plateau - and it never landed. That is the signal to
+                  change the TECHNIQUE rather than the values, so this is a
+                  different effect rather than another tuning of the last one.
 
-                  I had said the direction was the fault - light on the left
-                  and right is light behind the labels and the figures. The
-                  FAULT WAS THE ALPHA. Forty eight per cent white with a light
-                  grey stop at the far end makes a near-white ground, and
-                  white text on that is unreadable whichever way the gradient
-                  runs. Twenty per cent over the dark card lands about two
-                  steps up the surface ladder, where white text still reads at
-                  better than nine to one - so it can sit under a whole row
-                  and cost nothing.
+                  What a card actually looks lit BY is its edge. A wash
+                  behind the text is a wash: it sits under the content and
+                  reads as a slightly paler rectangle however wide it is,
+                  which is why widening it kept not helping. A bright rim is
+                  the thing the eye reads as a raised, glossy surface, and it
+                  is on `modernCard` below rather than here.
 
-                  Once the alpha is right, sideways is simply the better look,
-                  which is what the original was reaching for.
+                  And the gradient rakes CORNER TO CORNER, (0,0) to (1,1),
+                  bright at the top left and gone by two thirds of the way
+                  across. A diagonal reads as light falling on a surface;
+                  left-to-right symmetry reads as a painted stripe, which is
+                  what all four previous attempts were.
 
-                  AND IT NEEDS A PLATEAU, not a longer ramp. This is the one
-                  I got wrong twice. With two stops the light is at full
-                  strength only at the very edge and decays from there, so
-                  spreading it over more of the card makes it GENTLER at every
-                  point - fainter, not bigger. Reported both times as
-                  "buyumedi".
-
-                  Six stops instead of four. The light HOLDS across the outer
-                  38% of each side and only gives way across the middle few
-                  per cent, so roughly three quarters of the card is lit. That
-                  is a band you can see rather than a ramp that starts fading
-                  immediately.
-
-                  AND IT DOES COVER, which was the other half of the doubt -
-                  "kenarlari birakiyor mu". The gradient IS the card: it
-                  carries `styles.card` itself, it is `flex: 1`, nothing
-                  insets it and nothing is drawn over it. It runs edge to
-                  edge. What was missing was never coverage, it was that the
-                  lit part was too narrow and too faint to read as an effect.
-
-                  Thirteen per cent, down from sixteen. Widening it adds
-                  strength on its own, so the peak comes down as it grows -
-                  "yanlarda kalsin da daha az etki".
-
-                  The figures are not written here as hexes on purpose - the
-                  palette audit reads hexes out of comments too.
+                  Still nowhere near the old 48% - that made a near-white
+                  ground and broke the text. Sixteen at the corner is about
+                  ten to one under white type.
                  ------------------------------------------------------ */}
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
-                  '#1C242C', '#1C242C',
-                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
+                  'rgba(255,255,255,0.16)',
+                  'rgba(255,255,255,0.06)',
+                  '#1C242C',
+                  '#1C242C',
                 ]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.38, 0.47, 0.53, 0.62, 1]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                locations={[0, 0.3, 0.68, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -641,13 +620,14 @@ const HomeScreen = () => {
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
-                  '#1C242C', '#1C242C',
-                  'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.13)',
+                  'rgba(255,255,255,0.16)',
+                  'rgba(255,255,255,0.06)',
+                  '#1C242C',
+                  '#1C242C',
                 ]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.38, 0.47, 0.53, 0.62, 1]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                locations={[0, 0.3, 0.68, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (
@@ -1496,7 +1476,17 @@ const styles = StyleSheet.create({
     //  rasterises the layer first and cannot cache it.
     backgroundColor: '#1C242C',
     borderRadius: 33,
-    borderWidth: 0,
+    // ------------------------------------------------------------------
+    //  THE RIM IS THE GLOSS
+    // ------------------------------------------------------------------
+    //  This was `borderWidth: 0` and every attempt at a highlight went into
+    //  the gradient behind the text, where it can only ever be a paler
+    //  rectangle. A lit edge is what makes a dark card read as a raised
+    //  surface rather than a hole, and it does it at the one place the eye
+    //  is already looking - the boundary.
+    // ------------------------------------------------------------------
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
     shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
