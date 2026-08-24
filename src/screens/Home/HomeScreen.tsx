@@ -557,7 +557,7 @@ const HomeScreen = () => {
               />
               <View style={styles.nextMonthContent}>
                 <Text style={styles.nextMonthText}>{t('home.advanceToNextQuarter')}</Text>
-                <MaterialCommunityIcons name="chevron-double-right" size={16} color="#FFFFFF" />
+                <MaterialCommunityIcons name="chevron-double-right" size={20} color="#FFFFFF" />
               </View>
             </Pressable>
           </View>
@@ -850,14 +850,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: theme.spacing.lg,
-    gap: 8,
+    // "cok dar kaldi, yukari asagi biraz ayir." 8 between the brand, the
+    // header card and the widgets was the whole vertical rhythm of the page.
+    gap: 14,
     // Clear of the nav bar. The old 160 was there so a scrolling page could
     // reach its end; nothing scrolls now.
     paddingBottom: 110,
     // ------------------------------------------------------------------
     //  THE WHOLE PAGE, PULLED UPWARD FOR BREATHING ROOM
     // ------------------------------------------------------------------
-    transform: [{ translateY: -14 }],
+    //  Was -14, which is where the room at the bottom went. The header card
+    //  is taller now and the widgets can sit slightly lower, so the pull is
+    //  smaller. It is not zero: the brand still wants to clear the notch.
+    // ------------------------------------------------------------------
+    transform: [{ translateY: -4 }],
   },
   // ── Premium Header Card ──
   headerCard: {
@@ -865,9 +871,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.09)',
-    padding: 10,
-    gap: 8,
-    marginBottom: 2,
+    // The card the Succesor line sits above. Bigger, with its rows further
+    // apart, because everything inside it grew.
+    padding: 14,
+    gap: 12,
+    marginBottom: 4,
     shadowColor: '#1C242C',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
@@ -877,15 +885,15 @@ const styles = StyleSheet.create({
   headerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   headerRow: { flexDirection: 'row', alignItems: 'center' }, // legacy stub
   headerLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 }, // legacy stub
   headerRight: { alignItems: 'flex-end' }, // legacy stub
   avatarCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
     // The colour the gradient over it starts from, so the shadow below is one
@@ -899,7 +907,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   avatarInitial: {
-    fontSize: 20,
+    fontSize: 23,
     fontWeight: '900',
     // ------------------------------------------------------------------
     //  BLACK, BECAUSE THE CIRCLE IS A LIGHT FILL
@@ -923,13 +931,13 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   name: {
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: 0.2,
   },
   gender: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#FFFFFF',
   },
   premiumTag: {
@@ -944,7 +952,7 @@ const styles = StyleSheet.create({
   },
   bio: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 0.1,
   },
   ageChips: {
@@ -954,27 +962,27 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(5,168,246,0.25)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 10,
   },
   ageChip: {
     alignItems: 'center',
   },
   ageChipLabel: {
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 1,
   },
   ageChipValue: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '900',
     color: '#FFFFFF',
   },
   ageChipDivider: {
     width: 1,
-    height: 22,
+    height: 26,
     backgroundColor: 'rgba(5,168,246,0.3)',
   },
   // --- Legacy stubs ---
@@ -989,18 +997,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8, // Increased opacity for better glow
     shadowRadius: 12,
     elevation: 8,
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: 'hidden',
     width: '100%',
-    marginTop: 2,
+    marginTop: 4,
   },
   nextMonthContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    gap: 8,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    gap: 10,
   },
   nextMonthButtonPressed: {
     opacity: 0.85,
@@ -1009,8 +1017,11 @@ const styles = StyleSheet.create({
   nextMonthText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 11.3,
-    letterSpacing: 4,
+    // 11.3 with four points of tracking. The tracking is what gives this
+    // button its look, so the SIZE went up and the tracking came down a
+    // touch to pay for the extra width it would have cost.
+    fontSize: 13,
+    letterSpacing: 3.4,
     textTransform: 'uppercase',
     textAlign: 'center',
     textShadowColor: 'rgba(5,168,246,0.4)', // Softer glow
@@ -1048,6 +1059,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     alignItems: 'stretch',
+    // "alttaki kartlarin boyutu ve yeri iyi, belki hafif asagi kayabilir."
+    // Their size is untouched; this is the shift.
+    marginTop: 4,
   },
   widgetColumn: {
     flex: 1,
@@ -1438,8 +1452,8 @@ const styles = StyleSheet.create({
   //    color: theme.colors.onLight, fontWeight: '800', fontSize: 16,
   //  },
   brandContainer: {
-    marginTop: 2,
-    marginBottom: 2,
+    marginTop: 6,
+    marginBottom: 4,
     paddingHorizontal: 4,
     flexDirection: 'row',
     alignItems: 'center',
