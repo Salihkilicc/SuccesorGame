@@ -584,10 +584,10 @@ const HomeScreen = () => {
                   fifteen points below where the first row starts.
                  ------------------------------------------------------ */}
               <LinearGradient
-                colors={['rgba(255,255,255,0.12)', '#434B50', '#434B50']}
+                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C']}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
-                locations={[0, 0.28, 1]}
+                locations={[0, 0.45, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -617,10 +617,10 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['rgba(255,255,255,0.12)', '#434B50', '#434B50']}
+                colors={['rgba(255,255,255,0.20)', '#1C242C', '#1C242C']}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
-                locations={[0, 0.28, 1]}
+                locations={[0, 0.45, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (
@@ -1457,11 +1457,17 @@ const styles = StyleSheet.create({
     //  All three now defer to `styles.card`, which had the right answers
     //  from the start. Only the radius stays, because that is the look.
     // ------------------------------------------------------------------
-    //  The fill is declared HERE as well as on `styles.card`, and not
-    //  because it is duplicated: homeChrome.test.ts requires a gradient that
-    //  carries a shadow to name an opaque background at the point the shadow
-    //  is declared, or iOS rasterises the layer first and cannot cache it.
-    backgroundColor: '#434B50',
+    //  The card is the DARK one, which is what it always was and what was
+    //  asked for again: "kart siyah olmali". It reads against the wallpaper
+    //  rather than against a flat ground, and the sheen along its top edge is
+    //  what gives it an edge to be read by - which is why the previous
+    //  attempt, with the sheen removed, looked like nothing at all.
+    //
+    //  Declared HERE as well as on `styles.card` and not by duplication:
+    //  homeChrome.test.ts requires a gradient that carries a shadow to name an
+    //  opaque background at the point the shadow is declared, or iOS
+    //  rasterises the layer first and cannot cache it.
+    backgroundColor: '#1C242C',
     borderRadius: 33,
     borderWidth: 0,
     shadowColor: '#1C242C',

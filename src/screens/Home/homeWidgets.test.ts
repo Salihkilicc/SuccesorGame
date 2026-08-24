@@ -47,11 +47,13 @@ const code = () => read()
 
 describe('the two widget cards', () => {
     it('have a sheen, and it is a sheen rather than a fill', () => {
-        // The gloss was asked for back after the bands came off. Twelve per
-        // cent over #434B50 lands around #5A6165 - white text on it still
-        // reads at better than seven to one, so it can overlap a row.
+        // Asked for at "en az 20%". Twenty per cent of white over the dark
+        // card lands about two steps up the surface ladder and white text on
+        // it still reads at better than nine to one, so the gloss can run
+        // down over the first rows - which is what lets it be a gloss rather
+        // than a hairline.
         const src = code();
-        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.12\)', '#434B50', '#434B50'\]\}/);
+        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C'\]\}/);
         // What it replaced: 48% white and a #CFD0D2 stop. Those are fills.
         // Scoped to a gradient STOP: the same string is a chevron colour and
         // a label colour elsewhere in this file, and neither is a ground.
@@ -69,9 +71,10 @@ describe('the two widget cards', () => {
         expect(src).not.toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}/);
     });
 
-    it('and it is gone before the rows get going', () => {
+    it('and it is big enough to read as a gloss', () => {
+        // 28% was a hairline. Reported as "efekt kucuk kaliyor".
         const src = code();
-        expect(src).toMatch(/locations=\{\[0, 0\.28, 1\]\}/);
+        expect(src).toMatch(/locations=\{\[0, 0\.45, 1\]\}/);
     });
 
     it('and both of them, not just the one that was open', () => {
@@ -79,7 +82,7 @@ describe('the two widget cards', () => {
         // reading the other as done is how the casino's 700 survived a
         // whole commit.
         const src = code();
-        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.12\)', '#434B50', '#434B50'\]\}/g) ?? [];
+        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.20\)', '#1C242C', '#1C242C'\]\}/g) ?? [];
         expect(sheen).toHaveLength(2);
         const vertical = src.match(/start=\{\{ x: 0\.5, y: 0 \}\}/g) ?? [];
         expect(vertical.length).toBeGreaterThanOrEqual(2);
@@ -140,13 +143,15 @@ describe('the note on modernCard', () => {
 // ============================================================================
 
 describe('what the bands were hiding', () => {
-    it('is that the card was the colour of the screen', () => {
-        // `styles.card` declares #434B50 and `modernCard` was overriding it
-        // with `theme.colors.background`. The card was only ever visible
-        // because of the bright stops running down its edges.
+    it('is that the card is dark, and needs the sheen to have an edge', () => {
+        // The colour was never the fault. The card is the dark one - "kart
+        // siyah olmali" - and it reads against the WALLPAPER rather than a
+        // flat ground. What went wrong was removing the sheen and leaving it
+        // with no edge at all; painting it grey was the wrong repair and it
+        // was reverted.
         const src = code();
-        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,1400}backgroundColor: theme\.colors\.background/);
-        expect(src).toMatch(/card: \{\s*backgroundColor: '#434B50'/);
+        expect(src).toMatch(/modernCard: \{[\s\S]{0,1600}backgroundColor: '#1C242C'/);
+        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.20\)'/);
     });
 
     it('and that the shadow behind it was light grey', () => {
