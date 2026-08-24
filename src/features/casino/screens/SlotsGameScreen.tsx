@@ -35,42 +35,27 @@ const SlotsGameScreen = () => {
   const { grid, bet, isSpinning, message, showResult, lastResult, money, config } = state;
 
   // Win Animation State (Standard Animated)
-  const winScale = useRef(new Animated.Value(0)).current;
-  const winOpacity = useRef(new Animated.Value(0)).current;
+  // `winScale` and `winOpacity` drove the BIG WIN curtain and are shelved with
+  // it. See the note below.
 
   // Location Modal State (for header)
   const [locationModalVisible, setLocationModalVisible] = useState(false);
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (showResult && lastResult?.type === 'win') {
-      winScale.setValue(0);
-      winOpacity.setValue(0);
-
-      Animated.parallel([
-        Animated.spring(winScale, {
-          toValue: 1,
-          friction: 5,
-          useNativeDriver: true
-        }),
-        Animated.timing(winOpacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true
-        })
-      ]).start();
-
-      // Auto dismiss after 3 seconds
-      timer = setTimeout(() => {
-        actions.hideResult();
-      }, 3000);
-
-    } else {
-      winScale.setValue(0);
-      winOpacity.setValue(0);
-    }
-    return () => clearTimeout(timer);
-  }, [showResult, lastResult]);
+  // ----------------------------------------------------------------------
+  //  THE BIG WIN CURTAIN IS GONE
+  // ----------------------------------------------------------------------
+  //  SHELVED: a full screen Pressable with BIG WIN at forty point, the amount
+  //  under it, and "tap to continue" under that, held for three seconds after
+  //  every winning spin. On the Ticker that is better than one spin in nine.
+  //
+  //  It also ATE THE NEXT SPIN: the overlay covered the button, so a player
+  //  going again while it was up dismissed the curtain instead. The rhythm of
+  //  a slot machine is spin, see, spin, and this put a door in the middle of
+  //  it.
+  //
+  //  The amount rises and fades on its own now, through a component that takes
+  //  no taps at all. See components/GameResultPopup.tsx.
+  // ----------------------------------------------------------------------
 
   // Transpose Grid: The logic returns [Row][Col], but Reels need [Col][Row]
   const columns = grid[0] ? grid[0].map((_, colIndex) => grid.map(row => row[colIndex])) : [];
@@ -86,19 +71,11 @@ const SlotsGameScreen = () => {
         cash={money}
       />
 
-      {/* GameResultPopup removed as requested */}
-
-      {/* BIG WIN OVERLAY */}
-      {/* BIG WIN OVERLAY */}
-      {showResult && lastResult?.type === 'win' && (
-        <Pressable style={styles.winOverlay} onPress={actions.hideResult}>
-          <Animated.Text style={[styles.bigWinText, { transform: [{ scale: winScale }], opacity: winOpacity }]}>{t('ui.bigWin')}</Animated.Text>
-          <Animated.Text style={[styles.winAmount, { transform: [{ scale: winScale }], opacity: winOpacity }]}>
-            +${lastResult.amount.toLocaleString()}
-          </Animated.Text>
-          <Text style={styles.tapToCloseText}>{t('ui.tapScreenToContinue')}</Text>
-        </Pressable>
-      )}
+      {/* The amount, rising and fading, taking no taps. */}
+      <GameResultPopup
+        result={showResult && lastResult ? lastResult : null}
+        onHide={actions.hideResult}
+      />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -280,32 +257,36 @@ const styles = StyleSheet.create({
 
   disabledButton: { opacity: 0.7 },
 
-  winOverlay: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 100,
-    backgroundColor: 'rgba(28,36,44,0.6)'
-  },
-  bigWinText: {
-    color: theme.colors.textPrimary,
-    fontSize: 64,
-    fontWeight: '900',
-    textShadowColor: '#FF8A8A',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 20,
-    transform: [{ rotate: '-5deg' }]
-  },
-  winAmount: {
-    color: '#FFFFFF',
-    fontSize: 42,
-    fontWeight: '800',
-    marginTop: 12,
-    textShadowColor: 'rgba(28,36,44,1)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
+  // ----------------------------------------------------------------------
+  //  SHELVED, with the curtain they dressed. Kept because they record what
+  //  the screen used to do, and because deleting is not the move here.
+  // ----------------------------------------------------------------------
+  // winOverlay: {
+  // position: 'absolute',
+  // top: 0, left: 0, right: 0, bottom: 0,
+  // justifyContent: 'center',
+  // alignItems: 'center',
+  // zIndex: 100,
+  // backgroundColor: 'rgba(28,36,44,0.6)'
+  // },
+  // bigWinText: {
+  // color: theme.colors.textPrimary,
+  // fontSize: 64,
+  // fontWeight: '900',
+  // textShadowColor: '#FF8A8A',
+  // textShadowOffset: { width: 0, height: 2 },
+  // textShadowRadius: 20,
+  // transform: [{ rotate: '-5deg' }]
+  // },
+  // winAmount: {
+  // color: '#FFFFFF',
+  // fontSize: 42,
+  // fontWeight: '800',
+  // marginTop: 12,
+  // textShadowColor: 'rgba(28,36,44,1)',
+  // textShadowOffset: { width: 0, height: 2 },
+  // textShadowRadius: 4,
+  // },
   tapToCloseText: {
     color: 'rgba(255,255,255,0.7)',
     marginTop: 20,

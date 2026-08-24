@@ -1,248 +1,165 @@
+// src/features/casino/components/GameResultPopup.tsx
+//
+// ============================================================================
+//  THE NUMBER, AND NOTHING ELSE
+// ============================================================================
+//
+//  What was here: a full screen overlay, a card with a border and a glow, a
+//  trophy emoji, the word VICTORY or DEFEAT in twenty two point, and a line of
+//  prose explaining that the winnings had been deposited to your cash balance.
+//  For a hand of blackjack. Every hand.
+//
+//  Asked for as "oyuncuyu oyundan ayirmasin ve de sadece belli etsin para
+//  miktarini" - do not take the player out of the game, just show the money.
+//  Which is right, and the reason is that a casino is a RHYTHM. Spin, see,
+//  spin. Anything that has to be dismissed between two spins is not a
+//  celebration, it is a door, and after the fourth one the player is closing
+//  doors rather than playing.
+//
+//  So: the amount, signed, rising and fading on its own in about a second and
+//  a half. No words, no card, no emoji, no overlay.
+//
+//  ---------------------------------------------------------------------------
+//  AND IT DOES NOT TAKE TAPS AT ALL
+//  ---------------------------------------------------------------------------
+//  `pointerEvents="none"` on the whole thing, which is the strongest reading
+//  of "basmasak da gorunup kaybolsa": it is not that dismissing is optional,
+//  it is that there is nothing to dismiss. The SPIN button underneath stays
+//  live the entire time, so a player who wants to go again can go again while
+//  the last number is still fading.
+//
+//  The old version had a `Pressable` over the whole screen to catch the
+//  dismiss tap, so a fast player's next spin was eaten by the popup they were
+//  trying to get past.
+//
+//  ---------------------------------------------------------------------------
+//  GREEN AND RED, AND THIS IS THE ONE PLACE THEY BELONG
+//  ---------------------------------------------------------------------------
+//  The house rule reserves them for profit and loss, and this is literally
+//  that. It also says they are TEXT tokens rather than fills or borders, which
+//  the old card broke twice over - a coloured border and a coloured glow. Here
+//  they colour a number and nothing else.
+// ============================================================================
+
 import React, { useEffect, useRef } from 'react';
-import { t, useLocale } from '../../../core/i18n';
-import { StyleSheet, Text, View, Pressable, Animated, Easing } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { StyleSheet, Animated, Easing } from 'react-native';
 import { theme } from '../../../core/theme';
 import { formatMoney } from '../../../core/utils';
 
-type Props = {
-  result: {
+export type GameResult = {
     type: 'win' | 'loss' | 'push';
+    /**
+     * What moved, always POSITIVE. The sign comes from `type`.
+     *
+     * On a loss this is the STAKE. Slots was passing the winnings, which are
+     * zero on a loss, so it read "-$0" - hidden until now by the word DEFEAT
+     * being the loudest thing on the card.
+     */
     amount: number;
-  } | null;
-  onHide?: () => void;
 };
 
+type Props = {
+    result: GameResult | null;
+    /** Kept so the four screens can clear their own state when it is over. */
+    onHide?: () => void;
+};
+
+/** How long the number is on screen, in and out included. */
+const LIFETIME_MS = 1400;
+
+/** How far it drifts upward while it goes. */
+const RISE = 34;
+
 const GameResultPopup = ({ result, onHide }: Props) => {
-  useLocale();
+    const progress = useRef(new Animated.Value(0)).current;
+    // The result is captured on the way in so the number does not change
+    // under the animation if a fast player spins again mid-fade.
+    const shown = useRef<GameResult | null>(null);
 
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
-  const contentScale = useRef(new Animated.Value(0.7)).current;
-  const contentOpacity = useRef(new Animated.Value(0)).current;
-  const slideY = useRef(new Animated.Value(25)).current;
+    if (result) shown.current = result;
 
-  const visible = !!result;
+    useEffect(() => {
+        if (!result) return;
 
-  useEffect(() => {
-    if (visible) {
-      // Reset
-      overlayOpacity.setValue(0);
-      contentScale.setValue(0.7);
-      contentOpacity.setValue(0);
-      slideY.setValue(25);
+        progress.setValue(0);
+        const anim = Animated.timing(progress, {
+            toValue: 1,
+            duration: LIFETIME_MS,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+        });
+        anim.start(({ finished }) => {
+            if (finished) onHide?.();
+        });
 
-      // Animate in
-      Animated.parallel([
-        Animated.timing(overlayOpacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(contentScale, {
-          toValue: 1,
-          friction: 6,
-          tension: 90,
-          delay: 50,
-          useNativeDriver: true,
-        }),
-        Animated.timing(contentOpacity, {
-          toValue: 1,
-          duration: 250,
-          delay: 50,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideY, {
-          toValue: 0,
-          duration: 280,
-          delay: 50,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]).start();
+        return () => anim.stop();
+        // `result` by identity: every spin sets a new object, so a run of
+        // identical wins still restarts the animation.
+    }, [result]);
 
-      // Auto-hide after 2.8s
-      const timer = setTimeout(() => {
-        handleDismiss();
-      }, 2800);
+    const current = result ?? shown.current;
+    if (!current) return null;
 
-      return () => clearTimeout(timer);
-    } else {
-      overlayOpacity.setValue(0);
-      contentScale.setValue(0.7);
-      contentOpacity.setValue(0);
-      slideY.setValue(25);
-    }
-  }, [visible]);
+    const isWin = current.type === 'win';
+    const isPush = current.type === 'push';
 
-  const handleDismiss = () => {
-    Animated.parallel([
-      Animated.timing(overlayOpacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(contentOpacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(contentScale, {
-        toValue: 0.85,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onHide?.();
-    });
-  };
+    const colour = isWin
+        ? theme.colors.success
+        : isPush
+            ? theme.colors.textMuted
+            : theme.colors.danger;
 
-  if (!result) return null;
+    // A push returned the stake, so it is neither. Showing the figure with no
+    // sign says that more clearly than the word PUSH did.
+    const sign = isWin ? '+' : isPush ? '' : '-';
 
-  const isWin = result.type === 'win';
-  const isPush = result.type === 'push';
-
-  const accentColor = isWin ? '#10B981' : isPush ? '#F59E0B' : '#EF4444';
-  const glowColor = isWin ? 'rgba(16, 185, 129, 0.35)' : isPush ? 'rgba(245, 158, 11, 0.35)' : 'rgba(239, 68, 68, 0.35)';
-  const emoji = isWin ? '🏆' : isPush ? '🤝' : '🎲';
-  const label = isWin ? (t('casino.victory') || 'VICTORY') : isPush ? (t('casino.draw') || 'PUSH') : (t('casino.defeat') || 'DEFEAT');
-  const sign = isWin ? '+' : isPush ? '' : '-';
-  const subtitle = isWin
-    ? (t('casino.winSub') || 'Winnings deposited to your cash balance.')
-    : isPush
-    ? (t('casino.drawSub') || 'Your bet was returned in full.')
-    : (t('casino.lossSub') || 'The house took this round. Better luck next time.');
-
-  return (
-    <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]} pointerEvents="box-none">
-      <Pressable style={StyleSheet.absoluteFill} onPress={handleDismiss} />
-
-      <Animated.View
-        style={[
-          styles.popup,
-          {
-            borderColor: accentColor,
-            shadowColor: accentColor,
-            transform: [
-              { scale: contentScale },
-              { translateY: slideY },
-            ],
-            opacity: contentOpacity,
-          },
-        ]}
-      >
-        {/* Top Gradient Header */}
-        <LinearGradient
-          colors={[glowColor, 'transparent']}
-          style={styles.gradientHeader}
-        />
-
-        <View style={styles.content}>
-          {/* Badge & Icon */}
-          <View style={[styles.badge, { backgroundColor: isWin ? 'rgba(16, 185, 129, 0.15)' : isPush ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)', borderColor: accentColor }]}>
-            <Text style={styles.badgeEmoji}>{emoji}</Text>
-            <Text style={[styles.badgeText, { color: accentColor }]}>{label}</Text>
-          </View>
-
-          {/* Formatted Amount */}
-          <Text style={[styles.amount, { color: isWin ? '#34D399' : isPush ? '#FBBF24' : '#F87171' }]}>
-            {sign}{formatMoney(result.amount)}
-          </Text>
-
-          {/* Subtitle */}
-          <Text style={styles.subtitle}>{subtitle}</Text>
-
-          {/* Tap to close indicator */}
-          <View style={styles.footerNote}>
-            <Text style={styles.footerText}>{t('casino.tapToContinue') || 'Tap anywhere to continue'}</Text>
-          </View>
-        </View>
-      </Animated.View>
-    </Animated.View>
-  );
+    return (
+        <Animated.View
+            pointerEvents="none"
+            style={[
+                styles.wrap,
+                {
+                    opacity: progress.interpolate({
+                        inputRange: [0, 0.12, 0.65, 1],
+                        outputRange: [0, 1, 1, 0],
+                    }),
+                    transform: [{
+                        translateY: progress.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, -RISE],
+                        }),
+                    }],
+                },
+            ]}
+        >
+            <Animated.Text style={[styles.amount, { color: colour }]}>
+                {sign}{formatMoney(Math.abs(current.amount || 0))}
+            </Animated.Text>
+        </Animated.View>
+    );
 };
 
 export default GameResultPopup;
 
 const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.75)',
-    zIndex: 100,
-  },
-  popup: {
-    width: '84%',
-    maxWidth: 320,
-    backgroundColor: '#1E252B',
-    borderRadius: 22,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 16,
-  },
-  gradientHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-  },
-  content: {
-    alignItems: 'center',
-    paddingTop: 24,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    gap: 8,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 20,
-    borderWidth: 1,
-    marginBottom: 4,
-  },
-  badgeEmoji: {
-    fontSize: 16,
-  },
-  badgeText: {
-    fontSize: 13,
-    fontWeight: '900',
-    letterSpacing: 2,
-  },
-  amount: {
-    fontSize: 32,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.65)',
-    textAlign: 'center',
-    lineHeight: 17,
-    marginTop: 2,
-    paddingHorizontal: 10,
-  },
-  footerNote: {
-    marginTop: 10,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    width: '100%',
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 10.5,
-    color: 'rgba(255, 255, 255, 0.35)',
-    letterSpacing: 0.5,
-  },
+    wrap: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        // Above the controls and below the table, so it never sits on top of
+        // the thing the player is watching.
+        bottom: '32%',
+        alignItems: 'center',
+        zIndex: 20,
+    },
+    amount: {
+        fontSize: 30,
+        fontWeight: '900',
+        letterSpacing: 0.5,
+        // No background. The rule for the signal colours in this codebase is
+        // that they are text and never a fill.
+        textShadowColor: 'rgba(0,0,0,0.55)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 6,
+    },
 });

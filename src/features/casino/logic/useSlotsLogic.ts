@@ -276,7 +276,15 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
     }
 
     // Show Popup
-    setLastResult({ type: resultType, amount: winAmount });
+    // ------------------------------------------------------------------
+    //  THE STAKE ON A LOSS, NOT THE WINNINGS
+    // ------------------------------------------------------------------
+    //  This passed `winAmount`, which is zero when you lose, so the result
+    //  read "-$0". Hidden for as long as the word DEFEAT was the loudest
+    //  thing on the card - see components/GameResultPopup.tsx, which is now
+    //  only the number. Blackjack and poker were already passing the stake.
+    // ------------------------------------------------------------------
+    setLastResult({ type: resultType, amount: resultType === 'win' ? winAmount : bet });
     setShowResult(true);
   };
 
