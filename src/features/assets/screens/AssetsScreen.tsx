@@ -38,22 +38,42 @@
 //     set two screens away under Equity. Now it is a row you can press.
 //
 //  ---------------------------------------------------------------------------
-//  THE CARDS ARE THE HOME SCREEN'S CARDS
-// ---------------------------------------------------------------------------
-//  Dark ground, a lit RIM, and a faint diagonal rake from the top left. That
-//  technique was settled over eight rounds on the home screen and the two
-//  screens are one tap apart, so this one does not get a second look of its
-//  own. What was here - `#434B50` at 24 radius with a 20pt light shadow - was
-//  from before that work.
+//  AND THE CARDS ARE THE GAME'S CARDS, NOT THE HOME SCREEN'S
+//  ---------------------------------------------------------------------------
+//  SHELVED: the lit rim and the diagonal rake.
+//
+//      <LinearGradient
+//          colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)',
+//                   theme.colors.background, theme.colors.background]}
+//          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+//          locations={[0, 0.3, 0.68, 1]}
+//          style={styles.card} />
+//      // borderColor: 'rgba(255,255,255,0.22)'
+//
+//  That effect took eight rounds to land and it belongs to the home screen,
+//  which is a wallpaper with two widgets floating on it. This is a page inside
+//  the app, and inside the app a card is `theme.colors.card` at 16 radius with
+//  a hairline border. Reusing the widget treatment here made a destination
+//  look like a home screen tile.
+//
+//  Same reasoning for the header: this had a hand-rolled one with its own
+//  centring and its own back button, and there is exactly one header in this
+//  app for exactly that reason - see components/common/ScreenHeader.tsx, which
+//  also draws the section rule that says which part of the game you are in.
+//
+//  The nav bar is rendered once by RootNavigator and floats over every route,
+//  so what a screen owes it is clearance rather than a copy of it. See the
+//  note on `content` below.
+//
+//  The symbols, the wording and the sections are untouched.
 // ============================================================================
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { ScrollView, View, StyleSheet, Pressable, Text, StatusBar } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme, palette } from '../../../core/theme';
 import { useAssetsLogic } from '../hooks/useAssetsLogic';
 import { BreakdownSection } from '../components/AssetsUI';
@@ -94,38 +114,28 @@ const AssetsScreen = () => {
         PAY_CHANGE_COOLDOWN - (currentQuarter() - (stats.ceoPaySetQuarter ?? -PAY_CHANGE_COOLDOWN)),
     );
 
-    const backButton = (
-        <Pressable
-            onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
-            style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}
-        >
-            <MaterialCommunityIcons name="chevron-left" size={28} color={theme.colors.textPrimary} />
-        </Pressable>
-    );
+    // SHELVED: a hand-rolled back button and a hand-rolled centred title.
+    // There is one header in this app on purpose - a player should never have
+    // to look for the way out. See components/common/ScreenHeader.tsx.
+    //
+    //  const backButton = (
+    //      <Pressable
+    //          onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
+    //          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}>
+    //          <MaterialCommunityIcons name="chevron-left" size={28} color={theme.colors.textPrimary} />
+    //      </Pressable>
+    //  );
 
     /**
      * The card everything on this screen is made of.
      *
-     * One component rather than three copies of the same gradient, because the
+     * One component rather than three copies of the same style, because the
      * home screen learned that lesson the expensive way: two identical
      * gradients forty lines apart, and fixing one and reading the other as
      * done is how the casino's 700 survived a whole commit.
      */
     const Card = ({ children }: { children: React.ReactNode }) => (
-        <LinearGradient
-            colors={[
-                'rgba(255,255,255,0.08)',
-                'rgba(255,255,255,0.03)',
-                theme.colors.background,
-                theme.colors.background,
-            ]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            locations={[0, 0.3, 0.68, 1]}
-            style={styles.card}
-        >
-            {children}
-        </LinearGradient>
+        <View style={styles.card}>{children}</View>
     );
 
     const HoldingRow = ({
@@ -147,19 +157,9 @@ const AssetsScreen = () => {
 
     return (
         <View style={styles.root}>
-            <StatusBar barStyle="light-content" />
+            <ScreenHeader title={t('personal.title')} subtitle={t('personal.subtitle')} />
 
-            <SafeAreaView style={styles.safeArea} edges={['top']}>
-                <View style={styles.header}>
-                    <View style={styles.sideNode}>{backButton}</View>
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.headerTitle}>{t('personal.title')}</Text>
-                        <Text style={styles.headerSubtitle}>{t('personal.subtitle')}</Text>
-                    </View>
-                    <View style={styles.sideNode} />
-                </View>
-
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
                     {/* ============================================================
                         WHAT YOU ARE WORTH, AND HOW MUCH OF IT IS REAL
@@ -291,8 +291,7 @@ const AssetsScreen = () => {
                         <BreakdownSection title={t('personal.expenses')} items={report.expenseBreakdown} />
                     </Card>
 
-                </ScrollView>
-            </SafeAreaView>
+            </ScrollView>
         </View>
     );
 };
@@ -308,60 +307,64 @@ const styles = StyleSheet.create({
         // ------------------------------------------------------------------
         backgroundColor: theme.colors.background,
     },
-    safeArea: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: theme.spacing.xl,
-        paddingVertical: theme.spacing.lg,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.border,
-    },
-    titleContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    headerTitle: {
-        fontSize: theme.typography.subtitle + 4,
-        fontWeight: '900',
-        color: theme.colors.textPrimary,
-        letterSpacing: 2,
-    },
-    headerSubtitle: {
-        fontSize: theme.typography.micro,
-        color: theme.colors.textMuted,
-        fontWeight: '600',
-        letterSpacing: 0.8,
-        marginTop: 2,
-    },
-    sideNode: {
-        width: 44,
-    },
+
+    // ----------------------------------------------------------------------
+    //  SHELVED WITH THE HAND-ROLLED HEADER
+    // ----------------------------------------------------------------------
+    //  `safeArea`, `header`, `titleContainer`, `headerTitle`,
+    //  `headerSubtitle`, `sideNode`, `backButton` and `backButtonPressed` -
+    //  eight style keys reimplementing what ScreenHeader already does, down to
+    //  its own status bar inset and its own bottom rule. ScreenHeader draws
+    //  the rule in the SECTION's colour, resolved from the route, which is a
+    //  thing a hand-rolled header cannot do by construction.
+    //
+    //  safeArea:        { flex: 1 },
+    //  header:          { flexDirection: 'row', alignItems: 'center',
+    //                     justifyContent: 'space-between',
+    //                     paddingHorizontal: theme.spacing.xl,
+    //                     paddingVertical: theme.spacing.lg,
+    //                     borderBottomWidth: 1,
+    //                     borderBottomColor: theme.colors.border },
+    //  titleContainer:  { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    //  headerTitle:     { fontSize: theme.typography.subtitle + 4,
+    //                     fontWeight: '900', color: theme.colors.textPrimary,
+    //                     letterSpacing: 2 },
+    //  headerSubtitle:  { fontSize: theme.typography.micro,
+    //                     color: theme.colors.textMuted, fontWeight: '600',
+    //                     letterSpacing: 0.8, marginTop: 2 },
+    //  sideNode:        { width: 44 },
+    //  backButton:      { width: 40, height: 40, borderRadius: theme.radius.md,
+    //                     alignItems: 'center', justifyContent: 'center',
+    //                     backgroundColor: theme.colors.surface,
+    //                     borderWidth: 1, borderColor: theme.colors.border },
+    //  backButtonPressed: { backgroundColor: theme.colors.surfaceRaised,
+    //                     transform: [{ scale: 0.95 }] },
+    // ----------------------------------------------------------------------
+
     content: {
         paddingHorizontal: theme.spacing.xl,
-        paddingTop: theme.spacing.xl,
-        paddingBottom: 120,
+        paddingTop: theme.spacing.lg,
+        // CrystalNavBar is absolute against the WINDOW and rendered once by
+        // RootNavigator, so it floats over the end of this list. What a screen
+        // owes it is clearance; the rest of the app uses 120 to 140.
+        paddingBottom: 130,
         gap: theme.spacing.lg,
     },
 
     // ----------------------------------------------------------------------
-    //  THE CARD. The rim is the effect; see HomeScreen.modernCard.
+    //  THE CARD, WHICH IS THE APP'S CARD
+    // ----------------------------------------------------------------------
+    //  `theme.colors.card` at 16 with a hairline border, the same as the
+    //  product cards and everything else inside the app. The home screen's
+    //  lit rim is for widgets floating on a wallpaper and it made this page
+    //  read as a home screen tile.
     // ----------------------------------------------------------------------
     card: {
-        backgroundColor: theme.colors.background,
-        borderRadius: 24,
-        padding: theme.spacing.xl,
+        backgroundColor: theme.colors.card,
+        borderRadius: 16,
+        padding: theme.spacing.lg,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.22)',
-        shadowColor: theme.colors.background,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
-        elevation: 4,
+        borderColor: theme.colors.border,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -405,7 +408,19 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.sm,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: theme.colors.surface,
+        // ------------------------------------------------------------------
+        //  A RUNG ABOVE THE CARD, NOT THE SAME AS IT
+        // ------------------------------------------------------------------
+        //  This was `surface`, which is #323A40 - and the card is now
+        //  `card`, which is ALSO #323A40. Same value, two token names, so
+        //  every icon box would have dissolved into the card the moment the
+        //  ground changed and only the hairline border would have been left.
+        //
+        //  It read fine before this commit purely because the card behind it
+        //  was the darker `background`. A token that happens to contrast is
+        //  not a token that contrasts.
+        // ------------------------------------------------------------------
+        backgroundColor: theme.colors.surfaceRaised,
         borderWidth: 1,
         borderColor: theme.colors.border,
     },
@@ -515,20 +530,6 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: theme.colors.border,
         marginVertical: theme.spacing.lg,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: theme.radius.md,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: theme.colors.surface,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-    },
-    backButtonPressed: {
-        backgroundColor: theme.colors.surfaceRaised,
-        transform: [{ scale: 0.95 }],
     },
 });
 

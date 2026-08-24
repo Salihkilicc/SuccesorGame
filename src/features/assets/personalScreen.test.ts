@@ -228,20 +228,64 @@ describe('the pay row', () => {
 // ============================================================================
 
 describe('the cards', () => {
-    it('use the rim technique the home screen settled on', () => {
-        // Eight rounds of work one tap away. This screen does not get its own
-        // look; what was here predates that.
+    it('are the app\'s cards, not the home screen\'s widgets', () => {
+        // ----------------------------------------------------------------
+        //  THE HOME SCREEN'S LOOK DOES NOT TRAVEL
+        // ----------------------------------------------------------------
+        //  The lit rim and the diagonal rake took eight rounds to land, and
+        //  they belong to two widgets floating on a wallpaper. Carried onto
+        //  a page INSIDE the app they made a destination read as a home
+        //  screen tile. Reported as "ana sayfadaki kart sistemini kullanma".
+        //
+        //  Inside the app a card is `theme.colors.card` at 16 with a
+        //  hairline border, which is what the product cards are.
+        // ----------------------------------------------------------------
         const src = code('screens/AssetsScreen.tsx');
-        expect(src).toMatch(/borderColor: 'rgba\(255,255,255,0\.22\)'/);
-        expect(src).toMatch(/locations=\{\[0, 0\.3, 0\.68, 1\]\}/);
+        expect(src).not.toMatch(/borderColor: 'rgba\(255,255,255,0\.22\)'/);
+        expect(src).not.toMatch(/locations=\{/);
+        expect(src).not.toMatch(/LinearGradient/);
+        expect(src).toMatch(/backgroundColor: theme\.colors\.card/);
+        expect(src).toMatch(/borderColor: theme\.colors\.border/);
     });
 
-    it('and are one component rather than three copies of one gradient', () => {
+    it('and are one component rather than three copies of one style', () => {
         // Two identical gradients forty lines apart is how the home screen
-        // shipped a fix to one card and not the other.
+        // shipped a fix to one card and not the other. The technique changed;
+        // the reason for writing it once did not.
         const src = code('screens/AssetsScreen.tsx');
-        expect((src.match(/<LinearGradient/g) ?? []).length).toBe(1);
+        expect((src.match(/<View style=\{styles\.card\}>/g) ?? []).length).toBe(1);
         expect((src.match(/<Card>/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    });
+
+    it('and an icon box does not dissolve into the card behind it', () => {
+        // `surface` and `card` are the SAME hex, #323A40. The icon boxes sat
+        // on `surface` and read fine only because the card behind them used
+        // to be the darker `background`. Changing the card would have left
+        // nothing but a hairline. A token that happens to contrast is not a
+        // token that contrasts.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).not.toMatch(/holdingIcon: \{[\s\S]{0,400}backgroundColor: theme\.colors\.surface,/);
+        expect(src).toMatch(/holdingIcon: \{[\s\S]{0,900}backgroundColor: theme\.colors\.surfaceRaised/);
+    });
+
+    it('and the screen uses the one header this app has', () => {
+        // Eight style keys reimplemented a centred title, a back button and a
+        // bottom rule. ScreenHeader also colours that rule by SECTION, from
+        // the route, which a hand-rolled header cannot do at all.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/<ScreenHeader\s+title=\{t\('personal\.title'\)\}/);
+        expect(src).not.toMatch(/styles\.headerTitle/);
+        expect(src).not.toMatch(/styles\.backButton/);
+    });
+
+    it('and leaves room for the nav bar rather than drawing its own', () => {
+        // CrystalNavBar is absolute against the window and rendered once by
+        // RootNavigator. 44 files used to render their own copy, and on some
+        // of them it sat outside the touchable area and did nothing.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).not.toMatch(/CrystalNavBar/);
+        const pad = Number(src.match(/paddingBottom: (\d+),/)?.[1]);
+        expect(pad).toBeGreaterThanOrEqual(110);
     });
 
     it('and the background is a colour rather than a gradient of one colour', () => {
