@@ -572,7 +572,7 @@ const HomeScreen = () => {
                   colours change.
                  ------------------------------------------------------ */}
               <LinearGradient
-                colors={['#1C242C', '#1C242C', '#1C242C', '#1C242C']}
+                colors={['#434B50', '#434B50', '#434B50', '#434B50']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -605,7 +605,7 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['#1C242C', '#1C242C', '#1C242C', '#1C242C']}
+                colors={['#434B50', '#434B50', '#434B50', '#434B50']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 locations={[0, 0.2, 0.8, 1]}
@@ -1423,17 +1423,40 @@ const styles = StyleSheet.create({
     //  than what shows through it, and the shadow can still be cached
     //  because the layer is opaque all the way across.
     // ------------------------------------------------------------------
-    backgroundColor: theme.colors.background,
+    // ------------------------------------------------------------------
+    //  AND THE HALO BEHIND IT
+    // ------------------------------------------------------------------
+    //  Three of these were only survivable while the gradient had white in
+    //  it, and became the whole problem the moment it did not.
+    //
+    //  THE FILL was `theme.colors.background`, which is the SCREEN colour,
+    //  overriding the `#434B50` that `styles.card` above already declares.
+    //  The card was only visible because of the bright bands running down
+    //  its edges. Take those away and it is the same colour as the ground.
+    //
+    //  THE SHADOW was `#CFD0D2` at radius 20 - a light grey glow, cast
+    //  BEHIND a card that had just become invisible. Reported as "beyaz
+    //  kisim arkada kalmis, gri kisim biraz fazla buyuk", and that is
+    //  exactly what was left on the screen: the halo and nothing else.
+    //
+    //  AND THE NEGATIVE MARGINS pulled it twenty four wider and sixteen
+    //  taller than the column it sits in, so it overhung its own slot.
+    //
+    //  All three now defer to `styles.card`, which had the right answers
+    //  from the start. Only the radius stays, because that is the look.
+    // ------------------------------------------------------------------
+    //  The fill is declared HERE as well as on `styles.card`, and not
+    //  because it is duplicated: homeChrome.test.ts requires a gradient that
+    //  carries a shadow to name an opaque background at the point the shadow
+    //  is declared, or iOS rasterises the layer first and cannot cache it.
+    backgroundColor: '#434B50',
     borderRadius: 33,
     borderWidth: 0,
-    shadowColor: '#CFD0D2',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 8,
-    marginHorizontal: -12,
-    marginVertical: -8,
-    padding: 30,
+    shadowColor: '#1C242C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 4,
     paddingBottom: 10,
   },
 });

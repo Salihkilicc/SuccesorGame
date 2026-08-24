@@ -57,8 +57,8 @@ describe('the two widget cards', () => {
         // reading the other as done is how the casino's 700 survived a
         // whole commit.
         const src = code();
-        const dark = src.match(/colors=\{\['#1C242C', '#1C242C', '#1C242C', '#1C242C'\]\}/g) ?? [];
-        expect(dark).toHaveLength(2);
+        const flat = src.match(/colors=\{\['#434B50', '#434B50', '#434B50', '#434B50'\]\}/g) ?? [];
+        expect(flat).toHaveLength(2);
     });
 
     it('and are shorter than they were', () => {
@@ -80,10 +80,8 @@ describe('and nothing else moved', () => {
         expect(src).toMatch(/<LinearGradient[\s\S]{0,300}styles\.widgetCard, styles\.modernCard/);
     });
 
-    it('and modernCard keeps its own look', () => {
-        const src = code();
-        expect(src).toMatch(/modernCard: \{[\s\S]{0,600}borderRadius: 33/);
-        expect(src).toMatch(/modernCard: \{[\s\S]{0,600}backgroundColor: theme\.colors\.background/);
+    it('and modernCard keeps the radius, which is the look', () => {
+        expect(code()).toMatch(/modernCard: \{[\s\S]{0,1400}borderRadius: 33/);
     });
 
     it('and the app tiles are exactly as they were', () => {
@@ -102,5 +100,43 @@ describe('the note on modernCard', () => {
         const raw = read();
         const note = raw.slice(raw.indexOf('modernCard: {'), raw.indexOf('modernCard: {') + 1400);
         expect(note).not.toMatch(/Only the FIRST gradient stop is translucent/);
+    });
+});
+
+
+// ============================================================================
+//  AND THE HALO THAT WAS LEFT WHEN THE BANDS CAME OFF
+// ============================================================================
+//
+//  Taking the white out was right and it exposed three things underneath that
+//  had only ever worked because the bands were there. Reported the second
+//  time as "beyaz kisim arkada kalmis, gri kisim biraz fazla buyuk" - the
+//  card had become the same colour as the screen and all that was left of it
+//  was a light grey glow.
+// ============================================================================
+
+describe('what the bands were hiding', () => {
+    it('is that the card was the colour of the screen', () => {
+        // `styles.card` declares #434B50 and `modernCard` was overriding it
+        // with `theme.colors.background`. The card was only ever visible
+        // because of the bright stops running down its edges.
+        const src = code();
+        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,1400}backgroundColor: theme\.colors\.background/);
+        expect(src).toMatch(/card: \{\s*backgroundColor: '#434B50'/);
+    });
+
+    it('and that the shadow behind it was light grey', () => {
+        // #CFD0D2 at radius 20 behind a card that had just gone invisible.
+        // That halo WAS the "beyaz kisim arkada".
+        const src = code();
+        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,1400}shadowColor: '#CFD0D2'/);
+        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,1400}shadowRadius: 20/);
+    });
+
+    it('and that it overhung its own column', () => {
+        // -12 and -8 pulled it wider and taller than the slot it sits in.
+        const src = code();
+        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,1400}marginHorizontal: -12/);
+        expect(src).not.toMatch(/modernCard: \{[\s\S]{0,1400}marginVertical: -8/);
     });
 });
