@@ -149,11 +149,32 @@ export const DISGRACE_BELOW = 20;
 /** And above this it has started giving you rather too much of it. */
 export const CELEBRATED_ABOVE = 85;
 
+// ============================================================================
+//  THE TWO CASINO TITLES ARE DERIVED, NOT TYPED
+// ============================================================================
+//  These were 600 and 300, with comments naming the rooms they were supposed
+//  to line up with. The rooms moved - see features/casino/data/casinoData.ts,
+//  where the rungs now widen because reputation is paid per bet and the chips
+//  scale with the room - and these did not, so "Macau" would have been awarded
+//  a quarter of the way up and the door itself sat at 2100.
+//
+//  One fact, one place. Read off the room rather than agreeing with it.
+// ============================================================================
+
+const roomRequirement = (id: string, fallback: number): number => {
+    try {
+        const { CASINO_LOCATIONS } = require('../../features/casino/data/casinoData');
+        return CASINO_LOCATIONS.find((l: any) => l.id === id)?.requirement ?? fallback;
+    } catch {
+        return fallback;
+    }
+};
+
 /** Macau, the seventh room, and the only one worth a title. */
-export const MACAU_REPUTATION = 600;
+export const MACAU_REPUTATION = roomRequirement('macau', 2100);
 
 /** London, the fourth. Far enough in to be a habit rather than an evening. */
-export const HIGH_ROLLER_REPUTATION = 300;
+export const HIGH_ROLLER_REPUTATION = roomRequirement('london', 900);
 
 /** More children than most people have relatives. */
 export const LARGE_FAMILY = 20;

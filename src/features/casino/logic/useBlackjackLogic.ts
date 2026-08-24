@@ -2,6 +2,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
+import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 
 // --- TİPLER VE SABİTLER ---
 export type Card = {
@@ -88,12 +89,12 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
         require('../../../core/store/useCasinoRiskStore')
             .useCasinoRiskStore.getState().recordVisit();
     } catch { /* risk store not ready */ }
-        updateReputation('casino', clamp(casinoReputation + delta, 0, 1000));
+        updateReputation('casino', clamp(casinoReputation + delta, 0, REPUTATION_CEILING));
     };
 
     const reputationDownSmall = () => {
         if (lossStreak.current >= 3) {
-            updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
+            updateReputation('casino', clamp(casinoReputation - 1, 0, REPUTATION_CEILING));
             lossStreak.current = 0;
         }
     };
@@ -102,7 +103,7 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
         let winnings = 0;
 
         // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
-        const spendingRep = Math.max(1, Math.floor(bet / 10000));
+        const spendingRep = reputationForBet(bet);
         reputationUp(spendingRep);
 
         if (outcome === 'win') {

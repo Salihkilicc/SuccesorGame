@@ -168,8 +168,12 @@ describe('the casino', () => {
     });
 
     it('and Macau is the seventh room, which is where it stops', () => {
+        // 1000 was written in here as "obviously past Macau", which stopped
+        // being true when the rungs widened - the seventh room asks for 2100
+        // now. Derived from the constant so the next move cannot strand it.
+        // See features/casino/data/casinoData.ts.
         expect(at(0, { casinoReputation: MACAU_REPUTATION - 1 })).toBe('High Roller');
-        expect(at(0, { casinoReputation: 1000 })).toBe('Known in Macau');
+        expect(at(0, { casinoReputation: MACAU_REPUTATION })).toBe('Known in Macau');
     });
 
     it('but it does not wag the dog', () => {

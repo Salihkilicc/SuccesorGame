@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
+import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 
 // --- TİPLER VE SABİTLER ---
 
@@ -110,12 +111,12 @@ export const useRouletteLogic = (initialChip?: number) => {
         require('../../../core/store/useCasinoRiskStore')
             .useCasinoRiskStore.getState().recordVisit();
     } catch { /* risk store not ready */ }
-    updateReputation('casino', clamp(casinoReputation + delta, 0, 1000));
+    updateReputation('casino', clamp(casinoReputation + delta, 0, REPUTATION_CEILING));
   };
 
   const reputationDownSmall = () => {
     if (lossStreak.current >= 3) {
-      updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
+      updateReputation('casino', clamp(casinoReputation - 1, 0, REPUTATION_CEILING));
       lossStreak.current = 0;
     }
   };
@@ -188,7 +189,7 @@ export const useRouletteLogic = (initialChip?: number) => {
       }
 
       // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
-      const spendingRep = Math.max(1, Math.floor(totalBetAmount / 10000));
+      const spendingRep = reputationForBet(totalBetAmount);
       reputationUp(spendingRep);
 
       // Apply winnings

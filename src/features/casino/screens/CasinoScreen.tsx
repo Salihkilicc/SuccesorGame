@@ -17,6 +17,7 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import { useCasinoHomeLogic } from '../logic/useCasinoHomeLogic';
 import CasinoLocationModal from '../components/CasinoLocationModal';
 import { GameRoomCard } from '../components/GameRoomCard';
+import { CASINO_LADDER_TOP } from '../data/casinoData';
 
 const CasinoScreen: React.FC = () => {
   useLocale();
@@ -31,7 +32,10 @@ const CasinoScreen: React.FC = () => {
     locationModalVisible,
   } = state;
 
-  const repProgress = Math.min(casinoReputation / 700, 1);
+  // The bar is a fraction of the LAST ROOM rather than of a round number
+  // somebody typed. It read /700 while the ladder ended at 600, so a player
+  // at the top of the game was shown a bar that never filled.
+  const repProgress = Math.min(casinoReputation / CASINO_LADDER_TOP, 1);
   const getRepRank = (rep: number) => {
     if (rep >= 600) return 'High Roller';
     if (rep >= 300) return 'VIP';
@@ -191,7 +195,7 @@ const CasinoScreen: React.FC = () => {
             <View style={styles.repTrackWrapper}>
               <View style={styles.repTrackHeader}>
                 <Text style={styles.repTrackLabel}>
-                  {t('ui.casinoRep') || 'Reputation'}: {casinoReputation.toFixed(0)} / 700
+                  {t('ui.casinoRep') || 'Reputation'}: {casinoReputation.toFixed(0)} / {CASINO_LADDER_TOP}
                 </Text>
               </View>
               <View style={styles.repTrack}>
@@ -218,7 +222,6 @@ const CasinoScreen: React.FC = () => {
             <GameRoomCard
               title={t('ui.blackjack') || 'BLACKJACK 21'}
               subtitle={t('ui.highStakesTables') || 'Classic 3:2 Multi-Hand VIP Tables'}
-              image={require('../assets/blackjack_thumb.png')}
               themeColor={currentLocation.theme.primary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="cards-spade"
@@ -232,7 +235,6 @@ const CasinoScreen: React.FC = () => {
             <GameRoomCard
               title={t('ui.roulette') || 'ROULETTE ROYALE'}
               subtitle={t('ui.europeanAmerican') || 'Single-Zero European Wheel & Straight Bets'}
-              image={require('../assets/roulette_thumb.png')}
               themeColor={currentLocation.theme.secondary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="circle-slice-8"
@@ -246,7 +248,6 @@ const CasinoScreen: React.FC = () => {
             <GameRoomCard
               title={t('ui.slots') || 'CYBER SLOTS'}
               subtitle={t('ui.progressiveJackpots') || 'Multi-Payline Mega Jackpots & Wilds'}
-              image={require('../assets/slots_thumb.png')}
               themeColor={currentLocation.theme.primary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="slot-machine"
@@ -260,7 +261,6 @@ const CasinoScreen: React.FC = () => {
             <GameRoomCard
               title={t('ui.poker') || "TEXAS HOLD'EM"}
               subtitle={t('ui.texasHoldEm') || 'High Stakes No-Limit Private Lounge'}
-              image={require('../assets/poker_thumb.png')}
               themeColor={currentLocation.theme.secondary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="cards-club"

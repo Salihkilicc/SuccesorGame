@@ -1,4 +1,36 @@
 // src/features/casino/data/casinoData.ts
+//
+// ============================================================================
+//  THE LADDER, AND WHY THE RUNGS ARE NOT EVEN
+// ============================================================================
+//
+//  Seven rooms at 0, 100, 200, 300, 400, 500, 600, and the screen drew a
+//  progress bar against a hardcoded 700 that matched nothing.
+//
+//  Even rungs are wrong here, and the reason is in the earning rate rather
+//  than in the thresholds. Reputation is paid out per bet:
+//
+//      spendingRep = max(1, floor(bet / 10_000))
+//
+//  and the chips scale with the room. Athens tops out at a 50,000 chip, so a
+//  maximum bet is worth +5 and the first hundred is about twenty spins. That
+//  is a real climb. Istanbul's top chip is 2,500,000, worth +250 a hand - so
+//  under even rungs, ONE hand clears an entire room and the remaining five
+//  gates are decoration.
+//
+//  So the rungs widen with the rooms they gate. A hundred to leave Athens,
+//  because that is the one you earn at five points a spin, and four hundred
+//  for each one after, which is the smallest step that still costs more than
+//  a single maximum bet at the bottom of each tier's chip range.
+//
+//  Asked for as "ilkini 100 yapalim, tier2'ye gecis sonrasi her biri 200 olsun
+//  veya 400". Four hundred, for the reason above: two hundred is one hand at
+//  the top of Istanbul's range and the ladder collapses again.
+//
+//  REPUTATION_CEILING moved with them. It was clamped at 1000 in four
+//  separate logic files while the ladder now ends at 2100, so the last two
+//  rooms would have been unreachable at any stake.
+// ============================================================================
 
 export type LocationId =
   | 'athens'
@@ -30,6 +62,59 @@ export type CasinoLocation = {
   maxBet: number;
   theme: CasinoTheme;
   chips: number[];
+};
+
+/**
+ * The most reputation anybody can hold.
+ *
+ * Was 1000, typed by hand into four separate game logic files. The top room
+ * now asks for 2100, so the clamp had to move or Monte Carlo and Macau were
+ * gated behind a number the game refused to let you reach.
+ */
+export const REPUTATION_CEILING = 2500;
+
+/** What the progress bar is a fraction OF. The last room, not a round number. */
+export const CASINO_LADDER_TOP = 2100;
+
+// ============================================================================
+//  AND HOW FAST YOU CLIMB IT
+// ============================================================================
+//
+//  Moving the rungs was not enough on its own, and a test found it rather than
+//  I did. Reputation was paid as `max(1, floor(bet / 10_000))` with no upper
+//  limit, and the chips run to fifty billion. So:
+//
+//      Athens      top chip 50,000        +5    a real climb
+//      Istanbul    top chip 2,500,000     +250  one hand a room
+//      Monte Carlo SMALLEST chip 10m      +1000 the cheapest bet in the
+//                                               room clears the next gate
+//                                               four times over
+//
+//  A ladder whose gates are cleared by the minimum bet is not a ladder, it is
+//  a corridor with doors drawn on it. So a single bet is worth at most
+//  MAX_REP_PER_BET, whatever it cost.
+//
+//  Twenty five, chosen against the rungs rather than in the abstract: sixteen
+//  maximum bets to cross any four hundred gate, against twenty spins to leave
+//  Athens at five a spin. The same climb at every size of stake, which is the
+//  point - the rooms are earned by turning up, not by the size of one chip.
+// ============================================================================
+
+/** The most reputation any single bet can be worth. */
+export const MAX_REP_PER_BET = 25;
+
+/** One dollar of stake in reputation terms, before the cap. */
+export const REP_PER_DOLLAR_STAKED = 1 / 10_000;
+
+/**
+ * What one bet is worth, which is the only place this is decided now.
+ *
+ * It was four copies of the same expression in four game logic files, none of
+ * which had a cap and none of which knew about the ladder they were feeding.
+ */
+export const reputationForBet = (bet: number): number => {
+    const staked = Math.max(0, bet || 0);
+    return Math.max(1, Math.min(MAX_REP_PER_BET, Math.floor(staked * REP_PER_DOLLAR_STAKED)));
 };
 
 export const CASINO_LOCATIONS: CasinoLocation[] = [
@@ -77,7 +162,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     id: 'las_vegas',
     name: 'Las Vegas',
     subTitle: 'Neon Palace',
-    requirement: 200,
+    requirement: 500,
     maxBet: 25_000_000,
     theme: {
       primary: '#C4B5FD',
@@ -97,7 +182,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     id: 'london',
     name: 'London',
     subTitle: 'The Crown Club',
-    requirement: 300,
+    requirement: 900,
     maxBet: 100_000_000,
     theme: {
       primary: '#93A0F7',
@@ -117,7 +202,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     id: 'singapore',
     name: 'Singapore',
     subTitle: 'Marina Bay Heights',
-    requirement: 400,
+    requirement: 1300,
     maxBet: 1_000_000_000,
     theme: {
       primary: '#4ADE80',
@@ -137,7 +222,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     id: 'monte_carlo',
     name: 'Monte Carlo',
     subTitle: 'Le Grand Casino',
-    requirement: 500,
+    requirement: 1700,
     maxBet: 10_000_000_000,
     theme: {
       primary: '#EFC94C',
@@ -157,7 +242,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     id: 'macau',
     name: 'Macau',
     subTitle: "Dragon's Ascendancy",
-    requirement: 600,
+    requirement: 2100,
     maxBet: 100_000_000_000,
     theme: {
       primary: '#FF8A8A',

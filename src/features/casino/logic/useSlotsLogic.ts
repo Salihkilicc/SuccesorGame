@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { SLOT_CONFIG, SlotVariant } from './slotsData';
+import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 
 export type Grid = [string, string, string][];
 
@@ -65,10 +66,10 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
         require('../../../core/store/useCasinoRiskStore')
             .useCasinoRiskStore.getState().recordVisit();
     } catch { /* risk store not ready */ }
-    updateReputation('casino', clamp(Math.round(casinoReputation + delta), 0, 1000));
+    updateReputation('casino', clamp(Math.round(casinoReputation + delta), 0, REPUTATION_CEILING));
   };
   const reputationDownSmall = () => {
-    updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
+    updateReputation('casino', clamp(casinoReputation - 1, 0, REPUTATION_CEILING));
   };
 
   // Constants for Probabilities
@@ -202,7 +203,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
     let resultType: 'win' | 'loss' = 'loss';
 
     // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
-    const spendingRep = Math.max(1, Math.floor(bet / 10000));
+    const spendingRep = reputationForBet(bet);
     reputationUp(spendingRep);
 
     if (outcome === 'JACKPOT') {

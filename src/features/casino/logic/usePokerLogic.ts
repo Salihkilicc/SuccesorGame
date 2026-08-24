@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
+import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 
 // --- TİPLER ---
 export type Card = {
@@ -61,12 +62,12 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
 
   // --- OYUN MOTORU ---
   const reputationUp = (delta: number) => {
-    updateReputation('casino', clamp(casinoReputation + delta, 0, 1000));
+    updateReputation('casino', clamp(casinoReputation + delta, 0, REPUTATION_CEILING));
   };
 
   const reputationDownSmall = () => {
     if (lossStreak.current >= 3) {
-      updateReputation('casino', clamp(casinoReputation - 1, 0, 1000));
+      updateReputation('casino', clamp(casinoReputation - 1, 0, REPUTATION_CEILING));
       lossStreak.current = 0;
     }
   };
@@ -128,7 +129,7 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       setCurrentBet(baseBet);
 
       // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
-      const spendingRep = Math.max(1, Math.floor(baseBet / 10000));
+      const spendingRep = reputationForBet(baseBet);
       reputationUp(spendingRep);
 
       const deck = createDeck();
@@ -155,7 +156,7 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       setCurrentBet(currentBet + baseBet);
 
       // Harcama bazlı reputation
-      const spendingRepFlop = Math.max(1, Math.floor(baseBet / 10000));
+      const spendingRepFlop = reputationForBet(baseBet);
       reputationUp(spendingRepFlop);
 
       setRevealedBoard(4);
@@ -172,7 +173,7 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       setCurrentBet(currentBet + baseBet);
 
       // Harcama bazlı reputation
-      const spendingRepTurn = Math.max(1, Math.floor(baseBet / 10000));
+      const spendingRepTurn = reputationForBet(baseBet);
       reputationUp(spendingRepTurn);
 
       setRevealedBoard(5);

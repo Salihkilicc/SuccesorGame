@@ -1,6 +1,35 @@
 // src/features/casino/components/GameRoomCard.tsx
+//
+// ============================================================================
+//  THE FOUR CARDS THAT WERE SHOWING NOTHING
+// ============================================================================
+//
+//  Reported as "fotolari yok", and they were not: the four thumbnails are
+//  JPEGs with a .png extension.
+//
+//      blackjack_thumb.png   FFD8FF ... JFIF     670 KB
+//      poker_thumb.png       FFD8FF ... JFIF     676 KB
+//      roulette_thumb.png    FFD8FF ... JFIF     640 KB
+//      slots_thumb.png       FFD8FF ... JFIF     575 KB
+//
+//  Metro decides how to decode an asset from its extension, so every one of
+//  them failed and the cards drew an empty box under the gradient. Two and a
+//  half megabytes of bundle for four blank rectangles.
+//
+//  ---------------------------------------------------------------------------
+//  AND THE REPLACEMENT IS NOT A CORRECTED PHOTOGRAPH
+//  ---------------------------------------------------------------------------
+//  Asked for directly: "sen oyuna uygun sembol temasina uygun her birine bul
+//  resimlerinin yerine koy". Which is the better answer anyway. Each casino
+//  already carries a full palette in data/casinoData.ts - a primary, a glow,
+//  a gradient - and a photograph fights all of it. A large symbol in the
+//  room's own colour makes Athens and Macau look like different places
+//  without four more files to keep in step.
+//
+//  The `image` prop is gone. Nothing on the card reads a file now.
+// ============================================================================
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { t, useLocale } from '../../../core/i18n';
@@ -9,7 +38,6 @@ import { theme } from '../../../core/theme';
 interface GameRoomCardProps {
     title: string;
     subtitle: string;
-    image: ImageSourcePropType;
     onPress: () => void;
     locked?: boolean;
     themeColor?: string;
@@ -21,7 +49,6 @@ interface GameRoomCardProps {
 export const GameRoomCard: React.FC<GameRoomCardProps> = ({
     title,
     subtitle,
-    image,
     onPress,
     locked = false,
     themeColor = theme.colors.primary,
@@ -41,14 +68,27 @@ export const GameRoomCard: React.FC<GameRoomCardProps> = ({
                 locked && styles.lockedContainer,
             ]}
         >
-            <Image source={image} style={[styles.image, locked && styles.lockedImage]} resizeMode="cover" />
-
-            {/* Dark Ambient Overlay Gradient */}
+            {/* The room's own colour, washing out downwards so the text at
+                the bottom sits on the ground rather than on the colour. */}
             <LinearGradient
-                colors={['rgba(28, 36, 44, 0.25)', 'rgba(28, 36, 44, 0.88)', '#1C242C']}
+                colors={[
+                    locked ? 'rgba(255,255,255,0.03)' : accentGlow,
+                    'rgba(28, 36, 44, 0.85)',
+                    '#1C242C',
+                ]}
                 style={StyleSheet.absoluteFillObject}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
+                start={{ x: 0.15, y: 0 }}
+                end={{ x: 0.85, y: 1 }}
+            />
+
+            {/* The symbol, oversized and half off the edge, which is what a
+                photograph was doing badly. Faint, because the title has to
+                stay the loudest thing on the card. */}
+            <MaterialCommunityIcons
+                name={iconName}
+                size={128}
+                color={locked ? theme.colors.textMuted : themeColor}
+                style={styles.watermark}
             />
 
             {/* Top Badge (Stakes / Type) */}
@@ -105,13 +145,11 @@ const styles = StyleSheet.create({
     lockedContainer: {
         borderColor: 'rgba(255,255,255,0.06)',
     },
-    image: {
-        width: '100%',
-        height: '100%',
+    watermark: {
         position: 'absolute',
-    },
-    lockedImage: {
-        opacity: 0.25,
+        right: -18,
+        top: -10,
+        opacity: 0.22,
     },
     topBadge: {
         position: 'absolute',
