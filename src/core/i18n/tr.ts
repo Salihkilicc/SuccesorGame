@@ -2011,7 +2011,12 @@ export const tr: Record<string, string> = {
     'personal.incomeSources': 'Nereden geliyor',
     'personal.expenses': 'Nereye gidiyor',
     'personal.yourPay': 'Maaşın',
-    'personal.payTap': 'Hisse ekranından ayarlanır. Değiştirmek için dokun.',
+    'personal.payTap': 'Ne aldığını değiştirmek için dokun.',
     'personal.payLocked': 'Maaş yılda bir kez belirlenir. {n} kaldı.',
     'personal.quarter': 'çeyrek başına',
+    'personal.stakeDetail': '{company} şirketinin %{percent} kadarı · {shares} hisse',
+    'personal.stakeNoName': 'Şirketin %{percent} kadarı · {shares} hisse',
+    'personal.luxury': 'Lüks varlıklar',
+    'personal.luxuryCount': '{n} adet · yılda {cost} bakım',
+    'personal.luxuryNote': 'LuxoNet üzerinden alındı. Yukarıdaki toplama dahil değil.',
 };

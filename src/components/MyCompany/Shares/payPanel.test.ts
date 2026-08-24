@@ -38,32 +38,36 @@ import {
 } from '../../../core/market/ceoPay';
 import { CEO_BASE_SALARY_QUARTERLY } from '../../../core/market/personalEconomy';
 
-const read = () => fs.readFileSync(path.join(__dirname, 'ShareControlHub.tsx'), 'utf8');
+const read = (file = 'CeoPayPanel.tsx') =>
+    fs.readFileSync(path.join(__dirname, file), 'utf8');
 
 /** Source with comments stripped, so a rule cannot pass on a mention in prose. */
-const code = () =>
-    read()
+const code = (file?: string) =>
+    read(file)
         .replace(/\{?\/\*[\s\S]*?\*\/\}?/g, '')
         .split('\n')
         .filter(l => !/^\s*(\/\/|\*)/.test(l))
         .map(l => l.replace(/\s\/\/.*$/, ''))
         .join('\n');
 
-/** Just the body of openPayPanel, so nothing on this screen answers for it. */
-const payPanelBody = () => {
-    const src = code();
-    const start = src.indexOf('const openPayPanel');
-    expect(start).toBeGreaterThan(-1);
-    return src.slice(start, src.indexOf('const handleStockSplit'));
-};
+/**
+ * The panel's own source.
+ *
+ * It used to be a slice of ShareControlHub between two markers, because the
+ * panel was a closure on a screen. It is a component now, so the file IS the
+ * body and there is nothing else in it to answer for it.
+ */
+const payPanelBody = () => code();
 
 describe('the pay panel', () => {
     it('offers its three options as choices rather than as reading matter', () => {
         const body = payPanelBody();
-        expect(body).toMatch(/choices:\s*options\.map/);
+        expect(body).toMatch(/const choices = options\.map/);
+        expect(body).toMatch(/choices=\{choices\}/);
         // The old shape. `lines` renders a label and a value and nothing else
         // on the row can be pressed.
         expect(body).not.toMatch(/lines:\s*options\.map/);
+        expect(body).not.toMatch(/lines=\{/);
     });
 
     it('and every one of them actually asks for its own number', () => {
@@ -75,12 +79,11 @@ describe('the pay panel', () => {
     });
 
     it('and hands them to a panel that can render them', () => {
-        // A choice list built into state that the panel is never given is the
-        // same bug one level up, and it is a real risk here: `choices` was on
-        // ConfirmPanel the whole time and this screen never passed it.
+        // A choice list built and never passed is the same bug one level up,
+        // and it is a real risk here: `choices` was on ConfirmPanel the whole
+        // time and the old screen never passed it.
         const src = code();
-        expect(src).toMatch(/choices=\{panel\?\.choices\}/);
-        expect(src).toMatch(/choices\?:\s*\{/);
+        expect(src).toMatch(/choices=\{choices\}/);
     });
 
     it('and shows the ones it cannot take, greyed, with the reason', () => {
@@ -139,5 +142,78 @@ describe('and the option that was unreachable', () => {
             quartersSinceChange: PAY_CHANGE_COOLDOWN - 1,
         });
         expect(blocked.blocked).toContain('1 more quarter');
+    });
+});
+
+
+// ============================================================================
+//  AND IT IS ONE DOOR NOW
+// ============================================================================
+//
+//  The panel lived under Equity, beside the IPO and the buyback, because that
+//  is where it was first written. It is the player's OWN wages, and a player
+//  looking for their wages does not open a share control screen.
+//
+//  It moved WHOLE. The risk in a move like this is that it becomes a copy -
+//  which this codebase has paid for four times: the casino's 700 in four
+//  places, three salaries, four buyout deciders, two net worths. So these
+//  rules are about there being exactly one of it.
+// ============================================================================
+
+describe('the pay decision', () => {
+    /**
+     * The hub's LIVE source.
+     *
+     * It has to strip JSX block comments as well as line comments, because
+     * the shelved row is inside a `{/* ... *\/}` block - and a rule that only
+     * strips `//` would read the shelved markup as live and fail on a file
+     * that is correct. The reverse of the trap this project hit twice, where
+     * a probe passed because `code()` had stripped the very thing it meant to
+     * check.
+     */
+    const hub = () =>
+        fs.readFileSync(path.join(__dirname, 'ShareControlHub.tsx'), 'utf8')
+            .replace(/\{?\/\*[\s\S]*?\*\/\}?/g, '')
+            .split('\n')
+            .filter(l => !/^\s*(\/\/|\*)/.test(l))
+            .join('\n');
+
+    it('is not still openable from the equity screen', () => {
+        expect(hub()).not.toMatch(/onPress=\{openPayPanel\}/);
+    });
+
+    it('and the equity screen no longer builds one of its own', () => {
+        const src = hub();
+        expect(src).not.toMatch(/requestCeoPay/);
+        expect(src).not.toMatch(/decidePay\(/);
+    });
+
+    it('and it is shelved there rather than deleted', () => {
+        const raw = fs.readFileSync(path.join(__dirname, 'ShareControlHub.tsx'), 'utf8');
+        expect(raw).toContain('openPayPanel');
+        expect(raw).toContain('CeoPayPanel.tsx');
+    });
+
+    it('and exactly one file asks the store for a pay change', () => {
+        // The rule that would have caught the four buyout deciders.
+        const root = path.join(__dirname, '../../..');
+        const hits: string[] = [];
+        const walk = (dir: string) => {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                const full = path.join(dir, entry.name);
+                if (entry.isDirectory()) { walk(full); continue; }
+                if (!/\.tsx?$/.test(entry.name) || /\.test\./.test(entry.name)) continue;
+                const body = fs.readFileSync(full, 'utf8')
+                    .split('\n')
+                    .filter(l => !/^\s*(\/\/|\*)/.test(l))
+                    .join('\n');
+                if (/requestCeoPay\(/.test(body)) hits.push(entry.name);
+            }
+        };
+        walk(root);
+        // One. The store DEFINES `requestCeoPay:` rather than calling it, so
+        // it does not appear here - which is the shape this rule wants: one
+        // implementation, one caller, no second door.
+        expect(hits.sort()).toEqual(['CeoPayPanel.tsx']);
     });
 });

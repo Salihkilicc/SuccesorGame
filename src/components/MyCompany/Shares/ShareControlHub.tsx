@@ -29,16 +29,18 @@ import InfoTooltipModal from './InfoTooltipModal';
 import { StatRow, DetailLine, DetailRule, DetailNote, RowGroup } from '../../common/Disclosure';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
-import {
-    decidePay,
-    payCeiling,
-    payAsShareOfRevenue,
-    CEO_BASE_SALARY_QUARTERLY,
-    PAY_VOTE_MULTIPLE,
-    PAY_CHANGE_COOLDOWN,
-} from '../../../core/market/ceoPay';
-import { currentQuarter } from '../../../core/story/world';
-import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
+// Shelved with the pay panel below. Every one of these was imported for it
+// and nothing else on this screen; they live in CeoPayPanel.tsx now.
+// import {
+//     decidePay,
+//     payCeiling,
+//     payAsShareOfRevenue,
+//     CEO_BASE_SALARY_QUARTERLY,
+//     PAY_VOTE_MULTIPLE,
+//     PAY_CHANGE_COOLDOWN,
+// } from '../../../core/market/ceoPay';
+// import { currentQuarter } from '../../../core/story/world';
+// import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 
@@ -143,112 +145,131 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
     }>(null);
 
     // ======================================================================
-    //  YOUR OWN PAY
+    //  YOUR OWN PAY MOVED OUT OF THIS SCREEN
     // ======================================================================
-    //  Three choices rather than a number field, and each one shows what it
-    //  costs before it is picked. A free entry box invites the player to type
-    //  the treasury and be told no; these are the three answers that exist.
+    //  It is a PERSONAL salary and it was decided here, under Equity, beside
+    //  the IPO and the buyback - two taps from the page the money actually
+    //  lands on, and only findable by a player who already knew to look on a
+    //  company screen for their own wages.
     //
-    //  The ceiling is a share of TRAILING revenue, so it is a number the
-    //  player has already earned rather than one they can conjure. Every rule
-    //  behind it is in core/market/ceoPay.ts, written one per loophole.
+    //  It now lives on the personal screen, whole. Not copied: this codebase
+    //  has paid for duplication four times - the casino's 700 in four places,
+    //  three salaries, four buyout deciders, two net worths - so there is one
+    //  implementation, in components/MyCompany/Shares/CeoPayPanel.tsx, and one
+    //  door to it.
+    //
+    //  Kept here rather than deleted because the panel's shape is the record
+    //  of what it is for: three answers instead of a number field, each one
+    //  priced before it is picked.
     // ======================================================================
-    const ceoPay = stats.ceoPayQuarterly ?? CEO_BASE_SALARY_QUARTERLY;
-    const ttmRevenueForPay = trailingTotal(stats.revenueHistory ?? []);
-    const payMax = payCeiling(ttmRevenueForPay);
-    // When they may next change it. Shown rather than only enforced: "no" with
-    // no date on it reads as broken, which is how the old contract presets and
-    // the old friendly-acquisition lock both went wrong.
-    const quartersSincePayChange =
-        currentQuarter() - (stats.ceoPaySetQuarter ?? -PAY_CHANGE_COOLDOWN);
-    const payLockedFor = Math.max(0, PAY_CHANGE_COOLDOWN - quartersSincePayChange);
 
-    /** Ask for a number, then say what came of it. Shared by all three rows. */
-    const askForPay = (amount: number) => {
-        const r = useCorporateFinanceStore.getState().requestCeoPay(amount);
-        setPanel({
-            title: r.ok ? 'Set' : 'Not this year',
-            summary: r.message,
-            confirmLabel: 'OK',
-            tone: r.ok ? 'default' : 'danger',
-        });
-    };
-
-    const openPayPanel = () => {
-        // ------------------------------------------------------------------
-        //  THREE ANSWERS, AND ALL THREE CAN BE GIVEN
-        // ------------------------------------------------------------------
-        //  This panel listed the three as `lines` - read only - under a single
-        //  button labelled "Ask for the maximum", so a player could see the
-        //  founder's wage and the middle step and take neither. The only move
-        //  available was the greediest one, which is the opposite of what a
-        //  panel built around a choice is for, and it made a pay CUT
-        //  unreachable from the screen although `decidePay` allows one at any
-        //  time and charges nothing for it.
-        //
-        //  `choices` already existed for exactly this - the acquisition panel
-        //  pays in cash, debt or stock the same way - so this is the shape the
-        //  screen should have had, not a new mechanism.
-        //
-        //  Nothing is filtered out. A row that cannot be taken is shown greyed
-        //  with the reason underneath, which is the rule the acquisition panel
-        //  learned the hard way: a missing button teaches nothing.
-        // ------------------------------------------------------------------
-        const options: { label: string; amount: number }[] = [
-            { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY },
-            { label: 'A real rise', amount: Math.min(payMax, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2) },
-            { label: 'Everything the company can carry', amount: payMax },
-        ];
-
-        setPanel({
-            title: 'Your pay',
-            summary: `You take ${formatMoney(ceoPay)} a quarter, and the company pays it. `
-                + `The most it can carry is ${formatMoney(payMax)}, which is two per cent of what it sells.`,
-            choices: options.map(o => {
-                const d = decidePay({
-                    amount: o.amount,
-                    current: ceoPay,
-                    trailingAnnualRevenue: ttmRevenueForPay,
-                    quartersSinceChange: quartersSincePayChange,
-                });
-                const share = payAsShareOfRevenue(d.granted, ttmRevenueForPay);
-                const isCut = d.granted < ceoPay;
-                const unchanged = d.granted === ceoPay;
-
-                // The description carries the WHY, because it is also what a
-                // greyed row has to explain.
-                const detail = d.blocked
-                    ? d.blocked
-                    : unchanged
-                        ? 'What you already take.'
-                        : [
-                            `${formatMoney(d.granted)} a quarter`,
-                            share > 0 ? `${(share * 100).toFixed(1)}% of sales` : '',
-                            d.needsVote ? 'the board votes on this' : 'no vote needed',
-                            isCut
-                                ? 'a cut costs nothing and takes effect at once'
-                                : d.trustCost > 0
-                                    ? `costs every director ${d.trustCost} trust`
-                                    : 'costs no trust',
-                        ].filter(Boolean).join(' · ');
-
-                return {
-                    label: o.label,
-                    description: detail,
-                    disabled: !!d.blocked || unchanged,
-                    onPress: () => askForPay(o.amount),
-                };
-            }),
-            note: payLockedFor > 0
-                ? `Pay is set once a year. ${payLockedFor} more ${payLockedFor === 1 ? 'quarter' : 'quarters'} before it can rise again. A cut still takes effect at once.`
-                : 'A rise is set once a year and costs trust with every director, '
-                    + 'whether or not they approve it. A cut takes effect at once and costs nothing.',
-            // Unused while `choices` is present - the choices ARE the answer -
-            // but ConfirmPanel takes it as required, and the cancel row is
-            // what closes this one.
-            confirmLabel: 'Close',
-        });
-    };
+//     // ======================================================================
+//     //  YOUR OWN PAY
+//     // ======================================================================
+//     //  Three choices rather than a number field, and each one shows what it
+//     //  costs before it is picked. A free entry box invites the player to type
+//     //  the treasury and be told no; these are the three answers that exist.
+//     //
+//     //  The ceiling is a share of TRAILING revenue, so it is a number the
+//     //  player has already earned rather than one they can conjure. Every rule
+//     //  behind it is in core/market/ceoPay.ts, written one per loophole.
+//     // ======================================================================
+//     const ceoPay = stats.ceoPayQuarterly ?? CEO_BASE_SALARY_QUARTERLY;
+//     const ttmRevenueForPay = trailingTotal(stats.revenueHistory ?? []);
+//     const payMax = payCeiling(ttmRevenueForPay);
+//     // When they may next change it. Shown rather than only enforced: "no" with
+//     // no date on it reads as broken, which is how the old contract presets and
+//     // the old friendly-acquisition lock both went wrong.
+//     const quartersSincePayChange =
+//         currentQuarter() - (stats.ceoPaySetQuarter ?? -PAY_CHANGE_COOLDOWN);
+//     const payLockedFor = Math.max(0, PAY_CHANGE_COOLDOWN - quartersSincePayChange);
+//
+//     /** Ask for a number, then say what came of it. Shared by all three rows. */
+//     const askForPay = (amount: number) => {
+//         const r = useCorporateFinanceStore.getState().requestCeoPay(amount);
+//         setPanel({
+//             title: r.ok ? 'Set' : 'Not this year',
+//             summary: r.message,
+//             confirmLabel: 'OK',
+//             tone: r.ok ? 'default' : 'danger',
+//         });
+//     };
+//
+//     const openPayPanel = () => {
+//         // ------------------------------------------------------------------
+//         //  THREE ANSWERS, AND ALL THREE CAN BE GIVEN
+//         // ------------------------------------------------------------------
+//         //  This panel listed the three as `lines` - read only - under a single
+//         //  button labelled "Ask for the maximum", so a player could see the
+//         //  founder's wage and the middle step and take neither. The only move
+//         //  available was the greediest one, which is the opposite of what a
+//         //  panel built around a choice is for, and it made a pay CUT
+//         //  unreachable from the screen although `decidePay` allows one at any
+//         //  time and charges nothing for it.
+//         //
+//         //  `choices` already existed for exactly this - the acquisition panel
+//         //  pays in cash, debt or stock the same way - so this is the shape the
+//         //  screen should have had, not a new mechanism.
+//         //
+//         //  Nothing is filtered out. A row that cannot be taken is shown greyed
+//         //  with the reason underneath, which is the rule the acquisition panel
+//         //  learned the hard way: a missing button teaches nothing.
+//         // ------------------------------------------------------------------
+//         const options: { label: string; amount: number }[] = [
+//             { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY },
+//             { label: 'A real rise', amount: Math.min(payMax, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2) },
+//             { label: 'Everything the company can carry', amount: payMax },
+//         ];
+//
+//         setPanel({
+//             title: 'Your pay',
+//             summary: `You take ${formatMoney(ceoPay)} a quarter, and the company pays it. `
+//                 + `The most it can carry is ${formatMoney(payMax)}, which is two per cent of what it sells.`,
+//             choices: options.map(o => {
+//                 const d = decidePay({
+//                     amount: o.amount,
+//                     current: ceoPay,
+//                     trailingAnnualRevenue: ttmRevenueForPay,
+//                     quartersSinceChange: quartersSincePayChange,
+//                 });
+//                 const share = payAsShareOfRevenue(d.granted, ttmRevenueForPay);
+//                 const isCut = d.granted < ceoPay;
+//                 const unchanged = d.granted === ceoPay;
+//
+//                 // The description carries the WHY, because it is also what a
+//                 // greyed row has to explain.
+//                 const detail = d.blocked
+//                     ? d.blocked
+//                     : unchanged
+//                         ? 'What you already take.'
+//                         : [
+//                             `${formatMoney(d.granted)} a quarter`,
+//                             share > 0 ? `${(share * 100).toFixed(1)}% of sales` : '',
+//                             d.needsVote ? 'the board votes on this' : 'no vote needed',
+//                             isCut
+//                                 ? 'a cut costs nothing and takes effect at once'
+//                                 : d.trustCost > 0
+//                                     ? `costs every director ${d.trustCost} trust`
+//                                     : 'costs no trust',
+//                         ].filter(Boolean).join(' · ');
+//
+//                 return {
+//                     label: o.label,
+//                     description: detail,
+//                     disabled: !!d.blocked || unchanged,
+//                     onPress: () => askForPay(o.amount),
+//                 };
+//             }),
+//             note: payLockedFor > 0
+//                 ? `Pay is set once a year. ${payLockedFor} more ${payLockedFor === 1 ? 'quarter' : 'quarters'} before it can rise again. A cut still takes effect at once.`
+//                 : 'A rise is set once a year and costs trust with every director, '
+//                     + 'whether or not they approve it. A cut takes effect at once and costs nothing.',
+//             // Unused while `choices` is present - the choices ARE the answer -
+//             // but ConfirmPanel takes it as required, and the cancel row is
+//             // what closes this one.
+//             confirmLabel: 'Close',
+//         });
+//     };
 
     const handleStockSplit = () => {
         if (stockPrice <= 1000) {
@@ -562,31 +583,38 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                         </TouchableOpacity>
 
                         {/* ------------------------------------------------
-                            WHAT YOU PAY YOURSELF
+                            WHAT YOU PAY YOURSELF - MOVED, NOT COPIED
 
-                            Here rather than on a screen of its own because it
-                            belongs with the other four: every row on this page
-                            moves money between the company and its owners, and
-                            this is the one that moves it to you. See
-                            core/market/ceoPay.ts for why it is not simply a
-                            number field.
+                            The old reasoning was that it belongs with the
+                            other four because every row on this page moves
+                            money between the company and its owners, and this
+                            is the one that moves it to you.
+
+                            True, and it lost to a simpler fact: it is the
+                            player's OWN wages, and a player looking for their
+                            wages does not open a share control screen. It is
+                            on the personal page now, on the row that shows the
+                            money arriving. There is one door, because two
+                            doors to one decision is the same fault as two
+                            places holding one fact.
+
+                            <TouchableOpacity
+                                style={styles.actionRow}
+                                onPress={openPayPanel}
+                                activeOpacity={0.7}
+                            >
+                                <View style={[styles.actionIconBox, ...]}>
+                                    <MaterialCommunityIcons name="account-tie" size={24} ... />
+                                </View>
+                                <View style={styles.actionContent}>
+                                    <Text style={styles.actionTitle}>Your pay</Text>
+                                    <Text style={styles.actionDescription}>
+                                        {`${formatMoney(ceoPay)} a quarter · the board may cap it at ${formatMoney(payMax)}`}
+                                    </Text>
+                                </View>
+                                <Text style={styles.actionArrow}>›</Text>
+                            </TouchableOpacity>
                            ------------------------------------------------ */}
-                        <TouchableOpacity
-                            style={styles.actionRow}
-                            onPress={openPayPanel}
-                            activeOpacity={0.7}
-                        >
-                            <View style={[styles.actionIconBox, { backgroundColor: theme.colors.surfaceRaised, borderWidth: 1, borderColor: theme.colors.border }]}>
-                                <MaterialCommunityIcons name="account-tie" size={24} color={theme.colors.textPrimary} />
-                            </View>
-                            <View style={styles.actionContent}>
-                                <Text style={styles.actionTitle}>Your pay</Text>
-                                <Text style={styles.actionDescription}>
-                                    {`${formatMoney(ceoPay)} a quarter · the board may cap it at ${formatMoney(payMax)}`}
-                                </Text>
-                            </View>
-                            <Text style={styles.actionArrow}>›</Text>
-                        </TouchableOpacity>
 
                         <View style={{ height: 40 }} />
                     </ScrollView>

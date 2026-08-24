@@ -71,7 +71,10 @@
 import React, { useMemo } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+// Shelved with the hand-rolled back button below. ScreenHeader pops the
+// stack itself, and the pay decision is raised in place rather than navigated
+// to, so this screen no longer sends the player anywhere.
+// import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme, palette } from '../../../core/theme';
@@ -88,12 +91,40 @@ import {
 } from '../../../core/market/ceoPay';
 import { trailingTotal } from '../../../core/market/equity';
 import { currentQuarter } from '../../../core/story/world';
+import { useShareholderStore } from '../../shareholders/stores/useShareholderStore';
+import { useLuxoNetStore } from '../../../core/store/useLuxoNetStore';
+import CeoPayPanel from '../../../components/MyCompany/Shares/CeoPayPanel';
+import { formatNumber } from '../../../core/utils';
 
 const AssetsScreen = () => {
     useLocale();
-    const navigation = useNavigation<any>();
+    // const navigation = useNavigation<any>();
     const { cash, equityValue, investmentsValue, netWorth, report } = useAssetsLogic();
     const stats = useStatsStore((s) => s);
+    const { playerShareCount } = useShareholderStore();
+
+    // ------------------------------------------------------------------
+    //  LUXONET, READ FOR THE FIRST TIME
+    // ------------------------------------------------------------------
+    //  `getTotalPortfolioValue`, `getTotalAnnualMaintenance`, `quarterlyTick`
+    //  and `getTotalPrestige` all had ZERO callers. Four query helpers, a
+    //  quarterly tick that returns maintenance and value change, and an owned
+    //  assets array - and nothing anywhere consulted any of it. A player could
+    //  buy a hypercar and their wealth would not move by a dollar.
+    //
+    //  Read here, and INFORMATION ONLY on purpose: it is not added to the net
+    //  worth above and the row does not lead into LuxoNet. Adding it to the
+    //  total would change the balance of the game in a commit that was asked
+    //  to display a number; that is a decision on its own and it has not been
+    //  made yet. What this fixes is that the number was invisible.
+    // ------------------------------------------------------------------
+    const luxuryValue = useLuxoNetStore((s) => s.ownedAssets)
+        .reduce((sum, a) => sum + (a.currentMarketValue || 0), 0);
+    const luxuryCount = useLuxoNetStore((s) => s.ownedAssets).length;
+    const luxuryUpkeep = useLuxoNetStore((s) => s.ownedAssets)
+        .reduce((sum, a) => sum + (a.annualMaintenanceCost || 0), 0);
+
+    const [payOpen, setPayOpen] = React.useState(false);
 
     // ------------------------------------------------------------------
     //  THE PART YOU CANNOT SPEND
@@ -180,12 +211,33 @@ const AssetsScreen = () => {
                             value={cash}
                             tint={palette.greyLight}
                         />
+                        {/* ------------------------------------------------
+                            THE STAKE, SPELLED OUT
+
+                            This showed a money figure and, when the company
+                            happened to have a name, the words "in Nexus".
+                            Neither the PERCENTAGE nor the share count appeared
+                            anywhere on the screen - and the percentage is the
+                            number the whole game turns on. Below fifty and
+                            every decision goes to a vote; that threshold was
+                            invisible on the page that reports the holding.
+
+                            The no-name case gets its own string rather than
+                            dropping the line, because a run before the company
+                            is named is exactly when a player is least sure
+                            what they own.
+                           ------------------------------------------------ */}
                         <HoldingRow
                             icon="chart-pie"
                             label={t('personal.stake')}
-                            sub={stats.companyName
-                                ? t('personal.stakeIn', { company: stats.companyName })
-                                : undefined}
+                            sub={t(
+                                stats.companyName ? 'personal.stakeDetail' : 'personal.stakeNoName',
+                                {
+                                    percent: (stats.companyOwnership ?? 0).toFixed(1),
+                                    company: stats.companyName,
+                                    shares: formatNumber(playerShareCount || 0),
+                                },
+                            )}
                             value={equityValue}
                             tint={palette.orange}
                         />
@@ -250,16 +302,20 @@ const AssetsScreen = () => {
                         </View>
 
                         {/* ----------------------------------------------------
-                            YOUR PAY, ON THE SCREEN THE MONEY LANDS ON
+                            YOUR PAY, DECIDED WHERE IT LANDS
 
-                            It is set under Equity, two taps away, and nothing
-                            here said so. A player who wanted a raise had to
-                            already know that a personal salary is decided on a
-                            company screen. Now the row that shows the money
-                            leads to the room where it is argued about.
+                            First this said "Job Salary" and led nowhere. Then
+                            it navigated to Equity, where the panel lived. Now
+                            the panel lives here: a personal salary settled on
+                            a company share screen was only findable by a
+                            player who already knew to look there.
+
+                            The panel moved WHOLE rather than being copied -
+                            see components/MyCompany/Shares/CeoPayPanel.tsx and
+                            the shelved block in ShareControlHub.
                            ---------------------------------------------------- */}
                         <Pressable
-                            onPress={() => navigation.navigate('StockMarket')}
+                            onPress={() => setPayOpen(true)}
                             style={({ pressed }) => [styles.payRow, pressed && styles.payRowPressed]}
                         >
                             <View style={styles.payIcon}>
@@ -291,7 +347,45 @@ const AssetsScreen = () => {
                         <BreakdownSection title={t('personal.expenses')} items={report.expenseBreakdown} />
                     </Card>
 
+                    {/* ============================================================
+                        WHAT LUXONET SAYS YOU OWN
+
+                        Information only, and deliberately so. The row does not
+                        open LuxoNet and the figure is not in the net worth
+                        above - see the note on the store read at the top of
+                        this file. Before this it was not shown anywhere at
+                        all: the store's four query helpers had no callers.
+
+                        It renders only when there is something to report,
+                        because an empty luxury row on a founder's first
+                        quarter is an advertisement rather than a fact.
+                       ============================================================ */}
+                    {luxuryCount > 0 && (
+                        <Card>
+                            <View style={styles.holdingRow}>
+                                <View style={styles.holdingIcon}>
+                                    <MaterialCommunityIcons name="diamond-stone" size={18} color={palette.violet} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.holdingLabel}>{t('personal.luxury')}</Text>
+                                    <Text style={styles.holdingSub} numberOfLines={1}>
+                                        {t('personal.luxuryCount', {
+                                            n: String(luxuryCount),
+                                            cost: formatMoney(luxuryUpkeep),
+                                        })}
+                                    </Text>
+                                </View>
+                                <Text style={styles.holdingValue} numberOfLines={1} adjustsFontSizeToFit>
+                                    {formatMoney(luxuryValue)}
+                                </Text>
+                            </View>
+                            <Text style={styles.luxuryNote}>{t('personal.luxuryNote')}</Text>
+                        </Card>
+                    )}
+
             </ScrollView>
+
+            <CeoPayPanel open={payOpen} onClose={() => setPayOpen(false)} />
         </View>
     );
 };
@@ -519,6 +613,12 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceRaised,
         borderWidth: 1,
         borderColor: theme.colors.border,
+    },
+    luxuryNote: {
+        fontSize: theme.typography.micro,
+        color: theme.colors.textMuted,
+        marginTop: theme.spacing.sm,
+        lineHeight: 14,
     },
     payCeilingText: {
         fontSize: theme.typography.micro,

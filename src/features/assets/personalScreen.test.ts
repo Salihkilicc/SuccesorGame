@@ -148,6 +148,8 @@ describe('the personal screen', () => {
         'personal.thisQuarter', 'personal.comesIn', 'personal.goesOut',
         'personal.leftOver', 'personal.incomeSources', 'personal.expenses',
         'personal.yourPay', 'personal.payTap',
+        'personal.stakeDetail', 'personal.stakeNoName',
+        'personal.luxury', 'personal.luxuryCount', 'personal.luxuryNote',
     ];
 
     it('does not label the player\'s own money as the company\'s', () => {
@@ -202,12 +204,15 @@ describe('the pay row', () => {
         expect(src).toMatch(/formatMoney\(ceoPay\)/);
     });
 
-    it('and leads to where pay is actually decided', () => {
-        // It was labelled "Job Salary" with no route anywhere. A player who
-        // wanted a rise had to already know a personal salary is set on a
-        // company screen.
+    it('and the decision happens here rather than two screens away', () => {
+        // First it was "Job Salary" with no route at all. Then it navigated
+        // to Equity, where the panel lived. Now the panel lives here: a
+        // personal salary settled on a company share screen was only findable
+        // by a player who already knew to look there.
         const src = code('screens/AssetsScreen.tsx');
-        expect(src).toMatch(/navigation\.navigate\('StockMarket'\)/);
+        expect(src).toMatch(/setPayOpen\(true\)/);
+        expect(src).toMatch(/<CeoPayPanel open=\{payOpen\}/);
+        expect(src).not.toMatch(/navigation\.navigate\('StockMarket'\)/);
     });
 
     it('and says when it is locked rather than only refusing later', () => {
@@ -301,5 +306,92 @@ describe('the cards', () => {
         const src = code('screens/AssetsScreen.tsx');
         expect(src).not.toMatch(/backgroundColor: '#434B50'/);
         expect(src).toMatch(/backgroundColor: theme\.colors\.background/);
+    });
+});
+
+
+// ============================================================================
+//  7. WHAT THE STAKE ACTUALLY IS
+// ============================================================================
+//
+//  The row showed a money figure and, when the company happened to have a
+//  name, the words "in Nexus". The PERCENTAGE appeared nowhere on the screen -
+//  and it is the number the whole game turns on: below fifty, every decision
+//  goes to a vote. See governance.CONTROL_THRESHOLD.
+// ============================================================================
+
+describe('the stake row', () => {
+    it('says what share of the company it is', () => {
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/percent: \(stats\.companyOwnership \?\? 0\)\.toFixed\(1\)/);
+    });
+
+    it('and how many shares that is', () => {
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/shares: formatNumber\(playerShareCount \|\| 0\)/);
+    });
+
+    it('and still says something when the company has no name yet', () => {
+        // It used to pass `undefined` and drop the line entirely, which is
+        // exactly the moment a player is least sure what they own.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/stats\.companyName \? 'personal\.stakeDetail' : 'personal\.stakeNoName'/);
+        expect(src).not.toMatch(/: undefined\}/);
+    });
+
+    it('and both wordings carry the percentage', () => {
+        for (const catalogue of [en, tr]) {
+            const c = catalogue as Record<string, string>;
+            expect(c['personal.stakeDetail']).toContain('{percent}');
+            expect(c['personal.stakeNoName']).toContain('{percent}');
+            expect(c['personal.stakeDetail']).toContain('{shares}');
+            expect(c['personal.stakeNoName']).toContain('{shares}');
+        }
+    });
+});
+
+// ============================================================================
+//  8. LUXONET, READ FOR THE FIRST TIME
+// ============================================================================
+//
+//  `getTotalPortfolioValue`, `getTotalAnnualMaintenance`, `quarterlyTick` and
+//  `getTotalPrestige` all had ZERO callers. Four query helpers, a quarterly
+//  tick returning maintenance and value change, and an owned-assets array, and
+//  nothing anywhere consulted any of it. A player could buy a hypercar and
+//  their wealth would not move by a dollar.
+//
+//  The signature failure of this codebase for the sixth time this session.
+// ============================================================================
+
+describe('the luxury row', () => {
+    it('reads what the store has been recording all along', () => {
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/useLuxoNetStore/);
+        expect(src).toMatch(/currentMarketValue/);
+        expect(src).toMatch(/annualMaintenanceCost/);
+    });
+
+    it('and is information only, with no door into LuxoNet', () => {
+        // Asked for in those words. The row must not become a shop entrance.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).not.toMatch(/openLuxoNet/);
+        expect(src).not.toMatch(/navigate\('Profile'/);
+        expect(src).not.toMatch(/LuxoNetPreviewModal|LuxoNetInventoryModal/);
+    });
+
+    it('and is not folded into the net worth above it', () => {
+        // A display commit should not quietly change what the player is worth.
+        // `personalNetWorth` takes belongingsValue and this screen does not
+        // pass it - deliberately, and the note says so.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).not.toMatch(/belongingsValue: luxuryValue/);
+        expect(src).not.toMatch(/netWorth \+ luxuryValue/);
+    });
+
+    it('and stays away when there is nothing to report', () => {
+        // An empty luxury row on a founder's first quarter is an
+        // advertisement rather than a fact.
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/\{luxuryCount > 0 && \(/);
     });
 });

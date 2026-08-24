@@ -2024,7 +2024,12 @@ export const en: Record<string, string> = {
     'personal.incomeSources': 'Where it comes from',
     'personal.expenses': 'Where it goes',
     'personal.yourPay': 'Your pay',
-    'personal.payTap': 'Set on the equity screen. Tap to change it.',
+    'personal.payTap': 'Tap to change what you take.',
     'personal.payLocked': 'Pay is set once a year. {n} to wait.',
     'personal.quarter': 'a quarter',
+    'personal.stakeDetail': '{percent}% of {company} · {shares} shares',
+    'personal.stakeNoName': '{percent}% of the company · {shares} shares',
+    'personal.luxury': 'Luxury holdings',
+    'personal.luxuryCount': '{n} owned · upkeep {cost} a year',
+    'personal.luxuryNote': 'Bought through LuxoNet. Not counted in the total above.',
 };
