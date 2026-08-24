@@ -27,9 +27,44 @@ import {
     DEMAND_COOLDOWN_MET, DEMAND_COOLDOWN_FAILED, DEMAND_QUIET,
     NO_CONFIDENCE_COOLDOWN, FATIGUE_CAP, FATIGUE_RECOVERY,
     DEMAND_MET_TRUST, DEMAND_MET_TRUST_OTHERS, DEMAND_FAILED_TRUST, DEMAND_FAILED_TRUST_OTHERS,
-    type BoardDemand, type DemandContext, type DemandKind, type PetIssue,
+    type BoardDemand, type DemandContext, type DemandKind, type PetIssue, type ProposalKind,
 }from '../../../core/market/governance';
 import { buyoutAsk, settleBuyout } from '../../../core/market/buyout';
+import { quoteBuyoutFinancing, type BuyoutRoute } from '../../../core/market/buyoutFinancing';
+// ============================================================================
+//  REACHING THE FINANCE STORE WITHOUT A CIRCLE
+// ============================================================================
+//  useCorporateFinanceStore already requires THIS file lazily, in boardGate
+//  and in the acquisition path, precisely because the two need each other. A
+//  top level import here would close the loop and one of them would be
+//  undefined at module load depending on which was pulled in first.
+//
+//  Same lazy shape, and both fail open: a vote that cannot be held does not
+//  silently block a decision the player has already paid the price of.
+// ============================================================================
+const financeModule = () => require('../../finance/stores/useCorporateFinanceStore');
+
+const boardGate = (
+    kind: ProposalKind,
+    amount: number,
+    title: string,
+): { needed: boolean; passed: boolean; reason: string } => {
+    try {
+        return financeModule().boardGate(kind, amount, title);
+    } catch (err) {
+        console.warn('[buyout] board gate unavailable, allowing', err);
+        return { needed: false, passed: true, reason: '' };
+    }
+};
+
+/** The company's borrowing rate, which moves with the credit score. */
+const interestRateNow = (): number => {
+    try {
+        return financeModule().useCorporateFinanceStore.getState().getInterestRate();
+    } catch {
+        return 0.08;
+    }
+};
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { INITIAL_DIALS } from '../../../core/story/state';
 
@@ -170,7 +205,7 @@ interface ShareholderState {
     calculateNegotiationChance: (memberId: string, offerPremium: number) => { success: boolean; reaction: 'insulted' | 'neutral' | 'happy' };
 
     // Trading Actions
-    negotiateSharePurchase: (memberId: string, shareCount: number, offerPremium: number) => { success: boolean; message: string; sharesBought: number };
+    negotiateSharePurchase: (memberId: string, shareCount: number, offerPremium: number, route?: BuyoutRoute) => { success: boolean; message: string; sharesBought: number };
     sellSharesToMember: (memberId: string, shareCount: number, priceMultiplier: number) => { success: boolean; message: string; sharesSold: number };
 
     // Helper Selectors
@@ -1311,7 +1346,7 @@ export const useShareholderStore = create<ShareholderState>()(
              * Includes negotiation, cash transfer, and positive price impact.
              * ATOMIC TRANSFER: Deduct from member, add to player.
              */
-            negotiateSharePurchase: (memberId: string, shareCount: number, offerPremium: number) => {
+            negotiateSharePurchase: (memberId: string, shareCount: number, offerPremium: number, route: BuyoutRoute = 'cash') => {
                 const { members, playerShareCount, totalShares } = get();
 
                 // 1. Find the Seller
@@ -1372,11 +1407,33 @@ export const useShareholderStore = create<ShareholderState>()(
 
                 const finalPrice = marketPerShare * actualBuyAmount * (1 + offerPremium / 100);
 
-                // Check if player has enough cash
-                if (money < finalPrice) {
+                // ------------------------------------------------------------
+                //  WHO IS PAYING, AND WHETHER THEY CAN
+                // ------------------------------------------------------------
+                //  This used to be one line - `if (money < finalPrice)` - and
+                //  that line is why a successor could never buy out a sibling:
+                //  the estate leaves them sixty per cent of the SHARES and one
+                //  nth of the CASH, so a sibling's holding is worth an order
+                //  of magnitude more than everything the new player owns.
+                //  See core/market/buyoutFinancing.ts.
+                // ------------------------------------------------------------
+                const statsAll = useStatsStore.getState();
+                const quote = quoteBuyoutFinancing(route, {
+                    price: finalPrice,
+                    playerCash: money,
+                    companyCapital: statsAll.companyCapital || 0,
+                    companyValuation: statsAll.companyValue || 0,
+                    existingDebt: statsAll.companyDebtTotal || 0,
+                    totalShares,
+                    playerShares: playerShareCount,
+                    targetShares: actualBuyAmount,
+                    interestRate: interestRateNow(),
+                });
+
+                if (!quote.feasible) {
                     return {
                         success: false,
-                        message: `Insufficient funds. Need ${formatMoney(finalPrice)} but only have ${formatMoney(money)}.`,
+                        message: quote.reason || `Cannot fund ${formatMoney(finalPrice)}.`,
                         sharesBought: 0,
                     };
                 }
@@ -1410,6 +1467,40 @@ export const useShareholderStore = create<ShareholderState>()(
                     };
                 }
 
+                // ------------------------------------------------------------
+                //  IT IS THEIR MONEY, SO THEY GET A VOTE
+                // ------------------------------------------------------------
+                //  Only the two routes that spend the COMPANY'S money. Buying
+                //  a holding out of your own pocket is nobody's business.
+                //
+                //  Note what this means for a successor, and it is the whole
+                //  design rather than a side effect: they hold thirty three
+                //  per cent, CONTROL_THRESHOLD is fifty, so every one of these
+                //  goes to a vote - and runSuccession seated their siblings on
+                //  that board. You are asking your brothers to approve
+                //  spending the family firm to buy one of them out.
+                //
+                //  AFTER the price question and before the money moves. Asking
+                //  a board to approve a number the seller will not take is not a
+                //  decision, it is a waste of a quarter, and the seller's price
+                //  is the cheaper thing to check.
+                // ------------------------------------------------------------
+                if (quote.proposalKind) {
+                    const gate = boardGate(
+                        quote.proposalKind,
+                        finalPrice,
+                        `Buy out ${member.name}: ${formatMoney(finalPrice)}`,
+                    );
+                    if (gate.needed && !gate.passed) {
+                        return {
+                            success: false,
+                            message: `The board voted it down. ${gate.reason}`,
+                            sharesBought: 0,
+                        };
+                    }
+                }
+
+
                 if (!verdict.accepted) {
                     // A serious offer they still turned down. It moves them, so
                     // the next attempt is cheaper as well as likelier.
@@ -1438,8 +1529,38 @@ export const useShareholderStore = create<ShareholderState>()(
                 // EXECUTE ATOMIC TRANSFER
                 // ------------------------------------------------------------
 
-                // 3. Deduct Cash
-                spendMoney(finalPrice);
+                // ------------------------------------------------------------
+                //  3. WHOEVER AGREED TO PAY, PAYS
+                // ------------------------------------------------------------
+                //  One line before this: `spendMoney(finalPrice)`, always the
+                //  player. The quote decides now, and only one of the three
+                //  figures on it is ever non-zero.
+                // ------------------------------------------------------------
+                if (quote.personalCashUsed > 0) {
+                    spendMoney(quote.personalCashUsed);
+                }
+                if (quote.companyCashUsed > 0) {
+                    useStatsStore.getState().setCompanyCapital(
+                        (statsAll.companyCapital || 0) - quote.companyCashUsed,
+                    );
+                }
+                if (quote.debtRaised > 0) {
+                    useStatsStore.getState().update({
+                        companyDebtTotal: (statsAll.companyDebtTotal || 0) + quote.debtRaised,
+                    });
+                }
+
+                // ------------------------------------------------------------
+                //  4. AND THE SHARES GO WHERE THE ROUTE SENDS THEM
+                // ------------------------------------------------------------
+                //  Bought personally, they move to the player. Bought by the
+                //  company, they are TORN UP: the player's count does not
+                //  change and their percentage rises anyway, because the
+                //  denominator just shrank. That is the whole reason the
+                //  treasury route exists, and it is the one thing about it a
+                //  player will not believe until they see the number move.
+                // ------------------------------------------------------------
+                const retiring = quote.totalSharesAfter < totalShares;
 
                 set((state) => {
                     const updatedMembers = [...state.members];
@@ -1463,10 +1584,15 @@ export const useShareholderStore = create<ShareholderState>()(
                         };
                     }
 
-                    return {
-                        members: updatedMembers,
-                        playerShareCount: state.playerShareCount + actualBuyAmount,
-                    };
+                    return retiring
+                        ? {
+                            members: updatedMembers,
+                            totalShares: Math.max(1, state.totalShares - actualBuyAmount),
+                        }
+                        : {
+                            members: updatedMembers,
+                            playerShareCount: state.playerShareCount + actualBuyAmount,
+                        };
                 });
 
                 // Trust impact (slight decrease if premium < 10%)

@@ -35,6 +35,13 @@ import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { giftEffect } from '../../../core/market/governance';
 import { acceptanceChance, MAX_ASK_PREMIUM } from '../../../core/market/buyout';
+import {
+    quoteAllBuyoutRoutes,
+    BUYOUT_ROUTE_LABELS,
+    BUYOUT_ROUTE_EXPLANATIONS,
+    type BuyoutRoute,
+} from '../../../core/market/buyoutFinancing';
+
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
 import { formatMoney, formatNumber } from '../../../core/utils';
@@ -49,6 +56,13 @@ interface Props {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
     asScreen?: boolean;
 }
+
+/** One icon per route, here rather than in the data: these are three fixed things. */
+const ROUTE_ICON: Record<BuyoutRoute, string> = {
+    cash: 'wallet-outline',
+    treasury: 'bank-outline',
+    leveraged: 'scale-unbalanced',
+};
 
 type TabType = 'LOBBYING' | 'BUYOUT';
 
@@ -83,6 +97,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         tone?: 'default' | 'danger';
     }>(null);
     const [offerPremium, setOfferPremium] = useState(0); // Percentage premium (-20 to +100)
+    // Who pays. Declared with the other hooks, ABOVE the early return.
+    const [route, setRoute] = useState<BuyoutRoute>('cash');
     // ------------------------------------------------------------------
     //  SPEAKING TO THEM PRIVATELY IS A THING YOU DO ABOUT A PERSON
     // ------------------------------------------------------------------
@@ -100,6 +116,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
     const lobbied = useShareholderStore(st => st.lobbied);
     const promises = useShareholderStore(st => st.promises);
     const companyValue = useStatsStore(st => st.companyValue);
+    // The two figures the company routes are paid out of, and the count the
+    // player actually holds. Hooks, so above the early return like the rest.
+    const companyCapital = useStatsStore(st => st.companyCapital);
+    const companyDebtTotal = useStatsStore(st => st.companyDebtTotal);
+    const playerShareCount = useShareholderStore(st => st.playerShareCount);
     const totalShares = useShareholderStore(st => st.totalShares);
     const playerPercent = useShareholderStore(st =>
         st.totalShares > 0 ? (st.playerShareCount / st.totalShares) * 100 : 0,
@@ -294,6 +315,26 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
 
     const offerPrice = calculateOfferPrice();
 
+    // ----------------------------------------------------------------------
+    //  ALL THREE ROUTES, INCLUDING THE ONES THAT WILL NOT WORK
+    // ----------------------------------------------------------------------
+    //  A route the player cannot walk today is still the most useful thing on
+    //  this panel: seeing that the treasury covers what the wallet never will
+    //  is the entire lesson of a succession. Same argument as the venues on
+    //  the proposal sheet and the financing rows on an acquisition.
+    // ----------------------------------------------------------------------
+    const routeQuotes = quoteAllBuyoutRoutes({
+        price: offerPrice,
+        playerCash: money,
+        companyCapital,
+        companyValuation: companyValue,
+        existingDebt: companyDebtTotal,
+        totalShares,
+        playerShares: playerShareCount,
+        targetShares: member.shareCount,
+        interestRate: 0.08,
+    });
+
     const getLikelihoodColor = () => {
         if (offerPremium < 0) return '#FF8A8A'; // Insulted
         if (offerPremium < 20) return '#FF8A8A'; // Hesitant
@@ -408,7 +449,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                 //  The store has always had negotiateSharePurchase; it
                 //  was simply never called from here.
                 // ------------------------------------------------------
-                const r = negotiateSharePurchase(member.id, member.shareCount, offerPremium);
+                const r = negotiateSharePurchase(member.id, member.shareCount, offerPremium, route);
 
                 if (!r.success) {
                     setPanel({
@@ -702,10 +743,10 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                     style={({ pressed }) => [
                                         styles.stepperButton,
                                         pressed && styles.stepperButtonPressed,
-                                        offerPremium >= 100 && styles.stepperButtonDisabled,
+                                        offerPremium >= PREMIUM_CEILING && styles.stepperButtonDisabled,
                                     ]}
                                     onPress={() => adjustPremium(10)}
-                                    disabled={offerPremium >= 100}
+                                    disabled={offerPremium >= PREMIUM_CEILING}
                                 >
                                     <Text style={styles.stepperButtonText}>+</Text>
                                 </Pressable>
@@ -733,25 +774,74 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                             </View>
                         </View>
 
+                        {/* ------------------------------------------------
+                            WHO PAYS
+
+                            The button below used to be disabled whenever
+                            `money < offerPrice`, which made your own wallet
+                            the only answer and put a serious holding out of
+                            reach for good. A successor inherits sixty per
+                            cent of the shares and one nth of the cash, so
+                            that gate is permanent, not temporary.
+                            See core/market/buyoutFinancing.ts.
+                           ------------------------------------------------ */}
+                        <Text style={styles.routeHeading}>Paid by</Text>
+                        {(Object.keys(BUYOUT_ROUTE_LABELS) as BuyoutRoute[]).map((r) => {
+                            const q = routeQuotes[r];
+                            const chosen = r === route;
+                            return (
+                                <Pressable
+                                    key={r}
+                                    onPress={() => setRoute(r)}
+                                    style={[
+                                        styles.routeRow,
+                                        chosen && styles.routeRowChosen,
+                                        !q.feasible && styles.routeRowOff,
+                                    ]}
+                                >
+                                    <MaterialCommunityIcons
+                                        name={ROUTE_ICON[r]}
+                                        size={20}
+                                        color={chosen ? theme.colors.textPrimary : theme.colors.textMuted}
+                                    />
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={styles.routeName}>{BUYOUT_ROUTE_LABELS[r]}</Text>
+                                        <Text style={styles.routeMeta} numberOfLines={2}>
+                                            {q.feasible
+                                                ? `Your stake ${q.ownershipBefore.toFixed(1)}% becomes ${q.ownershipAfter.toFixed(1)}%`
+                                                : q.reason}
+                                        </Text>
+                                    </View>
+                                    {q.proposalKind ? (
+                                        <MaterialCommunityIcons
+                                            name="gavel"
+                                            size={16}
+                                            color={theme.colors.textMuted}
+                                        />
+                                    ) : null}
+                                </Pressable>
+                            );
+                        })}
+
                         {/* Make Offer Button */}
                         <Pressable
                             style={({ pressed }) => [
                                 styles.makeOfferButton,
                                 pressed && styles.makeOfferButtonPressed,
-                                money < offerPrice && styles.makeOfferButtonDisabled,
+                                !routeQuotes[route].feasible && styles.makeOfferButtonDisabled,
                             ]}
                             onPress={handleMakeOffer}
-                            disabled={money < offerPrice}
+                            disabled={!routeQuotes[route].feasible}
                         >
                             <Text style={styles.makeOfferButtonText}>
-                                {money < offerPrice ? `💰 ${t('mem.insufficientFunds')}` : `💼 ${t('mem.makeOffer')}`}
+                                {routeQuotes[route].feasible ? t('mem.makeOffer') : t('mem.insufficientFunds')}
                             </Text>
                         </Pressable>
 
                         {/* Info Box */}
                         <View style={styles.infoBox}>
                             <Text style={styles.infoText}>
-                                💡 Tip: Higher premiums increase acceptance chance. Sharks and Snakes require higher premiums.
+                                {BUYOUT_ROUTE_EXPLANATIONS[route]}
                             </Text>
                         </View>
                     </View>
@@ -1083,5 +1173,52 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#FFFFFF',
         lineHeight: 18,
+    },
+
+    // ----------------------------------------------------------------------
+    //  WHO PAYS
+    // ----------------------------------------------------------------------
+    //  A list rather than a segmented control, because each row has a
+    //  consequence that needs a line of its own: what your stake becomes, or
+    //  why this one will not work today. Same reasoning as the venue list on
+    //  the proposal sheet.
+    // ----------------------------------------------------------------------
+    routeHeading: {
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+        color: theme.colors.textMuted,
+        textTransform: 'uppercase',
+        marginTop: theme.spacing.sm,
+    },
+    routeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: theme.radius.md,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.border,
+        backgroundColor: theme.colors.surface,
+        marginTop: 6,
+    },
+    routeRowChosen: {
+        backgroundColor: theme.colors.surfaceRaised,
+        borderColor: theme.colors.primary,
+    },
+    // Dimmed, not hidden. A route you cannot afford is the one worth reading.
+    routeRowOff: {
+        opacity: 0.5,
+    },
+    routeName: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: theme.colors.textPrimary,
+    },
+    routeMeta: {
+        fontSize: 11,
+        color: theme.colors.textMuted,
+        marginTop: 2,
     },
 });
