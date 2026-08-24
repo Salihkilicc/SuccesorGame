@@ -35,8 +35,15 @@ import {
     iconStrip,
     colourOfIcon,
     symbolByIcon,
+    symbolsFor,
+    VALUE_COLOURS,
     type SlotVariant,
 } from './slotsData';
+import { CASINO_LOCATIONS } from '../data/casinoData';
+
+/** Whatever the first room shows, for the tests that need faces at all. */
+const FACES = CASINO_LOCATIONS[0].slotFaces;
+const symbolsOf = (v: SlotVariant) => symbolsFor(SLOT_CONFIG[v], FACES);
 
 const isEmoji = (s: string): boolean =>
     [...s].some(ch => {
@@ -70,7 +77,7 @@ describe('what the house takes', () => {
         // a gift, which is what the old flat 3x could never do.
         const generous = {
             ...SLOT_CONFIG.boardroom,
-            symbols: SLOT_CONFIG.boardroom.symbols.map(s => ({ ...s, payout: s.payout * 1.5 })),
+            payouts: SLOT_CONFIG.boardroom.payouts.map(p => p * 1.5) as any,
         };
         expect(isBalanced(generous)).toBe(true);
         expect(expectedReturn(generous)).toBeCloseTo(TARGET_RTP, 3);
@@ -85,7 +92,7 @@ describe('what the house takes', () => {
         // without a word. `isBalanced` is the word.
         const absurd = {
             ...SLOT_CONFIG.dynasty,
-            symbols: SLOT_CONFIG.dynasty.symbols.map(s => ({ ...s, payout: s.payout * 2 })),
+            payouts: SLOT_CONFIG.dynasty.payouts.map(p => p * 2) as any,
         };
         expect(isBalanced(absurd)).toBe(false);
         expect(miniOdds(absurd)).toBe(0);
@@ -103,7 +110,7 @@ describe('what the house takes', () => {
         // than a negative probability.
         const absurd = {
             ...SLOT_CONFIG.ticker,
-            symbols: SLOT_CONFIG.ticker.symbols.map(s => ({ ...s, payout: 1000 })),
+            payouts: SLOT_CONFIG.ticker.payouts.map(() => 1000) as any,
         };
         expect(miniOdds(absurd)).toBe(0);
         expect(miniOdds(absurd)).not.toBeNaN();
@@ -117,7 +124,7 @@ describe('the three machines', () => {
         expect(j('ticker')).toBeGreaterThan(j('boardroom'));
         expect(j('boardroom')).toBeGreaterThan(j('dynasty'));
 
-        const top = (v: SlotVariant) => Math.max(...SLOT_CONFIG[v].symbols.map(s => s.payout));
+        const top = (v: SlotVariant) => Math.max(...SLOT_CONFIG[v].payouts);
         expect(top('ticker')).toBeLessThan(top('boardroom'));
         expect(top('boardroom')).toBeLessThan(top('dynasty'));
     });
@@ -148,9 +155,8 @@ describe('the symbols', () => {
         // removed emoji from the product screens and the proposal sheet for
         // exactly this reason.
         for (const v of VARIANTS) {
-            for (const s of SLOT_CONFIG[v].symbols) {
+            for (const s of symbolsOf(v)) {
                 expect(isEmoji(s.icon)).toBe(false);
-                expect(isEmoji(s.id)).toBe(false);
             }
             expect(isEmoji(SLOT_CONFIG[v].icon)).toBe(false);
             expect(isEmoji(SLOT_CONFIG[v].title)).toBe(false);
@@ -169,7 +175,7 @@ describe('the symbols', () => {
 
     it('and each machine has five distinct ones', () => {
         for (const v of VARIANTS) {
-            const icons = iconStrip(SLOT_CONFIG[v]);
+            const icons = iconStrip(symbolsOf(v));
             expect(icons).toHaveLength(5);
             expect(new Set(icons).size).toBe(5);
         }
@@ -180,12 +186,12 @@ describe('the symbols', () => {
         // entry with no symbol behind it would pay the fallback and nobody
         // would notice.
         for (const v of VARIANTS) {
-            const c = SLOT_CONFIG[v];
-            for (const icon of iconStrip(c)) {
-                expect(symbolByIcon(c, icon)).toBeDefined();
-                expect(symbolByIcon(c, icon)!.payout).toBeGreaterThan(0);
+            const syms = symbolsOf(v);
+            for (const icon of iconStrip(syms)) {
+                expect(symbolByIcon(syms, icon)).toBeDefined();
+                expect(symbolByIcon(syms, icon)!.payout).toBeGreaterThan(0);
             }
-            expect(symbolByIcon(c, 'not-a-symbol')).toBeUndefined();
+            expect(symbolByIcon(syms, 'not-a-symbol')).toBeUndefined();
         }
     });
 });
@@ -193,7 +199,7 @@ describe('the symbols', () => {
 describe('the payouts themselves', () => {
     it('climb within a machine, so a rarer face is worth more', () => {
         for (const v of VARIANTS) {
-            const p = SLOT_CONFIG[v].symbols.map(s => s.payout);
+            const p = SLOT_CONFIG[v].payouts;
             for (let i = 1; i < p.length; i++) {
                 expect(p[i]).toBeGreaterThan(p[i - 1]);
             }
@@ -203,14 +209,13 @@ describe('the payouts themselves', () => {
     it('and three of a kind always beats two', () => {
         for (const v of VARIANTS) {
             const c = SLOT_CONFIG[v];
-            expect(Math.min(...c.symbols.map(s => s.payout)))
-                .toBeGreaterThan(c.twoKindMultiplier);
+            expect(Math.min(...c.payouts)).toBeGreaterThan(c.twoKindMultiplier);
         }
     });
 
     it('and the mean is what a jackpot is worth on average', () => {
         expect(meanJackpot(SLOT_CONFIG.ticker)).toBeCloseTo((3 + 4 + 5 + 6 + 9) / 5, 6);
-        expect(meanJackpot({ ...SLOT_CONFIG.ticker, symbols: [] })).toBe(0);
+        expect(meanJackpot({ ...SLOT_CONFIG.ticker, payouts: [] as any })).toBe(0);
     });
 });
 
@@ -232,51 +237,76 @@ describe('the payouts themselves', () => {
 import { palette, theme } from '../../../core/theme';
 
 describe('the colours', () => {
-    it('are a different one for every face on a machine', () => {
-        for (const v of VARIANTS) {
-            const colours = SLOT_CONFIG[v].symbols.map(s => s.colour);
-            expect(new Set(colours).size).toBe(colours.length);
-        }
+    it('are a different one for every rung', () => {
+        expect(new Set(VALUE_COLOURS).size).toBe(VALUE_COLOURS.length);
     });
 
-    it('and they come from the palette rather than from a hex somebody liked', () => {
+    it('and they come from the palette rather than a hex somebody liked', () => {
         const known = new Set(Object.values(palette) as string[]);
-        for (const v of VARIANTS) {
-            for (const s of SLOT_CONFIG[v].symbols) {
-                expect(known.has(s.colour)).toBe(true);
-            }
-        }
+        for (const c of VALUE_COLOURS) expect(known.has(c)).toBe(true);
     });
 
     it('and they are never the profit or the loss colour', () => {
-        // Those two mean money in and money out, and the amount that floats
-        // up after a spin is already using them. A symbol that looked like a
-        // signal would be worse than a symbol with no colour at all.
-        for (const v of VARIANTS) {
-            for (const s of SLOT_CONFIG[v].symbols) {
-                expect(s.colour).not.toBe(theme.colors.success);
-                expect(s.colour).not.toBe(theme.colors.danger);
+        for (const c of VALUE_COLOURS) {
+            expect(c).not.toBe(theme.colors.success);
+            expect(c).not.toBe(theme.colors.danger);
+        }
+    });
+
+    it('and the same ramp is used in every city, so the reading travels', () => {
+        // A player who learns that orange is the good one in Athens should
+        // not have to learn it again in Macau.
+        for (const loc of CASINO_LOCATIONS) {
+            const syms = symbolsFor(SLOT_CONFIG.dynasty, loc.slotFaces);
+            expect(syms.map(x => x.colour)).toEqual([...VALUE_COLOURS]);
+        }
+    });
+
+    it('and the reel can look one up, with a visible fallback', () => {
+        const syms = symbolsOf('dynasty');
+        expect(colourOfIcon(syms, syms[4].icon)).toBe(VALUE_COLOURS[4]);
+        expect(colourOfIcon(syms, 'not-a-symbol')).toBe('#FFFFFF');
+    });
+});
+
+describe('a slot per city', () => {
+    it('gives every room its own five faces', () => {
+        for (const loc of CASINO_LOCATIONS) {
+            expect(loc.slotFaces).toHaveLength(5);
+            expect(new Set(loc.slotFaces).size).toBe(5);
+        }
+    });
+
+    it('and no two rooms look the same', () => {
+        // "her sehre ayri slot yap, sadece sembollerini degistir". If two
+        // cities shared a set the whole change would be invisible in half
+        // the game.
+        const seen = CASINO_LOCATIONS.map(l => l.slotFaces.join('|'));
+        expect(new Set(seen).size).toBe(CASINO_LOCATIONS.length);
+    });
+
+    it('and the jackpot face is the city itself', () => {
+        // Index 4 is always the top payout, so the emblem the player already
+        // knows the room by is the one worth the most.
+        for (const loc of CASINO_LOCATIONS) {
+            expect(loc.slotFaces[4]).toBe(loc.theme.icon);
+        }
+    });
+
+    it('while the maths does not move an inch between them', () => {
+        // The whole point of the split: seven rooms, one payout table.
+        for (const loc of CASINO_LOCATIONS) {
+            for (const v of VARIANTS) {
+                const syms = symbolsFor(SLOT_CONFIG[v], loc.slotFaces);
+                expect(syms.map(x => x.payout)).toEqual([...SLOT_CONFIG[v].payouts]);
             }
         }
     });
 
-    it('and the reel can look one up, with a fallback that is still visible', () => {
-        const c = SLOT_CONFIG.dynasty;
-        expect(colourOfIcon(c, 'crown')).toBe(palette.orange);
-        // A strip entry with no symbol behind it draws white rather than
-        // nothing, because an invisible reel is worse than a wrong colour.
-        expect(colourOfIcon(c, 'not-a-symbol')).toBe('#FFFFFF');
-    });
-});
-
-describe('the icons come from the rest of the game', () => {
-    it('so the player has met the important ones before', () => {
-        // `bank` and `rocket-launch-outline` are how companies are drawn on
-        // the stock screen, `castle` is the fairytale venue on the proposal
-        // sheet, and `crown` is the London casino's own emblem.
-        const all = VARIANTS.flatMap(v => iconStrip(SLOT_CONFIG[v]));
-        for (const shared of ['bank', 'rocket-launch-outline', 'castle', 'crown']) {
-            expect(all).toContain(shared);
-        }
+    it('and a room with too few faces still fills the reel', () => {
+        // Never an undefined icon on a strip, which renders as nothing.
+        const syms = symbolsFor(SLOT_CONFIG.ticker, ['cash']);
+        expect(syms).toHaveLength(5);
+        for (const x of syms) expect(typeof x.icon).toBe('string');
     });
 });

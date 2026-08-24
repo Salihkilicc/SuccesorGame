@@ -62,6 +62,27 @@ export type CasinoLocation = {
   maxBet: number;
   theme: CasinoTheme;
   chips: number[];
+  /**
+   * The five faces its slot machines show, cheapest first.
+   *
+   * ------------------------------------------------------------------
+   *  A SLOT PER CITY, AND ONLY THE FACES CHANGE
+   * ------------------------------------------------------------------
+   *  Asked for as "her sehre ayri slot yap, tabii sadece sembollerini
+   *  degistir". Which is the right split: the maths is the machine and the
+   *  faces are the room, so Athens and Macau look like different places
+   *  without seven copies of a payout table to keep in step.
+   *
+   *  ORDER IS VALUE. The machine supplies the payouts and this supplies
+   *  what they look like, so index 4 is always the jackpot face - which is
+   *  why it is the city's own emblem, the same icon as `theme.icon` above.
+   *
+   *  All money and treasure: "yine de parasal yapabilirsin, elmas altin
+   *  vs gibi". And every one of them is an icon this repo already draws
+   *  somewhere else, so nothing here is a name that might not exist.
+   * ------------------------------------------------------------------
+   */
+  slotFaces: readonly [string, string, string, string, string];
 };
 
 /**
@@ -158,6 +179,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇬🇷',
     },
     chips: [1000, 5000, 10000, 50000],
+    slotFaces: ['cash', 'wallet-outline', 'bank-outline', 'diamond-stone', 'pillar'] as const,
   },
   {
     id: 'istanbul',
@@ -178,6 +200,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇹🇷',
     },
     chips: [50000, 100000, 500000, 2500000],
+    slotFaces: ['cash-multiple', 'treasure-chest', 'star-circle', 'ring', 'mosque'] as const,
   },
   {
     id: 'las_vegas',
@@ -198,6 +221,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇺🇸',
     },
     chips: [100000, 500000, 2500000, 10000000],
+    slotFaces: ['dice-5-outline', 'cash', 'bell-ring-outline', 'diamond-stone', 'dice-multiple'] as const,
   },
   {
     id: 'london',
@@ -218,6 +242,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇬🇧',
     },
     chips: [500000, 2500000, 10000000, 50000000],
+    slotFaces: ['cash-multiple', 'watch', 'bank', 'ring', 'crown'] as const,
   },
   {
     id: 'singapore',
@@ -238,6 +263,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇸🇬',
     },
     chips: [2500000, 10000000, 50000000, 500000000],
+    slotFaces: ['cash', 'chip', 'bank-outline', 'diamond-stone', 'city-variant'] as const,
   },
   {
     id: 'monte_carlo',
@@ -258,6 +284,7 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇲🇨',
     },
     chips: [10000000, 50000000, 500000000, 5000000000],
+    slotFaces: ['cash-multiple', 'watch', 'treasure-chest', 'castle', 'diamond-stone'] as const,
   },
   {
     id: 'macau',
@@ -278,5 +305,6 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       flag: '🇲🇴',
     },
     chips: [100000000, 1000000000, 10000000000, 50000000000],
+    slotFaces: ['cash', 'treasure-chest', 'tower-fire', 'diamond-stone', 'fire'] as const,
   },
 ];

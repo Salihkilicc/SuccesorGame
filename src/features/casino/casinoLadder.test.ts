@@ -220,7 +220,7 @@ describe('the wiring the arithmetic hangs on', () => {
         // The old line was `winAmount = bet * 3` whatever the reels showed,
         // which is what made eighteen hand-written payouts decoration.
         const src = codeOfW('logic', 'useSlotsLogic.ts');
-        expect(src).toMatch(/symbolByIcon\(config,/);
+        expect(src).toMatch(/symbolByIcon\(symbols,/);
         expect(src).toMatch(/bet \* multiple/);
         expect(src).not.toMatch(/winAmount = bet \* 3;/);
         expect(src).not.toMatch(/winAmount = bet \* 2;/);

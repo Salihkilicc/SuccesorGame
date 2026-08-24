@@ -84,7 +84,15 @@ export type SlotConfig = {
     title: string;
     icon: string;
     subtitle: string;
-    symbols: SlotSymbol[];
+    /**
+     * What three of a kind pays, cheapest face first.
+     *
+     * The FACES are not here any more. They come from the city - see
+     * `slotFaces` in data/casinoData.ts - so the same machine wears seven
+     * different sets of symbols without seven copies of this table to keep
+     * in step. The maths is the machine, the pictures are the room.
+     */
+    payouts: readonly [number, number, number, number, number];
     /** What two of a kind pays, as a multiple of the stake. */
     twoKindMultiplier: number;
     /**
@@ -113,9 +121,52 @@ export type SlotConfig = {
  */
 export const TARGET_RTP = 0.94;
 
-const sym = (
-    id: string, icon: string, payout: number, colour: string,
-): SlotSymbol => ({ id, icon, payout, colour });
+/**
+ * The colour of each rung, cheapest first.
+ *
+ * ------------------------------------------------------------------------
+ *  COLOUR IS THE PAYOUT TABLE, DRAWN
+ * ------------------------------------------------------------------------
+ *  Every symbol on a reel used to be tinted with the ROOM's colour, so five
+ *  different things arrived in one colour and a machine read as a column of
+ *  identical shapes. Reported as "daha renkli".
+ *
+ *  More colours alone would fix the look and waste the chance. These climb
+ *  with the payout, so a player learns what a good face looks like before
+ *  they have read a number and a near miss on the jackpot face is visible
+ *  from across the reel. The ramp is the same in every city, which is what
+ *  lets a player carry that reading from Athens to Macau.
+ *
+ *  Green and red are absent on purpose. They mean profit and loss in this
+ *  game and the amount that floats up after a spin is already using them; a
+ *  symbol that looked like a signal would be worse than one with no colour.
+ * ------------------------------------------------------------------------
+ */
+export const VALUE_COLOURS: readonly [string, string, string, string, string] = [
+    palette.grey,
+    palette.greyLight,
+    palette.blueLight,
+    palette.violet,
+    palette.orange,
+] as const;
+
+/**
+ * The machine's maths and the city's faces, zipped.
+ *
+ * This is the whole "her sehre ayri slot" change in one function: the
+ * payouts come from the variant, the icons come from the room, and the
+ * colour comes from the rung. Nothing has to agree with anything by hand.
+ */
+export const symbolsFor = (
+    config: SlotConfig,
+    faces: readonly string[],
+): SlotSymbol[] =>
+    config.payouts.map((payout, i) => ({
+        id: `${i}`,
+        icon: faces[i] ?? faces[faces.length - 1] ?? 'help-circle-outline',
+        payout,
+        colour: VALUE_COLOURS[i] ?? VALUE_COLOURS[VALUE_COLOURS.length - 1],
+    }));
 
 export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
     // ------------------------------------------------------------------
@@ -129,16 +180,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         title: 'The Ticker',
         icon: 'chart-line',
         subtitle: 'Small print, small margins, all night long',
-        //  Icons the rest of the game already uses: `bank` and
-        //  `rocket-launch-outline` are both from core/market/companyVisuals,
-        //  which is where every company on the stock screen gets its face.
-        symbols: [
-            sym('bear', 'trending-down', 3, palette.grey),
-            sym('bull', 'trending-up', 4, palette.greyLight),
-            sym('bell', 'bell-ring-outline', 5, palette.blueLight),
-            sym('vault', 'bank', 6, palette.orangeMuted),
-            sym('ipo', 'rocket-launch-outline', 9, palette.violet),
-        ],
+        payouts: [3, 4, 5, 6, 9] as const,
         twoKindMultiplier: 1.5,
         jackpotOdds: 0.11,
         minBet: 10,
@@ -152,13 +194,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         title: 'The Boardroom',
         icon: 'gavel',
         subtitle: 'Motions carried, seats taken, minutes kept',
-        symbols: [
-            sym('minutes', 'file-document-outline', 4, palette.grey),
-            sym('seat', 'seat-outline', 6, palette.greyLight),
-            sym('gavel', 'gavel', 8, palette.blueLight),
-            sym('seal', 'seal-variant', 11, palette.orangeMuted),
-            sym('signature', 'fountain-pen-tip', 16, palette.orange),
-        ],
+        payouts: [4, 6, 8, 11, 16] as const,
         twoKindMultiplier: 1.4,
         jackpotOdds: 0.06,
         minBet: 10,
@@ -177,16 +213,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         title: 'The Dynasty',
         icon: 'crown',
         subtitle: 'Rings, wills, and the name on the building',
-        //  `castle` is the fairytale venue from the proposal sheet and
-        //  `crown` is the London casino's own emblem, so the two most
-        //  valuable faces in the game are things the player has already met.
-        symbols: [
-            sym('cradle', 'baby-carriage', 8, palette.grey),
-            sym('ring', 'ring', 14, palette.greyLight),
-            sym('will', 'scroll', 22, palette.blueLight),
-            sym('estate', 'castle', 40, palette.violet),
-            sym('crown', 'crown', 100, palette.orange),
-        ],
+        payouts: [8, 14, 22, 40, 100] as const,
         twoKindMultiplier: 1.2,
         jackpotOdds: 0.018,
         minBet: 10,
@@ -197,15 +224,15 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
 export const VARIANTS: readonly SlotVariant[] = ['ticker', 'boardroom', 'dynasty'] as const;
 
 /** Every icon name a machine can show, for the reel strip. */
-export const iconStrip = (config: SlotConfig): string[] => config.symbols.map(s => s.icon);
+export const iconStrip = (symbols: SlotSymbol[]): string[] => symbols.map(s => s.icon);
 
 /** What colour an icon is drawn in. Falls back to plain white. */
-export const colourOfIcon = (config: SlotConfig, icon: string): string =>
-    config.symbols.find(s => s.icon === icon)?.colour ?? '#FFFFFF';
+export const colourOfIcon = (symbols: SlotSymbol[], icon: string): string =>
+    symbols.find(s => s.icon === icon)?.colour ?? '#FFFFFF';
 
 /** The symbol behind an icon name, for turning a landed reel into money. */
-export const symbolByIcon = (config: SlotConfig, icon: string): SlotSymbol | undefined =>
-    config.symbols.find(s => s.icon === icon);
+export const symbolByIcon = (symbols: SlotSymbol[], icon: string): SlotSymbol | undefined =>
+    symbols.find(s => s.icon === icon);
 
 /**
  * What a machine actually returns per unit staked.
@@ -217,9 +244,12 @@ export const symbolByIcon = (config: SlotConfig, icon: string): SlotSymbol | und
  * asserted in a comment - see slotsData.test.ts, which measures all three.
  */
 export const meanJackpot = (config: SlotConfig): number => {
-    const payouts = config.symbols.map(s => s.payout);
-    if (payouts.length === 0) return 0;
-    return payouts.reduce((a, b) => a + b, 0) / payouts.length;
+    // The tuple is always five long, so the old empty guard is a comparison
+    // TypeScript can prove is never true. Kept as a divide-by-zero guard on
+    // the ARITHMETIC rather than on the length.
+    const payouts = config.payouts;
+    const total = payouts.reduce((a, b) => a + b, 0);
+    return payouts.length > 0 ? total / payouts.length : 0;
 };
 
 /**

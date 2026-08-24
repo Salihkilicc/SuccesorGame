@@ -15,7 +15,7 @@ import { CASINO_LOCATIONS } from '../data/casinoData';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
-import { iconStrip, colourOfIcon } from '../logic/slotsData';
+import { colourOfIcon } from '../logic/slotsData';
 
 const { width } = Dimensions.get('window');
 
@@ -30,7 +30,7 @@ const SlotsGameScreen = () => {
   const { currentLocation, casinoReputation } = useCasinoSystem();
 
   // Logic Hook - Pass location max bet
-  const { state, actions } = useSlotsLogic(variant, initialBet, currentLocation.maxBet);
+  const { state, actions } = useSlotsLogic(variant, initialBet, currentLocation.maxBet, currentLocation.slotFaces);
   // Ensure we define config locally or from state, to avoid TS errors if state structure changed differently
   const { grid, bet, isSpinning, message, showResult, lastResult, money, config } = state;
 
@@ -105,11 +105,11 @@ const SlotsGameScreen = () => {
           <View style={styles.reelsWrapper}>
             {columns.map((colSymbols, colIdx) => (
               <Reel
-                symbols={iconStrip(state.config)}
+                symbols={state.symbolIcons}
                 key={colIdx}
                 index={colIdx}
                 finalSymbol={colSymbols[1]}
-                colourOf={(icon) => colourOfIcon(state.config, icon)}
+                colourOf={(icon) => colourOfIcon(state.symbols, icon)}
                 tint={currentLocation.theme.primary}
                 isSpinning={state.isSpinning}
                 delay={colIdx * 300} // Staggered stop

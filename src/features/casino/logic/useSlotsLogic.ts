@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
-import { SLOT_CONFIG, SlotVariant, miniOdds, symbolByIcon, iconStrip } from './slotsData';
+import { SLOT_CONFIG, SlotVariant, miniOdds, symbolByIcon, iconStrip, symbolsFor } from './slotsData';
+import { CASINO_LOCATIONS } from '../data/casinoData';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 
 export type Grid = [string, string, string][];
@@ -25,15 +26,38 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 type OutcomeTier = 'JACKPOT' | 'MINI' | 'LOSS';
 
-export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customMaxBet?: number) => {
+export const useSlotsLogic = (
+  variant: SlotVariant,
+  initialBet?: number,
+  customMaxBet?: number,
+  /** The city's five faces, cheapest first. See data/casinoData.ts. */
+  slotFaces?: readonly string[],
+) => {
   const config = SLOT_CONFIG[variant];
+
+  // ----------------------------------------------------------------------
+  //  THE MACHINE'S MATHS, THE CITY'S FACES
+  // ----------------------------------------------------------------------
+  //  A slot per city, and only the symbols change. See `slotFaces` in
+  //  data/casinoData.ts for why the split is here rather than seven copies
+  //  of a payout table.
+  // ----------------------------------------------------------------------
+  //  The faces are PASSED IN rather than looked up, because the room the
+  //  player is in lives in `useCasinoSystem`'s own state and only the screen
+  //  has it. A hook that guessed would be a second answer to a question the
+  //  screen already knows.
+  const faces = slotFaces ?? CASINO_LOCATIONS[0].slotFaces;
+  const symbols = useMemo(
+    () => symbolsFor(config, faces),
+    [variant, faces.join(',')],
+  );
   const maxBetLimit = customMaxBet ?? config.maxBet;
 
   const { money, spendMoney, earnMoney } = useStatsStore();
   const { reputation, updateReputation } = usePlayerStore();
   const casinoReputation = reputation.casino;
 
-  const [grid, setGrid] = useState<Grid>(() => generateRandomGrid(iconStrip(config)));
+  const [grid, setGrid] = useState<Grid>(() => generateRandomGrid(iconStrip(symbols)));
   const [bet, setBet] = useState<number>(() => clamp(initialBet ?? config.minBet, config.minBet, maxBetLimit));
 
   const [isSpinning, setIsSpinning] = useState(false);
@@ -46,7 +70,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   const targetGridRef = useRef<Grid | null>(null);
 
   useEffect(() => {
-    setGrid(generateRandomGrid(iconStrip(config)));
+    setGrid(generateRandomGrid(iconStrip(symbols)));
   }, [variant]);
 
   useEffect(() => {
@@ -125,14 +149,14 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   const generateForcedGrid = (outcome: OutcomeTier): Grid => {
     // Robust symbol getter
     const getSafeSymbol = (): string => {
-      const syms = iconStrip(config);
-      if (!syms || syms.length === 0) return iconStrip(config)[0] ?? 'help-circle-outline';
+      const syms = iconStrip(symbols);
+      if (!syms || syms.length === 0) return iconStrip(symbols)[0] ?? 'help-circle-outline';
       return syms[Math.floor(Math.random() * syms.length)] || syms[0];
     };
 
     // Safe helper to pick a DIFFERENT valid symbol
     const getDifferentSymbol = (exclude: string[]): string => {
-      const syms = iconStrip(config);
+      const syms = iconStrip(symbols);
       if (!syms || syms.length < 2) return getSafeSymbol(); // Not enough symbols to diff
 
       // Filter out excluded items
@@ -144,7 +168,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
       return candidates[Math.floor(Math.random() * candidates.length)];
     };
 
-    const syms = iconStrip(config);
+    const syms = iconStrip(symbols);
     // Safety check: ensure we have symbols
     if (!syms || syms.length === 0) {
       return [['?', '?', '?'], ['?', '?', '?'], ['?', '?', '?']];
@@ -209,7 +233,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
 
     // Animation loop (visual only)
     const interval = setInterval(() => {
-      setGrid(generateRandomGrid(iconStrip(config)));
+      setGrid(generateRandomGrid(iconStrip(symbols)));
     }, 90);
 
     const spinDuration = 2000;
@@ -249,8 +273,8 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
       //  Three crowns is a hundred times the stake now, and three
       //  bears is three, because that is what the machine says.
       // ------------------------------------------------------------
-      const landed = symbolByIcon(config, targetGridRef.current?.[1]?.[0] ?? '');
-      const multiple = landed?.payout ?? config.symbols[0].payout;
+      const landed = symbolByIcon(symbols, targetGridRef.current?.[1]?.[0] ?? '');
+      const multiple = landed?.payout ?? config.payouts[0];
       winAmount = Math.round(bet * multiple);
       resultType = 'win';
       lossStreak.current = 0;
@@ -298,7 +322,13 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   };
 
   return {
-    state: { grid, bet, isSpinning, message, showResult, lastResult, money, config: { ...config, maxBet: maxBetLimit } },
+    state: {
+      grid, bet, isSpinning, message, showResult, lastResult, money,
+      config: { ...config, maxBet: maxBetLimit },
+      // The zipped faces, so the screen draws exactly what the payout read.
+      symbols,
+      symbolIcons: iconStrip(symbols),
+    },
     actions: { handleSpin, setBetAmount, hideResult }
   };
 };
