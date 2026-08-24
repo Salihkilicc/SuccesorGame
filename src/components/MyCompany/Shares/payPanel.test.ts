@@ -217,3 +217,74 @@ describe('the pay decision', () => {
         expect(hits.sort()).toEqual(['CeoPayPanel.tsx']);
     });
 });
+
+
+// ============================================================================
+//  A CHOICE, NOT AN ESSAY
+// ============================================================================
+//
+//  Reported as "cok yazi var, cok karisik". It was two sentences of summary,
+//  then three rows each carrying FOUR facts joined by middots - the amount,
+//  the share of sales, whether the board votes, and the trust cost - then a
+//  two sentence note. Around sixty words to choose between three numbers.
+//
+//  The repair is not shorter sentences. It is taking the facts OUT of the
+//  prose: the amount becomes the figure on the row, an icon gives the row a
+//  handle, and the description keeps only what is not otherwise visible.
+// ============================================================================
+
+import { en as enCat } from '../../../core/i18n/en';
+import { tr as trCat } from '../../../core/i18n/tr';
+
+describe('the pay panel reads as a choice', () => {
+    it('puts the amount where the eye goes, not inside a sentence', () => {
+        const body = payPanelBody();
+        expect(body).toMatch(/value: formatMoney\(d\.granted\)/);
+        // It used to be the first of four middot separated pieces.
+        expect(body).not.toMatch(/\$\{formatMoney\(d\.granted\)\} a quarter/);
+    });
+
+    it('and gives each row a symbol so the three are told apart', () => {
+        const body = payPanelBody();
+        expect(body).toMatch(/icon: 'shield-outline'/);
+        expect(body).toMatch(/icon: 'trending-up'/);
+        expect(body).toMatch(/icon: 'crown-outline'/);
+        expect(body).toMatch(/icon: o\.icon/);
+    });
+
+    it('and drops the share of sales, which said the amount twice', () => {
+        const body = payPanelBody();
+        expect(body).not.toMatch(/payAsShareOfRevenue\(/);
+        expect(body).not.toMatch(/% of sales/);
+    });
+
+    it('and a row carries at most two consequences', () => {
+        // The old join had four pieces. Counting the separators is how this
+        // stays true when somebody adds a fifth fact "just this once".
+        const body = payPanelBody();
+        const joined = body.slice(body.indexOf('const detail'), body.indexOf('return {'));
+        const pieces = (joined.match(/^\s{20}[^\s].*$/gm) ?? []).length;
+        expect(pieces).toBeLessThanOrEqual(8);
+        expect(body).toMatch(/\]\.join\(' · '\)/);
+    });
+
+    it('and the summary is one sentence in both catalogues', () => {
+        for (const c of [enCat, trCat] as Record<string, string>[]) {
+            const summary = c['pay.summary'];
+            expect(summary).toBeTruthy();
+            expect(summary.split('.').filter(Boolean).length).toBeLessThanOrEqual(2);
+            expect(summary.length).toBeLessThan(75);
+            // House rule.
+            expect(summary).not.toMatch(/—/);
+            expect(summary).not.toMatch(/\s-\s/);
+        }
+    });
+
+    it('and the note is short in both catalogues', () => {
+        for (const c of [enCat, trCat] as Record<string, string>[]) {
+            expect(c['pay.note'].length).toBeLessThan(85);
+            expect(c['pay.locked']).toContain('{n}');
+            expect(c['pay.locked']).toContain('{unit}');
+        }
+    });
+});

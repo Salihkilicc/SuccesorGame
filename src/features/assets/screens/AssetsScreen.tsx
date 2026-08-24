@@ -170,14 +170,41 @@ const AssetsScreen = () => {
     );
 
     const HoldingRow = ({
-        icon, label, sub, value, tint,
-    }: { icon: string; label: string; sub?: string; value: number; tint: string }) => (
+        icon, label, sub, chip, value, tint,
+    }: {
+        icon: string; label: string; sub?: string; value: number; tint: string;
+        /**
+         * A short figure that belongs to the LABEL rather than to the money.
+         *
+         * ------------------------------------------------------------------
+         *  WHY THE PERCENTAGE IS NOT IN `sub`
+         * ------------------------------------------------------------------
+         *  It was, and it may as well not have been there. `sub` is eleven
+         *  point at fifty per cent white on one line, so
+         *  "35.0% of Nexus Dynamics · 3,500,000 shares" arrived faint and cut
+         *  off at whatever the row had left over. Reported as the stake
+         *  looking unchanged, and it did: the number was on screen and below
+         *  the threshold at which anybody reads it.
+         *
+         *  Control of the company is decided at fifty per cent. That number
+         *  gets its own element.
+         * ------------------------------------------------------------------
+         */
+        chip?: string;
+    }) => (
         <View style={styles.holdingRow}>
             <View style={styles.holdingIcon}>
                 <MaterialCommunityIcons name={icon} size={18} color={tint} />
             </View>
             <View style={{ flex: 1 }}>
-                <Text style={styles.holdingLabel}>{label}</Text>
+                <View style={styles.holdingLabelRow}>
+                    <Text style={styles.holdingLabel}>{label}</Text>
+                    {!!chip && (
+                        <View style={styles.chip}>
+                            <Text style={styles.chipText}>{chip}</Text>
+                        </View>
+                    )}
+                </View>
                 {!!sub && <Text style={styles.holdingSub} numberOfLines={1}>{sub}</Text>}
             </View>
             <Text style={styles.holdingValue} numberOfLines={1} adjustsFontSizeToFit>
@@ -230,10 +257,10 @@ const AssetsScreen = () => {
                         <HoldingRow
                             icon="chart-pie"
                             label={t('personal.stake')}
+                            chip={`${(stats.companyOwnership ?? 0).toFixed(1)}%`}
                             sub={t(
                                 stats.companyName ? 'personal.stakeDetail' : 'personal.stakeNoName',
                                 {
-                                    percent: (stats.companyOwnership ?? 0).toFixed(1),
                                     company: stats.companyName,
                                     shares: formatNumber(playerShareCount || 0),
                                 },
@@ -517,6 +544,27 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceRaised,
         borderWidth: 1,
         borderColor: theme.colors.border,
+    },
+    holdingLabelRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.sm,
+    },
+    // A dark fill with white text, so it stays inside the rule: the signal
+    // colours are for profit and loss and a shareholding is neither.
+    chip: {
+        paddingHorizontal: theme.spacing.sm,
+        paddingVertical: 1,
+        borderRadius: theme.radius.xs,
+        backgroundColor: theme.colors.surfaceHigh,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    chipText: {
+        fontSize: theme.typography.micro + 1,
+        fontWeight: '900',
+        color: theme.colors.textPrimary,
+        letterSpacing: 0.3,
     },
     holdingLabel: {
         fontSize: theme.typography.body,

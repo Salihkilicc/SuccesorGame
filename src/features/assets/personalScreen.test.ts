@@ -321,9 +321,30 @@ describe('the cards', () => {
 // ============================================================================
 
 describe('the stake row', () => {
-    it('says what share of the company it is', () => {
+    it('says what share of the company it is, somewhere the eye lands', () => {
+        // ----------------------------------------------------------------
+        //  IT WAS ALREADY THERE AND IT MAY AS WELL NOT HAVE BEEN
+        // ----------------------------------------------------------------
+        //  The first attempt put the percentage in `sub`, which is eleven
+        //  point at fifty per cent white on ONE line. So
+        //  "35.0% of Nexus Dynamics · 3,500,000 shares" arrived faint and
+        //  truncated at whatever the row had left. Reported as the stake
+        //  looking unchanged, and it did.
+        //
+        //  This rule is about PLACEMENT, not presence, because presence was
+        //  never the problem. Control is decided at fifty per cent; that
+        //  number gets its own element.
+        // ----------------------------------------------------------------
         const src = code('screens/AssetsScreen.tsx');
-        expect(src).toMatch(/percent: \(stats\.companyOwnership \?\? 0\)\.toFixed\(1\)/);
+        expect(src).toMatch(/chip=\{`\$\{\(stats\.companyOwnership \?\? 0\)\.toFixed\(1\)\}%`\}/);
+        // And not buried back in the faint one line subtitle.
+        expect(src).not.toMatch(/percent: \(stats\.companyOwnership/);
+    });
+
+    it('and the chip is a real element rather than more muted text', () => {
+        const src = code('screens/AssetsScreen.tsx');
+        expect(src).toMatch(/chipText: \{[\s\S]{0,200}color: theme\.colors\.textPrimary/);
+        expect(src).not.toMatch(/chipText: \{[\s\S]{0,200}color: theme\.colors\.textMuted/);
     });
 
     it('and how many shares that is', () => {
@@ -339,13 +360,15 @@ describe('the stake row', () => {
         expect(src).not.toMatch(/: undefined\}/);
     });
 
-    it('and both wordings carry the percentage', () => {
+    it('and both wordings carry the share count', () => {
+        // The percentage moved to the chip, so these carry what is left. The
+        // no-name case still has to say SOMETHING - a run before the company
+        // is named is when a player is least sure what they own.
         for (const catalogue of [en, tr]) {
             const c = catalogue as Record<string, string>;
-            expect(c['personal.stakeDetail']).toContain('{percent}');
-            expect(c['personal.stakeNoName']).toContain('{percent}');
             expect(c['personal.stakeDetail']).toContain('{shares}');
             expect(c['personal.stakeNoName']).toContain('{shares}');
+            expect(c['personal.stakeDetail']).toContain('{company}');
         }
     });
 });

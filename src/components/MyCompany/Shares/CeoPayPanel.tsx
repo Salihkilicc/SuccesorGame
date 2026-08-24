@@ -43,7 +43,8 @@ import { useCorporateFinanceStore } from '../../../features/finance/stores/useCo
 import {
     decidePay,
     payCeiling,
-    payAsShareOfRevenue,
+    // payAsShareOfRevenue - SHELVED: it printed the salary as a share of
+    // sales beside the salary itself, which is the same fact twice.
     PAY_CHANGE_COOLDOWN,
     PAY_VOTE_MULTIPLE,
 } from '../../../core/market/ceoPay';
@@ -128,11 +129,35 @@ const CeoPayPanel = ({ open, onClose }: Props) => {
     //  Nothing is filtered out. An option that cannot be taken is greyed with
     //  the reason underneath, which is ConfirmPanel's rule: a missing button
     //  teaches nothing.
+    //
+    //  ------------------------------------------------------------------
+    //  AND IT IS A CHOICE, NOT AN ESSAY
+    //  ------------------------------------------------------------------
+    //  Reported as "cok yazi var, cok karisik". It was: two sentences of
+    //  summary, then three rows each carrying FOUR facts joined by middots -
+    //  the amount, the share of sales, whether the board votes, and the trust
+    //  cost - then a two sentence note underneath. Around sixty words to pick
+    //  one of three numbers.
+    //
+    //  The repair is not shorter sentences, it is moving the facts out of the
+    //  prose. The AMOUNT is now the figure on the right, which is what the
+    //  player is actually choosing between and what they had to parse a
+    //  sentence to find. An ICON gives each row a handle so the three are
+    //  told apart before any of them is read. What is left in the description
+    //  is the CONSEQUENCE, at most two short pieces, because that is the only
+    //  part that is not already visible.
+    //
+    //  The share of sales came out entirely. It is a second way of saying the
+    //  amount, next to the amount.
     // ------------------------------------------------------------------
-    const options: { label: string; amount: number }[] = [
-        { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY },
-        { label: 'A real rise', amount: Math.min(ceiling, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2) },
-        { label: 'Everything the company can carry', amount: ceiling },
+    const options: {
+        label: string;
+        amount: number;
+        icon: string;
+    }[] = [
+        { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY, icon: 'shield-outline' },
+        { label: 'A real rise', amount: Math.min(ceiling, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2), icon: 'trending-up' },
+        { label: 'All it can carry', amount: ceiling, icon: 'crown-outline' },
     ];
 
     const choices = options.map(o => {
@@ -142,27 +167,27 @@ const CeoPayPanel = ({ open, onClose }: Props) => {
             trailingAnnualRevenue,
             quartersSinceChange,
         });
-        const share = payAsShareOfRevenue(d.granted, trailingAnnualRevenue);
         const isCut = d.granted < current;
         const unchanged = d.granted === current;
 
+        // At most two pieces, and only what the row does not already show.
         const detail = d.blocked
             ? d.blocked
             : unchanged
-                ? 'What you already take.'
+                ? 'What you take now'
                 : [
-                    `${formatMoney(d.granted)} a quarter`,
-                    share > 0 ? `${(share * 100).toFixed(1)}% of sales` : '',
-                    d.needsVote ? 'the board votes on this' : 'no vote needed',
+                    d.needsVote ? 'The board votes' : 'No vote',
                     isCut
-                        ? 'a cut costs nothing and takes effect at once'
+                        ? 'Takes effect at once'
                         : d.trustCost > 0
-                            ? `costs every director ${d.trustCost} trust`
-                            : 'costs no trust',
-                ].filter(Boolean).join(' · ');
+                            ? `Costs ${d.trustCost} trust each`
+                            : 'Costs no trust',
+                ].join(' · ');
 
         return {
             label: o.label,
+            icon: o.icon,
+            value: formatMoney(d.granted),
             description: detail,
             disabled: !!d.blocked || unchanged,
             onPress: () => askForPay(o.amount),
@@ -173,13 +198,17 @@ const CeoPayPanel = ({ open, onClose }: Props) => {
         <ConfirmPanel
             visible
             title={t('personal.yourPay')}
-            summary={`You take ${formatMoney(current)} a quarter, and the company pays it. `
-                + `The most it can carry is ${formatMoney(ceiling)}, which is two per cent of what it sells.`}
+            summary={t('pay.summary', {
+                current: formatMoney(current),
+                ceiling: formatMoney(ceiling),
+            })}
             choices={choices}
             note={lockedFor > 0
-                ? `Pay is set once a year. ${lockedFor} more ${lockedFor === 1 ? 'quarter' : 'quarters'} before it can rise again. A cut still takes effect at once.`
-                : 'A rise is set once a year and costs trust with every director, '
-                    + 'whether or not they approve it. A cut takes effect at once and costs nothing.'}
+                ? t('pay.locked', {
+                    n: String(lockedFor),
+                    unit: lockedFor === 1 ? t('pay.quarter') : t('pay.quarters'),
+                })
+                : t('pay.note')}
             // Unused while `choices` is present - the choices ARE the answer -
             // but ConfirmPanel takes it as required.
             confirmLabel="Close"

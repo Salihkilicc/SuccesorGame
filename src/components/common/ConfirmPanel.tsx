@@ -49,6 +49,7 @@
 
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 
 export type ConfirmLine = {
@@ -102,6 +103,24 @@ type Props = {
         onPress: () => void;
         /** Shown, greyed, and not pressable. `description` carries the why. */
         disabled?: boolean;
+        /**
+         * A MaterialCommunityIcons name, drawn in the row's left gutter.
+         *
+         * Optional, and it should stay that way: a row still has to be
+         * readable with its label alone, because an icon is a reminder of a
+         * choice rather than the choice itself. Added because the pay panel
+         * was three paragraphs stacked on each other and the eye had no
+         * handle to pick a row by. See CeoPayPanel.
+         */
+        icon?: string;
+        /**
+         * The figure this choice comes down to, shown large on the right.
+         *
+         * A decision like a salary is A NUMBER, and burying it mid-sentence in
+         * `description` makes the player parse prose to compare three options.
+         * When present the description keeps only the consequences.
+         */
+        value?: string;
     }[];
 };
 
@@ -174,9 +193,30 @@ const ConfirmPanel = ({
                                     c.disabled && styles.choiceOff,
                                     pressed && !c.disabled && styles.btnPressed,
                                 ]}>
-                                <Text style={[styles.choiceLabel, c.disabled && styles.choiceLabelOff]}>
-                                    {c.label}
-                                </Text>
+                                <View style={styles.choiceHead}>
+                                    {!!c.icon && (
+                                        <MaterialCommunityIcons
+                                            name={c.icon}
+                                            size={20}
+                                            color={c.disabled ? theme.colors.textMuted : theme.colors.textPrimary}
+                                        />
+                                    )}
+                                    <Text
+                                        style={[
+                                            styles.choiceLabel,
+                                            styles.choiceLabelFlex,
+                                            c.disabled && styles.choiceLabelOff,
+                                        ]}>
+                                        {c.label}
+                                    </Text>
+                                    {!!c.value && (
+                                        <Text
+                                            style={[styles.choiceValue, c.disabled && styles.choiceLabelOff]}
+                                            numberOfLines={1}>
+                                            {c.value}
+                                        </Text>
+                                    )}
+                                </View>
                                 {!!c.description && (
                                     <Text style={styles.choiceDesc}>{c.description}</Text>
                                 )}
@@ -275,7 +315,11 @@ const styles = StyleSheet.create({
     // explanation nobody reads. See rule 3 in core/theme.ts: no signal colour
     // for a state that is not a profit or a loss.
     choiceOff: { opacity: 0.55 },
+    choiceHead: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
     choiceLabel: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: theme.typography.body + 1 },
+    /** Only when the row has a head; a label on its own still fills the row. */
+    choiceLabelFlex: { flex: 1 },
+    choiceValue: { color: theme.colors.textPrimary, fontWeight: '900', fontSize: theme.typography.subtitle },
     choiceLabelOff: { color: theme.colors.textMuted },
     choiceDesc: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, marginTop: 3, lineHeight: 16 },
     actions: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.xs },

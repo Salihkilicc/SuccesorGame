@@ -2027,9 +2027,21 @@ export const en: Record<string, string> = {
     'personal.payTap': 'Tap to change what you take.',
     'personal.payLocked': 'Pay is set once a year. {n} to wait.',
     'personal.quarter': 'a quarter',
-    'personal.stakeDetail': '{percent}% of {company} · {shares} shares',
-    'personal.stakeNoName': '{percent}% of the company · {shares} shares',
+    'personal.stakeDetail': '{shares} shares in {company}',
+    'personal.stakeNoName': '{shares} shares',
     'personal.luxury': 'Luxury holdings',
     'personal.luxuryCount': '{n} owned · upkeep {cost} a year',
     'personal.luxuryNote': 'Bought through LuxoNet. Not counted in the total above.',
+    // ------------------------------------------------------------------
+    //  THE PAY PANEL, SHORTENED
+    // ------------------------------------------------------------------
+    //  It ran to about sixty words for a choice between three numbers.
+    //  What is left is the roof and the two rules; the amounts are the
+    //  figures on the rows themselves.
+    // ------------------------------------------------------------------
+    'pay.summary': 'You take {current} a quarter. The company can carry {ceiling}.',
+    'pay.note': 'A rise is set once a year and costs trust. A cut is free and immediate.',
+    'pay.locked': 'Set once a year. {n} {unit} to wait. A cut is still immediate.',
+    'pay.quarter': 'quarter',
+    'pay.quarters': 'quarters',
 };
