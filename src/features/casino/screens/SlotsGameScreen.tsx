@@ -15,6 +15,7 @@ import { CASINO_LOCATIONS } from '../data/casinoData';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
+import { iconStrip } from '../logic/slotsData';
 
 const { width } = Dimensions.get('window');
 
@@ -22,7 +23,7 @@ const SlotsGameScreen = () => {
     useLocale();
   const navigation = useNavigation();
   const route = useRoute<any>();
-  const variant: SlotVariant = route.params?.variant ?? 'street_fighter';
+  const variant: SlotVariant = route.params?.variant ?? 'ticker';
   const initialBet = route.params?.betAmount;
 
   // Get current location logic to apply theme & limits
@@ -113,10 +114,11 @@ const SlotsGameScreen = () => {
           <View style={styles.reelsWrapper}>
             {columns.map((colSymbols, colIdx) => (
               <Reel
-                symbols={state.config.symbols}
+                symbols={iconStrip(state.config)}
                 key={colIdx}
                 index={colIdx}
-                finalSymbol={colSymbols[1]} // The target symbol
+                finalSymbol={colSymbols[1]}
+                tint={currentLocation.theme.primary}
                 isSpinning={state.isSpinning}
                 delay={colIdx * 300} // Staggered stop
               />

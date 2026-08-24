@@ -1,19 +1,41 @@
+// src/features/casino/components/Reel.tsx
+//
+// ============================================================================
+//  THE STRIP DRAWS ICONS NOW
+// ============================================================================
+//  It rendered whatever string it was handed inside a <Text> at forty point,
+//  which worked because the strip was emoji - thirteen of them across three
+//  machines, in a codebase that has twice removed emoji for doing an icon's
+//  job. The names it receives are MaterialCommunityIcons now. See
+//  logic/slotsData.ts.
+//
+//  The fallback strip mattered more than it looks: an empty `symbols` array
+//  fell through to eight fruit machine emoji, so a machine with a bad config
+//  silently became a different game.
+// ============================================================================
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Animated, Easing } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { theme } from '../../../core/theme';
 
 const SYMBOL_HEIGHT = 80;
 
 interface ReelProps {
+    /** MaterialCommunityIcons names. */
     symbols: string[];
+    /** The icon name this reel comes to rest on. */
     finalSymbol: string;
+    /** The room's colour, so a reel looks like where it is. */
+    tint?: string;
     isSpinning: boolean;
     delay: number;
     index: number;
 }
 
-const MOCK_STRIP = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🔔', '🍀', '🍊'];
+/** If a machine hands over nothing, show that rather than another game. */
+const MOCK_STRIP = ['help-circle-outline'];
 
-export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index }: ReelProps) => {
+export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, tint }: ReelProps) => {
     // Fallback if symbols is empty
     const stripSymbols = symbols && symbols.length > 0 ? symbols : MOCK_STRIP;
 
@@ -65,7 +87,11 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index }: ReelPro
                 {/* Render the strip repeatedly for the loop illusion */}
                 {[...stripSymbols, ...stripSymbols, ...stripSymbols].map((sym, i) => (
                     <View key={i} style={styles.symbolContainer}>
-                        <Text style={styles.symbol}>{sym}</Text>
+                        <MaterialCommunityIcons
+                            name={sym}
+                            size={38}
+                            color={tint ?? theme.colors.textPrimary}
+                        />
                     </View>
                 ))}
             </Animated.View>
@@ -94,9 +120,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    symbol: {
-        fontSize: 40,
-    },
+    // `symbol` was a 40pt font size. The icon carries its own size now.
     shadeTop: {
         position: 'absolute',
         top: 0,

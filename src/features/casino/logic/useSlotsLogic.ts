@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
-import { SLOT_CONFIG, SlotVariant } from './slotsData';
+import { SLOT_CONFIG, SlotVariant, miniOdds, symbolByIcon, iconStrip } from './slotsData';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 
 export type Grid = [string, string, string][];
@@ -33,7 +33,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   const { reputation, updateReputation } = usePlayerStore();
   const casinoReputation = reputation.casino;
 
-  const [grid, setGrid] = useState<Grid>(() => generateRandomGrid(config.symbols));
+  const [grid, setGrid] = useState<Grid>(() => generateRandomGrid(iconStrip(config)));
   const [bet, setBet] = useState<number>(() => clamp(initialBet ?? config.minBet, config.minBet, maxBetLimit));
 
   const [isSpinning, setIsSpinning] = useState(false);
@@ -42,9 +42,11 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   const [lastResult, setLastResult] = useState<{ type: 'win' | 'loss' | 'push', amount: number } | null>(null);
 
   const lossStreak = useRef(0);
+  /** The grid that actually landed, for the payout to read. */
+  const targetGridRef = useRef<Grid | null>(null);
 
   useEffect(() => {
-    setGrid(generateRandomGrid(config.symbols));
+    setGrid(generateRandomGrid(iconStrip(config)));
   }, [variant]);
 
   useEffect(() => {
@@ -66,16 +68,43 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
         require('../../../core/store/useCasinoRiskStore')
             .useCasinoRiskStore.getState().recordVisit();
     } catch { /* risk store not ready */ }
-    updateReputation('casino', clamp(Math.round(casinoReputation + delta), 0, REPUTATION_CEILING));
+
+    // ------------------------------------------------------------------
+    //  AND THE QUARTER ONLY HAS SO MUCH STANDING IN IT
+    // ------------------------------------------------------------------
+    //  Nothing limits how long a player sits here - no energy, no cap on
+    //  hands - so without this the seven room ladder falls in one evening.
+    //  `bankReputation` returns what was actually allowed, which is 0 once
+    //  the quarter is spent. See MAX_REP_PER_QUARTER.
+    // ------------------------------------------------------------------
+    const allowed = (() => {
+        try {
+            return require('../../../core/store/useCasinoRiskStore')
+                .useCasinoRiskStore.getState().bankReputation(delta);
+        } catch {
+            return delta;
+        }
+    })();
+    if (allowed <= 0) return;
+
+    updateReputation('casino', clamp(Math.round(casinoReputation + allowed), 0, REPUTATION_CEILING));
   };
   const reputationDownSmall = () => {
     updateReputation('casino', clamp(casinoReputation - 1, 0, REPUTATION_CEILING));
   };
 
-  // Constants for Probabilities
+  // ------------------------------------------------------------------
+  //  THE ODDS COME FROM THE MACHINE, NOT FROM THIS FILE
+  // ------------------------------------------------------------------
+  //  They were 1/14 and 1/6 here, the same for all three machines, while
+  //  each machine carried its own payout table that nothing read. So the
+  //  three differed only in which pictures went past, and the pair of them
+  //  together returned 0.548 of the stake - a forty five per cent house
+  //  edge nobody had multiplied out. See logic/slotsData.ts.
+  // ------------------------------------------------------------------
   const ODDS = {
-    JACKPOT: 1 / 14, // ~7.1%
-    MINI: 1 / 6,     // ~16.6%
+    JACKPOT: config.jackpotOdds,
+    MINI: miniOdds(config),
   };
 
   // Step 1: Determine Outcome (The Math)
@@ -96,14 +125,14 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
   const generateForcedGrid = (outcome: OutcomeTier): Grid => {
     // Robust symbol getter
     const getSafeSymbol = (): string => {
-      const syms = config.symbols;
-      if (!syms || syms.length === 0) return '🍒'; // Ultimate fallback
+      const syms = iconStrip(config);
+      if (!syms || syms.length === 0) return iconStrip(config)[0] ?? 'help-circle-outline';
       return syms[Math.floor(Math.random() * syms.length)] || syms[0];
     };
 
     // Safe helper to pick a DIFFERENT valid symbol
     const getDifferentSymbol = (exclude: string[]): string => {
-      const syms = config.symbols;
+      const syms = iconStrip(config);
       if (!syms || syms.length < 2) return getSafeSymbol(); // Not enough symbols to diff
 
       // Filter out excluded items
@@ -115,7 +144,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
       return candidates[Math.floor(Math.random() * candidates.length)];
     };
 
-    const syms = config.symbols;
+    const syms = iconStrip(config);
     // Safety check: ensure we have symbols
     if (!syms || syms.length === 0) {
       return [['?', '?', '?'], ['?', '?', '?'], ['?', '?', '?']];
@@ -168,6 +197,10 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
     const outcome = determineOutcome();
     // 2. Prepare Visuals
     const targetGrid = generateForcedGrid(outcome);
+    // And remember it, because the payout is now decided by which symbol
+    // came up rather than by a flat multiple. The ref rather than state
+    // because processResult runs from a timer, after this closure is gone.
+    targetGridRef.current = targetGrid;
 
     setIsSpinning(true);
     setShowResult(false);
@@ -176,7 +209,7 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
 
     // Animation loop (visual only)
     const interval = setInterval(() => {
-      setGrid(generateRandomGrid(config.symbols));
+      setGrid(generateRandomGrid(iconStrip(config)));
     }, 90);
 
     const spinDuration = 2000;
@@ -207,17 +240,28 @@ export const useSlotsLogic = (variant: SlotVariant, initialBet?: number, customM
     reputationUp(spendingRep);
 
     if (outcome === 'JACKPOT') {
-      winAmount = bet * 3;
+      // ------------------------------------------------------------
+      //  WHAT LANDED IS WHAT IT PAYS
+      // ------------------------------------------------------------
+      //  This was `bet * 3` whatever the reels showed, which made the
+      //  payout table - eighteen hand-written numbers across three
+      //  machines - decoration, and made the reels decoration with it.
+      //  Three crowns is a hundred times the stake now, and three
+      //  bears is three, because that is what the machine says.
+      // ------------------------------------------------------------
+      const landed = symbolByIcon(config, targetGridRef.current?.[1]?.[0] ?? '');
+      const multiple = landed?.payout ?? config.symbols[0].payout;
+      winAmount = Math.round(bet * multiple);
       resultType = 'win';
       lossStreak.current = 0;
       reputationUp(3);
-      setMessage(`JACKPOT! +$${winAmount}`);
+      setMessage(`JACKPOT! +$${winAmount.toLocaleString()}`);
     } else if (outcome === 'MINI') {
-      winAmount = bet * 2;
+      winAmount = Math.round(bet * config.twoKindMultiplier);
       resultType = 'win';
       lossStreak.current = 0;
       reputationUp(1);
-      setMessage(`MINI WIN! +$${winAmount}`);
+      setMessage(`MINI WIN! +$${winAmount.toLocaleString()}`);
     } else {
       // LOSS
       winAmount = 0;

@@ -178,7 +178,9 @@ export type AssetsStackParamList = {
 export type CasinoStackParamList = {
   CasinoLobby: undefined;
   SlotsGame: {
-    variant: 'street_fighter' | 'poseidon' | 'high_roller';
+    // The three machines. See features/casino/logic/slotsData.ts - they were
+    // Street Fighter, Poseidon and High Roller, in a game about a succession.
+    variant: 'ticker' | 'boardroom' | 'dynasty';
     betAmount?: number;
   };
   RouletteGame: {

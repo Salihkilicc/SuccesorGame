@@ -27,6 +27,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
+import { MAX_REP_PER_QUARTER } from '../../features/casino/data/casinoData';
 
 /** Consecutive quarters at which a pattern becomes a story. */
 export const SCANDAL_STREAK = 3;
@@ -34,6 +35,19 @@ export const SCANDAL_STREAK = 3;
 export interface CasinoRiskState {
     /** Has the player been at a table at all this quarter? */
     visitedThisQuarter: boolean;
+    /**
+     * Reputation already banked this quarter.
+     *
+     * The casino has no energy cost and no limit on how many hands you play,
+     * so without this the seven room ladder falls in one sitting to anybody
+     * with a bankroll - the gates were a minute of tapping rather than a
+     * career. See MAX_REP_PER_QUARTER in features/casino/data/casinoData.ts.
+     *
+     * It lives here rather than in the player store because it is a fact
+     * about a QUARTER, and this is the store that already knows when one
+     * ends.
+     */
+    repThisQuarter: number;
     /** Consecutive quarters with at least one visit. */
     streak: number;
     /** Longest run this campaign, for the scene to be able to say it. */
@@ -45,6 +59,13 @@ type Store = CasinoRiskState & {
     setHasHydrated: (v: boolean) => void;
     /** Called when a bet is placed. Idempotent within a quarter. */
     recordVisit: () => void;
+    /**
+     * Bank some standing, and return what was actually allowed.
+     *
+     * Returns 0 once the quarter is spent, so the caller can leave the
+     * player's reputation alone rather than writing the same number back.
+     */
+    bankReputation: (amount: number) => number;
     /** Called by the tick. Rolls the quarter over. */
     closeQuarter: (quarters?: number) => void;
     reset: () => void;
@@ -52,6 +73,7 @@ type Store = CasinoRiskState & {
 
 export const initialCasinoRiskState: CasinoRiskState = {
     visitedThisQuarter: false,
+    repThisQuarter: 0,
     streak: 0,
     longestStreak: 0,
     _hasHydrated: false,
@@ -59,11 +81,20 @@ export const initialCasinoRiskState: CasinoRiskState = {
 
 export const useCasinoRiskStore = create<Store>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             ...initialCasinoRiskState,
             setHasHydrated: v => set({ _hasHydrated: v }),
 
             recordVisit: () => set(s => (s.visitedThisQuarter ? s : { visitedThisQuarter: true })),
+
+            bankReputation: (amount: number) => {
+                const asked = Math.max(0, Math.floor(amount || 0));
+                if (asked <= 0) return 0;
+                const room = Math.max(0, MAX_REP_PER_QUARTER - (get().repThisQuarter || 0));
+                const given = Math.min(asked, room);
+                if (given > 0) set(s => ({ repThisQuarter: (s.repThisQuarter || 0) + given }));
+                return given;
+            },
 
             closeQuarter: (quarters = 1) =>
                 set(s => {
@@ -71,7 +102,7 @@ export const useCasinoRiskStore = create<Store>()(
                         // One clean quarter clears the whole run. Merciful, and
                         // it is what makes the streak a decision the player can
                         // act on rather than a debt they accumulate.
-                        return { visitedThisQuarter: false, streak: 0 };
+                        return { visitedThisQuarter: false, repThisQuarter: 0, streak: 0 };
                     }
                     // Advancing several months at once counts as ONE quarter of
                     // attendance, because the flag is all the evidence there is
@@ -80,6 +111,9 @@ export const useCasinoRiskStore = create<Store>()(
                     const streak = s.streak + 1;
                     return {
                         visitedThisQuarter: false,
+                        // The allowance refills with the quarter, which is the
+                        // whole point of measuring it in quarters.
+                        repThisQuarter: 0,
                         streak,
                         longestStreak: Math.max(s.longestStreak, streak),
                     };
@@ -92,6 +126,7 @@ export const useCasinoRiskStore = create<Store>()(
             storage: createJSONStorage(() => zustandStorage),
             partialize: state => ({
                 visitedThisQuarter: state.visitedThisQuarter,
+                repThisQuarter: state.repThisQuarter,
                 streak: state.streak,
                 longestStreak: state.longestStreak,
             }),

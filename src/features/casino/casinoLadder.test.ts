@@ -194,3 +194,104 @@ describe('the four game cards', () => {
         expect(fs.readdirSync(dir).length).toBe(4);
     });
 });
+
+// ============================================================================
+//  AND THE TWO HALVES THE PURE MODULES CANNOT SEE
+// ============================================================================
+//
+//  Both of these were added because a probe did NOT fail. Reverting the
+//  payout to a flat `bet * 3` and lifting the quarterly allowance to a
+//  million each left every test green, which is the same gap that let the
+//  buyout screens and the education multiplier through: the arithmetic was
+//  covered and the door it goes through was not.
+// ============================================================================
+
+describe('the wiring the arithmetic hangs on', () => {
+    const fsw = require('fs');
+    const pathw = require('path');
+    const codeOfW = (...p: string[]): string =>
+        fsw.readFileSync(pathw.join(__dirname, ...p), 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .split('\n')
+            .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+            .join('\n');
+
+    it('pays what landed rather than a flat multiple', () => {
+        // The old line was `winAmount = bet * 3` whatever the reels showed,
+        // which is what made eighteen hand-written payouts decoration.
+        const src = codeOfW('logic', 'useSlotsLogic.ts');
+        expect(src).toMatch(/symbolByIcon\(config,/);
+        expect(src).toMatch(/bet \* multiple/);
+        expect(src).not.toMatch(/winAmount = bet \* 3;/);
+        expect(src).not.toMatch(/winAmount = bet \* 2;/);
+    });
+
+    it('and takes its odds from the machine rather than from the file', () => {
+        const src = codeOfW('logic', 'useSlotsLogic.ts');
+        expect(src).toMatch(/JACKPOT: config\.jackpotOdds/);
+        expect(src).toMatch(/MINI: miniOdds\(config\)/);
+        expect(src).not.toMatch(/1 \/ 14/);
+    });
+
+    it('and every table routes its reputation through the quarter', () => {
+        for (const f of ['useRouletteLogic', 'useSlotsLogic', 'useBlackjackLogic', 'usePokerLogic']) {
+            const src = codeOfW('logic', `${f}.ts`);
+            expect(src).toMatch(/bankReputation\(delta\)/);
+            expect(src).toMatch(/casinoReputation \+ allowed/);
+        }
+    });
+
+    it('and poker tells the company it was there, which it never did', () => {
+        // Found while adding the allowance. The other three called
+        // `recordVisit` - the thing that feeds the scandal streak - and poker
+        // did not, so a player who only played poker could sit at a table
+        // every quarter for a decade and the board never heard.
+        expect(codeOfW('logic', 'usePokerLogic.ts')).toMatch(/recordVisit\(\)/);
+    });
+});
+
+describe('the quarter has an allowance', () => {
+    const { useCasinoRiskStore } = require('../../core/store/useCasinoRiskStore');
+    const { MAX_REP_PER_QUARTER } = require('./data/casinoData');
+
+    beforeEach(() => useCasinoRiskStore.getState().reset());
+
+    it('and it runs out', () => {
+        // Without this the seven room ladder falls in one evening: there is no
+        // energy cost on the casino and no cap on hands played.
+        const st = () => useCasinoRiskStore.getState();
+        expect(st().bankReputation(MAX_REP_PER_QUARTER)).toBe(MAX_REP_PER_QUARTER);
+        expect(st().bankReputation(10)).toBe(0);
+        expect(st().bankReputation(1)).toBe(0);
+    });
+
+    it('and it hands back only what is left', () => {
+        const st = () => useCasinoRiskStore.getState();
+        st().bankReputation(MAX_REP_PER_QUARTER - 3);
+        expect(st().bankReputation(10)).toBe(3);
+    });
+
+    it('and it refills with the quarter', () => {
+        const st = () => useCasinoRiskStore.getState();
+        st().bankReputation(MAX_REP_PER_QUARTER);
+        st().recordVisit();
+        st().closeQuarter(1);
+        expect(st().bankReputation(10)).toBe(10);
+    });
+
+    it('and a whole ladder takes years rather than an afternoon', () => {
+        // 400 a gate at 50 a quarter is eight quarters, and the walk from
+        // Athens to Macau is about ten years of turning up. The MONEY is
+        // untouched - you can still lose a fortune in one sitting. It is the
+        // standing that takes a career, which is the right way round.
+        const quartersForTheLadder = CASINO_LADDER_TOP / MAX_REP_PER_QUARTER;
+        expect(quartersForTheLadder).toBeGreaterThanOrEqual(40);
+    });
+
+    it('and asking for nothing is not a way to bank something', () => {
+        const st = () => useCasinoRiskStore.getState();
+        expect(st().bankReputation(0)).toBe(0);
+        expect(st().bankReputation(-50)).toBe(0);
+        expect(st().bankReputation(NaN)).toBe(0);
+    });
+});

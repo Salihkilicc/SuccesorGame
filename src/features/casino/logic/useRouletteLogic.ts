@@ -111,7 +111,26 @@ export const useRouletteLogic = (initialChip?: number) => {
         require('../../../core/store/useCasinoRiskStore')
             .useCasinoRiskStore.getState().recordVisit();
     } catch { /* risk store not ready */ }
-    updateReputation('casino', clamp(casinoReputation + delta, 0, REPUTATION_CEILING));
+
+    // ------------------------------------------------------------------
+    //  AND THE QUARTER ONLY HAS SO MUCH STANDING IN IT
+    // ------------------------------------------------------------------
+    //  Nothing limits how long a player sits here - no energy, no cap on
+    //  hands - so without this the seven room ladder falls in one evening.
+    //  `bankReputation` returns what was actually allowed, which is 0 once
+    //  the quarter is spent. See MAX_REP_PER_QUARTER.
+    // ------------------------------------------------------------------
+    const allowed = (() => {
+        try {
+            return require('../../../core/store/useCasinoRiskStore')
+                .useCasinoRiskStore.getState().bankReputation(delta);
+        } catch {
+            return delta;
+        }
+    })();
+    if (allowed <= 0) return;
+
+    updateReputation('casino', clamp(Math.round(casinoReputation + allowed), 0, REPUTATION_CEILING));
   };
 
   const reputationDownSmall = () => {

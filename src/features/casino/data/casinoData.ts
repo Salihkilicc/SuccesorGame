@@ -103,6 +103,27 @@ export const CASINO_LADDER_TOP = 2100;
 /** The most reputation any single bet can be worth. */
 export const MAX_REP_PER_BET = 25;
 
+/**
+ * And the most a whole QUARTER can be worth, however long you sit there.
+ *
+ * Capping the bet was not enough either, which only became obvious once the
+ * question "is this ladder actually a climb" was asked properly: there is no
+ * energy cost on the casino and no limit on how many hands you play in a
+ * quarter. `visitedThisQuarter` in useCasinoRiskStore is a boolean for the
+ * scandal streak, not a limiter. So sixteen bets a gate is about a minute of
+ * tapping, and the whole seven room ladder falls in one sitting to anybody
+ * with a bankroll.
+ *
+ * A quarter is the unit this game measures everything else in. Fifty points
+ * is two good evenings, so a four hundred gate is eight quarters and the walk
+ * from Athens to Macau is about ten years of turning up. That is what makes
+ * Macau a place somebody arrives at rather than a room they unlock.
+ *
+ * The money is untouched: you can lose as much as you like in an afternoon.
+ * It is the STANDING that takes years, which is the right way round.
+ */
+export const MAX_REP_PER_QUARTER = 50;
+
 /** One dollar of stake in reputation terms, before the cap. */
 export const REP_PER_DOLLAR_STAKED = 1 / 10_000;
 

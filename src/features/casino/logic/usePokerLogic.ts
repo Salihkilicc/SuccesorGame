@@ -62,7 +62,32 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
 
   // --- OYUN MOTORU ---
   const reputationUp = (delta: number) => {
-    updateReputation('casino', clamp(casinoReputation + delta, 0, REPUTATION_CEILING));
+    // ------------------------------------------------------------------
+    //  POKER WAS NOT TELLING THE COMPANY ANYTHING
+    // ------------------------------------------------------------------
+    //  The other three tables call `recordVisit`, which is what feeds the
+    //  scandal streak in data/events/casino.ts. This one never did, so a
+    //  player who only ever played poker could sit at a table every quarter
+    //  for a decade and the board would never hear about it. Found while
+    //  adding the quarterly allowance below.
+    // ------------------------------------------------------------------
+    try {
+        require('../../../core/store/useCasinoRiskStore')
+            .useCasinoRiskStore.getState().recordVisit();
+    } catch { /* risk store not ready */ }
+
+    // The quarter only has so much standing in it. See MAX_REP_PER_QUARTER.
+    const allowed = (() => {
+        try {
+            return require('../../../core/store/useCasinoRiskStore')
+                .useCasinoRiskStore.getState().bankReputation(delta);
+        } catch {
+            return delta;
+        }
+    })();
+    if (allowed <= 0) return;
+
+    updateReputation('casino', clamp(Math.round(casinoReputation + allowed), 0, REPUTATION_CEILING));
   };
 
   const reputationDownSmall = () => {
