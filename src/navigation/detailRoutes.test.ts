@@ -178,9 +178,4 @@ describe('the route names', () => {
         expect(helper).toContain('export const jumpToTab');
         expect(helper).toMatch(/jumpToCompany[\s\S]{0,200}jumpToTab\(ref, 'MyCompany'\)/);
     });
-
-    it('and MyCompany back button addresses the Dashboard tab', () => {
-        const myComp = code('features', 'assets', 'screens', 'MyCompanyScreen.tsx');
-        expect(myComp).toMatch(/jumpToTab\(rootNavigationRef, 'Dashboard'\)/);
-    });
 });

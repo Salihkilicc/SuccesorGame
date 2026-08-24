@@ -22,7 +22,7 @@ import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStor
 import { useLaboratoryStore } from '../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../core/store/useProductStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
-import { theme, glyphOn } from '../../core/theme';
+import { theme } from '../../core/theme';
 import { formatMoney, formatNumber } from '../../core/utils';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs';
@@ -427,10 +427,7 @@ const HomeScreen = () => {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          {/* Black or white, decided by the tile it is on. It was always
-              white, so Mail and News were white glyphs on #CFD0D2 - a
-              contrast of about 1.4 against a floor of 3. See glyphOn. */}
-          <MaterialCommunityIcons name={item.icon} size={34} color={glyphOn(item.gradient[0])} style={styles.appIconVector} />
+          <MaterialCommunityIcons name={item.icon} size={34} color="#FFFFFF" style={styles.appIconVector} />
         </LinearGradient>
         <UnreadBadge count={badgeFor(item.key)} floating />
       </View>
@@ -558,23 +555,13 @@ const HomeScreen = () => {
                 <Text style={styles.sectionTitle}>{t('home.overview')}</Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
-              {/* ------------------------------------------------------
-                  A CARD, NOT A GRADIENT
-
-                  It ran rgba(255,255,255,0.48) into the ground and out to
-                  #CFD0D2, horizontally, which put a bright band down the
-                  LEFT and RIGHT edge of the card. Reported as "beyaz
-                  icindeki efekt".
-
-                  Worse than a smear: the labels sit on the left band and
-                  the figures are right aligned onto the other one, so
-                  white text was landing on a near-white ground. The one
-                  rule this project does not bend.
-
-                  A plain surface also lets iOS cache the shadow, which is
-                  what the note on `modernCard` below was working around.
-                 ------------------------------------------------------ */}
-              <View style={[styles.card, styles.widgetCard, styles.modernCard]}>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.48)', '#1C242C', '#1C242C', '#CFD0D2']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                locations={[0, 0.2, 0.8, 1]}
+                style={[styles.card, styles.widgetCard, styles.modernCard]}
+              >
                 <View style={styles.widgetRowBetween}>
                   <Text style={styles.widgetLabel}>{t('home.netWorth')}</Text>
                   <Text style={styles.widgetValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(realNetWorth)}</Text>
@@ -595,14 +582,19 @@ const HomeScreen = () => {
                     {finances.totalExpenses ? formatMoney(finances.totalExpenses) : '$0'}
                   </Text>
                 </View>
-              </View>
+              </LinearGradient>
             </TouchableOpacity>
 
             {/* Status Widget */}
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
-              {/* Same card, same reason. See the note on the one above. */}
-              <View style={[styles.card, styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.48)', '#1C242C', '#1C242C', '#CFD0D2']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                locations={[0, 0.2, 0.8, 1]}
+                style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
+              >
                 {statusRows.map((row, index) => (
                   <View
                     key={row.key}
@@ -628,7 +620,7 @@ const HomeScreen = () => {
                     </View>
                   </View>
                 ))}
-              </View>
+              </LinearGradient>
             </View>
           </View>
 
@@ -1002,18 +994,10 @@ const styles = StyleSheet.create({
   },
   widgetCard: {
     flex: 1,
-    // ------------------------------------------------------------------
-    //  SMALLER
-    // ------------------------------------------------------------------
-    //  32 of padding on a 250 tall card, for four rows of text. Reported as
-    //  "biraz buyuk kalmis", and it was: the pair of them took most of the
-    //  screen between the header and the app icons, so the four things a
-    //  player opens the game to tap were pushed to the bottom edge.
-    // ------------------------------------------------------------------
-    paddingVertical: 16,
-    paddingHorizontal: 14,
+    paddingVertical: 32,
+    paddingHorizontal: 12,
     justifyContent: 'space-between',
-    minHeight: 168,
+    minHeight: 250,
   },
   widgetRowBetween: {
     flexDirection: 'column',
@@ -1102,10 +1086,8 @@ const styles = StyleSheet.create({
   },
   statusCardAdjuster: {
     justifyContent: 'flex-start',
-    // 30 and 24 against the card above it, which is where the two of them
-    // stopped looking like a pair.
-    paddingTop: 12,
-    gap: theme.spacing.md,
+    paddingTop: 30,
+    gap: theme.spacing.xl || 24,
   },
   card: {
     backgroundColor: '#434B50',
@@ -1409,32 +1391,32 @@ const styles = StyleSheet.create({
   },
   modernCard: {
     // ------------------------------------------------------------------
-    //  A SURFACE, ON THE GROUND
+    //  THE GROUND UNDER THE CARD, SO ITS SHADOW CAN BE CACHED
     // ------------------------------------------------------------------
-    //  This used to be the note explaining how to give a LinearGradient a
-    //  shadow iOS could cache. The gradient is gone - see the card itself -
-    //  and with it the whole problem: a plain view with a solid background
-    //  is rasterised once and its shadow comes free.
+    //  It was `transparent`, and iOS cannot compute a shadow from a layer it
+    //  has to rasterise first - reported twice per render as
+    //  "BVLinearGradient has a shadow set but cannot calculate shadow
+    //  efficiently".
     //
-    //  It was `theme.colors.background`, the same colour as the screen, so
-    //  the card was not a card. It only read as one because of a light grey
-    //  shadow around it, which is what made the pair look like two heavy
-    //  blocks rather than two panels. `surface` is the next step up the
-    //  ladder in core/theme.ts and it is what every other card in the app
-    //  sits on.
-    //
-    //  The padding was 30 with negative margins pulling it back out, which
-    //  is two numbers doing one job in opposite directions. `widgetCard`
-    //  owns the padding now.
+    //  Only the FIRST gradient stop is translucent here: the card runs
+    //  rgba(255,255,255,0.48) into #1C242C at 20% and stays opaque from
+    //  there. So this colour is visible in one place, the top edge, where
+    //  the wallpaper used to show through a white haze and now the ground
+    //  does. That is the whole visual change and it makes the edge
+    //  consistent between the two cards, which sit at different heights over
+    //  different parts of the photograph.
     // ------------------------------------------------------------------
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 10,
-    elevation: 6,
+    backgroundColor: theme.colors.background,
+    borderRadius: 33,
+    borderWidth: 0,
+    shadowColor: '#CFD0D2',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
+    marginHorizontal: -12,
+    marginVertical: -8,
+    padding: 30,
+    paddingBottom: 10,
   },
 });

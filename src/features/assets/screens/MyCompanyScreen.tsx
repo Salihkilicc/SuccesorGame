@@ -28,8 +28,6 @@ import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
-import { jumpToTab } from '../../../navigation/jumpToCompany';
-import { rootNavigationRef } from '../../../navigation/navigationRef';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
 import IpoModal from '../../../components/MyCompany/Shares/IpoModal';
@@ -166,7 +164,7 @@ const MyCompanyScreen = () => {
            ---------------------------------------------------------------- */}
         <ScreenHeader
           title={t('company.commandCenter')}
-          onBack={() => jumpToTab(rootNavigationRef, 'Dashboard')}
+          onBack={() => navigation.navigate('Home')}
         />
 
         {/* `paddingTop: 0` was correct when the header scrolled WITH the
