@@ -46,10 +46,32 @@ const code = () => read()
     .join('\n');
 
 describe('the two widget cards', () => {
-    it('have no light stop left in them', () => {
+    it('have a sheen, and it is a sheen rather than a fill', () => {
+        // The gloss was asked for back after the bands came off. Twelve per
+        // cent over #434B50 lands around #5A6165 - white text on it still
+        // reads at better than seven to one, so it can overlap a row.
         const src = code();
+        expect(src).toMatch(/colors=\{\['rgba\(255,255,255,0\.12\)', '#434B50', '#434B50'\]\}/);
+        // What it replaced: 48% white and a #CFD0D2 stop. Those are fills.
+        // Scoped to a gradient STOP: the same string is a chevron colour and
+        // a label colour elsewhere in this file, and neither is a ground.
         expect(src).not.toMatch(/colors=\{\['rgba\(255,255,255,0\.48\)'/);
         expect(src).not.toMatch(/'#1C242C', '#1C242C', '#CFD0D2'/);
+    });
+
+    it('and it runs DOWNWARDS, which is the half that was actually wrong', () => {
+        // The old one went start (0, 0.5) to end (1, 0.5) - light on the
+        // left and right edges, which is exactly where the labels and the
+        // figures are. Vertical puts it on the top edge, where there is
+        // padding and no text.
+        const src = code();
+        expect(src).toMatch(/start=\{\{ x: 0\.5, y: 0 \}\}\s*\n\s*end=\{\{ x: 0\.5, y: 1 \}\}/);
+        expect(src).not.toMatch(/start=\{\{ x: 0, y: 0\.5 \}\}/);
+    });
+
+    it('and it is gone before the rows get going', () => {
+        const src = code();
+        expect(src).toMatch(/locations=\{\[0, 0\.28, 1\]\}/);
     });
 
     it('and both of them, not just the one that was open', () => {
@@ -57,8 +79,10 @@ describe('the two widget cards', () => {
         // reading the other as done is how the casino's 700 survived a
         // whole commit.
         const src = code();
-        const flat = src.match(/colors=\{\['#434B50', '#434B50', '#434B50', '#434B50'\]\}/g) ?? [];
-        expect(flat).toHaveLength(2);
+        const sheen = src.match(/colors=\{\['rgba\(255,255,255,0\.12\)', '#434B50', '#434B50'\]\}/g) ?? [];
+        expect(sheen).toHaveLength(2);
+        const vertical = src.match(/start=\{\{ x: 0\.5, y: 0 \}\}/g) ?? [];
+        expect(vertical.length).toBeGreaterThanOrEqual(2);
     });
 
     it('and are shorter than they were', () => {

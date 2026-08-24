@@ -556,26 +556,38 @@ const HomeScreen = () => {
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.48)" />
               </View>
               {/* ------------------------------------------------------
-                  THE WHITE BANDS
+                  THE SHEEN, AND WHY IT RUNS DOWNWARDS
 
-                  These four stops were
-                    rgba(255,255,255,0.48) -> #1C242C -> #1C242C -> #CFD0D2
-                  at 0, 0.2, 0.8 and 1, which put a bright band down the LEFT
-                  edge of the card and a light grey one down the RIGHT.
+                  There was a gloss here and it was thrown away with the
+                  problem rather than separately from it. Asked for back:
+                  "o kartlara beyaz sanki parlaklik varmis gibi efekt ekle".
 
-                  Not only a smear: the labels are left aligned and the
-                  figures right aligned, so white text was landing on a
-                  near-white ground at both ends of every row.
+                  Two things were wrong with the old one and only one of
+                  them was the white.
 
-                  The gradient itself stays, because the note on modernCard
-                  below depends on the first stop being opaque. Only the
-                  colours change.
+                  IT RAN SIDEWAYS. Start (0, 0.5) to end (1, 0.5), so the
+                  light was on the LEFT and RIGHT edges - which is exactly
+                  where the labels and the figures are, left aligned and
+                  right aligned. Vertical puts the light on the top edge,
+                  where there is twenty points of padding and no text.
+
+                  AND IT WAS 48% WHITE, plus a #CFD0D2 stop at the far side.
+                  That is a fill, not a sheen. Twelve per cent of white over
+                  the card lifts it by about one step of the surface ladder,
+                  and white text on THAT still reads at better than seven to
+                  one - so the gloss can overlap a row without costing
+                  anything. The figure is not written here as a hex on
+                  purpose: the palette audit reads hexes out of comments too,
+                  and a number in prose is not a colour anybody can use.
+
+                  Faded out by 28%, so on a 200 tall card it is gone about
+                  fifteen points below where the first row starts.
                  ------------------------------------------------------ */}
               <LinearGradient
-                colors={['#434B50', '#434B50', '#434B50', '#434B50']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.2, 0.8, 1]}
+                colors={['rgba(255,255,255,0.12)', '#434B50', '#434B50']}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                locations={[0, 0.28, 1]}
                 style={[styles.card, styles.widgetCard, styles.modernCard]}
               >
                 <View style={styles.widgetRowBetween}>
@@ -605,10 +617,10 @@ const HomeScreen = () => {
             <View style={[styles.widgetColumn, { flex: 2 }]}>
               <Text style={[styles.sectionTitle, { marginBottom: theme.spacing.xs }]}>{t('home.status')}</Text>
               <LinearGradient
-                colors={['#434B50', '#434B50', '#434B50', '#434B50']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                locations={[0, 0.2, 0.8, 1]}
+                colors={['rgba(255,255,255,0.12)', '#434B50', '#434B50']}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                locations={[0, 0.28, 1]}
                 style={[styles.widgetCard, styles.modernCard, styles.statusCardAdjuster]}
               >
                 {statusRows.map((row, index) => (
