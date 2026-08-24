@@ -1,5 +1,8 @@
 import { useUserStore, usePlayerStore, useMarketStore } from '../../../core/store';
 import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useShareholderStore } from '../../shareholders/stores/useShareholderStore';
+import { useEquityStore } from '../../finance/stores/useEquityStore';
+import { personalNetWorth } from '../../../core/market/personalEconomy';
 import { calculateQuarterlyFinances } from '../logic/EconomyEngine';
 import { Alert } from 'react-native';
 import { STOCKS } from '../data/marketData';
@@ -11,6 +14,8 @@ export const useAssetsLogic = () => {
 
     const player = usePlayerStore((state) => state); // Get player store for personality
     const { liquidatePortfolio, holdings, marketPrices } = useMarketStore();
+    const { playerShareCount } = useShareholderStore();
+    const { stockPrice } = useEquityStore();
 
     // Calculate "Projected" Report for UI
     const report = calculateQuarterlyFinances(user, { holdings }, stats);
@@ -22,9 +27,28 @@ export const useAssetsLogic = () => {
         return sum + (holding.quantity * currentPrice);
     }, 0);
 
-    // Assuming stats now has cash and bank properties, or they are derived
-    const cash = stats.money; // Re-using stats.money for cash, adjust if stats has a separate 'cash' property
-    const bank = 0; // Stats doesn't have bank, defaulting to 0
+    const cash = stats.money;
+
+    // ----------------------------------------------------------------------
+    //  `bank` IS SHELVED
+    // ----------------------------------------------------------------------
+    //      const bank = 0; // Stats doesn't have bank, defaulting to 0
+    //
+    //  A constant zero with a comment admitting it is a constant zero, added
+    //  to a total and shown as an account the player has. There is no bank in
+    //  this game; when there is one, it becomes a real field on the stats
+    //  store and joins `personalNetWorth` as a real term.
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    //  THE STAKE, WHICH IS USUALLY MOST OF THE ANSWER
+    // ----------------------------------------------------------------------
+    //  HomeScreen computed this itself and the Assets screen did not have it
+    //  at all, so the card and the screen behind it disagreed about the same
+    //  number under the same name. One derivation now, here, where both of
+    //  them already look. See personalEconomy.personalNetWorth.
+    // ----------------------------------------------------------------------
+    const equityValue = (playerShareCount || 0) * (stockPrice || 0);
 
     const handleLiquidation = () => {
         const portfolioValue = investmentsValue;
@@ -88,8 +112,8 @@ export const useAssetsLogic = () => {
 
     return {
         cash,
-        bank,
-        netWorth: cash + bank + investmentsValue, // Include investments in Net Worth
+        equityValue,
+        netWorth: personalNetWorth({ cash, equityValue, investmentsValue }),
         report, // { totalIncome, totalExpenses, netFlow, breakdowns... }
         handleLiquidation,
         investmentsValue,

@@ -94,18 +94,38 @@ export const calculateQuarterlyFinances = (
     const tax = q.tax;
     const totalExpenses = q.totalExpenses;
 
-    // 3. Prepare Assets Breakdown
+    // ----------------------------------------------------------------------
+    //  3. WHAT THE PLAYER HOLDS
+    // ----------------------------------------------------------------------
+    //  THREE OF THESE FIVE ROWS COULD NEVER APPEAR:
+    //
+    //      const properties = statsState?.propertiesValue || 0;
+    //      const vehicles   = statsState?.vehiclesValue   || 0;
+    //      const valuables  = statsState?.belongingsValue || 0;
+    //
+    //  Those three fields are READ here and written NOWHERE in the codebase.
+    //  They belong to the shopping feature, which is flagged off. The
+    //  `.filter(amount > 0)` below then removed them silently, so the screen
+    //  showed two rows out of five and nothing anywhere said why.
+    //
+    //  Shelved rather than deleted: when shopping returns, this is where the
+    //  rows come back, and `personalEconomy.WealthInput.belongingsValue` is
+    //  the term already waiting for them in the net worth.
+    //
+    //  AND THE PLAYER'S SHAREHOLDING WAS NEVER IN THIS LIST AT ALL - usually
+    //  the largest thing they own. The personal screen builds its own holdings
+    //  list from `useAssetsLogic` now, which has the stake, so this array has
+    //  no reader. Kept because the report TYPE still carries it and because
+    //  it is the shape the shopping rows return to.
+    // ----------------------------------------------------------------------
     const cash = statsState?.money || 0;
-    const properties = statsState?.propertiesValue || 0;
-    const vehicles = statsState?.vehiclesValue || 0;
-    const valuables = statsState?.belongingsValue || 0;
 
     const assetsBreakdown: BreakdownItem[] = [
         { id: 'cash', label: 'Cash (Liquid)', amount: cash, type: 'asset' as const },
         { id: 'investments', label: 'Investments', amount: portfolioValue, type: 'asset' as const },
-        { id: 'properties', label: 'Properties', amount: properties, type: 'asset' as const },
-        { id: 'vehicles', label: 'Vehicles', amount: vehicles, type: 'asset' as const },
-        { id: 'valuables', label: 'Valuables', amount: valuables, type: 'asset' as const }
+        // { id: 'properties', label: 'Properties', amount: properties, type: 'asset' as const },
+        // { id: 'vehicles', label: 'Vehicles', amount: vehicles, type: 'asset' as const },
+        // { id: 'valuables', label: 'Valuables', amount: valuables, type: 'asset' as const },
     ].filter(item => item.amount > 0);
 
     // 4. Generate Report
@@ -115,7 +135,11 @@ export const calculateQuarterlyFinances = (
         netFlow: totalIncome - totalExpenses,
         // We can add portfolioValue here if needed by UI directly, currently it's in breakdown
         incomeBreakdown: [
-            { id: 'salary', label: 'Job Salary', amount: salaryQuarterly, type: 'income' },
+            // "Job Salary" was the old label, and the player does not have a
+            // job. This is CEO pay, the board can cap it, and it is decided
+            // under Equity - which the personal screen now links to from the
+            // row that shows this number.
+            { id: 'salary', label: 'Your pay as CEO', amount: salaryQuarterly, type: 'income' },
             ...(dividendIncome > 0 ? [{ id: 'dividends', label: 'Portfolio Income (Divs/Interest)', amount: dividendIncome, type: 'income' as const }] : []),
             ...(businessProfit > 0 ? [{ id: 'business', label: 'Business Profit', amount: businessProfit, type: 'income' as const }] : [])
         ],

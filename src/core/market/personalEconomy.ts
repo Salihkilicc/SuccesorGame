@@ -199,3 +199,66 @@ export const personalQuarter = (
  */
 export const asMonthly = (quarterly: number): number =>
     (quarterly || 0) / MONTHS_PER_QUARTER;
+
+// ============================================================================
+//  WHAT THE PLAYER IS WORTH
+// ============================================================================
+//
+//  There were two answers, forty files apart, and they did not agree.
+//
+//      HomeScreen:    cash + equityValue + investmentsValue
+//      AssetsScreen:  cash + bank + investmentsValue        // bank was 0
+//
+//  `equityValue` is the player's own shareholding times the share price,
+//  which in most runs is the largest thing they own by an order of magnitude.
+//  So the card on the home screen said one number, and TAPPING that card took
+//  you to a screen that said a smaller one. Neither was labelled differently.
+//
+//  Same shape as the casino's 700, the three salaries and the four buyout
+//  deciders: one fact kept in two places, found one at a time. So it lives
+//  here now and both screens read it.
+//
+//  ---------------------------------------------------------------------------
+//  AND THE HOME SCREEN'S ANSWER WAS THE RIGHT ONE
+//  ---------------------------------------------------------------------------
+//  A founder's wealth IS their stake. Leaving it out does not make the figure
+//  conservative, it makes it wrong: it reports a person who has spent the
+//  whole game accumulating shares as being worth only their spending money.
+// ============================================================================
+
+export type WealthInput = {
+    /** Personal spending money. `useStatsStore.money`. */
+    cash?: number;
+    /** Shares held in the player's own company, at the current price. */
+    equityValue?: number;
+    /** Everything held through the market screen, at live prices. */
+    investmentsValue?: number;
+    /**
+     * Property, vehicles and belongings.
+     *
+     * SHELVED as an input rather than dropped. EconomyEngine read
+     * `propertiesValue`, `vehiclesValue` and `belongingsValue` off the stats
+     * store and NOTHING IN THE CODEBASE EVER WROTE THEM, so three of the five
+     * asset rows could not appear and were filtered out silently by an
+     * `amount > 0`. They belong to the shopping feature, which is flagged
+     * off. When it comes back this is where the number joins the total, and
+     * until then it is zero rather than a row that renders as nothing.
+     */
+    belongingsValue?: number;
+};
+
+const finite = (n: number | undefined): number =>
+    Number.isFinite(n) ? Math.max(0, n as number) : 0;
+
+/**
+ * One net worth, for every screen that shows one.
+ *
+ * Not clamped at zero overall: a player can be underwater on cash and the
+ * figure should say so. The individual parts are clamped because a negative
+ * shareholding is a bug rather than a debt.
+ */
+export const personalNetWorth = (input: WealthInput): number =>
+    (Number.isFinite(input?.cash) ? (input.cash as number) : 0)
+    + finite(input?.equityValue)
+    + finite(input?.investmentsValue)
+    + finite(input?.belongingsValue);

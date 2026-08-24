@@ -1,7 +1,12 @@
 import React from 'react';
-import { t, useLocale } from '../../../core/i18n';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import ScreenHeader from '../../../components/common/ScreenHeader';
+import { useLocale } from '../../../core/i18n';
+import { View, Text, StyleSheet } from 'react-native';
+// `t`, `Pressable` and `ScreenHeader` are referenced only by the four shelved
+// components below. Left commented rather than removed so uncommenting them
+// is one step rather than a hunt for what they used to need.
+// import { t } from '../../../core/i18n';
+// import { Pressable } from 'react-native';
+// import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { formatMoney } from '../../../core/utils';
 
@@ -12,22 +17,40 @@ export const StatPill = ({ label, value }: { label: string; value: string }) => 
     </View>
 );
 
-export const AssetsHeader = ({ onBack, risk, strategy }: any) => (
-    <View style={styles.header}>
-        <ScreenHeader title={t('company.assets2')} onBack={onBack} />
-        <View style={styles.riskRow}>
-            <StatPill label={t('company.riskAppetite')} value={`${Math.round(risk)}%`} />
-            <StatPill label={t('company.strategicSense')} value={`${Math.round(strategy)}%`} />
-        </View>
-    </View>
-);
+// ============================================================================
+//  FOUR COMPONENTS NOTHING RENDERS
+// ============================================================================
+//
+//  AssetsHeader, InfoCard, CategoryCard and ActionTile have zero call sites in
+//  the codebase. They are the remains of an earlier assets screen: a header
+//  with risk-appetite and strategic-sense pills, two card variants and a pair
+//  of cyan action tiles leading to the market and the company.
+//
+//  SHELVED rather than deleted, because they are not dead ideas - they are a
+//  design that was replaced before it was wired. `AssetsHeader` in particular
+//  shows two player traits that the current screen has nowhere to put, and if
+//  the personal screen grows a second page that is where they go.
+//
+//  StatPill stays live below: it is the only one of the five with a reader,
+//  and shelving it would take the others' one working part with it.
+// ============================================================================
 
-export const InfoCard = ({ title, body, variant = 'default' }: any) => (
-    <View style={variant === 'soft' ? styles.cardSoft : styles.card}>
-        <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardBody}>{body}</Text>
-    </View>
-);
+// export const AssetsHeader = ({ onBack, risk, strategy }: any) => (
+//     <View style={styles.header}>
+//         <ScreenHeader title={t('company.assets2')} onBack={onBack} />
+//         <View style={styles.riskRow}>
+//             <StatPill label={t('company.riskAppetite')} value={`${Math.round(risk)}%`} />
+//             <StatPill label={t('company.strategicSense')} value={`${Math.round(strategy)}%`} />
+//         </View>
+//     </View>
+// );
+
+// export const InfoCard = ({ title, body, variant = 'default' }: any) => (
+//     <View style={variant === 'soft' ? styles.cardSoft : styles.card}>
+//         <Text style={styles.cardTitle}>{title}</Text>
+//         <Text style={styles.cardBody}>{body}</Text>
+//     </View>
+// );
 
 export const SummaryRow = ({ label, value, marginTop = false, valueColor }: any) => (
     <View style={marginTop && { marginTop: theme.spacing.md }}>
@@ -36,44 +59,81 @@ export const SummaryRow = ({ label, value, marginTop = false, valueColor }: any)
     </View>
 );
 
-export const CategoryCard = ({ label, value, meta, onPress }: any) => (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
-        <Text style={styles.categoryLabel}>{label}</Text>
-        <Text style={styles.categoryValue}>{value}</Text>
-        <Text style={styles.categoryMeta}>{meta}</Text>
-    </Pressable>
-);
+// SHELVED with the two above. Note `marketTile` and `companyTile` are the
+// SAME cyan fill, so the variant prop has never selected anything - a third
+// symptom of a design that was left half wired.
+// export const CategoryCard = ({ label, value, meta, onPress }: any) => (
+//     <Pressable onPress={onPress} style={({ pressed }) => [styles.categoryCard, pressed && styles.categoryCardPressed]}>
+//         <Text style={styles.categoryLabel}>{label}</Text>
+//         <Text style={styles.categoryValue}>{value}</Text>
+//         <Text style={styles.categoryMeta}>{meta}</Text>
+//     </Pressable>
+// );
 
-export const ActionTile = ({ title, body, onPress, variant = 'market' }: any) => (
-    <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-            styles.actionTile,
-            variant === 'market' ? styles.marketTile : styles.companyTile,
-            pressed && styles.actionTilePressed,
-        ]}>
-        <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.actionTitle}>{title}</Text>
-            <Text style={styles.actionBody}>{body}</Text>
-        </View>
-        <Text style={styles.tileCta}>›</Text>
-    </Pressable>
-);
+// export const ActionTile = ({ title, body, onPress, variant = 'market' }: any) => (
+//     <Pressable
+//         onPress={onPress}
+//         style={({ pressed }) => [
+//             styles.actionTile,
+//             variant === 'market' ? styles.marketTile : styles.companyTile,
+//             pressed && styles.actionTilePressed,
+//         ]}>
+//         <View style={{ gap: theme.spacing.xs }}>
+//             <Text style={styles.actionTitle}>{title}</Text>
+//             <Text style={styles.actionBody}>{body}</Text>
+//         </View>
+//         <Text style={styles.tileCta}>›</Text>
+//     </Pressable>
+// );
 
-export const BreakdownSection = ({ title, items, isIncome }: { title: string, items: any[], isIncome?: boolean }) => {
+// ============================================================================
+//  A ROW KNOWS WHAT IT IS
+// ============================================================================
+//
+//  SHELVED, and it was showing the player's savings as a debt:
+//
+//      ({ title, items, isIncome }) => ...
+//          {isIncome ? '+' : '-'}{formatMoney(item.amount)}
+//
+//  Three call sites on the assets screen. Income passed `isIncome`, expenses
+//  correctly did not, and CURRENT ASSETS did not either - because there was no
+//  third answer to pass. So the cash the player owns rendered as
+//  "Cash (Liquid) -$450,000", with a minus sign, in the one section that is
+//  neither a flow in nor a flow out.
+//
+//  The items have carried `type: 'asset' | 'income' | 'expense'` the whole
+//  time. Reading it off the row removes the chance for a caller to disagree
+//  with the data it is passing, which is the same repair as solving the slot
+//  machines' two-kind odds instead of storing them.
+//
+//  Green and red stay inside the rule: an asset is a holding rather than a
+//  profit or a loss, so it is plain white with no sign at all.
+// ============================================================================
+export const BreakdownSection = ({ title, items }: { title: string, items: any[] }) => {
     useLocale();
     if (!items || items.length === 0) return null;
     return (
         <View style={{ gap: theme.spacing.xs, marginTop: theme.spacing.lg }}>
             <Text style={styles.sectionHeader}>{title}</Text>
-            {items.map((item, index) => (
-                <View key={index} style={styles.breakdownRow}>
-                    <Text style={styles.breakdownLabel}>{item.label}</Text>
-                    <Text style={[styles.breakdownValue, { color: isIncome ? theme.colors.success : '#FFFFFF' }]}>
-                        {isIncome ? '+' : '-'}{formatMoney(item.amount)}
-                    </Text>
-                </View>
-            ))}
+            {items.map((item, index) => {
+                const kind = item?.type === 'income' || item?.type === 'expense'
+                    ? item.type
+                    : 'asset';
+                const sign = kind === 'income' ? '+' : kind === 'expense' ? '-' : '';
+                const colour = kind === 'income'
+                    ? theme.colors.success
+                    : kind === 'expense'
+                        ? theme.colors.danger
+                        : theme.colors.textPrimary;
+                return (
+                    <View key={index} style={styles.breakdownRow}>
+                        <Text style={styles.breakdownLabel}>{item.label}</Text>
+                        <Text style={[styles.breakdownValue, { color: colour }]}>
+                            {sign}{formatMoney(item.amount)}
+                        </Text>
+                    </View>
+                );
+            })}
         </View>
     );
 };

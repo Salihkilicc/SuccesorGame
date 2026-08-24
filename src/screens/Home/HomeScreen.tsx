@@ -33,8 +33,9 @@ import { useEducationSystem } from '../../features/life/components/Education/sto
 import { EducationExamModal } from '../../features/life/components/Education/modals/EducationExamModal';
 // ADDED: Sanctuary System Import
 import { startNewQuarter } from '../../features/life/components/Sanctuary/store/useSanctuarySystem';
-import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
-import { useEquityStore } from '../../features/finance/stores/useEquityStore';
+// SHELVED with their only readers - see the net worth note below.
+// import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
+// import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
 import { startNewGameAsking } from '../../core/newGamePrompt';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
@@ -167,17 +168,34 @@ const HomeScreen = () => {
   const gender = useIdentityStore(s => s.gender);
   const { age, currentMonth, advanceMonth, employeeMorale } = useGameStore();
   // Using useAssetsLogic for real-time financial data
-  const { cash, netWorth, report: finances, investmentsValue } = useAssetsLogic();
+  const { cash, netWorth, report: finances } = useAssetsLogic();
   const { setField, factoryCount, employeeCount, brandValue, brandChange } = useStatsStore();
   const totalRP = useLaboratoryStore(s => s.totalRP);
   const { reset: resetProducts } = useProductStore();
 
   // Real Net Worth Calculation
-  const { playerShareCount } = useShareholderStore();
-  const { stockPrice } = useEquityStore();
+  // Both SHELVED with the derivation below that was their only reader. They
+  // are live store subscriptions, so leaving them would re-render the whole
+  // home screen on every tick of a share price nothing here shows.
+  //     const { playerShareCount } = useShareholderStore();
+  //     const { stockPrice } = useEquityStore();
 
-  const equityValue = (playerShareCount || 0) * (stockPrice || 0);
-  const realNetWorth = cash + equityValue + investmentsValue; // Total Wealth
+  // ------------------------------------------------------------------
+  //  ONE NET WORTH, AND IT COMES FROM THE HOOK NOW
+  // ------------------------------------------------------------------
+  //  SHELVED, and it was the better of the two answers - which is exactly
+  //  why it was worth keeping and moving rather than leaving here:
+  //
+  //      const equityValue = (playerShareCount || 0) * (stockPrice || 0);
+  //      const realNetWorth = cash + equityValue + investmentsValue;
+  //
+  //  The Assets screen behind this card added no equity at all, so pressing
+  //  the card made the player's net worth DROP. Two derivations of one fact,
+  //  forty files apart, both reading `useAssetsLogic` already.
+  //
+  //  See core/market/personalEconomy.personalNetWorth.
+  // ------------------------------------------------------------------
+  const realNetWorth = netWorth;
 
   const { lastLifeEvent } = useEventStore();
   const [drawerOpen, setDrawerOpen] = useState(false);

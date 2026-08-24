@@ -1997,4 +1997,34 @@ export const en: Record<string, string> = {
     'tactic.empireTitle': 'Subsidiaries & Empire Management',
     'tactic.empireText': 'Acquired companies operate as subsidiaries, delivering passive quarterly profits and dividends to your holding.',
     'tactic.empireDetail': 'Tip: Diversify across multiple industries to push your empire valuation into the tens of billions.',
+    // ========================================================================
+    //  THE PERSONAL SCREEN
+    // ========================================================================
+    //  Its own namespace, because every string on it used to be a `company.*`
+    //  key. The screen shows the player's salary, rent, tax and portfolio and
+    //  not one figure belonging to the company, and it was captioned
+    //  "ASSETS / Wealth Management" throughout.
+    //
+    //  No dashes in any of these. See the house rule.
+    // ========================================================================
+    'personal.title': 'YOUR MONEY',
+    'personal.subtitle': 'What you own and what it costs you',
+    'personal.netWorth': 'Everything you are worth',
+    'personal.whatYouHold': 'What you hold',
+    'personal.cash': 'Cash',
+    'personal.stake': 'Your stake',
+    'personal.stakeIn': 'in {company}',
+    'personal.investments': 'Investments',
+    'personal.lockedUp': '{percent}% of what you are worth is shares you cannot spend.',
+    'personal.allCash': 'All of it is cash. Nothing is tied up.',
+    'personal.thisQuarter': 'This quarter',
+    'personal.comesIn': 'Comes in',
+    'personal.goesOut': 'Goes out',
+    'personal.leftOver': 'Left over',
+    'personal.incomeSources': 'Where it comes from',
+    'personal.expenses': 'Where it goes',
+    'personal.yourPay': 'Your pay',
+    'personal.payTap': 'Set on the equity screen. Tap to change it.',
+    'personal.payLocked': 'Pay is set once a year. {n} to wait.',
+    'personal.quarter': 'a quarter',
 };
