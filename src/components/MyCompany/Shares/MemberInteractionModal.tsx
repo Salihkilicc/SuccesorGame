@@ -34,6 +34,7 @@ import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { giftEffect } from '../../../core/market/governance';
+import { acceptanceChance, MAX_ASK_PREMIUM } from '../../../core/market/buyout';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
 import { useStatsStore } from '../../../core/store';
 import { formatMoney, formatNumber } from '../../../core/utils';
@@ -308,8 +309,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
 
     const getLikelihoodWidth = (): string => {
         // Map premium to percentage width
-        const normalized = Math.max(0, Math.min(100, offerPremium + 20)); // -20 to +100 → 0 to 120
-        const percentage = (normalized / 120) * 100;
+        const span = PREMIUM_CEILING + 20;
+        const normalized = Math.max(0, Math.min(span, offerPremium + 20));
+        const percentage = (normalized / span) * 100;
         return `${percentage}%`;
     };
 
@@ -345,57 +347,22 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             return;
         }
 
-        // Check if offer is acceptable
-        const requiredPrice = buyoutResult.askingPrice || 0;
-        const offerAcceptable = offerPrice >= requiredPrice;
+        // ------------------------------------------------------------------
+        //  TOTAL AGAINST TOTAL
+        // ------------------------------------------------------------------
+        //  `offerPrice` is the whole parcel and this used to be compared
+        //  against `askingPrice`, which is one share. A holder of 1.25m
+        //  shares at thirty cents was offered 375,000 against an ask of 51
+        //  cents, so every offer passed, including the one the stepper
+        //  labels "insulted", and the branch below was unreachable.
+        //  See core/market/buyout.ts.
+        // ------------------------------------------------------------------
+        const requiredPrice = buyoutResult.askingTotal;
 
-        if (offerAcceptable) {
-            setPanel({
-                title: t('mem.offerAccepted'),
-                summary: `${member.name} has accepted your offer.`,
-                lines: [
-                    { label: 'You pay', value: formatMoney(offerPrice) },
-                    { label: 'Shares acquired', value: `${memberPercent.toFixed(1)}%` },
-                    { label: 'Your stake after', value: `${(memberPercent + playerPercent).toFixed(1)}%`, strong: true },
-                ],
-                confirmLabel: t('equity.completePurchase'),
-                onConfirm: () => {
-                    // ------------------------------------------------------
-                    //  THE SHARES ACTUALLY MOVE NOW
-                    // ------------------------------------------------------
-                    //  This branch used to read `// TODO: Implement actual
-                    //  share transfer`, deduct the cash and stop. The player
-                    //  paid the full buyout price, saw "purchase complete",
-                    //  and received nothing - the member kept every share.
-                    //  The store has always had negotiateSharePurchase; it
-                    //  was simply never called from here.
-                    // ------------------------------------------------------
-                    const r = negotiateSharePurchase(member.id, member.shareCount, offerPremium);
-
-                    if (!r.success) {
-                        setPanel({
-                            title: 'Purchase failed',
-                            summary: r.message,
-                            confirmLabel: 'OK',
-                            tone: 'danger',
-                        });
-                        return;
-                    }
-
-                    updateStats({ money: money - offerPrice });
-                    setPanel({
-                        title: t('mem.purchaseComplete'),
-                        summary: t('mem.purchaseCompleteBody', { v1: memberPercent.toFixed(1) }),
-                        lines: [{ label: 'Shares transferred', value: formatNumber(r.sharesBought) }],
-                        confirmLabel: 'OK',
-                        onConfirm: undefined,
-                    });
-                },
-            });
-        } else {
+        if (offerPrice < requiredPrice) {
             setPanel({
                 title: 'Offer too low',
-                summary: `${member.name} rejected your offer.`,
+                summary: `${member.name} will not sell for that.`,
                 lines: [
                     { label: 'You offered', value: formatMoney(offerPrice) },
                     { label: 'They want', value: formatMoney(requiredPrice), strong: true },
@@ -403,11 +370,90 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                 confirmLabel: 'OK',
                 tone: 'danger',
             });
+            return;
         }
+
+        // ------------------------------------------------------------------
+        //  AND THE ANSWER IS NOT KNOWN UNTIL THEY GIVE IT
+        // ------------------------------------------------------------------
+        //  This screen used to open a panel headed "Offer accepted", list
+        //  what the player would pay and what their stake would become, and
+        //  only then - on confirm - call the store, which threw its own die
+        //  and could come back "Purchase failed". Being told yes and then no
+        //  is worse than being told no.
+        //
+        //  So the panel is a question now. The store settles it on confirm,
+        //  and the odds are on the button before it is pressed.
+        // ------------------------------------------------------------------
+        const chance = acceptanceChance(offerPrice, requiredPrice);
+
+        setPanel({
+            title: `Offer ${formatMoney(offerPrice)}?`,
+            summary: `${member.name} is asking ${formatMoney(requiredPrice)} for ${memberPercent.toFixed(1)}% of the company.`,
+            lines: [
+                { label: 'You pay', value: formatMoney(offerPrice) },
+                { label: 'Shares acquired', value: `${memberPercent.toFixed(1)}%` },
+                { label: 'Your stake after', value: `${(memberPercent + playerPercent).toFixed(1)}%`, strong: true },
+                { label: 'They accept', value: chance >= 1 ? 'Certain' : `${Math.round(chance * 100)}%` },
+            ],
+            confirmLabel: t('equity.completePurchase'),
+            onConfirm: () => {
+                // ------------------------------------------------------
+                //  THE SHARES ACTUALLY MOVE NOW
+                // ------------------------------------------------------
+                //  This branch used to read `// TODO: Implement actual
+                //  share transfer`, deduct the cash and stop. The player
+                //  paid the full buyout price, saw "purchase complete",
+                //  and received nothing - the member kept every share.
+                //  The store has always had negotiateSharePurchase; it
+                //  was simply never called from here.
+                // ------------------------------------------------------
+                const r = negotiateSharePurchase(member.id, member.shareCount, offerPremium);
+
+                if (!r.success) {
+                    setPanel({
+                        title: 'Not this quarter',
+                        summary: r.message,
+                        confirmLabel: 'OK',
+                        tone: 'danger',
+                    });
+                    return;
+                }
+
+                // ------------------------------------------------------
+                //  AND THE STORE IS THE ONE THAT SPENDS
+                // ------------------------------------------------------
+                //  SHELVED: `updateStats({ money: money - offerPrice })`.
+                //  negotiateSharePurchase already calls spendMoney, and
+                //  `money` here is the value captured at render, so this
+                //  wrote an absolute figure over the store's deduction
+                //  and quietly decided the price itself.
+                // ------------------------------------------------------
+                setPanel({
+                    title: t('mem.purchaseComplete'),
+                    summary: t('mem.purchaseCompleteBody', { v1: memberPercent.toFixed(1) }),
+                    lines: [{ label: 'Shares transferred', value: formatNumber(r.sharesBought) }],
+                    confirmLabel: 'OK',
+                    onConfirm: undefined,
+                });
+            },
+        });
     };
 
+    // ----------------------------------------------------------------------
+    //  THE CEILING HAD TO CLEAR THE DEAREST ASK
+    // ----------------------------------------------------------------------
+    //  The stepper stopped at 100 while an ask can reach 150: reluctance tops
+    //  out at 100 per cent and a Shark adds 50 on top. So the most expensive
+    //  holders on the register were priced by the game and then could not be
+    //  paid - a lock nobody designed, and invisible, because the broken
+    //  comparison meant every offer was accepted anyway. See
+    //  core/market/buyout.ts, MAX_ASK_PREMIUM.
+    // ----------------------------------------------------------------------
+    const PREMIUM_CEILING = Math.round(MAX_ASK_PREMIUM * 100) + 20;
+
     const adjustPremium = (delta: number) => {
-        setOfferPremium((prev) => Math.max(-20, Math.min(100, prev + delta)));
+        setOfferPremium((prev) => Math.max(-20, Math.min(PREMIUM_CEILING, prev + delta)));
     };
 
     return (

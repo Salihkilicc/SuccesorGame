@@ -29,6 +29,7 @@ import {
     DEMAND_MET_TRUST, DEMAND_MET_TRUST_OTHERS, DEMAND_FAILED_TRUST, DEMAND_FAILED_TRUST_OTHERS,
     type BoardDemand, type DemandContext, type DemandKind, type PetIssue,
 }from '../../../core/market/governance';
+import { buyoutAsk, settleBuyout } from '../../../core/market/buyout';
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { INITIAL_DIALS } from '../../../core/story/state';
 
@@ -96,7 +97,20 @@ export interface GestureResult {
 // Buyout negotiation result
 interface BuyoutResult {
     canSell: boolean;
-    askingPrice: number | null; // null if they refuse
+    /**
+     * PER SHARE, and null if they refuse.
+     *
+     * Kept under its old name because things still read it. The two fields
+     * below say their unit out loud, which is the point: this one did not,
+     * and a screen built a total, compared it against this, and passed every
+     * time. See core/market/buyout.ts.
+     */
+    askingPrice: number | null;
+    /** PER SHARE. Same figure, honest name. */
+    askingPricePerShare: number;
+    /** THE WHOLE HOLDING. This is the one an offer is measured against. */
+    askingTotal: number;
+    /** PER SHARE, before any premium. */
     basePrice: number;
     reluctanceFactor: number;
     traitMultiplier: number;
@@ -683,9 +697,21 @@ export const useShareholderStore = create<ShareholderState>()(
             },
 
             /**
-             * Calculate the buyout price for a board member's shares.
-             * Price is based on trust level, personality trait, and reluctance to sell.
-             * Some members may refuse to sell entirely if trust is too low.
+             * What a board member wants for their holding.
+             *
+             * ----------------------------------------------------------------
+             *  THE ARITHMETIC MOVED OUT
+             * ----------------------------------------------------------------
+             *  This function used to work the price out itself and return
+             *  `askingPrice`, which was PER SHARE while the screen calling it
+             *  built its offer as a TOTAL and then compared the two. See
+             *  core/market/buyout.ts for what that cost.
+             *
+             *  Now it is a lookup plus a call. The fields carry their unit in
+             *  their names so the same mistake cannot be typed again, and
+             *  `askingPrice` is kept as an alias of the per share figure so
+             *  nothing that still reads it breaks silently.
+             * ----------------------------------------------------------------
              */
             calculateBuyoutPrice: (memberId: string, currentStockPrice: number): BuyoutResult | null => {
                 const { members } = get();
@@ -697,6 +723,37 @@ export const useShareholderStore = create<ShareholderState>()(
                     console.warn(`[Shareholder Store] Member not found: ${memberId}`);
                     return null;
                 }
+
+                const ask = buyoutAsk(
+                    { trust: member.trust, trait: member.trait, shareCount: member.shareCount },
+                    currentStockPrice,
+                    member.name,
+                );
+
+                return {
+                    canSell: ask.canSell,
+                    askingPrice: ask.canSell ? ask.askPerShare : null,
+                    askingPricePerShare: ask.askPerShare,
+                    askingTotal: ask.askTotal,
+                    basePrice: ask.marketPerShare,
+                    reluctanceFactor: Math.max(0, Math.min(1, (100 - member.trust) / 100)),
+                    traitMultiplier: ask.canSell
+                        ? ask.premium - Math.max(0, Math.min(1, (100 - member.trust) / 100))
+                        : 0,
+                    totalPremium: ask.premium,
+                    refusalReason: ask.refusalReason ?? undefined,
+                };
+            },
+
+            // ----------------------------------------------------------------
+            //  SHELVED: the old body, kept for the numbers it documents.
+            //  Every constant in it now lives in core/market/buyout.ts.
+            // ----------------------------------------------------------------
+            /*
+            calculateBuyoutPriceOld: (memberId: string, currentStockPrice: number): BuyoutResult | null => {
+                const { members } = get();
+                const member = members.find((m) => m.id === memberId);
+                if (!member) return null;
 
                 // ============================================================
                 // REFUSAL CHECK (Hostile members with certain traits)
@@ -785,6 +842,7 @@ export const useShareholderStore = create<ShareholderState>()(
                     totalPremium,
                 };
             },
+            */
 
             /**
              * Take a predatory loan from a Shark board member.
@@ -1282,14 +1340,39 @@ export const useShareholderStore = create<ShareholderState>()(
                     };
                 }
 
-                // Calculate price with ACTUAL amount
-                const stockPrice = useEquityStore.getState().stockPrice;
-                const basePrice = stockPrice * actualBuyAmount;
-                const premiumMultiplier = 1 + (offerPremium / 100);
-                const finalPrice = basePrice * premiumMultiplier;
+                // ------------------------------------------------------------
+                //  ONE PRICE, FROM ONE PLACE
+                // ------------------------------------------------------------
+                //  This used to read the share price out of useEquityStore
+                //  while the screen above it read `stats.companySharePrice`,
+                //  so the number the player was quoted and the number they
+                //  were charged came from two stores that are only equal after
+                //  a `refresh()` nobody guarantees. Worse, `stockPrice` starts
+                //  at 0, so before the first sync every holding was free.
+                //
+                //  Stats is the source, because it is what the screen shows.
+                //  See core/market/buyout.ts for the rest of the argument.
+                // ------------------------------------------------------------
+                const { money, spendMoney, companySharePrice } = useStatsStore.getState();
+                const marketPerShare = companySharePrice || 0;
+
+                const ask = buyoutAsk(
+                    { trust: member.trust, trait: member.trait, shareCount: actualBuyAmount },
+                    marketPerShare,
+                    member.name,
+                );
+
+                if (!ask.canSell) {
+                    return {
+                        success: false,
+                        message: ask.refusalReason || `${member.name} refuses to sell.`,
+                        sharesBought: 0,
+                    };
+                }
+
+                const finalPrice = marketPerShare * actualBuyAmount * (1 + offerPremium / 100);
 
                 // Check if player has enough cash
-                const { money, spendMoney } = useStatsStore.getState();
                 if (money < finalPrice) {
                     return {
                         success: false,
@@ -1298,12 +1381,55 @@ export const useShareholderStore = create<ShareholderState>()(
                     };
                 }
 
-                // Negotiation check
-                const negotiationResult = get().calculateNegotiationChance(memberId, offerPremium);
-                if (!negotiationResult.success) {
+                // ------------------------------------------------------------
+                //  AND ONE DECISION
+                // ------------------------------------------------------------
+                //  SHELVED, and see core/market/buyout.ts: this threw a die
+                //  against trust alone, which meant the asking price the
+                //  screen had just quoted played no part in whether the offer
+                //  was taken. `calculateNegotiationChance` is left in the
+                //  store for the profile screen's likelihood bar until that
+                //  screen is moved over too.
+                //
+                //      const negotiationResult = get().calculateNegotiationChance(memberId, offerPremium);
+                //      if (!negotiationResult.success) {
+                //          return {
+                //              success: false,
+                //              message: `${member.name} rejected your offer. They seem ${negotiationResult.reaction}.`,
+                //              sharesBought: 0,
+                //          };
+                //      }
+                // ------------------------------------------------------------
+                const verdict = settleBuyout(finalPrice, ask);
+
+                if (verdict.tooLow) {
                     return {
                         success: false,
-                        message: `${member.name} rejected your offer. They seem ${negotiationResult.reaction}.`,
+                        message: `${member.name} wants ${formatMoney(ask.askTotal)} for that holding.`,
+                        sharesBought: 0,
+                    };
+                }
+
+                if (!verdict.accepted) {
+                    // A serious offer they still turned down. It moves them, so
+                    // the next attempt is cheaper as well as likelier.
+                    if (verdict.trustGain > 0) {
+                        set((state) => ({
+                            members: state.members.map((m) =>
+                                m.id === memberId
+                                    ? {
+                                        ...m,
+                                        trust: Math.min(100, m.trust + verdict.trustGain),
+                                        isHostile: false,
+                                    }
+                                    : m
+                            ),
+                        }));
+                        get().recalculateBoardMood();
+                    }
+                    return {
+                        success: false,
+                        message: `${member.name} turned you down this quarter. They took the offer seriously and will come back to it.`,
                         sharesBought: 0,
                     };
                 }
