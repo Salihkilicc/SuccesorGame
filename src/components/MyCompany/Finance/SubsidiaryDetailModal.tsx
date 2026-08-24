@@ -145,18 +145,23 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                 ]}>
                     {/* Header */}
                     <View style={styles.header}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                        {/* flex: 1 so the name below has a width to wrap
+                            against rather than the close button's leftovers. */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
                             <View style={[styles.headerIconBadge, { backgroundColor: visual.badgeBg, borderWidth: 1, borderColor: visual.badgeBorder }]}>
                                 <MaterialCommunityIcons name={visual.icon} size={26} color={visual.color} />
                             </View>
-                            <View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                                    <Text style={styles.companyName}>{company.name}</Text>
+                            {/* Name on its own line, tier beside the sector
+                                below it. Same row as the list this opens
+                                from, so it has to read the same way. */}
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.companyName} numberOfLines={1}>{company.name}</Text>
+                                <View style={styles.metaRow}>
                                     <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
                                         <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
                                     </View>
+                                    <Text style={styles.sectorText} numberOfLines={1}>{company.sector} Sector</Text>
                                 </View>
-                                <Text style={styles.sectorText}>{company.sector} Sector</Text>
                             </View>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -297,11 +302,24 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         letterSpacing: 0.5,
     },
+    // ------------------------------------------------------------------
+    //  THE SECOND LINE
+    // ------------------------------------------------------------------
+    //  Same treatment as the two lists that lead here. The tag holds its
+    //  width, the sector gives up whatever is needed.
+    // ------------------------------------------------------------------
+    metaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: 3,
+    },
     tierTag: {
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
         borderWidth: 1,
+        flexShrink: 0,
     },
     tierTagText: {
         fontSize: 9,
@@ -313,6 +331,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.48)',
         fontWeight: '600',
         textTransform: 'uppercase',
+        flexShrink: 1,
     },
     closeBtn: {
         padding: 8,

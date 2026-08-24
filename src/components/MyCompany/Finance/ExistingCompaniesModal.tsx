@@ -53,14 +53,16 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                                     <View style={[styles.sectorIconBadge, { backgroundColor: visual.badgeBg, borderColor: visual.badgeBorder }]}>
                                         <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
                                     </View>
+                                    {/* Name on its own line, tier beside the
+                                        sector below it. See styles.metaRow. */}
                                     <View style={{ flex: 1 }}>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                                            <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                                        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                                        <View style={styles.metaRow}>
                                             <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
                                                 <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
                                             </View>
+                                            <Text style={styles.sector} numberOfLines={1}>{item.sector}</Text>
                                         </View>
-                                        <Text style={styles.sector}>{item.sector}</Text>
                                     </View>
                                 </View>
                                 <View style={{ alignItems: 'flex-end', marginLeft: 8 }}>
@@ -150,11 +152,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 1,
     },
+    // ------------------------------------------------------------------
+    //  THE SECOND LINE
+    // ------------------------------------------------------------------
+    //  The tier used to sit beside the name on the first line, and a long
+    //  name squeezed it off the row. `flexShrink: 0` says the tag never
+    //  gives up width - it is eight characters and there is nothing to
+    //  shrink - and the sector takes whatever is left.
+    // ------------------------------------------------------------------
+    metaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: 3,
+    },
     tierTag: {
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
         borderWidth: 1,
+        flexShrink: 0,
     },
     tierTagText: {
         fontSize: 9,
@@ -169,6 +186,7 @@ const styles = StyleSheet.create({
     sector: {
         fontSize: 12,
         color: 'rgba(255,255,255,0.48)',
+        flexShrink: 1,
     },
     value: {
         fontSize: 16,

@@ -380,14 +380,16 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
         <View style={[styles.itemIcon, { backgroundColor: visual.badgeBg, borderWidth: 1, borderColor: visual.badgeBorder }]}>
           <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
         </View>
+        {/* Name on its own line, tier beside the sector below it. A long
+            name used to squeeze the tag off the row. See styles.metaRow. */}
         <View style={styles.itemInfo}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+          <View style={styles.metaRow}>
             <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
               <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
             </View>
+            <Text style={styles.itemSector} numberOfLines={1}>{item.category || t('common.technology')}</Text>
           </View>
-          <Text style={styles.itemSector}>{item.category || t('common.technology')}</Text>
         </View>
         <View style={styles.itemValue}>
           <Text style={styles.marketCap}>{formatMoney(valuation)}</Text>
@@ -742,11 +744,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 14,
   },
+  // ------------------------------------------------------------------
+  //  THE SECOND LINE
+  // ------------------------------------------------------------------
+  //  Same row as My Empire, and the same fix, because they show the same
+  //  companies. The tag never shrinks - it is eight characters wide and
+  //  there is nothing in it to give up - and the sector takes the rest.
+  // ------------------------------------------------------------------
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 3,
+  },
   tierTag: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
     borderWidth: 1,
+    flexShrink: 0,
   },
   tierTagText: {
     fontSize: 9,
@@ -771,6 +787,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
+    flexShrink: 1,
   },
   itemValue: {
     alignItems: 'flex-end',
