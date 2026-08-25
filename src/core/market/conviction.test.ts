@@ -30,6 +30,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 import { useGameStore, initialGameState } from '../store/useGameStore';
 import { useStatsStore, initialStatsState } from '../store/useStatsStore';
+import { indexToPoints } from './brand';
 import { useStoryStore, initialStoryState } from '../store/useStoryStore';
 import { useSponsorshipStore } from '../store/useSponsorshipStore';
 import { updateBrand } from './attraction';
@@ -40,8 +41,12 @@ const runYears = async (guilty: boolean, quarters: number): Promise<number> => {
     useStatsStore.setState({
         ...initialStatsState, _hasHydrated: true,
         companyCapital: 500_000_000,
+        // The two fields are DIFFERENT SCALES and this fixture set them to
+        // the same number, which is how the muddle stayed invisible:
+        // `brandValue` is the 0-100 index, `brandByCategory` is points, and
+        // 60 of index is 259.8 of points. See core/market/brand.indexToPoints.
         brandValue: 60,
-        brandByCategory: { Consumer: 60 },
+        brandByCategory: { Consumer: indexToPoints(60) },
     } as any);
     useStoryStore.setState({ ...initialStoryState, _hasHydrated: true });
     // ONE VARIABLE. The sponsorship drought is also a ceiling penalty and it
@@ -115,8 +120,19 @@ describe('and it is still there two years later', () => {
         const clean = await runYears(false, 8);
         const convicted = await runYears(true, 8);
         expect(convicted).toBeLessThan(clean);
-        // And by an amount somebody would notice, rather than by rounding.
-        expect(clean - convicted).toBeGreaterThan(2);
+        // ----------------------------------------------------------------
+        //  AND BY AN AMOUNT SOMEBODY WOULD NOTICE
+        // ----------------------------------------------------------------
+        //  This said 2, and it passed on a gap of 0.94 - because the fixture
+        //  and the engine were both muddling the index with the points, and
+        //  a threshold in the wrong unit is not a threshold. Two points of a
+        //  433 point scale is not something anybody notices.
+        //
+        //  Measured on the corrected scale: 21.1 against 12.9 at eight
+        //  quarters. Five is well inside that and leaves room for tuning
+        //  without rewriting the claim.
+        // ----------------------------------------------------------------
+        expect(clean - convicted).toBeGreaterThan(5);
     }, 20_000);
 
     it('and it is still substantial after three years', async () => {
@@ -133,6 +149,9 @@ describe('and it is still there two years later', () => {
         const convictedLong = await runYears(true, 12);
 
         expect(convictedLong).toBeLessThan(cleanLong);
-        expect(cleanLong - convictedLong).toBeGreaterThan(3);
+        // 16.5 against 9.0, so the gap narrows from 8.2 to 7.6 as both
+        // settle - exactly the transient the comment above describes, and
+        // now visible in a unit where the numbers mean something.
+        expect(cleanLong - convictedLong).toBeGreaterThan(4);
     }, 30_000);
 });

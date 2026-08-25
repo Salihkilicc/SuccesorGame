@@ -17,7 +17,7 @@ import { useMessageStore } from '../store/useMessageStore';
 import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import { useNewsStore } from '../store/useNewsStore';
-import { applyCorporateShock, corporateBrandFrom } from '../market/brand';
+import { applyCorporateShock, corporateBrandFrom, brandIndex, indexToPoints } from '../market/brand';
 import { fineAmount } from './fines';
 import { quotedDelta } from './prices';
 import type { EffectSink } from './effects';
@@ -143,12 +143,30 @@ export const gameSink = (): EffectSink => ({
             return;
         }
 
-        const next = applyCorporateShock(byCategory, amount, active);
+        // ------------------------------------------------------------------
+        //  THE AMOUNT IS AUTHORED IN INDEX POINTS
+        // ------------------------------------------------------------------
+        //  `brand: -25` in a scene means a quarter of the whole scale, because
+        //  that is what brand was when the scenes were written. Category
+        //  points run 0 to 433 and beyond, so unconverted it was landing as
+        //  five per cent of what it says.
+        //
+        //  Reported as the choice showing a plus or a minus and changing
+        //  nothing. It was changing something; it was changing a twentieth of
+        //  what it promised. See brand.indexToPoints.
+        // ------------------------------------------------------------------
+        const next = applyCorporateShock(byCategory, indexToPoints(amount), active);
         s.update({
             brandByCategory: next,
             // Recomputed rather than adjusted, so q stays DERIVED. Storing it
             // twice is how the two halves drifted apart in the first place.
-            brandValue: corporateBrandFrom(next, active),
+            //
+            // AND AS THE INDEX. `corporateBrandFrom` returns points; this
+            // field is read by six modules that all clamp at 100. Writing
+            // points here was the same mistake the quarterly tick was making,
+            // in a second place - which is this codebase's other signature
+            // failure, one fact kept in two places and fixed one at a time.
+            brandValue: brandIndex(corporateBrandFrom(next, active)),
         });
     },
     dial: (dial, delta) => {

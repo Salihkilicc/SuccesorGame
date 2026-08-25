@@ -312,15 +312,34 @@ describe('the quarter and the sponsorship', () => {
     const STORE = codeOf('..', 'store', 'useSponsorshipStore.ts');
 
     it('feeds the brand walk a moved destination', () => {
-        expect(TICK).toMatch(/equilibriumBonus: sponsorLift \* weightHere/);
+        // ----------------------------------------------------------------
+        //  AND IN THE RIGHT UNIT, WHICH IT WAS NOT
+        // ----------------------------------------------------------------
+        //  `sponsorGlow` returns INDEX points - SPONSOR_PEAK_POINTS is 40 and
+        //  means forty of a hundred. It was going straight into a category
+        //  equilibrium that runs 0 to 433 and beyond.
+        //
+        //  Measured: the biggest contract in the game moved a five per cent
+        //  brand by nine per cent, and a LOCAL one by half of one per cent -
+        //  peaks of 1.0 to 1.9 points against an equilibrium of 216. So the
+        //  wiring this rule was written to protect was correct and the value
+        //  travelling down it was a twentieth of what it said.
+        //
+        //  This rule passed the entire time, which is the lesson: it checked
+        //  that the two names were joined and not that the number arriving
+        //  meant anything.
+        // ----------------------------------------------------------------
+        expect(TICK).toMatch(/equilibriumBonus: indexToPoints\(sponsorLift\) \* weightHere/);
         expect(TICK).toMatch(/\.glow\(\)/);
+        // And the raw form is gone, not sitting beside it.
+        expect(TICK).not.toMatch(/equilibriumBonus: sponsorLift \* weightHere/);
     });
 
     it('and reads it BEFORE the term is decremented', () => {
         // The brand loop runs long before the sponsorship quarter is closed.
         // Reading the glow in that later block would be a quarter late and the
         // quarter a deal is signed would be worth nothing.
-        const brandAt = TICK.indexOf('equilibriumBonus: sponsorLift');
+        const brandAt = TICK.indexOf('equilibriumBonus: indexToPoints(sponsorLift)');
         const advanceAt = TICK.indexOf('sponsorship.getState().advance(');
         expect(brandAt).toBeGreaterThan(-1);
         expect(advanceAt).toBeGreaterThan(brandAt);

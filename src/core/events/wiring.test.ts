@@ -22,6 +22,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 import { useGameStore, initialGameState } from '../store/useGameStore';
 import { useStatsStore, initialStatsState } from '../store/useStatsStore';
+import { indexToPoints } from '../market/brand';
 import { useStoryStore, initialStoryState } from '../store/useStoryStore';
 import { useNewsStore } from '../store/useNewsStore';
 import { useMessageStore } from '../store/useMessageStore';
@@ -47,8 +48,27 @@ const grownCompany = () => {
         ...initialStatsState, _hasHydrated: true,
         companyName: 'Harness Industries',
         companyCapital: 500_000_000,
+        // ------------------------------------------------------------------
+        //  THE FIXTURE WAS IN THE WRONG UNIT, AND THAT WAS THE BUG'S COVER
+        // ------------------------------------------------------------------
+        //  It set both fields to 40, as though they were the same scale. They
+        //  are not: `brandValue` is the 0-100 INDEX and `brandByCategory` is
+        //  POINTS, which run 0 to 433 and beyond. A company with an index of
+        //  40 has 173.2 points in each category.
+        //
+        //  With the two muddled, the assertions below still passed - because
+        //  the engine was muddling them the same way. The test agreed with the
+        //  bug rather than catching it, which is the thing to look for when a
+        //  fixture is suspiciously round.
+        //
+        //  Written through `indexToPoints` rather than as 173.2, so it stays
+        //  true if the scale is ever retuned.
+        // ------------------------------------------------------------------
         brandValue: 40,
-        brandByCategory: { Consumer: 40, 'Deep Tech': 40 },
+        brandByCategory: {
+            Consumer: indexToPoints(40),
+            'Deep Tech': indexToPoints(40),
+        },
     } as any);
     useStoryStore.setState({ ...initialStoryState, _hasHydrated: true });
     useNewsStore.getState().reset();

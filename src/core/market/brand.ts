@@ -428,6 +428,38 @@ export const BRAND_FAILURE_PENALTY = 0.20;
 export const brandIndex = (points: number): number =>
     Math.max(0, Math.min(100, (points || 0) / BRAND_INDEX_SCALE));
 
+/**
+ * The other direction, and it exists because two systems were adding index
+ * sized numbers to a points sized scale.
+ *
+ * ---------------------------------------------------------------------------
+ *  WHAT IT COST
+ * ---------------------------------------------------------------------------
+ *  `SPONSOR_PEAK_POINTS` is 40 and its name says points, but it was chosen
+ *  when brand ran 0 to 100 - it means "a global sponsorship is worth forty of
+ *  a hundred". It was being added straight to a category's equilibrium, which
+ *  runs 0 to 433 and beyond. So the biggest contract in the game moved a five
+ *  per cent brand by nine per cent, and a local one by HALF OF ONE PER CENT.
+ *  Measured, not guessed: local peaks are 1.0 to 1.9 points against an
+ *  equilibrium of 216.
+ *
+ *  The story scenes have the same problem. `brand: -25` was authored to mean a
+ *  quarter of the whole scale, and it was landing as five per cent of it.
+ *
+ *  Both were reported the same way: "sponsor aldim, hicbir sey degismedi" and
+ *  "sohbette brand value arti yaziyor ama sifir etkileniyor".
+ *
+ * ---------------------------------------------------------------------------
+ *  WHY CONVERT RATHER THAN RESCALE THE CONSTANTS
+ * ---------------------------------------------------------------------------
+ *  Because a designer thinks in the index. "A global deal is worth forty
+ *  brand" is a sentence somebody can check; 173.2 is a number nobody can.
+ *  The authored values stay in the unit they were written in and the
+ *  conversion happens once, at the boundary, with its name saying so.
+ */
+export const indexToPoints = (index: number): number =>
+    (index || 0) * BRAND_INDEX_SCALE;
+
 /** The brand level a given market share supports on its own. */
 export const brandEquilibrium = (sharePercent: number): number =>
     Math.max(0, sharePercent || 0) * BRAND_POINTS_PER_SHARE;

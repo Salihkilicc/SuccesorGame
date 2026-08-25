@@ -16,7 +16,7 @@ import {
   // applyCorporateShock was imported here and never called - see the note in
   // core/story/gameSink.ts, which is now its caller. The unused import is why
   // the audit called it reachable for weeks.
-  advanceCategoryBrand, corporateBrandFrom, brandIndex, earnedFloor,
+  advanceCategoryBrand, corporateBrandFrom, brandIndex, indexToPoints, earnedFloor,
 } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import {
@@ -421,7 +421,27 @@ export const useGameStore = create<GameStore>()(
         //  girer. Boylece "bu ceyrek karar ver, gelecek ceyrek gelsinler"
         //  kurali kendiliginden isler.
         // ==================================================================
-        const brandValueRaw = stats.brandValue ?? 0;
+        // ------------------------------------------------------------------
+        //  WHERE BRAND ACTUALLY LIVES
+        // ------------------------------------------------------------------
+        //  SHELVED: `const brandValueRaw = stats.brandValue ?? 0;`
+        //
+        //  It read the stored field as POINTS and the line further down then
+        //  ran `brandIndex(brandValueRaw)` on it. Once the store holds the
+        //  index - which is what every reader of that field expects - the
+        //  same value was being divided by 4.33 a SECOND time, and the
+        //  conviction penalty measured as exactly zero because both companies
+        //  had been squeezed into the same corner of the scale.
+        //
+        //  So neither number is read off `brandValue` any more. Both are
+        //  derived from `brandByCategory`, which is the one place brand is
+        //  actually kept, and the stored index is only the fallback for the
+        //  first quarter of a run when no category exists yet.
+        // ------------------------------------------------------------------
+        const brandCategoriesPrev = stats.brandByCategory || {};
+        const brandValueRaw = Object.keys(brandCategoriesPrev).length > 0
+            ? corporateBrandFrom(brandCategoriesPrev)
+            : indexToPoints(stats.brandValue ?? 0);
         // Marketing reach used to be multiplied by a subsidiary buff here.
         // Owning a media company does not make your adverts louder; buying
         // more advertising does. See the shelved block at the top of the file.
@@ -455,7 +475,11 @@ export const useGameStore = create<GameStore>()(
           // ISE ALIM TAVANI: ceyrekte kadronun ~%25'i. Marka yukseltir,
           // dusuk moral dusurur. Sinirsizken 22 kisiden 3.842'ye tek
           // ceyrekte ciklabiliyordu.
-          const cap = hiringCap(headcount, brandValueRaw, currentMorale) * Math.max(1, quarters);
+          // The INDEX, not the points. `hiringCap` clamps its brand argument
+          // to 0-100, so handing it points pinned the pull at maximum from
+          // 2.31% market share onwards - the same clamp that hid the whole
+          // problem everywhere else. See the note above brandValueRaw.
+          const cap = hiringCap(headcount, brandIndex(brandValueRaw), currentMorale) * Math.max(1, quarters);
 
           // ONEMLI: gelecek ceyrek de insan kaybedecegiz. Ise alim bir
           // ceyrek gecikmeli oldugu icin sadece bugunku acigi kapatirsak
@@ -510,11 +534,15 @@ export const useGameStore = create<GameStore>()(
         // ------------------------------------------------------------------
         //  POINTS vs INDEX
         // ------------------------------------------------------------------
-        //  stats.brandValue now holds BRAND POINTS (share x 43.3, so 433 at
-        //  10% share). Everything written before that change - attraction,
-        //  valuation multiples, hiring pull, contract partners - reads a
-        //  0-100 brand. `brandValue` stays the 0-100 index so those callers
-        //  keep working; the raw points travel as brandValueRaw.
+        //  `brandByCategory` holds BRAND POINTS (share x 43.3, so 433 at 10%
+        //  share). Everything else - attraction, valuation multiples, hiring
+        //  pull, contract partners, the facility ceilings - reads a 0-100
+        //  brand, and `stats.brandValue` is that index.
+        //
+        //  It was the points, which is the bug this whole block is about: six
+        //  modules clamp at 100, so past 2.31% market share every one of them
+        //  sat at its maximum and no sponsorship, scandal or scene could move
+        //  any of them again.
         // ------------------------------------------------------------------
         const brandValue = brandIndex(brandValueRaw);
         const brandValueIndexPrev = brandValue;
@@ -1496,7 +1524,13 @@ export const useGameStore = create<GameStore>()(
             // walking towards, for as long as the glow lasts. Split the same
             // way marketing is, because a sponsorship is company-wide and a
             // category's share of it is its share of the sales.
-            equilibriumBonus: sponsorLift * weightHere,
+            //
+            // CONVERTED. `sponsorGlow` returns INDEX points - forty means
+            // forty of a hundred - and this scale runs past four hundred. Fed
+            // in raw, the biggest contract in the game moved a five per cent
+            // brand by nine per cent and a local one by half of one per cent.
+            // See brand.indexToPoints.
+            equilibriumBonus: indexToPoints(sponsorLift) * weightHere,
           });
           nextByCategory[cat] = r.newBrand;
           nextFloors[cat] = earnedFloor(prevFloors[cat], r.newBrand);
@@ -1553,9 +1587,33 @@ export const useGameStore = create<GameStore>()(
         // Hizli buyumenin gorunmeyen bedeli budur.
         const nextTenure = blendTenure(avgTenure, headcount, arrivedHires, Math.max(1, quarters));
 
+        // ------------------------------------------------------------------
+        //  BRAND IS STORED AS THE INDEX, AND IT WAS STORED AS POINTS
+        // ------------------------------------------------------------------
+        //  `brandValue: corporateQ` wrote raw category points - a scale that
+        //  runs 0 to 433 and beyond - into the field that attraction, hiring
+        //  pull, valuation multiples, contract partners and the facility
+        //  ceilings all read. Every one of them clamps at 100.
+        //
+        //  So from 2.31% market share onwards - the first year - the brand
+        //  was PINNED AT MAXIMUM everywhere downstream, and nothing could move
+        //  it again. Not a sponsorship, not a scandal, not a scene, not a
+        //  marketing budget. Measured: valuation multiple and hiring pull both
+        //  sit at their ceiling from 2.31% share to the end of the game.
+        //
+        //  That is the whole report - "sponsor aldim, degismedi", "sohbette
+        //  brand value arti yaziyor ama sifir etkileniyor".
+        //
+        //  `brandIdx` was already being computed on the line above and handed
+        //  to the equity valuation. It just was not what got stored.
+        //
+        //  NOTE ON EXISTING SAVES: a save written before this holds points, so
+        //  the first quarter after it reports one large negative brandChange.
+        //  That is the correction being applied once, not a fall.
+        // ------------------------------------------------------------------
         useStatsStore.getState().update({
-          brandValue: corporateQ,
-          brandChange: corporateQ - (stats.brandValue || 0),
+          brandValue: brandIdx,
+          brandChange: brandIdx - (stats.brandValue || 0),
           brandByCategory: nextByCategory,
           brandFloorByCategory: nextFloors,
           employeeCount: headcount,
@@ -1676,8 +1734,10 @@ export const useGameStore = create<GameStore>()(
 
           totalMarketDemand,
           totalUnmetDemand,
-          brandValue: corporateQ,
-          brandChange: corporateQ - (stats.brandValue || 0),
+          // The same unit as the store above, or the report and the screen
+          // disagree about the same number.
+          brandValue: brandIdx,
+          brandChange: brandIdx - (stats.brandValue || 0),
           brandMaintenance: marketingBrand.maintenance,
           brandCeiling: tier.brandCeiling,
 
