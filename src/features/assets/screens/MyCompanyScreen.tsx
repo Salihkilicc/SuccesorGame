@@ -27,6 +27,8 @@ import { CompanyModals } from '../components/MyCompany/CompanyModals';
 import FacilityPanel from '../components/FacilityPanel';
 import ManagementCard from '../../../components/MyCompany/ManagementCard';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { jumpToTab } from '../../../navigation/jumpToCompany';
+import { rootNavigationRef } from '../../../navigation/navigationRef';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import SectionCard from '../../../components/common/SectionCard';
 import ConfirmPanel, { type ConfirmLine } from '../../../components/common/ConfirmPanel';
@@ -164,7 +166,29 @@ const MyCompanyScreen = () => {
            ---------------------------------------------------------------- */}
         <ScreenHeader
           title={t('company.commandCenter')}
-          onBack={() => navigation.navigate('Home')}
+          // ------------------------------------------------------------
+          //  AND IT DID NOTHING, FOR THE REASON THE FILE ABOVE DESCRIBES
+          // ------------------------------------------------------------
+          //  SHELVED: `onBack={() => navigation.navigate('Home')}`
+          //
+          //  My Company is a SWIPE TAB inside the navigator RootStack
+          //  registers as 'Home'. So from here `navigate('Home')` resolves
+          //  to the route RootStack is already on, and a navigate to the
+          //  route you are already on is a no-op that never reaches the
+          //  child navigator. The button pressed and nothing moved.
+          //
+          //  This is the third time this exact shape has appeared: the
+          //  bar's Company button, the bar's Home button, and now this.
+          //  navigation/jumpToCompany.ts was written for it and aims the
+          //  action at the swipe navigator directly, so RootStack is never
+          //  asked and cannot swallow it.
+          //
+          //  'Dashboard' rather than 'Home' because the inner tab was
+          //  RENAMED to end the `Home > Home` collision - see the note
+          //  above SwipeTabParamList. Writing 'Home' here would have been
+          //  the same bug with a working helper.
+          // ------------------------------------------------------------
+          onBack={() => jumpToTab(rootNavigationRef, 'Dashboard')}
         />
 
         {/* `paddingTop: 0` was correct when the header scrolled WITH the

@@ -25,6 +25,7 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useAssetStore } from '../store/useAssetStore';
 import { useShoppingWithInventory } from '../hooks/useShopping';
 import { useLuxeNetNavigation } from '../hooks/useLuxeNetNavigation';
@@ -115,7 +116,11 @@ const getCategoryTheme = (category: string) => {
 
 export const ShoppingScreen = () => {
     const navigation = useNavigation<any>();
-    const playerMoney = usePlayerStore((state) => state.core.money);
+    // Display only, and it was displaying the wrong wallet: `core.money` is
+    // the one nothing in the game credits. Shopping is flagged off, so this
+    // was never seen - which is exactly how it would have survived the sweep
+    // and been the twelfth instance later. See src/logic/personalCash.test.ts.
+    const playerMoney = useStatsStore((state) => state.money);
     const { addToCart, isOwned, cart } = useAssetStore();
     const { getShopItems, getTrendingItems } = useShoppingWithInventory();
 

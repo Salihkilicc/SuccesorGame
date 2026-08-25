@@ -85,10 +85,13 @@ export const handleMessyBreakup = (reason: string = 'drifted'): RelationshipEven
     const playerStore = usePlayerStore.getState();
     let settlementAmount = 0;
     if (wasMarriedWithoutPrenup) {
-        const cash = playerStore.core.money;
+        // Personal cash is useStatsStore.money. Halving the OTHER store's
+        // 5,000 meant a divorce cost a founder two and a half thousand
+        // dollars, whatever they were worth.
+        const cash = useStatsStore.getState().money || 0;
         settlementAmount = Math.floor(cash * 0.5); // 50% divorce settlement (Nakit yarılanıyor)
         if (settlementAmount > 0) {
-            playerStore.spendMoney(settlementAmount);
+            useStatsStore.getState().spendMoney(settlementAmount);
         }
     }
 
@@ -370,8 +373,7 @@ export const handleGift = (giftValue: number = 15000): { success: boolean; error
         return { success: false, error: 'No partner to gift.', loveDelta: 0 };
     }
 
-    const playerStore = usePlayerStore.getState();
-    if (playerStore.core.money < giftValue) {
+    if ((useStatsStore.getState().money || 0) < giftValue) {
         return {
             success: false,
             error: `Insufficient cash ($${giftValue.toLocaleString()} required).`,
@@ -379,7 +381,10 @@ export const handleGift = (giftValue: number = 15000): { success: boolean; error
         };
     }
 
-    playerStore.spendMoney(giftValue);
+    useStatsStore.getState().spendMoney(giftValue);
+
+    // Happiness is genuinely the player store's. Only the money moved.
+    const playerStore = usePlayerStore.getState();
 
     const loveBoost = Math.max(10, Math.min(30, Math.round(giftValue / 750)));
     familyStore.updateLove(loveBoost);

@@ -2033,4 +2033,9 @@ export const tr: Record<string, string> = {
     'company.eventPress': '+{v1} marka, sonumlenir',
     'bank.forNQuarters': '{v1} çeyrek boyunca',
     'bank.totalOverTerm': 'Vade boyunca toplam {v1}',
+    'newGame.eraseTitle': 'Yeniden başla',
+    'newGame.eraseSummary': 'Bu oyun burada biter ve yerine yeni bir şirket kurulur.',
+    'newGame.eraseNote': 'Her şey silinir. Bu kayda dönmenin bir yolu yok.',
+    'newGame.eraseConfirm': 'Sil ve başla',
+    'newGame.eraseCancel': 'Devam et',
 };

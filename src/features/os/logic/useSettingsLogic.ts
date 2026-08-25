@@ -4,7 +4,7 @@ import { Alert, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import { useLocale, useLocaleStore, LOCALES, t } from '../../../core/i18n';
-import { startNewGameAsking } from '../../../core/newGamePrompt';
+import { startNewGameAsking, confirmNewGame } from '../../../core/newGamePrompt';
 
 if (
     Platform.OS === 'android' &&
@@ -66,27 +66,40 @@ export const useSettingsLogic = (): SettingsLogicReturn => {
         Alert.alert('Successor OS', docName ? `${docName} is currently unavailable.` : 'This document is currently unavailable.');
     }, []);
 
-    const handleNewGame = useCallback(() => {
-        Alert.alert(
-            'New Game',
-            'All progress will be erased and a fresh run will be set up. Are you sure?',
-            [
-                { text: t('os.cancel'), style: 'cancel' },
-                {
-                    text: t('os.reset'),
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await startNewGameAsking();
-                            navigation.goBack();
-                        } catch (e) {
-                            console.error('[Settings] Yeni oyun baslatilamadi', e);
-                            Alert.alert('Error', 'Could not start a new game. Check the console.');
-                        }
-                    },
-                },
-            ],
-        );
+    // ------------------------------------------------------------------
+    //  THE WARNING THE PLAYER WAS ACTUALLY SEEING
+    // ------------------------------------------------------------------
+    //  SHELVED: an `Alert.alert('New Game', 'All progress will be erased...')`
+    //  with a destructive button, raised BEFORE `startNewGameAsking`.
+    //
+    //  The skip question was themed and the report came back saying it still
+    //  looked like a warning. It did: this fired first, as a white iOS sheet,
+    //  and the themed panel only appeared after it was answered. Two dialogs
+    //  in one flow and the ugly one went first.
+    //
+    //  Both steps are the same mounted component now. See
+    //  core/newGamePrompt.confirmNewGame and components/story/NewGameQuestion.
+    //
+    //      Alert.alert(
+    //          'New Game',
+    //          'All progress will be erased and a fresh run will be set up. Are you sure?',
+    //          [
+    //              { text: t('os.cancel'), style: 'cancel' },
+    //              { text: t('os.reset'), style: 'destructive', onPress: ... },
+    //          ],
+    //      );
+    // ------------------------------------------------------------------
+    const handleNewGame = useCallback(async () => {
+        try {
+            if (!(await confirmNewGame())) return;
+            await startNewGameAsking();
+            navigation.goBack();
+        } catch (e) {
+            console.error('[Settings] Yeni oyun baslatilamadi', e);
+            // Alert is still right for a genuinely unexpected failure - see
+            // the note at the top of ConfirmPanel.
+            Alert.alert('Error', 'Could not start a new game. Check the console.');
+        }
     }, [navigation]);
 
     const handleBack = useCallback(() => {

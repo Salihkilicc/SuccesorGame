@@ -2056,4 +2056,9 @@ export const en: Record<string, string> = {
     'company.eventPress': '+{v1} brand, fading',
     'bank.forNQuarters': 'for {v1} quarters',
     'bank.totalOverTerm': '{v1} over the whole term',
+    'newGame.eraseTitle': 'Start again',
+    'newGame.eraseSummary': 'This run ends here and a new company is founded in its place.',
+    'newGame.eraseNote': 'Everything is erased. There is no way back to this save.',
+    'newGame.eraseConfirm': 'Erase and begin',
+    'newGame.eraseCancel': 'Keep playing',
 };

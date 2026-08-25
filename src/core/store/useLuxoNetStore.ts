@@ -15,6 +15,9 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
 import { usePlayerStore } from './usePlayerStore';
+// Personal CASH is here. Reputation and happiness stay on the player store,
+// which is what it is actually for.
+import { useStatsStore } from './useStatsStore';
 
 // ============================================================================
 //  TYPES
@@ -266,9 +269,20 @@ export const useLuxoNetStore = create<LuxoNetStore>()(
                     return { success: false, error: 'Item is currently out of stock or unavailable.' };
                 }
 
-                // Check and spend player personal funds
+                // ----------------------------------------------------------
+                //  PERSONAL CASH IS useStatsStore.money
+                // ----------------------------------------------------------
+                //  This read `usePlayerStore.core.money`, which starts at
+                //  5,000 and which the game never credits - salary, dividends
+                //  and share sales all land in the stats store. So every
+                //  purchase here was refused for a player with millions, the
+                //  same way the date night was. See the note in useEquityStore
+                //  from the time a dividend was paid into the invisible one.
+                // ----------------------------------------------------------
+                const currentMoney = useStatsStore.getState().money || 0;
+                // Still needed for the buffs below - reputation and happiness
+                // are genuinely this store's, and only the money moved.
                 const playerStore = usePlayerStore.getState();
-                const currentMoney = playerStore.core.money;
 
                 if (currentMoney < catalogItem.price) {
                     return {
@@ -278,7 +292,7 @@ export const useLuxoNetStore = create<LuxoNetStore>()(
                 }
 
                 // Deduct cash from player
-                const spent = playerStore.spendMoney(catalogItem.price);
+                const spent = useStatsStore.getState().spendMoney(catalogItem.price);
                 if (!spent) {
                     return { success: false, error: 'Transaction failed during funds withdrawal.' };
                 }
@@ -351,9 +365,9 @@ export const useLuxoNetStore = create<LuxoNetStore>()(
                 const conditionFactor = Math.max(0.4, targetAsset.condition / 100);
                 const grossSaleValue = Math.round(targetAsset.currentMarketValue * conditionFactor);
 
-                // Deposit funds into player's personal wallet
-                const playerStore = usePlayerStore.getState();
-                playerStore.earnMoney(grossSaleValue);
+                // Into the same pocket it was paid from. Selling into the
+                // other store is how money used to disappear.
+                useStatsStore.getState().earnMoney(grossSaleValue);
 
                 // Remove from owned assets & restore catalog stock if applicable
                 set((prev) => ({
@@ -386,15 +400,14 @@ export const useLuxoNetStore = create<LuxoNetStore>()(
                     (targetAsset.annualMaintenanceCost * 0.25) * (missingCondition / 100),
                 );
 
-                const playerStore = usePlayerStore.getState();
-                if (playerStore.core.money < serviceCost) {
+                if ((useStatsStore.getState().money || 0) < serviceCost) {
                     return {
                         success: false,
                         error: `Insufficient funds for servicing. Requires $${serviceCost.toLocaleString()}.`,
                     };
                 }
 
-                playerStore.spendMoney(serviceCost);
+                useStatsStore.getState().spendMoney(serviceCost);
 
                 set((prev) => ({
                     ownedAssets: prev.ownedAssets.map((asset) =>

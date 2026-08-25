@@ -25,6 +25,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { theme } from '../../../core/theme';
 import { useFamilyStore, FALLBACK_CHILD_NAME } from '../../../core/store/useFamilyStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import {
     handleGift,
@@ -113,11 +114,16 @@ export const FamilyMemberScreen: React.FC = () => {
 
     const handleDate = () => {
         const cost = 2500;
-        if (player.core.money < cost) {
+        // THE REPORTED BUG. `core.money` starts at 5,000 and nothing in the
+        // game ever adds to it, so a founder with millions was told they
+        // could not afford a $2,500 dinner. Personal cash is
+        // useStatsStore.money - see the note in useEquityStore, which had to
+        // learn this once already when a dividend went into the wrong store.
+        if ((useStatsStore.getState().money || 0) < cost) {
             Alert.alert('Insufficient Funds', 'You need $2,500 for an exclusive date night.');
             return;
         }
-        player.spendMoney(cost);
+        useStatsStore.getState().spendMoney(cost);
         family.updateLove(8);
         player.updateCore('happiness', Math.min(100, player.core.happiness + 6));
         player.updateCore('stress', Math.max(0, player.core.stress - 8));
@@ -163,7 +169,10 @@ export const FamilyMemberScreen: React.FC = () => {
     const handleStartProposal = () => {
         const { PROPOSAL_LOCATIONS } = require('../../love/data/loveConstants');
         const location = PROPOSAL_LOCATIONS[selectedLocationIndex];
-        const canAfford = player.core.money >= location.cost;
+        // The same fault on the same screen, one function down. Fixing only
+        // the one that was reported is how the casino's 700 survived in four
+        // places.
+        const canAfford = (useStatsStore.getState().money || 0) >= location.cost;
         const selectedRing = ownedRings.find((r) => r.instanceId === selectedRingInstanceId) ?? ownedRings[0] ?? null;
 
         if (ownedRings.length === 0 || !selectedRing) {
@@ -184,7 +193,7 @@ export const FamilyMemberScreen: React.FC = () => {
             return;
         }
 
-        player.spendMoney(location.cost);
+        useStatsStore.getState().spendMoney(location.cost);
         if (selectedRingInstanceId) {
             removeOwnedItem(selectedRingInstanceId);
         }
@@ -613,7 +622,7 @@ export const FamilyMemberScreen: React.FC = () => {
                             selectedRingInstanceId={selectedRingInstanceId}
                             isPickingRing={isPickingRing}
                             ownedRings={ownedRings}
-                            money={player.core.money}
+                            money={useStatsStore.getState().money || 0}
                             feedback={proposalFeedback}
                             onPickLocation={setSelectedLocationIndex}
                             onSelectRing={setSelectedRingInstanceId}

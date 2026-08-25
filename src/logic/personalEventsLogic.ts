@@ -96,7 +96,8 @@ export const handleBuyLuxury = (
 ): LuxuryPurchaseResult => {
     const price = asset.price;
     const playerStore = usePlayerStore.getState();
-    const currentCash = playerStore.core.money;
+    // useStatsStore.money, not the player store's 5,000 that nothing credits.
+    const currentCash = useStatsStore.getState().money || 0;
 
     // 1. Verify personal funds
     if (currentCash < price) {
@@ -117,7 +118,7 @@ export const handleBuyLuxury = (
 
     // If not in catalog, deduct cash directly through PlayerStore
     if (!purchaseOutcome.success && purchaseOutcome.error?.includes('Item not found')) {
-        const spent = playerStore.spendMoney(price);
+        const spent = useStatsStore.getState().spendMoney(price);
         if (!spent) {
             return {
                 success: false,

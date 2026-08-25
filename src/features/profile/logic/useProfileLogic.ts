@@ -84,7 +84,10 @@ export const useProfileLogic = () => {
     const currentQuarter = market.currentQuarter || 1;
 
     const finances: FormattedFinances = useMemo(() => {
-        const cash = player.core.money || 0;
+        // The profile showed 5,000 forever while the personal screen showed
+        // the real figure, because the two read different stores. See the
+        // note in useEquityStore: personal cash is useStatsStore.money.
+        const cash = stats.money || 0;
         const netWorth = player.core.netWorth || cash;
         const companyVal = stats.companyValue || 0;
 
@@ -101,7 +104,7 @@ export const useProfileLogic = () => {
             netWorth: formatCurrency(netWorth),
             companyValuation: formatCurrency(companyVal),
         };
-    }, [player.core.money, player.core.netWorth, stats.companyValue]);
+    }, [stats.money, player.core.netWorth, stats.companyValue]);
 
     const playerAge = useGameStore(state => state.age);
     const vitals: FormattedVitals = useMemo(() => ({
@@ -229,13 +232,13 @@ export const useProfileLogic = () => {
     const handleDatePartner = useCallback(() => {
         if (!family.partner) return;
         const cost = 2500;
-        if (player.core.money < cost) {
+        if ((stats.money || 0) < cost) {
             setActionFeedback('Insufficient cash for a high-society date.');
             setTimeout(() => setActionFeedback(null), 3000);
             return;
         }
 
-        player.spendMoney(cost);
+        useStatsStore.getState().spendMoney(cost);
         family.updateLove(8);
         player.updateCore('happiness', Math.min(100, player.core.happiness + 6));
         player.updateCore('stress', Math.max(0, player.core.stress - 8));

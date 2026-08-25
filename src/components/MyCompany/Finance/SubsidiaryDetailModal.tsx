@@ -4,6 +4,8 @@ import { Modal, View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { theme } from '../../../core/theme';
 import SellCompanyModal from '../Actions/SellCompanyModal';
@@ -29,6 +31,7 @@ type Props = {
 export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId, onClose, asScreen }: Props) {
     useLocale();
     const navigation = useNavigation<any>();
+    const insets = useSafeAreaInsets();
     const { subsidiaries, updateSubsidiaryStrategy } = useCorporateFinanceStore();
     const [isSellModalVisible, setSellModalVisible] = useState(false);
 
@@ -144,7 +147,14 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     asScreen && styles.containerScreen,
                 ]}>
                     {/* Header */}
-                    <View style={styles.header}>
+                    <View style={[
+                        styles.header,
+                        asScreen && {
+                            paddingTop: Math.max(insets.top, 12) + 8,
+                            paddingBottom: 16,
+                            paddingHorizontal: 20,
+                        },
+                    ]}>
                         {/* flex: 1 so the name below has a width to wrap
                             against rather than the close button's leftovers. */}
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
@@ -169,7 +179,11 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView contentContainerStyle={styles.content}>
+                    <ScrollView
+                        style={{ flex: 1 }}
+                        contentContainerStyle={[styles.content, asScreen && { paddingBottom: 24 }]}
+                        showsVerticalScrollIndicator={false}
+                    >
                         {/* KPI Dashboard */}
                         <View style={styles.kpiContainer}>
                             <View style={styles.kpiItem}>
@@ -219,7 +233,12 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                     </ScrollView>
 
                     {/* Footer */}
-                    <View style={styles.footer}>
+                    <View style={[
+                        styles.footer,
+                        asScreen && {
+                            paddingBottom: NAV_BAR_CLEARANCE,
+                        },
+                    ]}>
                         <TouchableOpacity style={styles.sellBtn} onPress={() => setSellModalVisible(true)}>
                             <Text style={styles.sellBtnText}>{t('finance.sellCompany')}</Text>
                         </TouchableOpacity>
@@ -250,11 +269,15 @@ const styles = StyleSheet.create({
     },
     overlayScreen: { backgroundColor: theme.colors.background, justifyContent: 'flex-start' },
     containerScreen: {
+        flex: 1,
         width: '100%',
         maxWidth: undefined,
         height: '100%',
         borderRadius: 0,
         borderWidth: 0,
+        marginBottom: 0,
+        shadowOpacity: 0,
+        elevation: 0,
     },
     container: {
         width: '90%',

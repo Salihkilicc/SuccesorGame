@@ -51,7 +51,34 @@ import { startNewGame, type NewGameOptions } from './newGame';
 
 export type NewGameAnswer = 'play' | 'skip';
 
+/**
+ * The destructive step, asked before anything is torn down.
+ *
+ * ---------------------------------------------------------------------------
+ *  IT WAS THE ALERT THE PLAYER WAS ACTUALLY SEEING
+ * ---------------------------------------------------------------------------
+ *  The skip question became a themed panel and the report came back saying it
+ *  still looked like a warning. It did, because Settings raises its OWN
+ *  `Alert.alert('New Game', 'All progress will be erased...')` first and the
+ *  themed one only appears after it is answered. Two dialogs, one flow, and
+ *  the white iOS sheet was the one that arrived first.
+ *
+ *  It lives here rather than on the settings screen so both steps of starting
+ *  a new game are asked by the same mounted component - see
+ *  components/story/NewGameQuestion.tsx.
+ * ---------------------------------------------------------------------------
+ */
+export type NewGameConfirm = 'erase' | 'cancel';
+
 type QuestionState = {
+    /**
+     * Which question is on screen, if any.
+     *
+     * `skip` is the pacing choice, `erase` is the destructive confirmation.
+     * One field rather than two booleans, because two booleans can both be
+     * true and this is a sequence.
+     */
+    mode: null | 'skip' | 'erase';
     /** Whether the question is on screen. */
     asking: boolean;
     /**
@@ -60,18 +87,36 @@ type QuestionState = {
      * Null while nothing is being asked. Held here rather than passed down so
      * the dialog does not need to know who raised the question.
      */
-    answer: ((choice: NewGameAnswer) => void) | null;
+    answer: ((choice: NewGameAnswer | NewGameConfirm) => void) | null;
 };
 
 export const useNewGameQuestion = create<QuestionState & {
     ask: (answer: (choice: NewGameAnswer) => void) => void;
+    askConfirm: (answer: (choice: NewGameConfirm) => void) => void;
     clear: () => void;
 }>()((set) => ({
+    mode: null,
     asking: false,
     answer: null,
-    ask: (answer) => set({ asking: true, answer }),
-    clear: () => set({ asking: false, answer: null }),
+    ask: (answer) => set({ mode: 'skip', asking: true, answer: answer as (c: NewGameAnswer | NewGameConfirm) => void }),
+    askConfirm: (answer) => set({ mode: 'erase', asking: true, answer: answer as (c: NewGameAnswer | NewGameConfirm) => void }),
+    clear: () => set({ mode: null, asking: false, answer: null }),
 }));
+
+/**
+ * Ask whether a run may be thrown away, in the game's own dialog.
+ *
+ * Separate from `startNewGameAsking` on purpose: the game over card does NOT
+ * ask this, because confirming that progress will be erased is noise when the
+ * run is already over. Only the settings screen has something to warn about.
+ */
+export const confirmNewGame = (): Promise<boolean> =>
+    new Promise(resolve => {
+        useNewGameQuestion.getState().askConfirm((choice) => {
+            useNewGameQuestion.getState().clear();
+            resolve(choice === 'erase');
+        });
+    });
 
 /**
  * Start a new game, asking first whether the opening act should be played.

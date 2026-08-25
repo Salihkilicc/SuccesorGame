@@ -168,3 +168,69 @@ describe('the question itself', () => {
         expect(dialog).toMatch(/onCancel=\{\(\) => answer\('play'\)\}/);
     });
 });
+
+
+// ============================================================================
+//  AND THE WARNING THE PLAYER WAS ACTUALLY SEEING
+// ============================================================================
+//
+//  The skip question became a themed panel, and the report came back saying it
+//  still looked like a warning. It did. Settings raised its OWN Alert.alert
+//  first - "All progress will be erased and a fresh run will be set up. Are
+//  you sure?" - and the themed one only appeared after that was answered.
+//
+//  Two dialogs in one flow, and the white iOS sheet went first. Theming one
+//  half of a sequence is not theming the sequence.
+// ============================================================================
+
+describe('the destructive step', () => {
+    it('is asked by the same mounted component as the pacing one', () => {
+        const dialog = code('../components/story/NewGameQuestion.tsx');
+        expect(dialog).toMatch(/mode === 'erase'/);
+        expect(dialog).toMatch(/tone="danger"/);
+        expect((dialog.match(/<ConfirmPanel/g) ?? []).length).toBe(2);
+    });
+
+    it('and settings no longer raises its own alert for it', () => {
+        const settings = code('../features/os/logic/useSettingsLogic.ts');
+        expect(settings).toMatch(/confirmNewGame\(\)/);
+        expect(settings).not.toMatch(/Alert\.alert\(\s*'New Game'/);
+        // Alert is still right for an unexpected failure, and that one stays.
+        expect(settings).toMatch(/Alert\.alert\('Error'/);
+    });
+
+    it('and a cancel stops before anything is torn down', () => {
+        // The order is the whole point: ask, then erase. A confirm that runs
+        // after the reset is a confirmation of nothing.
+        const settings = code('../features/os/logic/useSettingsLogic.ts');
+        const body = settings.slice(settings.indexOf('handleNewGame'));
+        const askAt = body.indexOf('confirmNewGame()');
+        const goAt = body.indexOf('startNewGameAsking()');
+        expect(askAt).toBeGreaterThan(-1);
+        expect(goAt).toBeGreaterThan(askAt);
+        expect(body).toMatch(/if \(!\(await confirmNewGame\(\)\)\) return;/);
+    });
+
+    it('and the game over card does NOT ask it', () => {
+        // Confirming that progress will be erased is noise when the run is
+        // already over. Deliberate, and worth pinning so a later tidy does not
+        // "make them consistent".
+        const home = code('../screens/Home/HomeScreen.tsx');
+        expect(home).toMatch(/startNewGameAsking\(\)/);
+        expect(home).not.toMatch(/confirmNewGame/);
+    });
+
+    it('and its words exist in both catalogues, with no dashes', () => {
+        const keys = [
+            'newGame.eraseTitle', 'newGame.eraseSummary', 'newGame.eraseNote',
+            'newGame.eraseConfirm', 'newGame.eraseCancel',
+        ];
+        for (const key of keys) {
+            for (const catalogue of [en, tr] as Record<string, string>[]) {
+                expect(catalogue[key]).toBeTruthy();
+                expect(catalogue[key]).not.toMatch(/—/);
+                expect(catalogue[key]).not.toMatch(/\s-\s/);
+            }
+        }
+    });
+});

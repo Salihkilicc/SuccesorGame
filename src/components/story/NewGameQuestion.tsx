@@ -31,9 +31,34 @@ import { useNewGameQuestion } from '../../core/newGamePrompt';
 
 const NewGameQuestion = () => {
     const asking = useNewGameQuestion(s => s.asking);
+    const mode = useNewGameQuestion(s => s.mode);
     const answer = useNewGameQuestion(s => s.answer);
 
     if (!asking || !answer) return null;
+
+    // ------------------------------------------------------------------
+    //  STEP ONE: MAY THIS RUN BE THROWN AWAY
+    // ------------------------------------------------------------------
+    //  Settings used to raise its own `Alert.alert` for this and only then
+    //  reach the themed question below - so the first thing the player saw
+    //  was a white iOS sheet, which is why the panel still read as a warning
+    //  after it had been themed. One flow, one dialog, both steps here.
+    // ------------------------------------------------------------------
+    if (mode === 'erase') {
+        return (
+            <ConfirmPanel
+                visible
+                title={t('newGame.eraseTitle')}
+                summary={t('newGame.eraseSummary')}
+                note={t('newGame.eraseNote')}
+                tone="danger"
+                confirmLabel={t('newGame.eraseConfirm')}
+                cancelLabel={t('newGame.eraseCancel')}
+                onConfirm={() => answer('erase')}
+                onCancel={() => answer('cancel')}
+            />
+        );
+    }
 
     return (
         <ConfirmPanel
