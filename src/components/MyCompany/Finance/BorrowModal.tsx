@@ -322,14 +322,32 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                         </RowGroup>
 
                         {/* Warning */}
-                        {/* Sozlesme esigi: motorun gercekten uyguladigi sinir. */}
+                        {/* ------------------------------------------------
+                            THE COVENANT WARNING, WITHOUT THE INFINITY
+                            ------------------------------------------------
+                            It used to reconstruct EBITDA by dividing debt by
+                            leverage:
+
+                              const ebitda = assessment.leverage > 0
+                                  ? (companyDebtTotal || 0) / assessment.leverage
+                                  : 0;
+                              const after = ebitda > 0 ? ... : Infinity;
+
+                            For a company with no debt that is zero over zero,
+                            so `after` was Infinity and the screen said "this
+                            puts you at INFINITY leverage" on the first loan a
+                            founder ever takes. Which is every founder, and it
+                            read as an alarm about nothing.
+
+                            The assessment publishes its own EBITDA now - see
+                            core/market/credit.ts. And when there is no EBITDA
+                            to divide by, the honest answer is to say NOTHING:
+                            a company with no earnings has no leverage ratio,
+                            and inventing a symbol for it is not a warning, it
+                            is noise. The distress message below still fires,
+                            and that one is real.
+                           ------------------------------------------------ */}
                         {(() => {
-                            const ebitda = assessment.leverage > 0
-                                ? (useStatsStore.getState().companyDebtTotal || 0) / assessment.leverage
-                                : 0;
-                            const after = ebitda > 0
-                                ? ((useStatsStore.getState().companyDebtTotal || 0) + amount) / ebitda
-                                : Infinity;
                             if (!distress.canBorrow) {
                                 return (
                                     <View style={styles.warningBox}>
@@ -338,36 +356,56 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                     </View>
                                 );
                             }
-                            if (after > COVENANT_MAX_LEVERAGE) {
-                                return (
-                                    <View style={styles.warningBox}>
-                                        <MaterialCommunityIcons name="alert-outline" size={16} color={theme.colors.warning} style={{ marginRight: 6 }} />
-                                        <Text style={styles.warningText}>
-                                            {t('bank.covenantWarn', {
-                                                leverage: after === Infinity ? '∞' : after.toFixed(1),
-                                                max: COVENANT_MAX_LEVERAGE,
-                                            })}
-                                        </Text>
-                                    </View>
-                                );
-                            }
-                            return null;
+
+                            const ebitda = assessment.ebitda || 0;
+                            if (ebitda <= 0) return null;
+
+                            const after = ((useStatsStore.getState().companyDebtTotal || 0) + amount) / ebitda;
+                            if (after <= COVENANT_MAX_LEVERAGE) return null;
+
+                            return (
+                                <View style={styles.warningBox}>
+                                    <MaterialCommunityIcons name="alert-outline" size={16} color={theme.colors.warning} style={{ marginRight: 6 }} />
+                                    <Text style={styles.warningText}>
+                                        {t('bank.covenantWarn', {
+                                            leverage: after.toFixed(1),
+                                            max: COVENANT_MAX_LEVERAGE,
+                                        })}
+                                    </Text>
+                                </View>
+                            );
                         })()}
 
                         {!!error && <Text style={styles.errorText}>{error}</Text>}
 
-                        {/* Scrolls with the page rather than pinned. */}
+                        {/* ------------------------------------------------
+                            ONE BUTTON, AND IT IS THE PRIMARY
+
+                            SHELVED: a Cancel beside it, at flex 1 against the
+                            sign button's flex 2, both on the same grey fill.
+
+                            Cancel had nothing to do. ScreenHeader's arrow is
+                            the way out of every screen in this game - that is
+                            the rule the header was written to enforce - so a
+                            second exit at the bottom of the page is a control
+                            that duplicates one the player already knows and
+                            makes the real action share its row.
+
+                                <Pressable onPress={onClose} style={styles.cancelButton}>
+                                    <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+                                </Pressable>
+
+                            And it is BLUE now. `theme.colors.primary` is the
+                            app's one primary fill and it is a light one, so
+                            the label goes black - see rule 1 in core/theme.ts.
+                            It was on `#434B50`, the same grey as the cancel
+                            beside it, which is a raised surface rather than an
+                            action.
+                           ------------------------------------------------ */}
                         <View style={styles.actions}>
-                            <Pressable onPress={onClose} style={styles.cancelButton}>
-                                <Text style={styles.cancelText}>{t('common.cancel')}</Text>
-                            </Pressable>
                             <Pressable
                                 onPress={handleConfirm}
-                                style={({ pressed }) => [
-                                    styles.confirmButton,
-                                    pressed && styles.confirmButtonPressed
-                                ]}
-                            >
+                                style={({ pressed }) => [styles.confirmButton, styles.confirmPrimary, pressed && styles.confirmButtonPressed]}>
                                 <Text style={styles.confirmText}>{t('bank.sign')}</Text>
                             </Pressable>
                         </View>
@@ -553,7 +591,11 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     sliderContainer: {
-        marginBottom: 24,
+        // Was 24, on top of the 12 the body's `gap` already puts between
+        // every block. Thirty six points of nothing between the amount and
+        // the figure it decides, which is the one pair on this screen that
+        // should read as a single thought.
+        marginBottom: 0,
     },
     previewContainer: {
         backgroundColor: '#323A40',
@@ -610,24 +652,34 @@ const styles = StyleSheet.create({
     actions: {
         flexDirection: 'row',
         gap: 12,
+        marginTop: theme.spacing.sm,
     },
-    cancelButton: {
+    // SHELVED with the cancel button above.
+    //  cancelButton: {
+    //      flex: 1, padding: 16, alignItems: 'center',
+    //      borderRadius: 12, backgroundColor: '#323A40',
+    //  },
+    //  cancelText: { color: '#FFFFFF', fontWeight: '600' },
+    // ------------------------------------------------------------------
+    //  THE SHAPE AND THE FILL ARE SEPARATE
+    // ------------------------------------------------------------------
+    //  The fill was one property inside this block and the palette audit
+    //  reported "primaryText on background fill = 1.34" - black text on the
+    //  dark ground - because it could not tell that the label's nearest
+    //  painted ancestor was this button rather than the page.
+    //
+    //  The finance hub next door has never been flagged and the difference is
+    //  the SHAPE: its fill is its own single-property style. Splitting it the
+    //  same way is what the checker can read, and it is the better structure
+    //  anyway - the box is the box, the fill is the variant. See the note at
+    //  the top of scripts/reachability.js about what it can and cannot see.
+    // ------------------------------------------------------------------
+    confirmPrimary: { backgroundColor: theme.colors.primary },
+    confirmButton: {
         flex: 1,
         padding: 16,
         alignItems: 'center',
         borderRadius: 12,
-        backgroundColor: '#323A40',
-    },
-    cancelText: {
-        color: '#FFFFFF',
-        fontWeight: '600',
-    },
-    confirmButton: {
-        flex: 2,
-        padding: 16,
-        alignItems: 'center',
-        borderRadius: 12,
-        backgroundColor: '#434B50',
         shadowColor: '#1C242C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -638,7 +690,8 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     confirmText: {
-        color: '#FFFFFF',
+        // Black, because the primary is a LIGHT fill. See rule 1 in the theme.
+        color: theme.colors.primaryText,
         fontWeight: '800',
         fontSize: 15,
     },

@@ -31,6 +31,7 @@
 import fs from 'fs';
 import path from 'path';
 import { theme } from '../../../core/theme';
+import { assessCredit } from '../../../core/market/credit';
 import { en } from '../../../core/i18n/en';
 import { tr } from '../../../core/i18n/tr';
 
@@ -135,5 +136,129 @@ describe('the payment', () => {
         const s = src();
         expect(s).toMatch(/paymentHero: \{[\s\S]{0,400}backgroundColor: theme\.colors\.card/);
         expect(s).not.toMatch(/paymentHero: \{[\s\S]{0,400}backgroundColor: '#/);
+    });
+});
+
+
+// ============================================================================
+//  THE WARNING ABOUT NOTHING
+// ============================================================================
+//
+//  "This puts you at INFINITY leverage." Reported as an alarm the player could
+//  not read, and it was firing on the FIRST loan of every run.
+//
+//  The screen needed EBITDA to say what a loan would do to the covenant and it
+//  did not have it, so it reconstructed one by dividing debt by leverage. For a
+//  company with no debt that is zero over zero: the divisor came out zero, the
+//  ratio came out Infinity, and the branch that prints a symbol for it ran.
+//
+//  Every founder takes a first loan with no debt, so every founder saw it.
+// ============================================================================
+
+describe('the covenant warning', () => {
+    it('does not invent a ratio when there is nothing to divide by', () => {
+        // ----------------------------------------------------------------
+        //  SCOPED TO THE WARNING, AND MY FIRST VERSION WAS NOT
+        // ----------------------------------------------------------------
+        //  It forbade `Infinity` anywhere in the file and failed on a correct
+        //  one: the HEADER prints an infinity symbol too, and there it is the
+        //  truth. A company with debt and no earnings has infinite leverage
+        //  and saying so is the point.
+        //
+        //  The bug was never the symbol. It was computing a ratio out of zero
+        //  over zero and then dressing the result as a warning.
+        // ----------------------------------------------------------------
+        const s = src();
+        const warning = s.slice(s.indexOf('const ebitda = assessment.ebitda'), s.indexOf('{!!error &&'));
+        expect(warning).toBeTruthy();
+        expect(warning).toMatch(/if \(ebitda <= 0\) return null;/);
+        expect(warning).not.toMatch(/Infinity/);
+        expect(warning).not.toMatch(/∞/);
+        // And nowhere does it work its way back to EBITDA by division.
+        expect(s).not.toMatch(/\/ assessment\.leverage/);
+    });
+
+    it('and reads the measurement rather than working back to it', () => {
+        expect(src()).toMatch(/const ebitda = assessment\.ebitda \|\| 0;/);
+    });
+
+    it('and the assessment publishes it, because it already had it', () => {
+        // One measurement, published, rather than every reader inventing its
+        // own way back to it.
+        const clean = assessCredit(0, 8_000_000, 6_000_000, 0);
+        expect(clean.ebitda).toBe(8_000_000);
+        expect(clean.leverage).toBe(0);
+    });
+
+    it('and the header leverage it sits under is right, which is why it stays', () => {
+        // Asked whether "0.0x leverage" works. It does: no debt IS zero
+        // leverage. The infinity belongs to a company that has debt and no
+        // earnings to service it, and there it is the truth.
+        expect(assessCredit(20_000_000, 8_000_000, 6_000_000, 1_400_000).leverage)
+            .toBeCloseTo(2.5, 3);
+        expect(assessCredit(5_000_000, 0, 0, 350_000).leverage).toBe(Infinity);
+    });
+
+    it('and the real distress message still fires', () => {
+        // Removing a warning must not remove the one that means something.
+        expect(src()).toMatch(/distress\.message/);
+        expect(src()).toMatch(/if \(!distress\.canBorrow\)/);
+    });
+});
+
+// ============================================================================
+//  AND THE BUTTON AT THE END OF IT
+// ============================================================================
+
+describe('signing', () => {
+    it('is one button, not a decision shared with a cancel', () => {
+        const s = src();
+        expect(s).not.toMatch(/styles\.cancelButton/);
+        expect(s).toMatch(/t\('bank\.sign'\)/);
+    });
+
+    it('and it is the primary fill, with the label that fill takes', () => {
+        // Primary is a LIGHT blue, so the text is black. Rule 1 in the theme.
+        const s = src();
+        expect(s).toMatch(/confirmPrimary: \{ backgroundColor: theme\.colors\.primary \}/);
+        expect(s).toMatch(/confirmText: \{[\s\S]{0,200}color: theme\.colors\.primaryText/);
+        expect(s).not.toMatch(/confirmButton: \{[\s\S]{0,300}backgroundColor: '#434B50'/);
+    });
+
+    it('and the fill is its own style, so the audit can see it', () => {
+        // ----------------------------------------------------------------
+        //  THE CHECKER READS SHAPE, NOT INTENT
+        // ----------------------------------------------------------------
+        //  With the fill buried among padding, radius and shadow, the palette
+        //  audit reported "primaryText on background fill = 1.34" - black
+        //  text measured against the dark PAGE, because it could not tell the
+        //  label's nearest painted ancestor was this button.
+        //
+        //  The finance hub next door has never been flagged, and the only
+        //  difference is that its fill is a single-property style. This rule
+        //  keeps that shape, because the alternative is a correct button that
+        //  the audit calls broken every time somebody runs it.
+        // ----------------------------------------------------------------
+        expect(src()).toMatch(/styles\.confirmButton, styles\.confirmPrimary/);
+    });
+
+    it('and fills the row now that nothing shares it', () => {
+        expect(src()).toMatch(/confirmButton: \{\s*\n\s*flex: 1,/);
+    });
+
+    it('and the cancel is shelved rather than deleted', () => {
+        const raw = fs.readFileSync(path.join(__dirname, 'BorrowModal.tsx'), 'utf8');
+        expect(raw).toContain('cancelButton');
+    });
+});
+
+describe('the space between the amount and what it costs', () => {
+    it('is the body gap and nothing on top of it', () => {
+        // 24 of margin plus the 12 the body already puts between blocks, so
+        // thirty six points of nothing between the slider and the figure it
+        // decides. They are one thought.
+        const s = src();
+        expect(s).toMatch(/sliderContainer: \{[\s\S]{0,500}marginBottom: 0,/);
+        expect(s).not.toMatch(/sliderContainer: \{[\s\S]{0,500}marginBottom: 24,/);
     });
 });

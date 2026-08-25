@@ -3,7 +3,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
-import { theme } from '../../../core/theme';
+import { theme, palette } from '../../../core/theme';
 import { useStatsStore } from '../../../core/store';
 import { useGameStore } from '../../../core/store/useGameStore';
 import {
@@ -90,15 +90,33 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
     //  itself already carries the ranking, so colour does not need to repeat
     //  it. Below investment grade gets the caution blue.
     // ------------------------------------------------------------------
+    //
+    // ------------------------------------------------------------------
+    //  AND THEN IT WENT TOO FAR THE OTHER WAY
+    // ------------------------------------------------------------------
+    //  Six of seven grades became plain white, so AAA and BBB were drawn
+    //  identically and the only colour on the screen was the junk case. The
+    //  grade stopped repeating the ranking, which was the point, and stopped
+    //  saying anything at all, which was not.
+    //
+    //  A LADDER inside the palette. Bright cyan at the top, the primary blue
+    //  through investment grade, drained grey once you are below it, and the
+    //  loss red kept for junk alone - which is genuinely the loss case and
+    //  the one place rule 3 allows it.
+    //
+    //  No green and no orange. Green is profit and orange is brand value; a
+    //  credit grade wearing either would be answering a different question.
+    // ------------------------------------------------------------------
     const getCreditRating = () => {
-        const good = theme.colors.textPrimary;
-        const caution = theme.colors.warning;
-        if (creditScore >= 800) return { label: 'AAA', color: good, description: t('finance.excellent') };
-        if (creditScore >= 750) return { label: 'AA', color: good, description: t('finance.veryGood') };
-        if (creditScore >= 700) return { label: 'A', color: good, description: t('finance.good') };
-        if (creditScore >= 650) return { label: 'BBB', color: good, description: t('finance.fair') };
-        if (creditScore >= 600) return { label: 'BB', color: caution, description: t('finance.moderate') };
-        if (creditScore >= 500) return { label: 'B', color: caution, description: t('finance.risky') };
+        const best = palette.blueLight;
+        const solid = theme.colors.primary;
+        const thin = theme.colors.textSecondary;
+        if (creditScore >= 800) return { label: 'AAA', color: best, description: t('finance.excellent') };
+        if (creditScore >= 750) return { label: 'AA', color: best, description: t('finance.veryGood') };
+        if (creditScore >= 700) return { label: 'A', color: solid, description: t('finance.good') };
+        if (creditScore >= 650) return { label: 'BBB', color: solid, description: t('finance.fair') };
+        if (creditScore >= 600) return { label: 'BB', color: thin, description: t('finance.moderate') };
+        if (creditScore >= 500) return { label: 'B', color: thin, description: t('finance.risky') };
         return { label: 'C', color: theme.colors.negative, description: t('finance.junk') };
     };
 
@@ -326,14 +344,14 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         <Pressable
                             onPress={onRepayDebt}
                             style={({ pressed }) => [styles.btn, styles.btnSecondary, pressed && styles.btnPressed]}>
-                            <MaterialCommunityIcons name="cash-refund" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+                            <MaterialCommunityIcons name="cash-refund" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
                             <Text style={styles.btnSecondaryText}>{t('finance.repayDebt')}</Text>
                         </Pressable>
                     )}
                     <Pressable
                         onPress={onRequestLoan}
                         style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}>
-                        <MaterialCommunityIcons name="bank-plus" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+                        <MaterialCommunityIcons name="bank-plus" size={20} color={theme.colors.onLight} style={{ marginRight: 8 }} />
                         <Text style={styles.btnPrimaryText}>{t('finance.requestNewLoan')}</Text>
                     </Pressable>
                 </View>
@@ -405,11 +423,19 @@ const styles = StyleSheet.create({
     capacityNote: { color: theme.colors.textMuted, fontSize: theme.typography.caption },
 
     // --- Actions ----------------------------------------------------------
-    actions: { flexDirection: 'row', gap: theme.spacing.sm },
+    // The row that ends the screen. It sat at the same height as the rows
+    // above it, so the one action on the page read as another line of
+    // information, and it finished hard against the nav bar clearance.
+    actions: {
+        flexDirection: 'row',
+        gap: theme.spacing.sm,
+        marginTop: theme.spacing.sm,
+        marginBottom: theme.spacing.xl,
+    },
     btn: {
         flex: 1,
         flexDirection: 'row',
-        paddingVertical: theme.spacing.md,
+        paddingVertical: theme.spacing.lg,
         borderRadius: theme.radius.md,
         alignItems: 'center',
         justifyContent: 'center',
@@ -417,13 +443,13 @@ const styles = StyleSheet.create({
     btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
     btnPrimary: { backgroundColor: theme.colors.primary },
     // Primary is the bright blue, a light fill - so the label is black.
-    btnPrimaryText: { color: theme.colors.onLight, fontWeight: '800', fontSize: theme.typography.body + 1 },
+    btnPrimaryText: { color: theme.colors.onLight, fontWeight: '800', fontSize: theme.typography.subtitle },
     btnSecondary: {
         backgroundColor: theme.colors.surfaceHigh,
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.border,
     },
-    btnSecondaryText: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.body + 1 },
+    btnSecondaryText: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.subtitle },
 
     customHeader: {
         flexDirection: 'row',

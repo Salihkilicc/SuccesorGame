@@ -89,6 +89,24 @@ export interface CreditAssessment {
     meaning: string;
     /** Sozlesme ihlali var mi */
     inBreach: boolean;
+    /**
+     * Annual EBITDA, as the assessment measured it.
+     *
+     * ----------------------------------------------------------------------
+     *  IT WAS BEING BACK-DERIVED, AND THAT PRINTED INFINITY
+     * ----------------------------------------------------------------------
+     *  The borrow screen needed EBITDA to say what a loan would do to the
+     *  covenant, and it did not have it - so it reconstructed it by dividing
+     *  debt by leverage. For a company with no debt that is zero over zero,
+     *  and the screen showed "this puts you at INFINITY leverage" on the
+     *  first loan a founder ever takes. Which is every founder.
+     *
+     *  Returned here because it is already the input to `leverage`. One
+     *  measurement, published, rather than every reader inventing its own way
+     *  back to it.
+     * ----------------------------------------------------------------------
+     */
+    ebitda: number;
 }
 
 /** Borc alinabilecek azami kaldirac — en riskli notta bile. */
@@ -139,6 +157,7 @@ export const assessCredit = (
         headroom: Math.max(0, debtCapacity - debt),
         meaning: tier.meaning,
         inBreach: leverage > COVENANT_MAX_LEVERAGE || coverage < COVENANT_MIN_COVERAGE,
+        ebitda,
     };
 };
 
