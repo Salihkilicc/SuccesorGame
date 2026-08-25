@@ -36,6 +36,7 @@ import EmployeesModule from '../../../components/MyCompany/Management/EmployeesM
 import BoardRoomModal from '../../../components/MyCompany/Shares/BoardRoomModal';
 import MemberInteractionModal from '../../../components/MyCompany/Shares/MemberInteractionModal';
 import ShareControlHub from '../../../components/MyCompany/Shares/ShareControlHub';
+import { SiliconNewsModal } from '../../news';
 import BuybackModal from '../../../components/MyCompany/Shares/BuybackModal';
 import DilutionModal from '../../../components/MyCompany/Shares/DilutionModal';
 import DividendModal from '../../../components/MyCompany/Shares/DividendModal';
@@ -103,6 +104,18 @@ export const FinanceScreen = () => {
             onRepayDebt={() => navigation.navigate('RepayDebt')}
         />
     );
+};
+
+/**
+ * SILICON NEWS, as a route.
+ *
+ * It was a Modal raised from the home screen, which meant it arrived from the
+ * BOTTOM while every other destination in the game pushes in from the right.
+ * See the note at the top of SiliconNewsModal.
+ */
+export const NewsScreen = () => {
+    const close = useGoBack();
+    return <SiliconNewsModal asScreen visible onClose={close} />;
 };
 
 export const BorrowLoanScreen = () => {

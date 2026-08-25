@@ -1,7 +1,35 @@
 // src/features/news/components/SiliconNewsModal.tsx
+//
+// ============================================================================
+//  IT CAME UP FROM THE BOTTOM, AND EVERYTHING ELSE COMES IN FROM THE RIGHT
+// ============================================================================
+//
+//  RootNavigator says it in a comment of its own: "Products slid in from the
+//  right while My Empire, the stock market and the takeover screen came up
+//  from the bottom, because those were Modals and Products was a screen. Two
+//  different gestures for the same kind of navigation is what made the app
+//  feel like separate pieces bolted together. Everything pushes from the right
+//  now."
+//
+//  Everything except this one, which stayed a Modal and so kept the bottom
+//  sheet animation - `animationType="slide"` has no other direction to offer.
+//  Reported as exactly that: it should arrive from the right and leave back to
+//  the right like every other screen.
+//
+//  So it is a ROUTE now. `asScreen` renders it as a plain view inside the
+//  stack, which gives it `slide_from_right` on push and the reverse on pop for
+//  free, and it renders as a Modal from anywhere that still raises it that way
+//  - see SiliconNewsButton. Same component, one implementation.
+//
+//  AND IT DREW ITS OWN NAV BAR. RootNavigator renders exactly one, absolutely
+//  against the window, because 44 files used to draw their own and on several
+//  of them the bar sat outside the touchable area and did nothing. As a route
+//  this screen inherits that one; the local copy is shelved for the modal
+//  path, where there is genuinely nothing else above it.
+// ============================================================================
+
 import React from 'react';
 import {
-  Modal,
   View,
   Text,
   FlatList,
@@ -12,6 +40,7 @@ import {
 import { NewsItem } from '../../../core/store/useNewsStore';
 import { useSiliconNewsLogic, NEWS_VISUAL_THEMES } from '../logic/useSiliconNewsLogic';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import ScreenHost from '../../../components/common/ScreenHost';
 import CrystalNavBar, { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../core/theme';
 import { t } from '../../../core/i18n';
@@ -19,6 +48,8 @@ import { t } from '../../../core/i18n';
 export interface SiliconNewsModalProps {
   visible: boolean;
   onClose: () => void;
+  /** Render as a route rather than a popup. See components/common/ScreenHost. */
+  asScreen?: boolean;
 }
 
 /** News Article Card */
@@ -46,14 +77,15 @@ const NewsCard = React.memo(({ item }: { item: NewsItem }) => {
   );
 });
 
-export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onClose }) => {
+export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onClose, asScreen }) => {
   const { state, actions } = useSiliconNewsLogic(visible, onClose);
   const { newsHistory } = state;
 
   const renderItem: ListRenderItem<NewsItem> = ({ item }) => <NewsCard item={item} />;
 
   return (
-    <Modal
+    <ScreenHost
+      asScreen={asScreen}
       visible={visible}
       animationType="slide"
       transparent={false}
@@ -85,14 +117,23 @@ export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onC
           }
         />
 
-        {/* Bottom Tab Bar for in-modal navigation consistency */}
-        <CrystalNavBar
-          activeTab="Home"
-          variant="dark"
-          onTabPress={actions.handleClose}
-        />
+        {/* ----------------------------------------------------------------
+            ONLY WHEN THERE IS NOTHING ELSE ABOVE THIS
+
+            As a route the global bar is already there, drawn once by
+            RootNavigator and absolute against the window. A second copy would
+            be the fault that comment describes: present, and outside the
+            touchable area.
+           ---------------------------------------------------------------- */}
+        {!asScreen && (
+          <CrystalNavBar
+            activeTab="Home"
+            variant="dark"
+            onTabPress={actions.handleClose}
+          />
+        )}
       </View>
-    </Modal>
+    </ScreenHost>
   );
 };
 

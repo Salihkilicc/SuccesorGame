@@ -2031,4 +2031,6 @@ export const tr: Record<string, string> = {
     'newGame.skip': 'Geçip başla',
     'newGame.skipWhy': 'Hepsi çoktan geride kalmış olarak başla.',
     'company.eventPress': '+{v1} marka, sonumlenir',
+    'bank.forNQuarters': '{v1} çeyrek boyunca',
+    'bank.totalOverTerm': 'Vade boyunca toplam {v1}',
 };

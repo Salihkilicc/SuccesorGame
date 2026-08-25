@@ -241,7 +241,57 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                             />
                         </View>
 
-                        {/* What this loan actually costs, number first. */}
+                        {/* ------------------------------------------------
+                            WHAT IT COSTS, AS A FIGURE RATHER THAN A ROW
+                            ------------------------------------------------
+                            It was here already, as one StatRow among the
+                            others, under a group heading that repeated its own
+                            label. So the single number a player is deciding
+                            with looked exactly like the rate, the term and the
+                            principal beside it, and it sat below a slider they
+                            were still moving.
+
+                            Reported as wanting the payment more visible. It is
+                            the headline of this block now: the figure large,
+                            the rate and the term under it as the caption, and
+                            the breakdown still one tap away in the row below.
+
+                            THE UNIT STAYS QUARTERLY. The ask said monthly and
+                            this game does not have months that mean anything -
+                            the engine bills every quarter, `termQuarters` is
+                            the term, and renaming the label without moving the
+                            money would be the two-places-one-fact bug written
+                            deliberately. The word is on the caption so nobody
+                            has to guess.
+                           ------------------------------------------------ */}
+                        <View style={styles.paymentHero}>
+                            <Text style={styles.paymentHeroLabel}>
+                                {t('bank.quarterlyPayment')}
+                            </Text>
+                            <Text
+                                style={styles.paymentHeroValue}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
+                            >
+                                {formatMoney(preview.totalPayment)}
+                            </Text>
+                            <Text style={styles.paymentHeroCaption}>
+                                {`${currentRate.toFixed(1)}% APR · ${
+                                    selected.product.termQuarters === 0
+                                        ? t('bank.revolving')
+                                        : t('bank.forNQuarters', { v1: String(selected.product.termQuarters) })
+                                }`}
+                            </Text>
+                            {selected.product.termQuarters > 0 && (
+                                <Text style={styles.paymentHeroCaption}>
+                                    {t('bank.totalOverTerm', {
+                                        v1: formatMoney(preview.totalPayment * selected.product.termQuarters),
+                                    })}
+                                </Text>
+                            )}
+                        </View>
+
+                        {/* The breakdown, still one tap away. */}
                         <RowGroup title={t('bank.quarterlyPayment')}>
                             <StatRow
                                 label={t('bank.quarterlyPayment')}
@@ -365,6 +415,41 @@ const styles = StyleSheet.create({
         fontSize: theme.typography.subtitle,
         fontWeight: '800',
         fontVariant: ['tabular-nums'],
+    },
+    // ------------------------------------------------------------------
+    //  THE PAYMENT BLOCK
+    // ------------------------------------------------------------------
+    //  Dark ground, hairline border, the app's card. The figure is the only
+    //  thing on this screen at display size, because it is the only thing the
+    //  player is actually deciding with.
+    // ------------------------------------------------------------------
+    paymentHero: {
+        backgroundColor: theme.colors.card,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        paddingVertical: theme.spacing.lg,
+        paddingHorizontal: theme.spacing.lg,
+        marginBottom: theme.spacing.md,
+    },
+    paymentHeroLabel: {
+        fontSize: theme.typography.caption,
+        fontWeight: '700',
+        color: theme.colors.textMuted,
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
+    },
+    paymentHeroValue: {
+        fontSize: theme.typography.title,
+        fontWeight: '900',
+        color: theme.colors.textPrimary,
+        letterSpacing: 0.5,
+        marginTop: 2,
+    },
+    paymentHeroCaption: {
+        fontSize: theme.typography.micro + 1,
+        color: theme.colors.textSecondary,
+        marginTop: 3,
     },
     warningBox: {
         flexDirection: 'row',

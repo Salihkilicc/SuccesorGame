@@ -46,7 +46,8 @@ import { useMailStore, unreadMailCount } from '../../core/store/useMailStore';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 import { useNewsStore } from '../../core/store/useNewsStore';
-import { SiliconNewsModal } from '../../features/news';
+// SHELVED with the modal in the render - Silicon News is a route now.
+// import { SiliconNewsModal } from '../../features/news';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { readTitle } from '../../core/story/world';
 import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
@@ -204,7 +205,9 @@ const HomeScreen = () => {
   // basinca yalnizca buradaki etiket degisiyordu ve ekran kapaninca
   // kayboluyordu. Artik tek kaynak: core/i18n.
   const locale = useLocale();
-  const [showNews, setShowNews] = useState(false);
+  // SHELVED with the modal below. News is a route now, so the screen that
+  // opens it does not have to hold its visibility.
+  //   const [showNews, setShowNews] = useState(false);
   // Subscribed rather than read once: a headline published while the player
   // is standing on the home screen should appear without a navigation.
   const newsItems = useNewsStore(state => state.items);
@@ -424,7 +427,10 @@ const HomeScreen = () => {
         (navigation as any).navigate('Casino', { screen: 'CasinoLobby' });
         break;
       case 'settings': handleNavigateStack('Settings'); break;
-      case 'news': setShowNews(true); break;
+      // A ROUTE rather than a modal, so it pushes in from the right and pops
+      // back out to it like every other destination. It was the last thing in
+      // the game still arriving from the bottom. See SiliconNewsModal.
+      case 'news': handleNavigateStack('News'); break;
     }
   };
 
@@ -774,10 +780,20 @@ const HomeScreen = () => {
           onClose={() => setReportVisible(false)}
           reportData={lastReportData}
         />
-        <SiliconNewsModal
-          visible={showNews}
-          onClose={() => setShowNews(false)}
-        />
+        {/* ----------------------------------------------------------------
+            SHELVED: Silicon News is a route.
+
+              <SiliconNewsModal
+                visible={showNews}
+                onClose={() => setShowNews(false)}
+              />
+
+            An RN Modal only knows how to slide up from the bottom, which is
+            why this one arrived differently from every other screen in the
+            game. RootNavigator has had a comment about exactly that for a
+            while - "everything pushes from the right now" - and this was the
+            one that was missed because it was not a route to begin with.
+           ---------------------------------------------------------------- */}
 
         {/* --- GAME OVER OVERLAY --- */}
         {/*

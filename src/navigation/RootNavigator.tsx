@@ -74,7 +74,7 @@ import {
   BoardMembersScreen, TeamMoraleScreen, FinanceScreen,
   BoardMemberScreen,
   SubsidiaryScreen,
-  MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen,
+  MyEmpireScreen, HostileTakeoverScreen, StockMarketScreen, NewsScreen,
   BorrowLoanScreen, RepayDebtScreen,
   CapitalInjectionScreen, SharkDealScreen,
 } from '../features/assets/screens/CompanyScreens';
@@ -231,6 +231,8 @@ export type RootStackParamList = {
   /** One company you own. Same argument as ProductDetail. */
   Subsidiary: { companyId: string };
   TeamMorale: undefined;
+  /** Silicon News. A route so it pushes from the right like everything else. */
+  News: undefined;
   Finance: undefined;
   MyEmpire: undefined;
   /**
@@ -641,6 +643,7 @@ const RootNavigator = () => {
           <RootStack.Screen name="Mail" component={MailScreen} />
           <RootStack.Screen name="MailDetail" component={MailDetailScreen} />
           <RootStack.Screen name="ComposeOffer" component={ComposeOfferScreen} />
+          <RootStack.Screen name="News" component={NewsScreen} />
           <RootStack.Screen name="Settings" component={SettingsScreen} />
           <RootStack.Screen name="Profile" component={ProfileScreen} />
           <RootStack.Screen name="FamilyMember" component={FamilyMemberScreen} />

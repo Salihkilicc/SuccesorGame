@@ -2054,4 +2054,6 @@ export const en: Record<string, string> = {
     'newGame.skip': 'Start past it',
     'newGame.skipWhy': 'Begin with all of that already behind you.',
     'company.eventPress': '+{v1} brand, fading',
+    'bank.forNQuarters': 'for {v1} quarters',
+    'bank.totalOverTerm': '{v1} over the whole term',
 };
