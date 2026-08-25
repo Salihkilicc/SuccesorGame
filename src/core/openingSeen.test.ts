@@ -116,3 +116,68 @@ describe('the skip question', () => {
         expect(hasSeenTheOpening()).toBe(true);
     });
 });
+
+
+// ============================================================================
+//  AND THE PLAYER WHO EXISTED BEFORE THE COUNTER DID
+// ============================================================================
+//
+//  Screenshot: the erase dialog appears, the player confirms, and the company
+//  name form comes up. The skip question never renders. Which proves the
+//  DIALOG works - it is the same component that drew the erase panel - and
+//  that the gate said no.
+//
+//  It said no correctly, and uselessly. `runsStarted` is incremented by
+//  startNewGame, so it can only count runs begun after it was written. Every
+//  existing player rehydrates with it undefined, which reads as zero, which
+//  reads as a first run.
+//
+//  The third gate had the same shape as the first two after all: a fact
+//  inferred from bookkeeping that did not exist yet. The difference is that
+//  this one can be answered honestly at rehydrate time.
+// ============================================================================
+
+describe('rehydrating a save from before the counter', () => {
+    /** What zustand's persist does: MERGE, so absent keys stay absent. */
+    const rehydrate = (persisted: Record<string, unknown>) => {
+        useIdentityStore.setState({
+            ...initialIdentityState,
+            ...persisted,
+            runsStarted: undefined as never,
+            _hasHydrated: false,
+        });
+        // The same two lines the store's onRehydrateStorage runs.
+        const s = useIdentityStore.getState();
+        if (s.created && typeof s.runsStarted !== 'number') {
+            useIdentityStore.setState({ runsStarted: 1 } as never);
+        } else if (typeof s.runsStarted !== 'number') {
+            useIdentityStore.setState({ runsStarted: 0 } as never);
+        }
+    };
+
+    it('credits somebody who already has an identity with the run they had', () => {
+        rehydrate({ created: true, firstName: 'Salih' });
+        expect(useIdentityStore.getState().runsStarted).toBe(1);
+        expect(hasSeenTheOpening()).toBe(true);
+    });
+
+    it('and does not credit a player who has never been created', () => {
+        // Genuinely their first launch. They have nothing to skip.
+        rehydrate({ created: false });
+        expect(useIdentityStore.getState().runsStarted).toBe(0);
+        expect(hasSeenTheOpening()).toBe(false);
+    });
+
+    it('and the store itself carries that migration, not just this test', () => {
+        // The rule above re-runs the logic; this one checks it is in the file
+        // that will actually run it. Written after a fix that lived only in a
+        // test helper would have passed everything and shipped nothing.
+        const fs = require('fs');
+        const path = require('path');
+        const src = fs.readFileSync(
+            path.join(__dirname, 'store', 'useIdentityStore.ts'), 'utf8',
+        );
+        expect(src).toMatch(/state\.created && typeof state\.runsStarted !== 'number'/);
+        expect(src).toMatch(/state\.runsStarted = 1;/);
+    });
+});

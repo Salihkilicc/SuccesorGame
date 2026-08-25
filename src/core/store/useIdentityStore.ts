@@ -217,6 +217,32 @@ export const useIdentityStore = create<IdentityStore>()(
                 // the player's own name, and the one they are wearing is the
                 // only one there has ever been.
                 if (state && !state.ownFirstName) state.ownFirstName = state.firstName;
+
+                // ------------------------------------------------------------
+                //  A PLAYER WHO EXISTED BEFORE THE COUNTER DID
+                // ------------------------------------------------------------
+                //  `runsStarted` is incremented by startNewGame, so it can only
+                //  count runs begun after it was written. For everybody already
+                //  playing it rehydrates as undefined, which reads as zero,
+                //  which reads as "first run" - and the skip question stayed
+                //  shut for exactly the people who had been asking for it.
+                //
+                //  That is the same shape as the two gates before it: a fact
+                //  inferred from bookkeeping that did not exist yet. The
+                //  difference is that this one has an honest answer at
+                //  rehydrate time. A save with an IDENTITY in it belongs to
+                //  somebody who has been playing; `created` is written when
+                //  they named themselves, and it survives every new game.
+                //
+                //  So they are credited with the run they have already had.
+                //  One, not more: the counter is not a history, it only has to
+                //  answer whether this is a restart.
+                // ------------------------------------------------------------
+                if (state && state.created && typeof state.runsStarted !== 'number') {
+                    state.runsStarted = 1;
+                }
+                if (state && typeof state.runsStarted !== 'number') state.runsStarted = 0;
+
                 state?.setHasHydrated(true);
             },
         },
