@@ -46,6 +46,7 @@ import {
   TEAM_EVENTS,
   eventCost,
   eventMoraleGain,
+  eventBrandGain,
   payCutShock,
   quarterlyWage,
   researcherWage,
@@ -2886,6 +2887,40 @@ export const useGameStore = create<GameStore>()(
           employeeMorale: Math.min(100, state.employeeMorale + gain),
           eventsHostedThisQuarter: state.eventsHostedThisQuarter + 1,
         }));
+
+        // ------------------------------------------------------------------
+        //  AND THE ONES SOMEBODY WOULD WRITE ABOUT REACH THE BRAND
+        // ------------------------------------------------------------------
+        //  Only the retreat and the gala carry `brandGlow` - a lunch is not a
+        //  press event. Reported as an event costing money and buying nothing
+        //  visible, and it was true: this function touched morale and capital
+        //  and nothing else, while the gala's own description promised "the
+        //  kind of night that gets photographed".
+        //
+        //  THROUGH gameSink().brand RATHER THAN A SECOND IMPLEMENTATION. That
+        //  effect already spreads a company-wide amount across the categories
+        //  by weight, normalises it so the total lands exactly, converts the
+        //  index to points, and falls back to the flat field before any
+        //  category exists. Writing a fourth copy of that here is how this
+        //  codebase ended up with four buyout deciders.
+        //
+        //  It is a SHOCK rather than a moved equilibrium, and that is the
+        //  difference between a party and a sponsorship: brand walks back
+        //  towards what your market share supports, so this fades over about
+        //  three quarters on its own. A night should fade. A contract should
+        //  not, which is why the sponsorship moves the destination instead.
+        //
+        //  Lazy require: gameSink imports this store.
+        // ------------------------------------------------------------------
+        const brandGain = eventBrandGain(event, currentState.eventsHostedThisQuarter);
+        if (brandGain > 0) {
+          try {
+            require('../story/gameSink').gameSink().brand(brandGain);
+          } catch (e) {
+            console.warn('[event] the brand effect did not land', e);
+          }
+        }
+
         return { success: true, message: `${event.name}: +${gain} morale for ${headcount} people.` };
       },
 

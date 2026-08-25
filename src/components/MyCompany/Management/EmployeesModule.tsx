@@ -37,6 +37,7 @@ import {
     WORKFORCE_EXPLANATIONS,
     efficiencyMultiplier,
     eventCost,
+    eventBrandGain,
     eventMoraleGain,
     marketWage,
     payCutShock,
@@ -247,6 +248,12 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                     {TEAM_EVENTS.map(ev => {
                         const cost = eventCost(ev, employeeCount);
                         const gain = eventMoraleGain(ev, eventsHosted);
+                        // The press an event buys, if it buys any. Shown for
+                        // the same reason the morale is: an effect the player
+                        // cannot see before choosing is an effect they will
+                        // conclude does not exist - which is exactly what
+                        // happened while this one did not exist.
+                        const press = eventBrandGain(ev, eventsHosted);
                         const afford = companyCapital >= cost;
                         const used = eventsHosted >= MAX_EVENTS_PER_QUARTER;
                         return (
@@ -269,6 +276,11 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                                         color: afford ? theme.colors.up : theme.colors.down,
                                     }]}>{formatMoney(cost)}</Text>
                                     <Text style={styles.eventGain}>+{gain} morale</Text>
+                                    {press > 0 && (
+                                        <Text style={styles.eventGain}>
+                                            {t('company.eventPress', { v1: press.toFixed(1) })}
+                                        </Text>
+                                    )}
                                 </View>
                             </Pressable>
                         );

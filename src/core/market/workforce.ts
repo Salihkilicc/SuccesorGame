@@ -441,6 +441,28 @@ export interface TeamEvent {
     /** Tam etkisi (ilk etkinlik) */
     moraleBoost: number;
     description: string;
+    /**
+     * What the outside world sees, in BRAND INDEX POINTS (0-100 scale).
+     *
+     * ----------------------------------------------------------------------
+     *  ONLY THE ONES SOMEBODY WOULD WRITE ABOUT
+     * ----------------------------------------------------------------------
+     *  A team lunch is not a press event. The gala's own description says it
+     *  is "the kind of night that gets photographed", and that line was the
+     *  only place in the game where an event touched reputation - as a hint
+     *  the code never honoured. Reported as hosting an event costing money
+     *  and appearing to buy nothing.
+     *
+     *  Absent means zero, deliberately: the field is opt in so a new cheap
+     *  event cannot pick up a press effect by forgetting to set it.
+     *
+     *  THE UNIT IS THE INDEX because that is the scale a designer can reason
+     *  about - eight of a hundred. It is converted to category points once,
+     *  at the point of use. See core/market/brand.indexToPoints and the
+     *  measurement of what happens when that conversion is missed.
+     * ----------------------------------------------------------------------
+     */
+    brandGlow?: number;
 }
 
 export const TEAM_EVENTS: TeamEvent[] = [
@@ -463,6 +485,9 @@ export const TEAM_EVENTS: TeamEvent[] = [
         get name() { return t('data.workforce.companyRetreat'); },
         costPerPerson: 2_200,
         moraleBoost: 13,
+        // People remember it, and so does the trade press. Modest: it is a
+        // company retreat, not a product launch.
+        brandGlow: 3,
         get description() { return t('data.workforce.twoNightsAwayExpensiveAnd'); },
     },
     {
@@ -470,6 +495,10 @@ export const TEAM_EVENTS: TeamEvent[] = [
         get name() { return t('data.workforce.flagshipGala'); },
         costPerPerson: 6_000,
         moraleBoost: 20,
+        // The one the description has always promised. Eight of a hundred,
+        // which is a fifth of what the largest sponsorship in the game is
+        // worth at its peak - a night against a sixteen quarter contract.
+        brandGlow: 8,
         get description() { return t('data.workforce.theKindOfNightThat'); },
     },
 ];
@@ -483,6 +512,17 @@ export const eventCost = (event: TeamEvent, headcount: number): number =>
 /** Ayni ceyrekteki ikinci etkinlik yari eder. */
 export const eventMoraleGain = (event: TeamEvent, alreadyHosted: number): number =>
     Math.round(event.moraleBoost * Math.pow(0.5, Math.max(0, alreadyHosted)));
+
+/**
+ * What the same event is worth to the brand, in INDEX points.
+ *
+ * The SAME halving as the morale, and that is the point of it being a
+ * separate function rather than a second rule: two parties in one quarter is
+ * one story, and a player who could stack the press by hosting twice would
+ * have found a lever the morale side already closes.
+ */
+export const eventBrandGain = (event: TeamEvent, alreadyHosted: number): number =>
+    (event.brandGlow ?? 0) * Math.pow(0.5, Math.max(0, alreadyHosted));
 
 // ============================================================================
 //  AÇIKLAMALAR — ekranda ⓘ altinda gosterilir

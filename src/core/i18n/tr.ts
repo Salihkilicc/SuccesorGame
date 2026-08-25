@@ -2030,4 +2030,5 @@ export const tr: Record<string, string> = {
     'newGame.playWhy': 'Mirastan cenazeye kadar açılış perdesinin tamamı.',
     'newGame.skip': 'Geçip başla',
     'newGame.skipWhy': 'Hepsi çoktan geride kalmış olarak başla.',
+    'company.eventPress': '+{v1} marka, sonumlenir',
 };
