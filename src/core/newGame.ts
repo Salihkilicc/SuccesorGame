@@ -281,6 +281,24 @@ export type NewGameOptions = {
 export const startNewGame = async (options: NewGameOptions = {}): Promise<void> => {
     console.log('[newGame] Yeni oyun baslatiliyor...');
 
+    // ------------------------------------------------------------------
+    //  COUNT THE RUN BEFORE ANYTHING IS TORN DOWN
+    // ------------------------------------------------------------------
+    //  This is what the skip question is gated on now, and the reason is that
+    //  the two gates before it were both INFERENCES - a chain of story
+    //  bookkeeping standing in for "is this a restart" - and each chain had a
+    //  link that could be missing. A counter has no chain.
+    //
+    //  The identity store is deliberately absent from the reset list above,
+    //  the same way it keeps the player's name and the endings they have
+    //  seen. What you have played outlives a run.
+    // ------------------------------------------------------------------
+    try {
+        useIdentityStore.getState().countRunStarted();
+    } catch (e) {
+        console.warn('[newGame] could not count the run', e);
+    }
+
     // 1) Reset memory. Do this first — the persist middleware then writes the
     //    clean state to disk on its next write.
     resetInMemoryStores();

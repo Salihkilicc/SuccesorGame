@@ -149,7 +149,21 @@ export const confirmNewGame = (): Promise<boolean> =>
  *  seen the part the question is about.
  */
 export const hasSeenTheOpening = (): boolean => {
-    if (useIdentityStore.getState().openingSeen) return true;
+    const identity = useIdentityStore.getState();
+
+    // ----------------------------------------------------------------------
+    //  THE PLAIN FACT FIRST
+    // ----------------------------------------------------------------------
+    //  "Yeniden baslayinca sorsun." A run counter answers that with no chain
+    //  of inference behind it, and it is why this line is above the others:
+    //  the two gates before it were both correct-looking chains with a link
+    //  that could be missing, and both shipped shut.
+    // ----------------------------------------------------------------------
+    if ((identity.runsStarted || 0) >= 1) return true;
+
+    // A run that got past the funeral and then chose New Game, on its first
+    // time through. Narrower, and still a yes.
+    if (identity.openingSeen) return true;
 
     try {
         // Lazily, because this module is imported by screens and the story
@@ -165,6 +179,16 @@ export const hasSeenTheOpening = (): boolean => {
             // Record it, so the next run reads one field instead of three.
             useIdentityStore.getState().markOpeningSeen();
             return true;
+        }
+
+        if (__DEV__) {
+            console.log(
+                '[newGame] not offering the skip:',
+                `runsStarted=${identity.runsStarted ?? 0}`,
+                `openingSeen=${identity.openingSeen}`,
+                `fatherDead=${!!story.flags?.fatherDead}`,
+                `scenes=${(story.seenScenes ?? []).length}`,
+            );
         }
     } catch (e) {
         console.warn('[newGame] could not read the story for the opening', e);

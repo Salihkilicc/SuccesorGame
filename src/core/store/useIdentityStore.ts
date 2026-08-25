@@ -70,6 +70,29 @@ export type IdentityState = {
      */
     openingSeen: boolean;
     /**
+     * How many runs this player has started, ever.
+     *
+     * ------------------------------------------------------------------
+     *  BECAUSE THE QUESTION IS ABOUT RESTARTING, NOT ABOUT REMEMBERING
+     * ------------------------------------------------------------------
+     *  The skip question was gated first on `tutorialCompleted`, then on
+     *  `openingSeen`, and both times it stayed shut for the people who wanted
+     *  it. Each was an INFERENCE - a chain of story bookkeeping standing in
+     *  for a plain fact - and each chain had a link that could be missing.
+     *
+     *  The fact the question actually needs is the one it was asked for:
+     *  "yeniden baslayinca". Is this a restart? That has no chain. It is a
+     *  counter, incremented in one place, persisted outside the wipe like the
+     *  player's name and their endings.
+     *
+     *  `openingSeen` stays, because it answers a narrower question honestly -
+     *  whether the act has been watched - and because a first run that got
+     *  past the funeral and then chose New Game should be offered the skip
+     *  too. Either is enough.
+     * ------------------------------------------------------------------
+     */
+    runsStarted: number;
+    /**
      * Which endings this person has reached, across every run.
      *
      * Here for the same reason `tutorialCompleted` is: it is a fact about the
@@ -109,6 +132,8 @@ type IdentityStore = IdentityState & {
     /** Called when the last lock clears. Never unset. */
     markTutorialCompleted: () => void;
     markOpeningSeen: () => void;
+    /** Called by startNewGame, once, before anything is torn down. */
+    countRunStarted: () => void;
     /**
      * Records that the player reached this ending. Idempotent.
      *
@@ -128,6 +153,7 @@ export const initialIdentityState: IdentityState = {
     created: false,
     tutorialCompleted: false,
     openingSeen: false,
+    runsStarted: 0,
     endingsSeen: [],
     ownFirstName: '',
     _hasHydrated: false,
@@ -157,6 +183,7 @@ export const useIdentityStore = create<IdentityStore>()(
             },
             markTutorialCompleted: () => set({ tutorialCompleted: true }),
             markOpeningSeen: () => set({ openingSeen: true }),
+            countRunStarted: () => set(state => ({ runsStarted: (state.runsStarted || 0) + 1 })),
             markEndingSeen: (id) => set(state => (
                 state.endingsSeen.includes(id)
                     ? state
@@ -176,6 +203,7 @@ export const useIdentityStore = create<IdentityStore>()(
                 // its reset list on purpose. What you have watched outlives a
                 // run, the same way your own name does.
                 openingSeen: state.openingSeen,
+                runsStarted: state.runsStarted,
                 endingsSeen: state.endingsSeen,
                 ownFirstName: state.ownFirstName,
             }),

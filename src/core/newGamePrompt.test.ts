@@ -74,10 +74,39 @@ describe('the old gate', () => {
 });
 
 describe('the gate now', () => {
-    it('is a single beat that every run reaches', () => {
+    it('is a plain fact rather than a chain of inference', () => {
+        // ----------------------------------------------------------------
+        //  THIRD GATE, AND THE FIRST ONE WITHOUT A CHAIN
+        // ----------------------------------------------------------------
+        //  tutorialCompleted needed six locks. openingSeen needed a flag that
+        //  could only be earned forwards. Both looked right and both shipped
+        //  shut, because each was an inference standing in for the fact the
+        //  question was asked about: is this a restart.
+        //
+        //  A counter has no chain. It is incremented in one place and it is
+        //  persisted outside the wipe.
+        // ----------------------------------------------------------------
         const src = code('newGamePrompt.ts');
-        expect(src).toMatch(/useIdentityStore\.getState\(\)\.openingSeen/);
+        expect(src).toMatch(/if \(\(identity\.runsStarted \|\| 0\) >= 1\) return true;/);
+        expect(src).toMatch(/if \(identity\.openingSeen\) return true;/);
         expect(src).not.toMatch(/tutorialCompleted/);
+    });
+
+    it('and the counter is incremented where a run actually begins', () => {
+        const newGame = code('newGame.ts');
+        expect(newGame).toMatch(/countRunStarted\(\)/);
+        // Before the wipe, not after - the identity store is not wiped, but
+        // counting after a teardown is a habit that breaks the day it is.
+        const countAt = newGame.indexOf('countRunStarted()');
+        const wipeAt = newGame.indexOf('resetInMemoryStores()');
+        expect(countAt).toBeGreaterThan(-1);
+        expect(wipeAt).toBeGreaterThan(countAt);
+    });
+
+    it('and it survives a new game, like the name and the endings do', () => {
+        const identity = code('store/useIdentityStore.ts');
+        expect(identity).toMatch(/runsStarted: number;/);
+        expect(identity).toMatch(/runsStarted: state\.runsStarted,/);
     });
 
     it('and that beat is recorded where a new game cannot erase it', () => {
@@ -108,10 +137,18 @@ describe('the gate now', () => {
 
     it('and a first time player is still not asked', () => {
         // Offering to skip a story they have never seen is offering to skip
-        // the game.
+        // the game. Behaviourally pinned in openingSeen.test.ts; this is the
+        // one door it has to come through.
         const src = code('newGamePrompt.ts');
         expect(src).toMatch(/if \(!hasSeenTheOpening\(\)\)/);
-        expect(src).toMatch(/if \(useIdentityStore\.getState\(\)\.openingSeen\) return true;/);
+    });
+
+    it('and when it says no, it says why', () => {
+        // Two gates shipped shut and neither could be diagnosed from the
+        // outside. The next one at least names its own reason.
+        const src = code('newGamePrompt.ts');
+        expect(src).toMatch(/not offering the skip/);
+        expect(src).toMatch(/runsStarted=/);
     });
 });
 

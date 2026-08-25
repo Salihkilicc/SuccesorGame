@@ -41,9 +41,31 @@ const freshPlayer = () => {
 describe('the skip question', () => {
     beforeEach(freshPlayer);
 
-    it('is NOT offered to somebody who has never seen the opening', () => {
+    // ------------------------------------------------------------------
+    //  THE GATE THAT IS NOT AN INFERENCE
+    // ------------------------------------------------------------------
+    //  Two versions of this feature shipped with a closed gate. Both were
+    //  chains: six tutorial locks, then a flag earned only going forward.
+    //  The fact the question is about is "is this a restart", and that is a
+    //  counter with nothing behind it.
+    // ------------------------------------------------------------------
+    it('is offered to anybody on their second run or later', () => {
+        useIdentityStore.setState({ runsStarted: 1 } as never);
+        expect(hasSeenTheOpening()).toBe(true);
+    });
+
+    it('and the counter alone is enough, with no story at all', () => {
+        // The story store is empty here. That is the point: this answer does
+        // not depend on any bookkeeping surviving.
+        useStoryStore.setState({ ...initialStoryState, _hasHydrated: true });
+        useIdentityStore.setState({ runsStarted: 3 } as never);
+        expect(hasSeenTheOpening()).toBe(true);
+    });
+
+    it('is NOT offered on a first run that has seen nothing', () => {
         // Offering to skip a story they have never watched is offering to
-        // skip the game.
+        // skip the game. runsStarted is 0 and the story is empty.
+        expect(useIdentityStore.getState().runsStarted).toBe(0);
         expect(hasSeenTheOpening()).toBe(false);
     });
 
