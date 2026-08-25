@@ -45,6 +45,31 @@ export type IdentityState = {
      */
     tutorialCompleted: boolean;
     /**
+     * Whether this player has watched the opening act end.
+     *
+     * ------------------------------------------------------------------
+     *  AND WHY IT IS NOT `tutorialCompleted`
+     * ------------------------------------------------------------------
+     *  The "play the first year again, or skip it" question was gated on
+     *  `tutorialCompleted`, and that flag turns true only when EVERY lock in
+     *  TUTORIAL_SEQUENCE is cleared. Two of the six need the player to open
+     *  the research page; three only engage while the father is alive; one of
+     *  those also needs morale to fall below a threshold inside that same
+     *  window.
+     *
+     *  So a run where the team stayed happy, or where research was never
+     *  opened, could never complete the tutorial - and the player was never
+     *  offered the skip, forever, on every new game. Reported as the feature
+     *  having disappeared, and it had.
+     *
+     *  This is a single beat instead of a conjunction of six. The opening act
+     *  is over when the father is dead; that is what the act is built around
+     *  and what the rest of the game gates on. A flag that needs several
+     *  things to all happen is the same bug wearing a different name.
+     * ------------------------------------------------------------------
+     */
+    openingSeen: boolean;
+    /**
      * Which endings this person has reached, across every run.
      *
      * Here for the same reason `tutorialCompleted` is: it is a fact about the
@@ -83,6 +108,7 @@ type IdentityStore = IdentityState & {
         { ok: true } | { ok: false; reason: string };
     /** Called when the last lock clears. Never unset. */
     markTutorialCompleted: () => void;
+    markOpeningSeen: () => void;
     /**
      * Records that the player reached this ending. Idempotent.
      *
@@ -101,6 +127,7 @@ export const initialIdentityState: IdentityState = {
     gender: 'male',
     created: false,
     tutorialCompleted: false,
+    openingSeen: false,
     endingsSeen: [],
     ownFirstName: '',
     _hasHydrated: false,
@@ -129,6 +156,7 @@ export const useIdentityStore = create<IdentityStore>()(
                 return { ok: true };
             },
             markTutorialCompleted: () => set({ tutorialCompleted: true }),
+            markOpeningSeen: () => set({ openingSeen: true }),
             markEndingSeen: (id) => set(state => (
                 state.endingsSeen.includes(id)
                     ? state
@@ -144,6 +172,10 @@ export const useIdentityStore = create<IdentityStore>()(
                 gender: state.gender,
                 created: state.created,
                 tutorialCompleted: state.tutorialCompleted,
+                // Persisted, and NOT reset by newGame - this store is not in
+                // its reset list on purpose. What you have watched outlives a
+                // run, the same way your own name does.
+                openingSeen: state.openingSeen,
                 endingsSeen: state.endingsSeen,
                 ownFirstName: state.ownFirstName,
             }),

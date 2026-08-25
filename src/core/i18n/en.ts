@@ -2044,4 +2044,13 @@ export const en: Record<string, string> = {
     'pay.locked': 'Set once a year. {n} {unit} to wait. A cut is still immediate.',
     'pay.quarter': 'quarter',
     'pay.quarters': 'quarters',
+    // ------------------------------------------------------------------
+    //  THE ONE QUESTION BETWEEN RUNS
+    // ------------------------------------------------------------------
+    'newGame.title': 'The first year',
+    'newGame.summary': 'You have played the opening before. Your father, the phone call, the letter that followed it.',
+    'newGame.play': 'Play it again',
+    'newGame.playWhy': 'The full opening act, from the inheritance to the funeral.',
+    'newGame.skip': 'Start past it',
+    'newGame.skipWhy': 'Begin with all of that already behind you.',
 };

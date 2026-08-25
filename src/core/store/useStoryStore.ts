@@ -213,8 +213,36 @@ export const useStoryStore = create<StoryStore>()(
                     dials: { ...state.dials, [dial]: clampDial(state.dials[dial] + delta) },
                 })),
 
-            raise: (flag) =>
-                set(state => (state.flags[flag] ? state : { flags: { ...state.flags, [flag]: true } })),
+            raise: (flag) => {
+                // ------------------------------------------------------------
+                //  THE ONE BEAT THAT MEANS THE OPENING IS BEHIND YOU
+                // ------------------------------------------------------------
+                //  `fatherDead` is raised exactly once per run, by the death
+                //  scene or by a skipped act, and everything downstream in the
+                //  game gates on it. So it is the honest signal for "this
+                //  player has seen the first year", and it is recorded on the
+                //  IDENTITY store, which survives a new game.
+                //
+                //  The skip question used to ask `tutorialCompleted` instead,
+                //  which needs all six tutorial locks cleared - including ones
+                //  that require opening the research page and one that needs
+                //  morale to drop while the father is still alive. Most runs
+                //  never satisfy all six, so the question never appeared. See
+                //  the note on `openingSeen` in useIdentityStore.
+                //
+                //  Lazy require: useIdentityStore is small and imports nothing
+                //  from here, but this file already sits in one import cycle
+                //  and a second is not worth the risk.
+                // ------------------------------------------------------------
+                if (flag === 'fatherDead') {
+                    try {
+                        require('./useIdentityStore').useIdentityStore.getState().markOpeningSeen();
+                    } catch (e) {
+                        console.warn('[story] could not record the opening as seen', e);
+                    }
+                }
+                set(state => (state.flags[flag] ? state : { flags: { ...state.flags, [flag]: true } }));
+            },
 
             has: (flag) => !!get().flags[flag],
 

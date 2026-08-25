@@ -1,7 +1,9 @@
 import { useUserStore, usePlayerStore, useMarketStore } from '../../../core/store';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useShareholderStore } from '../../shareholders/stores/useShareholderStore';
-import { useEquityStore } from '../../finance/stores/useEquityStore';
+// SHELVED: `useEquityStore().stockPrice` is a mirror that starts at zero. See
+// the note on `equityValue` below.
+// import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { personalNetWorth } from '../../../core/market/personalEconomy';
 import { calculateQuarterlyFinances } from '../logic/EconomyEngine';
 import { Alert } from 'react-native';
@@ -15,7 +17,6 @@ export const useAssetsLogic = () => {
     const player = usePlayerStore((state) => state); // Get player store for personality
     const { liquidatePortfolio, holdings, marketPrices } = useMarketStore();
     const { playerShareCount } = useShareholderStore();
-    const { stockPrice } = useEquityStore();
 
     // Calculate "Projected" Report for UI
     const report = calculateQuarterlyFinances(user, { holdings }, stats);
@@ -48,7 +49,24 @@ export const useAssetsLogic = () => {
     //  number under the same name. One derivation now, here, where both of
     //  them already look. See personalEconomy.personalNetWorth.
     // ----------------------------------------------------------------------
-    const equityValue = (playerShareCount || 0) * (stockPrice || 0);
+    // ----------------------------------------------------------------------
+    //  AND THE PRICE COMES FROM THE STORE THAT KEEPS IT
+    // ----------------------------------------------------------------------
+    //  This read `useEquityStore().stockPrice`, and the stake showed $0.
+    //
+    //  That field is a MIRROR. It initialises to zero and is only ever filled
+    //  in by `syncStockPrice`, which nothing calls on its own - it runs from
+    //  an effect on My Company, from a shareholder action, from an IPO. So the
+    //  price was correct if the player had already been to the right screen
+    //  this session and zero otherwise, and a founder holding three and a half
+    //  million shares was told their stake was worth nothing.
+    //
+    //  `stats.companySharePrice` is the value that is actually maintained: the
+    //  quarterly recalculation writes it from the cap table, `syncStockPrice`
+    //  writes it too, and it is persisted. Reading it removes the dependency
+    //  on where the player happened to have been.
+    // ----------------------------------------------------------------------
+    const equityValue = (playerShareCount || 0) * (stats.companySharePrice || 0);
 
     const handleLiquidation = () => {
         const portfolioValue = investmentsValue;

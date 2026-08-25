@@ -83,6 +83,7 @@ import OnboardingScreen from '../features/os/screens/OnboardingScreen';
 import { useIdentityStore } from '../core/store/useIdentityStore';
 import { useStatsStore } from '../core/store/useStatsStore';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
+import NewGameQuestion from '../components/story/NewGameQuestion';
 
 /**
  * Which swipe tab the bar should highlight for a given route.
@@ -664,6 +665,16 @@ const RootNavigator = () => {
             screen remembering to place it correctly.
            -------------------------------------------------------------- */}
         <CrystalNavBar activeTab={navTabFor(currentRouteName)} variant="dark" />
+
+        {/* ----------------------------------------------------------------
+            THE QUESTION ASKED BETWEEN RUNS, MOUNTED ONCE
+
+            Both screens that can start a new game are torn down by the act of
+            starting one, so a dialog owned by either would be unmounting
+            itself while it waited for its own answer. It renders nothing until
+            somebody asks. See core/newGamePrompt.ts.
+           ---------------------------------------------------------------- */}
+        <NewGameQuestion />
 
         {/* ----------------------------------------------------------------
             THE TEACHING LAYER, ABOVE EVERYTHING INCLUDING THE NAV BAR.

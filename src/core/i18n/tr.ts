@@ -2024,4 +2024,10 @@ export const tr: Record<string, string> = {
     'pay.locked': 'Yılda bir kez belirlenir. {n} {unit} kaldı. Kesinti yine anında.',
     'pay.quarter': 'çeyrek',
     'pay.quarters': 'çeyrek',
+    'newGame.title': 'İlk yıl',
+    'newGame.summary': 'Açılışı daha önce oynadın. Baban, o telefon, ardından gelen mektup.',
+    'newGame.play': 'Baştan oyna',
+    'newGame.playWhy': 'Mirastan cenazeye kadar açılış perdesinin tamamı.',
+    'newGame.skip': 'Geçip başla',
+    'newGame.skipWhy': 'Hepsi çoktan geride kalmış olarak başla.',
 };

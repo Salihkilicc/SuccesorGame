@@ -94,7 +94,21 @@ describe('net worth', () => {
     it('and both screens read the one derivation', () => {
         const hook = code('hooks/useAssetsLogic.ts');
         expect(hook).toMatch(/netWorth: personalNetWorth\(/);
-        expect(hook).toMatch(/const equityValue = \(playerShareCount \|\| 0\) \* \(stockPrice \|\| 0\)/);
+        // ----------------------------------------------------------------
+        //  AND FROM THE STORE THAT KEEPS THE PRICE, NOT THE MIRROR
+        // ----------------------------------------------------------------
+        //  This used to assert `* (stockPrice || 0)` - useEquityStore's
+        //  field, which initialises to ZERO and is only filled in when
+        //  something calls `syncStockPrice`. Nothing calls it on its own; it
+        //  runs from an effect on My Company, from a shareholder action, from
+        //  an IPO. So the stake read $0 unless the player had already been to
+        //  the right screen this session.
+        //
+        //  The rule passed the whole time, because it was checking that the
+        //  code said what I wrote rather than that the number was right.
+        // ----------------------------------------------------------------
+        expect(hook).toMatch(/const equityValue = \(playerShareCount \|\| 0\) \* \(stats\.companySharePrice \|\| 0\)/);
+        expect(hook).not.toMatch(/useEquityStore\(\)/);
         // And the home screen no longer keeps its own copy.
         const home = fs.readFileSync(
             path.join(__dirname, '../../screens/Home/HomeScreen.tsx'), 'utf8',
