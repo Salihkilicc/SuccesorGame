@@ -119,6 +119,61 @@ export const confirmNewGame = (): Promise<boolean> =>
     });
 
 /**
+ * Whether this player has watched the opening act end.
+ *
+ * ---------------------------------------------------------------------------
+ *  A FLAG THAT COULD ONLY BE EARNED GOING FORWARD
+ * ---------------------------------------------------------------------------
+ *  `openingSeen` is written when `fatherDead` is raised. Correct for every run
+ *  started after that code existed, and useless for every run started before
+ *  it: the death had already happened, the flag was never written, and so the
+ *  question never appeared for exactly the people who wanted it - the ones who
+ *  had already sat through the first year.
+ *
+ *  Reported as the skip system not being asked about, after it had already
+ *  been "fixed" once. It had: the gate moved off a conjunction of six tutorial
+ *  locks and onto one beat. What it did not do was look at the beat that had
+ *  already passed.
+ *
+ * ---------------------------------------------------------------------------
+ *  SO IT ASKS THE RUN, AND THEN REMEMBERS
+ * ---------------------------------------------------------------------------
+ *  The story store still holds the evidence while the old run is standing:
+ *  `fatherDead` is raised, or the opening conversations are in `seenScenes`.
+ *  Read here, BEFORE `startNewGame` tears that store down, and written to the
+ *  identity store so the next run does not have to look again.
+ *
+ *  Both signals rather than one, because a run that skipped the act has the
+ *  flag and the scenes, and a run that played it has both too - but a save
+ *  mid-way through the funeral has only the flag, and that player has still
+ *  seen the part the question is about.
+ */
+export const hasSeenTheOpening = (): boolean => {
+    if (useIdentityStore.getState().openingSeen) return true;
+
+    try {
+        // Lazily, because this module is imported by screens and the story
+        // store pulls in half the engine behind it.
+        const story = require('./store/useStoryStore').useStoryStore.getState();
+        const { OPENING_ACT } = require('../data/story/openingAct');
+
+        const seen = !!story.flags?.fatherDead
+            || (story.seenScenes ?? []).includes('father-death')
+            || OPENING_ACT.every((id: string) => (story.seenScenes ?? []).includes(id));
+
+        if (seen) {
+            // Record it, so the next run reads one field instead of three.
+            useIdentityStore.getState().markOpeningSeen();
+            return true;
+        }
+    } catch (e) {
+        console.warn('[newGame] could not read the story for the opening', e);
+    }
+
+    return false;
+};
+
+/**
  * Start a new game, asking first whether the opening act should be played.
  *
  * Resolves once the run is set up. It does not resolve false any more: the
@@ -133,7 +188,7 @@ export const startNewGameAsking = (): Promise<boolean> =>
             resolve(true);
         };
 
-        if (!useIdentityStore.getState().openingSeen) {
+        if (!hasSeenTheOpening()) {
             void go({});
             return;
         }

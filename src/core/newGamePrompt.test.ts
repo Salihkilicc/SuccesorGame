@@ -110,7 +110,8 @@ describe('the gate now', () => {
         // Offering to skip a story they have never seen is offering to skip
         // the game.
         const src = code('newGamePrompt.ts');
-        expect(src).toMatch(/if \(!useIdentityStore\.getState\(\)\.openingSeen\)/);
+        expect(src).toMatch(/if \(!hasSeenTheOpening\(\)\)/);
+        expect(src).toMatch(/if \(useIdentityStore\.getState\(\)\.openingSeen\) return true;/);
     });
 });
 
@@ -232,5 +233,68 @@ describe('the destructive step', () => {
                 expect(catalogue[key]).not.toMatch(/\s-\s/);
             }
         }
+    });
+});
+
+
+// ============================================================================
+//  AND A FLAG THAT COULD ONLY BE EARNED GOING FORWARD
+// ============================================================================
+//
+//  The gate moved off six tutorial locks and onto one beat: `openingSeen`,
+//  written when `fatherDead` is raised. Correct for every run started after
+//  that code existed, and useless for every run started before it - the death
+//  had already happened, so the flag was never written, and the question never
+//  appeared for exactly the people who wanted it.
+//
+//  Reported as the skip system still not being asked about. It had been fixed
+//  once and the fix could not see backwards.
+// ============================================================================
+
+describe('a run that already passed the funeral', () => {
+    const src = () => code('newGamePrompt.ts');
+
+    it('is recognised from the story it is standing in', () => {
+        const s = src();
+        expect(s).toMatch(/story\.flags\?\.fatherDead/);
+        expect(s).toMatch(/includes\('father-death'\)/);
+        expect(s).toMatch(/OPENING_ACT\.every/);
+    });
+
+    it('and is read BEFORE the store that holds it is torn down', () => {
+        // `startNewGame` resets the story store. Reading after it would find
+        // an empty one every time, which is the same bug with more steps.
+        const s = src();
+        const gateAt = s.indexOf('if (!hasSeenTheOpening())');
+        const resetAt = s.indexOf('await startNewGame(options)');
+        expect(gateAt).toBeGreaterThan(-1);
+        expect(resetAt).toBeGreaterThan(-1);
+        // The gate is evaluated inside the promise body, the reset only inside
+        // `go`, which the gate decides whether to call.
+        expect(s.slice(gateAt)).toMatch(/void go\(\{\}\);/);
+    });
+
+    it('and having been read once, it is written down', () => {
+        // So the next run reads one field instead of three, and so a player
+        // who skips the act still counts as having seen it.
+        expect(src()).toMatch(/markOpeningSeen\(\)/);
+    });
+
+    it('and the reader cannot throw on a screen', () => {
+        // It is called from the settings screen and from the game over card.
+        // A store that has not hydrated is not a reason to crash a menu.
+        const s = src();
+        const fn = s.slice(s.indexOf('export const hasSeenTheOpening'));
+        expect(fn).toMatch(/try \{/);
+        expect(fn).toMatch(/catch \(e\)/);
+        expect(fn).toMatch(/return false;/);
+    });
+
+    it('and the forward path still works, so both halves are live', () => {
+        // The backfill does not replace the flag being written when the death
+        // actually happens - that is still the cheap path.
+        const story = code('store/useStoryStore.ts');
+        expect(story).toMatch(/if \(flag === 'fatherDead'\)/);
+        expect(story).toMatch(/markOpeningSeen\(\)/);
     });
 });
