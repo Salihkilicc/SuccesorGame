@@ -118,11 +118,8 @@ describe('the advance button', () => {
         expect(styleNum('nextMonthText', 'fontSize')).toBeGreaterThan(11.3);
     });
 
-    it('and its chevron grew with the label', () => {
-        // A 16 point glyph beside a 13 point label reads as an afterthought.
-        const m = code().match(/name="chevron-double-right" size=\{(\d+)\}/);
-        expect(m).not.toBeNull();
-        expect(Number(m![1])).toBeGreaterThan(16);
+    it('has no chevron beside the label', () => {
+        expect(code().match(/name="chevron-double-right"/)).toBeNull();
     });
 
     it('and the tracking that gives it its look survived', () => {

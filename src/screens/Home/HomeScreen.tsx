@@ -563,7 +563,6 @@ const HomeScreen = () => {
               />
               <View style={styles.nextMonthContent}>
                 <Text style={styles.nextMonthText}>{t('home.advanceToNextQuarter')}</Text>
-                <MaterialCommunityIcons name="chevron-double-right" size={20} color="#FFFFFF" />
               </View>
             </Pressable>
           </View>

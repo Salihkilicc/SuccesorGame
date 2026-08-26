@@ -1492,7 +1492,30 @@ export const useGameStore = create<GameStore>()(
         const nextFloors: Record<string, number> = { ...prevFloors };
 
         const nextByCategory: Record<string, number> = { ...prevByCategory };
-        const marketingDeltaTotal = marketingBrand.newBrand - brandValueIndexPrev;
+
+        // ------------------------------------------------------------------
+        //  THE MARKETING LEG IS IN INDEX POINTS, AND IT IS THE MAIN LEVER
+        // ------------------------------------------------------------------
+        //  `updateBrand` works entirely on the 0-100 index - its ceiling is
+        //  `tier.brandCeiling`, which is 22 at tier one - so this difference
+        //  is an INDEX delta. It was being handed straight to
+        //  `advanceCategoryBrand`, which adds it to a scale that runs past
+        //  four hundred.
+        //
+        //  The same unit mismatch as the sponsorship and the scene amounts,
+        //  in the one channel the player actually controls. Measured, at 1%
+        //  share with the marketing budget at four times the benchmark:
+        //
+        //      raw        18.0 -> 17.6 -> 16.9 -> ... -> 15.8   falling
+        //      converted  18.0 -> 20.6 -> 22.8 -> ... -> 31.1   rising
+        //
+        //  Which is the report: brand only ever falls, and no amount of
+        //  spending moves it. It was not the market being harsh, it was four
+        //  fifths of every marketing quarter being thrown away.
+        // ------------------------------------------------------------------
+        const marketingDeltaTotal = indexToPoints(
+          marketingBrand.newBrand - brandValueIndexPrev,
+        );
 
         // ------------------------------------------------------------------
         //  WHAT THE NAME ON THE STADIUM IS WORTH THIS QUARTER
@@ -1520,7 +1543,10 @@ export const useGameStore = create<GameStore>()(
             share: shareHere,
             servedRatio: servedRatioOf(cat),
             marketingDelta: marketingDeltaTotal * weightHere,
-            acquisitionGain: (acquisitionGainByCategory[cat] || 0),
+            // Also INDEX points: `brandFromAcquisition` caps at
+            // ACQUISITION_BRAND_MAX, which is 12 of a hundred. Same
+            // conversion, same reason.
+            acquisitionGain: indexToPoints(acquisitionGainByCategory[cat] || 0),
             // The name on the stadium raises the level this category is
             // walking towards, for as long as the glow lasts. Split the same
             // way marketing is, because a sponsorship is company-wide and a
