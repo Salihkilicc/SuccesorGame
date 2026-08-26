@@ -94,7 +94,20 @@ export const SUCCESSOR_FIRST_NAMES: readonly string[] = [
 export const surnameOf = (fullName: string): string => {
     const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return '';
-    return parts[parts.length - 1];
+
+    // ----------------------------------------------------------------------
+    //  AND A NICKNAME IS NOT A FAMILY NAME
+    // ----------------------------------------------------------------------
+    //  Found by running a real succession rather than by reading: the board
+    //  has a "Marcus 'The Wolf'" on it, so the last word came back as `Wolf'`
+    //  with the closing quote still attached and his heir was christened
+    //  "Helena Wolf'".
+    //
+    //  Quotes come off; the full stop does NOT, because "Victor K." is
+    //  genuinely what that family is called and "Victor K" is a different
+    //  looking man.
+    // ----------------------------------------------------------------------
+    return parts[parts.length - 1].replace(/["'‘’“”]/g, '');
 };
 
 /**

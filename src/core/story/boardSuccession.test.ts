@@ -92,6 +92,22 @@ describe('who is sitting there afterwards', () => {
         expect(succeedBoard(board(), 2)[1].name.endsWith('K.')).toBe(true);
     });
 
+    it('and a nickname in quotes does not become the family name', () => {
+        // Found by running a real succession: the board has a
+        // "Marcus 'The Wolf'" on it and his heir came out as "Helena Wolf'",
+        // closing quote and all.
+        expect(surnameOf("Marcus 'The Wolf'")).toBe('Wolf');
+        expect(heirNameFor(
+            { id: 'npc-marcus-wolf', name: "Marcus 'The Wolf'", shareCount: 1, trait: 'Shark', trust: 50, isHostile: false, origin: 'DebtShark' },
+            2,
+        )).not.toContain("'");
+    });
+
+    it('but a full stop is kept, because that is what the family is called', () => {
+        // "Victor K" is a different looking man from "Victor K.".
+        expect(surnameOf('Victor K.')).toBe('K.');
+    });
+
     it('and a one word name survives rather than being emptied', () => {
         expect(surnameOf('Marcus')).toBe('Marcus');
         expect(surnameOf('')).toBe('');
