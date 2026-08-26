@@ -382,7 +382,34 @@ export const initialStatsState: StatsState = {
   //  lifts the ceiling to 29 - so the number goes UP when they do the right
   //  thing, which is what it was always supposed to signal.
   // ----------------------------------------------------------------------
-  brandValue: 18,
+  // ------------------------------------------------------------------
+  //  A BRAND OF 18 WAS A CLAIM ABOUT A COMPANY THIS ONE IS NOT
+  // ------------------------------------------------------------------
+  //  Brand walks towards the level your market share supports, and a
+  //  company on its first morning has no measurable share - the
+  //  equilibrium is ZERO. So 18 was a number with nothing underneath it,
+  //  and the opening of every run was the same: three or four quarters of
+  //  watching it drain, whatever the player did.
+  //
+  //  Measured, from 18, ten quarters:
+  //
+  //      67k marketing   13.6 11.2 9.7 8.5 7.6 6.8 6.1 5.6 5.1 5.0
+  //      300k marketing  13.4 11.9 12.0 12.9 14.2 ...
+  //
+  //  Even a budget four times the default spends two quarters going
+  //  backwards before anything the player did can show. Reported as brand
+  //  being impossible to raise at the start, twice.
+  //
+  //  From the tier floor instead, there is nowhere to fall and every
+  //  quarter of real marketing shows on the next report:
+  //
+  //      300k marketing  5.4 6.7 8.2 10.0 11.7 13.2 14.6 15.9 17.0 17.8
+  //
+  //  DERIVED rather than typed. The floor is what the factory guarantees -
+  //  see capacity.ts - and writing 5 here is how the two would disagree the
+  //  first time somebody retuned tier one.
+  // ------------------------------------------------------------------
+  brandValue: getTier(1).brandFloor,
   brandChange: 0,
   /** Kategori bazli markalar. Bkz. core/market/brand.ts */
   brandByCategory: {} as Record<string, number>,

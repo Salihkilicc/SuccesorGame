@@ -384,3 +384,63 @@ describe('underspending', () => {
         expect(src).not.toMatch(/marketingDeltaTotal = indexToPoints\(/);
     });
 });
+
+
+// ============================================================================
+//  AND THE OPENING WAS A DECLINE NOBODY COULD STOP
+// ============================================================================
+//
+//  Reported twice, the second time with the numbers: 15, 13, 12, 11, at the
+//  START of a run, while meeting demand.
+//
+//  Brand walks towards the level market share supports, and a company on its
+//  first morning has NO measurable share - the equilibrium is zero. The
+//  starting brand of 18 was a claim with nothing underneath it, so the walk
+//  dragged it down from the first quarter and marketing had to beat that pull
+//  before it could show anything at all.
+//
+//  Measured over ten quarters from 18:
+//
+//      67k marketing   13.6 11.2 9.7 8.5 7.6 6.8 6.1 5.6 5.1 5.0
+//      300k marketing  13.4 11.9 12.0 12.9 14.2 15.4 16.6 17.8 18.6 19.2
+//
+//  Even four times the default budget goes backwards for two quarters first.
+//  From the tier floor there is nowhere to fall:
+//
+//      300k marketing  5.4 6.7 8.2 10.0 11.7 13.2 14.6 15.9 17.0 17.8
+// ============================================================================
+
+describe('the brand a company starts with', () => {
+    const initial = () => {
+        const { initialStatsState } = require('../store/useStatsStore');
+        return initialStatsState.brandValue as number;
+    };
+
+    it('is a level its own factory guarantees', () => {
+        expect(initial()).toBe(getTier(1).brandFloor);
+    });
+
+    it('and not a level its market share would have to support', () => {
+        // 18 index is 78 points, which is 1.8% of a market the company does
+        // not have a measurable share of on day one.
+        expect(brandEquilibrium(0)).toBe(0);
+        expect(indexToPoints(initial())).toBeLessThan(indexToPoints(18));
+    });
+
+    it('so there is nowhere for the opening to fall to', () => {
+        // The floor and the start are the same number, so the walk has no
+        // room to drag the player backwards before their first decision
+        // lands.
+        expect(initial()).toBeLessThanOrEqual(getTier(1).brandFloor);
+    });
+
+    it('and it is derived, so it cannot drift from the floor', () => {
+        const fs2 = require('fs');
+        const path2 = require('path');
+        const src = fs2.readFileSync(
+            path2.join(__dirname, '..', 'store', 'useStatsStore.ts'), 'utf8',
+        );
+        expect(src).toMatch(/brandValue: getTier\(1\)\.brandFloor,/);
+        expect(src).not.toMatch(/brandValue: 18,/);
+    });
+});
