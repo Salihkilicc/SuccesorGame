@@ -485,7 +485,21 @@ const BRAND_MAX_GAIN = 4;
 /** Marka bir ceyrekte en fazla bu kadar DUSER. */
 const BRAND_MAX_DROP = 3;
 /** Bakim esigi kiyas butcesinin bu orani kadardir. */
-const BRAND_MAINTENANCE_RATIO = 0.25;
+export const BRAND_MAINTENANCE_RATIO = 0.25;
+
+/**
+ * What it costs to stand still this quarter.
+ *
+ * Exported because the tick needs to ask the same question the brand walk
+ * needs answered - "is this player paying their upkeep" - and two places
+ * computing 25% of a benchmark is two places to get it wrong.
+ */
+export const maintenanceCost = (benchmarkTotal: number): number =>
+    Math.max(0, benchmarkTotal || 0) * BRAND_MAINTENANCE_RATIO;
+
+/** Whether the marketing budget covers that upkeep. */
+export const meetsMaintenance = (spend: number, benchmarkTotal: number): boolean =>
+    Math.max(0, spend || 0) >= maintenanceCost(benchmarkTotal);
 /** Bakimin uzerine cikinca alinabilecek en yuksek kazanc. */
 const BRAND_GAIN_MAX = 4.0;
 /** Bakimin altina duserken alinabilecek en yuksek asinma. */

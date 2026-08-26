@@ -444,3 +444,138 @@ describe('the brand a company starts with', () => {
         expect(src).not.toMatch(/brandValue: 18,/);
     });
 });
+
+
+// ============================================================================
+//  PAY THE UPKEEP AND THE MARKET CANNOT DRAG YOU BACKWARDS
+// ============================================================================
+//
+//  Reported as: "I am above the benchmark, should it not go up? Is that not
+//  how we built the game?" It was not, and the player's model was the one the
+//  game had promised.
+//
+//  Being above maintenance made the MARKETING term positive and left the share
+//  pull untouched, and the pull is the larger force whenever brand sits above
+//  what share supports. Measured at brand 18 with no share, 250k upkeep:
+//
+//      300k spend  -> marketing +0.50   net -2.56
+//      1000k spend -> marketing +4.00   net +0.94
+//
+//  Four times the upkeep just to stop sliding, while the screen said the
+//  budget was above the line.
+//
+//  Through the real tick, ten quarters from 18:
+//
+//      67k   18.0 17.9 17.9 17.8 15.1 13.0 11.3 9.8 8.6 7.7
+//      300k  18.4 19.5 21.3 22.0 22.0 ...   rises from the first quarter
+// ============================================================================
+
+describe('paying the upkeep', () => {
+    const settled = indexToPoints(18);
+
+    it('stops the market pulling you down', () => {
+        const dragged = advanceCategoryBrand({ current: settled, share: 0, servedRatio: 1 });
+        const held = advanceCategoryBrand({
+            current: settled, share: 0, servedRatio: 1, maintained: true,
+        });
+        expect(dragged.newBrand).toBeLessThan(settled);
+        expect(held.newBrand).toBe(settled);
+    });
+
+    it('and a budget above the line now RISES rather than merely falling slower', () => {
+        const r = advanceCategoryBrand({
+            current: settled, share: 0, servedRatio: 1,
+            maintained: true, marketingDelta: marketingToPoints(0.5),
+        });
+        expect(r.newBrand).toBeGreaterThan(settled);
+    });
+
+    it('but it does not buy you the climb, only the floor under it', () => {
+        // Growing your share still lifts you, and that pull is untouched.
+        const rising = advanceCategoryBrand({
+            current: indexToPoints(5), share: 5, servedRatio: 1, maintained: true,
+        });
+        expect(rising.newBrand).toBeGreaterThan(indexToPoints(5));
+    });
+
+    it('and a scandal can still take you down, because that is not the market forgetting you', () => {
+        const hit = advanceCategoryBrand({
+            current: settled, share: 0, servedRatio: 1,
+            maintained: true, shock: indexToPoints(-10),
+        });
+        expect(hit.newBrand).toBeLessThan(settled);
+    });
+
+    it('and NOT paying it leaves the slide exactly as it was', () => {
+        const a = advanceCategoryBrand({ current: settled, share: 0, servedRatio: 1 });
+        const b = advanceCategoryBrand({
+            current: settled, share: 0, servedRatio: 1, maintained: false,
+        });
+        expect(a.newBrand).toBe(b.newBrand);
+    });
+
+    it('and the threshold is one function, asked by both sides', () => {
+        const { meetsMaintenance, maintenanceCost } = require('./attraction');
+        expect(maintenanceCost(1_000_000)).toBe(250_000);
+        expect(meetsMaintenance(300_000, 1_000_000)).toBe(true);
+        expect(meetsMaintenance(67_000, 1_000_000)).toBe(false);
+    });
+
+    it('but it does NOT hold you above your own ceiling', () => {
+        // ----------------------------------------------------------------
+        //  CAUGHT BY conviction.test.ts, NOT BY ME
+        // ----------------------------------------------------------------
+        //  The first version zeroed the downward pull whenever the upkeep was
+        //  paid, full stop. The conviction penalty and the sponsorship
+        //  drought both work by LOWERING the ceiling, and a brand that cannot
+        //  be pulled down cannot be pulled down to meet a lowered one either.
+        //  Two identical companies, one convicted, landed on exactly the same
+        //  number.
+        // ----------------------------------------------------------------
+        const ceiling = indexToPoints(10);
+        const above = indexToPoints(30);
+        const held = advanceCategoryBrand({
+            current: above, share: 0, servedRatio: 1, maintained: true, ceiling,
+        });
+        expect(held.newBrand).toBeLessThan(above);
+    });
+
+    it('and below the ceiling the upkeep still protects you', () => {
+        const ceiling = indexToPoints(30);
+        const below = indexToPoints(10);
+        const held = advanceCategoryBrand({
+            current: below, share: 0, servedRatio: 1, maintained: true, ceiling,
+        });
+        expect(held.newBrand).toBe(below);
+    });
+
+    it('and the tick hands it the ceiling its penalties have earned', () => {
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', 'store', 'useGameStore.ts'), 'utf8',
+        )
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .split('\n')
+            .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+            .join('\n');
+        expect(src).toMatch(
+            /ceiling: indexToPoints\(Math\.max\(0, \(tier\.brandCeiling \|\| 0\) - ceilingPenalty\)\)/,
+        );
+        // One penalty, computed once, used by both the marketing leg and the
+        // walk. Two copies would drift the first time either was retuned.
+        expect((src.match(/const ceilingPenalty =/g) ?? []).length).toBe(1);
+        expect(src).toMatch(/ceilingPenalty,/);
+    });
+
+    it('and the tick asks it, rather than deciding for itself', () => {
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', 'store', 'useGameStore.ts'), 'utf8',
+        )
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .split('\n')
+            .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+            .join('\n');
+        expect(src).toMatch(
+            /maintained: meetsMaintenance\(totalMarketingCost, totalMarketingBenchmark\)/,
+        );
+    });
+});

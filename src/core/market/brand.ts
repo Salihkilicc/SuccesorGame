@@ -552,6 +552,47 @@ export interface CategoryBrandInput {
      * worth and found it was worth almost nothing.
      */
     equilibriumBonus?: number;
+    /**
+     * Whether the marketing budget covered this quarter's upkeep.
+     *
+     * ----------------------------------------------------------------------
+     *  PAY THE MAINTENANCE AND THE MARKET CANNOT DRAG YOU BACKWARDS
+     * ----------------------------------------------------------------------
+     *  Reported as: "I am above the benchmark, should it not go up? Is that
+     *  not how we built it?" It was not.
+     *
+     *  Spending above maintenance made the MARKETING term positive and left
+     *  the share pull untouched, and the pull is the larger force whenever
+     *  brand is above what share supports. Measured at brand 18 with no
+     *  share, against a 250k upkeep:
+     *
+     *      300k spend  -> marketing +0.50   net -2.56
+     *      1000k spend -> marketing +4.00   net +0.94
+     *
+     *  Four times the upkeep to stop going backwards, while the screen said
+     *  the budget was above the line. The player's model and the engine
+     *  disagreed, and the player's was the one the game had promised.
+     *
+     *  So: when the upkeep is paid the DOWNWARD pull is zero. Upward pull
+     *  still works - growing your share still lifts you - and a scandal can
+     *  still take you down, because a shock is not the market forgetting
+     *  you. The rule is one sentence: pay the upkeep and you do not slide.
+     * ----------------------------------------------------------------------
+     */
+    maintained?: boolean;
+    /**
+     * The highest this category may sit, in POINTS, after every penalty.
+     *
+     * Only consulted when `maintained` is true, and it is the reason that
+     * flag is safe. Without it, paying the upkeep froze a company ABOVE its
+     * own ceiling forever: the conviction penalty and the sponsorship drought
+     * both work by lowering the ceiling, and a brand that could not be pulled
+     * down could not be pulled down to meet a lowered one either.
+     *
+     * Caught by conviction.test.ts, which measured two identical companies -
+     * one convicted - landing on exactly the same number.
+     */
+    ceiling?: number;
 }
 
 /**
@@ -579,7 +620,15 @@ export const advanceCategoryBrand = (input: CategoryBrandInput): {
     const rate = rising
         ? BRAND_APPROACH + BRAND_SERVICE_BONUS * served
         : BRAND_APPROACH - BRAND_LOYALTY_CUSHION * served + BRAND_FAILURE_PENALTY * (1 - served);
-    const pull = (equilibrium - current) * Math.max(0.05, rate);
+    const rawPull = (equilibrium - current) * Math.max(0.05, rate);
+    // See `maintained`: paying the upkeep buys you out of the slide, not out
+    // of the climb. An upward pull is untouched.
+    //
+    // AND NOT OUT OF YOUR OWN CEILING. Above it the pull works as it always
+    // did, or a convicted company would simply stop falling and the penalty
+    // would mean nothing.
+    const aboveCeiling = input.ceiling !== undefined && current > input.ceiling;
+    const pull = input.maintained && rawPull < 0 && !aboveCeiling ? 0 : rawPull;
     if (Math.abs(pull) > 0.05) {
         sources.push({ label: t('data.brand.marketShareLabel'), amount: pull });
     }

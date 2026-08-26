@@ -10,7 +10,7 @@ import { applyPartnerBuffs } from '../../logic/relationshipLogic';
 import { FEATURES, isEnabled } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket, marketCategoryForStock } from '../market/productMarkets';
-import { computeAttraction, computeShares, demandUnits, marketingBenchmark, updateBrand } from '../market/attraction';
+import { computeAttraction, computeShares, demandUnits, marketingBenchmark, meetsMaintenance, updateBrand } from '../market/attraction';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
   // applyCorporateShock was imported here and never called - see the note in
@@ -1341,6 +1341,29 @@ export const useGameStore = create<GameStore>()(
 
         // Pazarlama/kalite bacagi hala attraction.ts'te; artik markanin
         // TEK kaynagi degil, dort kaynaktan biri. Bkz. core/market/brand.ts
+        // ------------------------------------------------------------------
+        //  WHAT THE CEILING LOSES THIS QUARTER
+        // ------------------------------------------------------------------
+        //  Hoisted out of the `updateBrand` call because the brand WALK needs
+        //  the same number: paying the upkeep stops the market dragging you
+        //  down, and it must not also hold you above the ceiling your factory
+        //  and your failures allow. See `maintained` in brand.ts, and the
+        //  conviction test that caught exactly that.
+        // ------------------------------------------------------------------
+        const ceilingPenalty = (() => {
+          let penalty = 0;
+          try {
+            const { useStoryStore: st } = require('./useStoryStore');
+            const { CONVICTION_CEILING_PENALTY } = require('../story/state');
+            if (st.getState().flags?.fbiGuilty) penalty += CONVICTION_CEILING_PENALTY;
+          } catch { /* story store not ready */ }
+          try {
+            penalty += require('./useSponsorshipStore')
+              .useSponsorshipStore.getState().penalty();
+          } catch { /* sponsorship store not ready */ }
+          return penalty;
+        })();
+
         const marketingBrand = updateBrand({
           currentBrand: brandValue,
           unitsSold: totalSales,
@@ -1361,19 +1384,7 @@ export const useGameStore = create<GameStore>()(
           // be ceilings rather than drains for the same measured reason: the
           // brand mean-reverts, so a subtraction from the VALUE is pulled
           // straight back out within two or three quarters.
-          ceilingPenalty: (() => {
-            let penalty = 0;
-            try {
-              const { useStoryStore: st } = require('./useStoryStore');
-              const { CONVICTION_CEILING_PENALTY } = require('../story/state');
-              if (st.getState().flags?.fbiGuilty) penalty += CONVICTION_CEILING_PENALTY;
-            } catch { /* story store not ready */ }
-            try {
-              penalty += require('./useSponsorshipStore')
-                .useSponsorshipStore.getState().penalty();
-            } catch { /* sponsorship store not ready */ }
-            return penalty;
-          })(),
+          ceilingPenalty,
         });
 
         // ==================================================================
@@ -1563,6 +1574,30 @@ export const useGameStore = create<GameStore>()(
             //  was being fed in raw.
             // ------------------------------------------------------------
             floor: Math.max(prevFloors[cat] || 0, indexToPoints(tier.brandFloor || 0)),
+            // ------------------------------------------------------------
+            //  PAY THE UPKEEP AND THE MARKET CANNOT DRAG YOU BACKWARDS
+            // ------------------------------------------------------------
+            //  Reported as "I am above the benchmark, should it not go up?
+            //  Is that not how we built it?" It was not: being above the
+            //  line made the MARKETING term positive and left the share
+            //  pull alone, and the pull is the larger force whenever brand
+            //  sits above what share supports.
+            //
+            //  Measured at brand 18 with no share, against a 250k upkeep:
+            //  300k of marketing gave +0.50 from marketing and -2.56 net.
+            //  It took four times the upkeep to stop going backwards, while
+            //  the screen said the budget was above the line.
+            //
+            //  See brand.CategoryBrandInput.maintained. The climb is
+            //  untouched and a scandal can still take you down; what the
+            //  upkeep buys is that the market stops forgetting you.
+            // ------------------------------------------------------------
+            maintained: meetsMaintenance(totalMarketingCost, totalMarketingBenchmark),
+            // The upkeep buys a floor, not a licence to sit above your own
+            // ceiling. Above it the market pulls you back down as it always
+            // did - which is what makes a conviction and a sponsorship
+            // drought mean anything at all.
+            ceiling: indexToPoints(Math.max(0, (tier.brandCeiling || 0) - ceilingPenalty)),
             share: shareHere,
             servedRatio: servedRatioOf(cat),
             marketingDelta: marketingDeltaTotal * weightHere,
