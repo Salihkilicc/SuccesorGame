@@ -25,6 +25,7 @@
 // ============================================================================
 
 import { useIdentityStore } from '../store/useIdentityStore';
+import { succeedBoard } from './boardSuccession';
 import { useGameStore } from '../store/useGameStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { useFamilyStore } from '../store/useFamilyStore';
@@ -213,7 +214,30 @@ export const runSuccession = (): SuccessionPlan | null => {
         board.setState((st: any) => ({
             playerShareCount: plan.shares,
             members: [
-                ...st.members,
+                // ----------------------------------------------------------
+                //  AND EVERYBODY ELSE AT THE TABLE HAS CHILDREN TOO
+                // ----------------------------------------------------------
+                //  The founder became their own child and the siblings
+                //  arrived, and Elena Vance sat in the same chair with the
+                //  same grudge one generation later. The company outlives
+                //  the people; so does the seat.
+                //
+                //  ONE HEIR PER SEAT, the whole holding. The founder's
+                //  ESTATE splits - that is how the siblings arrive and how
+                //  control slips - but a director's holding does not, or the
+                //  board would double every generation and drown the player
+                //  in cousins. See core/story/boardSuccession.ts.
+                //
+                //  Nobody who left comes back: they are already absent from
+                //  this array and nothing here adds a seat.
+                //
+                //  THE BROTHER'S THREAD ENDS WITH HIM, deliberately. His seat
+                //  gets an heir like every other, and that heir has a new id,
+                //  so `brother.ts` stops finding him - it degrades to the
+                //  story's opening value by design. The arc is written about
+                //  a man who was in his father's will, and his child was not.
+                // ----------------------------------------------------------
+                ...succeedBoard(st.members ?? [], (family.generation ?? 1) + 1),
                 ...plan.siblings.map(s => ({
                     id: `DIR_HEIR_${s.id}`,
                     name: s.name,
