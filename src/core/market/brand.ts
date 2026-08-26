@@ -460,6 +460,58 @@ export const brandIndex = (points: number): number =>
 export const indexToPoints = (index: number): number =>
     (index || 0) * BRAND_INDEX_SCALE;
 
+/**
+ * How much of the conversion the DECAY side keeps.
+ *
+ * ---------------------------------------------------------------------------
+ *  CONVERTING BOTH DIRECTIONS WAS ARITHMETICALLY RIGHT AND MADE THE GAME WORSE
+ * ---------------------------------------------------------------------------
+ *  The marketing leg was being fed to the walk unconverted, so it was worth a
+ *  4.33th of what it said. Converting it fixed the complaint that brand could
+ *  never rise. It also multiplied the PENALTY for underspending by the same
+ *  4.33, and I never measured that direction before shipping it.
+ *
+ *  Measured, at the default budget against the opening benchmark:
+ *
+ *      67k spend, 250k maintenance -> -0.70 index -> -3.03 points converted
+ *
+ *  And maintenance is a share of the market's benchmark, so it GROWS as the
+ *  company does. A player who raises their budget but not fast enough now
+ *  falls behind four times harder than before, which is exactly the report:
+ *  meeting demand, spending real money, and watching it drop anyway.
+ *
+ *  ---------------------------------------------------------------------------
+ *  WHY THE TWO SIDES ARE NOT SYMMETRIC
+ *  ---------------------------------------------------------------------------
+ *  Because their limiters are not. A gain is bounded by the tier ceiling a few
+ *  lines later, so converting it in full cannot run away - it just reaches the
+ *  ceiling sooner, which is the intent. A loss is bounded only by the floor,
+ *  which sits far below where a growing company lives, so converting it in
+ *  full changed what the constant MEANS: `BRAND_DECAY_MAX` was authored as
+ *  "at worst 1.2 of a hundred a quarter" and became 5.2 points against a
+ *  brand that might only be 50.
+ *
+ *  So the decay keeps its authored severity rather than its converted one.
+ *  This is a deliberate asymmetry and it is named rather than buried, because
+ *  an unexplained magic number here is how the next person reintroduces the
+ *  problem in either direction.
+ */
+export const DECAY_CONVERSION_KEPT = 1 / BRAND_INDEX_SCALE;
+
+/**
+ * A marketing result, in points, with the two directions treated honestly.
+ *
+ * Positive: converted in full, so spending above maintenance is worth what it
+ * says and the brand can climb to the ceiling its factory allows.
+ *
+ * Negative: converted, then damped back to the strength the constant was
+ * written for. See DECAY_CONVERSION_KEPT.
+ */
+export const marketingToPoints = (indexDelta: number): number => {
+    const d = indexDelta || 0;
+    return d >= 0 ? indexToPoints(d) : indexToPoints(d) * DECAY_CONVERSION_KEPT;
+};
+
 /** The brand level a given market share supports on its own. */
 export const brandEquilibrium = (sharePercent: number): number =>
     Math.max(0, sharePercent || 0) * BRAND_POINTS_PER_SHARE;

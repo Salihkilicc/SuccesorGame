@@ -16,7 +16,7 @@ import {
   // applyCorporateShock was imported here and never called - see the note in
   // core/story/gameSink.ts, which is now its caller. The unused import is why
   // the audit called it reachable for weeks.
-  advanceCategoryBrand, corporateBrandFrom, brandIndex, indexToPoints, earnedFloor,
+  advanceCategoryBrand, corporateBrandFrom, brandIndex, indexToPoints, marketingToPoints, earnedFloor,
 } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import {
@@ -1513,7 +1513,12 @@ export const useGameStore = create<GameStore>()(
         //  spending moves it. It was not the market being harsh, it was four
         //  fifths of every marketing quarter being thrown away.
         // ------------------------------------------------------------------
-        const marketingDeltaTotal = indexToPoints(
+        //  AND THE DECAY IS NOT CONVERTED THE SAME WAY, DELIBERATELY. See
+        //  brand.marketingToPoints: converting both directions in full fixed
+        //  the climb and made underspending four times more punishing than
+        //  the constant was written to be. A gain is stopped by the tier
+        //  ceiling; a loss is not.
+        const marketingDeltaTotal = marketingToPoints(
           marketingBrand.newBrand - brandValueIndexPrev,
         );
 

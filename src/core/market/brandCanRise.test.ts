@@ -39,6 +39,8 @@
 // ============================================================================
 
 import {
+    marketingToPoints,
+    DECAY_CONVERSION_KEPT,
     advanceCategoryBrand,
     brandEquilibrium,
     brandIndex,
@@ -196,7 +198,7 @@ describe('the quarterly tick', () => {
 
     it('converts the marketing delta before it reaches the walk', () => {
         expect(TICK()).toMatch(
-            /const marketingDeltaTotal = indexToPoints\(\s*marketingBrand\.newBrand - brandValueIndexPrev,\s*\);/,
+            /const marketingDeltaTotal = marketingToPoints\(\s*marketingBrand\.newBrand - brandValueIndexPrev,\s*\);/,
         );
     });
 
@@ -315,5 +317,70 @@ describe('the tier floor', () => {
             }).newBrand;
         }
         expect(brandIndex(b)).toBeGreaterThan(tier.brandFloor);
+    });
+});
+
+
+// ============================================================================
+//  AND THE OTHER DIRECTION, WHICH I DID NOT MEASURE THE FIRST TIME
+// ============================================================================
+//
+//  Converting the marketing leg fixed the climb and broke the fall. Reported
+//  as brand still dropping while meeting demand and spending real money, four
+//  years into a run.
+//
+//  The conversion is symmetric arithmetic and the two sides are not symmetric
+//  in the game: a GAIN is stopped by the tier ceiling a few lines later, so
+//  converting it in full just reaches that ceiling sooner. A LOSS is stopped
+//  only by the floor, which sits far below where a growing company lives, so
+//  converting it in full turned "at worst 1.2 of a hundred a quarter" into
+//  5.2 points off a brand that might only be 50.
+//
+//  Measured at the opening default, 67k against a 250k maintenance:
+//
+//      -0.70 index  ->  -3.03 points converted in full
+//
+//  And maintenance is a share of the market's benchmark, so it GROWS. A
+//  player raising their budget but not fast enough fell behind four times
+//  harder than the constant was written for.
+// ============================================================================
+
+describe('underspending', () => {
+    it('still costs something, because the threshold has to mean something', () => {
+        expect(marketingToPoints(-1)).toBeLessThan(0);
+    });
+
+    it('but not four times what the constant was written for', () => {
+        // The whole regression, as one comparison.
+        expect(Math.abs(marketingToPoints(-1))).toBeLessThan(Math.abs(indexToPoints(-1)));
+    });
+
+    it('and a gain is still converted in full, which was the original fix', () => {
+        expect(marketingToPoints(1)).toBeCloseTo(indexToPoints(1), 6);
+    });
+
+    it('and zero stays zero', () => {
+        expect(marketingToPoints(0)).toBe(0);
+    });
+
+    it('and the asymmetry is named rather than a bare number', () => {
+        // An unexplained multiplier here is how the next person reintroduces
+        // this in either direction.
+        expect(DECAY_CONVERSION_KEPT).toBeGreaterThan(0);
+        expect(DECAY_CONVERSION_KEPT).toBeLessThan(1);
+    });
+
+    it('and the tick uses the asymmetric door, not the raw conversion', () => {
+        // Its own reader: `TICK` above is scoped to the describe that owns it.
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', 'store', 'useGameStore.ts'), 'utf8',
+        )
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .split('\n')
+            .filter((l: string) => !/^\s*(\/\/|\*)/.test(l))
+            .map((l: string) => l.replace(/\s\/\/.*$/, ''))
+            .join('\n');
+        expect(src).toMatch(/marketingToPoints\(/);
+        expect(src).not.toMatch(/marketingDeltaTotal = indexToPoints\(/);
     });
 });
