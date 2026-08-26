@@ -1539,7 +1539,25 @@ export const useGameStore = create<GameStore>()(
           const weightHere = totalPlayerShare > 0 ? shareHere / totalPlayerShare : 1 / Math.max(1, activeCategories.length);
           const r = advanceCategoryBrand({
             current: prevByCategory[cat] ?? 0,
-            floor: prevFloors[cat] || 0,
+            // ------------------------------------------------------------
+            //  THE FACTORY'S OWN FLOOR, WHICH NEVER REACHED THIS PATH
+            // ------------------------------------------------------------
+            //  Every tier carries a `brandFloor` - 5 at tier one - and it is
+            //  applied inside `updateBrand`, which only produces the marketing
+            //  DELTA. The category walk uses `earnedFloor`, which is about
+            //  unlocking a second market and starts at zero.
+            //
+            //  So the rule that says "your factory guarantees you this much
+            //  standing" had no reader on the path that decides the number.
+            //  Measured on a fresh company: brand fell from 18 to 0.81 in the
+            //  first quarter and crawled from there, which is the reported
+            //  "impossible to raise at the start".
+            //
+            //  Both floors, whichever is higher. Converted, because
+            //  `brandFloor` is on the 0-100 index like everything else that
+            //  was being fed in raw.
+            // ------------------------------------------------------------
+            floor: Math.max(prevFloors[cat] || 0, indexToPoints(tier.brandFloor || 0)),
             share: shareHere,
             servedRatio: servedRatioOf(cat),
             marketingDelta: marketingDeltaTotal * weightHere,

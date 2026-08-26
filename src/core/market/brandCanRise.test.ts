@@ -226,3 +226,94 @@ describe('the quarterly tick', () => {
         }
     });
 });
+
+
+// ============================================================================
+//  AND THE FLOOR THE FACTORY GUARANTEES
+// ============================================================================
+//
+//  Reported as brand being far too hard to raise AT THE START, whatever the
+//  player does. Measured on a fresh company, before this:
+//
+//      brand 18 -> 0.81 in the first quarter, then a crawl to 4.7
+//
+//  Every tier carries a `brandFloor` - 5 at tier one, rising to 8, 10, 12 as
+//  the factory grows - and it was applied inside `updateBrand`, which only
+//  produces the marketing DELTA. The walk that decides the actual number uses
+//  `earnedFloor`, which is about unlocking a second market and starts at zero.
+//
+//  So the rule that says "your factory guarantees you this much standing" had
+//  no reader on the path that decides the number. The fifth time this session,
+//  and the same shape as the other four: authored, correct, unread.
+//
+//  After, on the same company:
+//
+//      default budget   5.0 and steady, rather than 0.81 and crawling
+//      500k budget      5.0 -> 19.2 over twelve quarters, smoothly
+//
+//  It is a floor, not a boost: it stops the opening collapse and it rises with
+//  the tier, so it is a progression rather than a handout.
+// ============================================================================
+
+describe('the tier floor', () => {
+    it('rises with the factory, so it is progression rather than a gift', () => {
+        const floors = [1, 2, 3, 4].map(l => getTier(l).brandFloor);
+        for (let i = 1; i < floors.length; i++) {
+            expect(floors[i]).toBeGreaterThan(floors[i - 1]);
+        }
+    });
+
+    it('and it is on the index scale, like everything else fed to the walk', () => {
+        expect(getTier(1).brandFloor).toBeLessThan(getTier(1).brandCeiling);
+        expect(getTier(1).brandCeiling).toBeLessThanOrEqual(100);
+    });
+
+    it('and it holds a young company up instead of letting it sink to nothing', () => {
+        const tier = getTier(1);
+        const floorPoints = indexToPoints(tier.brandFloor);
+
+        // A company with no market share and no marketing. Without the floor
+        // the walk drags it towards zero; with it, it stops where the factory
+        // says it should.
+        let bare = indexToPoints(18);
+        let held = indexToPoints(18);
+        for (let q = 0; q < 8; q++) {
+            bare = advanceCategoryBrand({ current: bare, share: 0, servedRatio: 1 }).newBrand;
+            held = advanceCategoryBrand({
+                current: held, share: 0, servedRatio: 1, floor: floorPoints,
+            }).newBrand;
+        }
+        // Eight quarters at 25% a quarter with the loyalty cushion on the
+        // way down leaves 4.05, not the 1.8 a plain 0.75^8 would suggest -
+        // measured rather than assumed, which is why this says "below the
+        // floor" instead of a number I reasoned my way to.
+        expect(brandIndex(bare)).toBeLessThan(tier.brandFloor);
+        expect(brandIndex(held)).toBeCloseTo(tier.brandFloor, 4);
+        expect(brandIndex(held)).toBeGreaterThan(brandIndex(bare));
+    });
+
+    it('and the tick is the one applying it', () => {
+        // Source rule, for the same reason as the block above: the pure
+        // function takes a floor and will happily be given zero forever.
+        const TICK = fs.readFileSync(
+            path.join(__dirname, '..', 'store', 'useGameStore.ts'), 'utf8',
+        );
+        expect(TICK).toMatch(
+            /floor: Math\.max\(prevFloors\[cat\] \|\| 0, indexToPoints\(tier\.brandFloor \|\| 0\)\)/,
+        );
+    });
+
+    it('and it does not become a ceiling by accident', () => {
+        // The floor must not stop a company climbing above it.
+        const tier = getTier(1);
+        let b = indexToPoints(tier.brandFloor);
+        for (let q = 0; q < 6; q++) {
+            b = advanceCategoryBrand({
+                current: b, share: 2, servedRatio: 1,
+                floor: indexToPoints(tier.brandFloor),
+                marketingDelta: indexToPoints(1),
+            }).newBrand;
+        }
+        expect(brandIndex(b)).toBeGreaterThan(tier.brandFloor);
+    });
+});
