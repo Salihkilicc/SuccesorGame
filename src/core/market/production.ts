@@ -146,10 +146,28 @@ export const resolveTargetUnits = (
 //  whether you were sitting at 15,000 or at 700,000. Near the bottom of the
 //  range the control had about three usable positions.
 //
-//  The step is a tenth of the CURRENT value now, with a floor of a thousand so
+//  The step is a share of the CURRENT value now, with a floor of a thousand so
 //  it never becomes a control you have to tap forty times. That gives roughly
 //  the same number of taps to cross any part of the range, which is what
 //  "smooth" means for a stepper.
+//
+//  A TENTH WAS TOO MUCH AT THE TOP, AND THAT WAS MY DOING. Reported as "the
+//  tap should stay as it was, this time you made THAT one bigger", and it
+//  was true in the half of the range the player was actually in:
+//
+//      one tap        15,000    100,000    700,000
+//      old, flat      40,000     40,000     40,000
+//      a tenth         1,500     10,000     70,000   <- bigger than before
+//      a twentieth     1,000      5,000     35,000
+//
+//  So the first fix cured the bottom of the range and made the top worse. A
+//  twentieth lands within an eighth of the old step where the old step was
+//  bearable, and stays fine where it was not.
+//
+//  A CAP OF FIVE PER CENT OF CAPACITY WAS THE OTHER CANDIDATE and it would
+//  have matched the old number exactly at the top. Rejected: it puts the
+//  factory back into the step, which is the coupling this whole section
+//  exists to remove.
 //
 //  NOT SYMMETRIC, AND THAT IS ARITHMETIC RATHER THAN AN OVERSIGHT. Up ten per
 //  cent then down ten per cent does not return you to where you were, because
@@ -169,8 +187,13 @@ export const resolveTargetUnits = (
 /** Smallest a stepper tap will ever move, so the control stays usable low down. */
 export const NUDGE_MIN_STEP = 1_000;
 
-/** A tap is worth this share of what is already there. */
-export const NUDGE_RATIO = 0.10;
+/**
+ * A tap is worth this share of what is already there.
+ *
+ * A twentieth, not a tenth. See the note above: a tenth was larger than the
+ * flat step it replaced anywhere above 400,000.
+ */
+export const NUDGE_RATIO = 0.05;
 
 /** How far one tap of plus or minus moves, given where you are now. */
 export const nudgeStep = (current: number): number =>
@@ -206,43 +229,45 @@ export const nudgeUnits = (
 //  bigger than the first. There was no slow part to aim with.
 //
 //  A hold is a different gesture from a tap and needs its own size. It starts
-//  at three per cent of a tap and ramps to sixty per cent over two seconds,
-//  so the beginning is fine enough to land on a number and the end is fast
-//  enough to cross the range.
+//  at three per cent of a tap and ramps to forty per cent over two and a half
+//  seconds, so the beginning is fine enough to land on a number and the end
+//  is fast enough to be worth holding.
 //
 //  MEASURED, not guessed. I wrote a table here from the constants before
-//  running it and every figure was wrong, so these come off the simulation:
+//  running it and every figure was wrong, so these come off the simulation,
+//  holding plus from 15,000:
 //
-//                  holding + from 15,000     from 0
-//      0.5s              15,931                606
-//      1.0s              18,091              1,893
-//      2.0s              28,667              6,607
-//      3.0s              51,328             12,883
-//      5.0s             164,592             41,294
-//      8.0s             800,000  ceiling   237,119
+//      1.0s   16,140      still choosing
+//      2.0s   18,729
+//      3.0s   22,721
+//      5.0s   33,748
+//      8.0s   61,104
+//     12.0s  134,888
 //
-//  The first half second moves six per cent, which is the "azar azar" part,
-//  and the full range takes about eight seconds, which is the acceleration.
+//  The first second moves seven per cent, which is the "azar azar" part, and
+//  it keeps compounding, which is the acceleration.
 //
 //  THE ALTERNATIVES WERE MEASURED TOO, because a number chosen by feel is a
-//  number nobody can argue with later:
+//  number nobody can argue with later. Eight seconds from 15,000 reached:
 //
-//      start .08 max .75 ramp 1.5s   half a second already moved 12%
-//      start .02 max .45 ramp 2.5s   eight seconds only reached 308k
-//      start .03 max .35 ramp 2.0s   eight seconds only reached 175k
+//      start .08 max .75 ramp 1.5s   the ceiling, and half a second moved 12%
+//      start .03 max .60 ramp 2.0s   127k
+//      start .03 max .40 ramp 2.5s    61k   <- this one
+//      start .02 max .30 ramp 3.0s    42k
+//      start .02 max .20 ramp 3.0s    30k, about a slider
 // ============================================================================
 
 /** How often a held button repeats. */
 export const HOLD_TICK_MS = 100;
 
 /** How long a hold takes to reach full speed. */
-export const HOLD_RAMP_MS = 2_000;
+export const HOLD_RAMP_MS = 2_500;
 
 /** A hold's first ticks are worth this much of one tap. */
 export const HOLD_START_FRACTION = 0.03;
 
 /** And its fastest ticks are worth this much, deliberately under a whole tap. */
-export const HOLD_MAX_FRACTION = 0.60;
+export const HOLD_MAX_FRACTION = 0.40;
 
 /**
  * How much of a tap one tick of a hold is worth, this far into the press.

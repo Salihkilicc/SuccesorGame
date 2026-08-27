@@ -15,9 +15,20 @@
 //  Near the bottom of the range the control had about three usable positions,
 //  and 15,000 -> 55,000 is exactly one tap of it.
 //
-//  A tenth of the CURRENT value now, floored at a thousand, so it takes
+//  A share of the CURRENT value now, floored at a thousand, so it takes
 //  roughly the same number of taps to cross any part of the range. That is
 //  what "smooth" means for a stepper.
+//
+//  AND THE SHARE IS A TWENTIETH, NOT A TENTH, BECAUSE I OVERSHOT. Reported
+//  back as "the tap should stay as it was, this time you made THAT one
+//  bigger", and it was true wherever the number was large:
+//
+//      one tap        15,000    100,000    700,000
+//      old, flat      40,000     40,000     40,000
+//      a tenth         1,500     10,000     70,000   <- bigger than before
+//      a twentieth     1,000      5,000     35,000
+//
+//  The first fix cured the bottom of the range and made the top worse.
 // ============================================================================
 
 import fs from 'fs';
@@ -31,11 +42,20 @@ import {
 const MAX = 800_000;
 
 describe('how far one tap moves', () => {
-    it('is a tenth of where you are, not a slice of the factory', () => {
+    it('is a share of where you are, not a slice of the factory', () => {
         // THE DEFECT, as the two numbers in the report. The old step at this
         // capacity was 40,000, so 15,000 went to 55,000 in one tap.
         expect(Math.round(MAX * 0.05)).toBe(40_000);
-        expect(nudgeUnits(15_000, 1, MAX)).toBe(16_500);
+        expect(nudgeUnits(15_000, 1, MAX)).toBe(16_000);
+    });
+
+    it('and it is never bigger than the flat step it replaced', () => {
+        // THE SECOND DEFECT, which was mine. A tenth of the value beat the old
+        // 40,000 anywhere above 400,000, so the first fix made the top of the
+        // range worse while curing the bottom.
+        for (const v of [15_000, 100_000, 400_000, 700_000, 800_000]) {
+            expect(nudgeStep(v)).toBeLessThanOrEqual(Math.round(MAX * 0.05));
+        }
     });
 
     it('and it does not change when the factory gets bigger', () => {
@@ -45,16 +65,18 @@ describe('how far one tap moves', () => {
     });
 
     it('and it grows with the number, so the top of the range is not forty taps', () => {
-        expect(nudgeStep(700_000)).toBe(70_000);
-        expect(nudgeStep(15_000)).toBe(1_500);
+        expect(nudgeStep(700_000)).toBe(35_000);
+        expect(nudgeStep(100_000)).toBe(5_000);
     });
 
     it('and never gets so small the control stops being usable', () => {
-        // A tenth of 200 is 20. Crossing the low end at 20 a tap is not a
-        // control, it is a chore.
+        // A twentieth of 200 is 10. Crossing the low end at 10 a tap is not a
+        // control, it is a chore. The floor binds all the way up to 20,000.
         expect(nudgeStep(0)).toBe(NUDGE_MIN_STEP);
         expect(nudgeStep(200)).toBe(NUDGE_MIN_STEP);
-        expect(NUDGE_RATIO).toBeCloseTo(0.10, 6);
+        expect(nudgeStep(15_000)).toBe(NUDGE_MIN_STEP);
+        expect(nudgeStep(20_000)).toBe(NUDGE_MIN_STEP);
+        expect(NUDGE_RATIO).toBeCloseTo(0.05, 6);
     });
 
     it('and takes a similar number of taps to cross any decade', () => {
@@ -98,20 +120,25 @@ describe('and where it lands', () => {
         // the bigger number, so it is larger. Making it reversible would mean
         // remembering where a run of taps began - state the button does not
         // have and a rule the player would have to be told.
-        const up = nudgeUnits(15_000, 1, MAX);
-        expect(nudgeUnits(up, -1, MAX)).toBe(14_850);
+        const up = nudgeUnits(100_000, 1, MAX);
+        expect(nudgeUnits(up, -1, MAX)).toBe(99_750);
 
         // AND THE DRIFT IS THE SAME EVERYWHERE, WHICH I HAD WRONG. I wrote
-        // "a fraction of a per cent at the top" and this measured exactly one
-        // per cent at 700,000 as well as at 15,000. It is ratio squared, so
-        // it does not depend on the number at all.
+        // "a fraction of a per cent at the top" and this measured the same
+        // figure at 700,000 as at 15,000. It is ratio squared, so it does not
+        // depend on the number at all - a quarter of a per cent now that the
+        // ratio is a twentieth.
         const roundTrip = (v: number) => {
             const u = nudgeUnits(v, 1, 20_000_000);
             return Math.abs(nudgeUnits(u, -1, 20_000_000) - v) / v;
         };
-        for (const v of [15_000, 100_000, 700_000, 5_000_000]) {
+        for (const v of [100_000, 700_000, 5_000_000]) {
             expect(roundTrip(v)).toBeCloseTo(NUDGE_RATIO * NUDGE_RATIO, 4);
         }
+
+        // And below the floor it is exactly reversible, because a fixed step
+        // up and a fixed step down are the same step.
+        expect(nudgeUnits(nudgeUnits(15_000, 1, MAX), -1, MAX)).toBe(15_000);
     });
 });
 
@@ -157,12 +184,15 @@ describe('holding a stepper', () => {
         expect(s3).toBeGreaterThan(s2);
     });
 
-    it('and it crosses the whole range in a few seconds rather than instantly', () => {
-        // The old behaviour reached the ceiling from 15,000 in about a second
-        // and a half. Both ends matter: too fast is unusable, too slow is a
-        // control nobody will hold.
-        expect(held(15_000, 2000)).toBeLessThan(800_000);
-        expect(held(15_000, 10_000)).toBe(800_000);
+    it('and it is deliberately slow, so the whole range is a long hold', () => {
+        // Measured: 15,000 to the 800,000 ceiling takes 21.1 seconds, and the
+        // ceiling back down to zero takes 24.5. That is the point rather than
+        // a problem - big moves are what the tap and the match demand button
+        // are for, and this control is for landing on a number. The first
+        // version crossed the same range in about a second and a half.
+        expect(held(15_000, 5_000)).toBeLessThan(40_000);
+        expect(held(15_000, 15_000)).toBeLessThan(800_000);
+        expect(held(15_000, 25_000)).toBe(800_000);
     });
 
     it('and the ramp stops ramping, rather than growing without end', () => {
