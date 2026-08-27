@@ -1900,7 +1900,11 @@ export const en: Record<string, string> = {
     'board.demandConfidential': '{v1} raised this with you privately before the meeting, you have extra time.',
     'product.cannotBuildRetooling': 'You cannot build this quarter, the plant is being retooled. Demand is there; capacity is not.',
     'product.cannotBuildNoCrew': 'You cannot build this quarter, there is no crew on the line. Hire staff to use this demand.',
+    // SHELVED: superseded by `product.matchDemandShort`, which names the gap
+    // instead of stopping at "this is all the line can do".
     'product.matchDemandCapped': 'Build to capacity · {units}',
+    'product.matchDemandShort': 'Build {units} · {short} short of demand',
+    'product.matchDemandBuffer': 'Demand is {demand}. Ten per cent added for scrap and drift.',
     'product.qualityQueued': 'Only Lvl {v1} of {v2} is being built, your {v3} cannot go higher. The rest is queued and activates when you upgrade the plant.',
     'product.acqCapacityLocked': 'You own {v1} units of demand but can only build {v2}. The share you bought unlocks as capacity grows.',
     'alert.marketLockedBody': 'You cannot open {v1} yet. Every market you already trade in must reach {v4} brand. Your weakest is {v2} at {v3}. Build where you already are before spreading.',

@@ -133,6 +133,82 @@ export const resolveTargetUnits = (
 };
 
 // ============================================================================
+//  WHAT "MATCH DEMAND" HAS TO ACTUALLY BUILD
+// ============================================================================
+//
+//  Reported as "the button says X but I need several times X to stop running
+//  out". Measured, the demand figure on that screen is exact - it matched the
+//  engine to the unit over six quarters - so the number was never the lie.
+//  Three things sat between it and a shelf that stays full:
+//
+//  1. FIRE. A tier one line scraps about 9% of what it builds, and more as
+//     morale falls. The button divided by the yield already.
+//
+//  2. THE CAP CAME AFTERWARDS. The label compared RAW need against capacity
+//     and then set `min(capacity, need / yield)`. So at need 3800, yield 0.9
+//     and capacity 4050 it announced "build 4222" and quietly set 4050. The
+//     button promised a number it did not deliver.
+//
+//  3. DEMAND MOVES WHILE YOU BUILD. Serving a quarter well raises the reach
+//     index and the brand, both of which raise next quarter's demand. Aiming
+//     at exactly this quarter's figure means arriving slightly short every
+//     time, and being slightly short is what costs the reach index.
+//
+//  So the target carries a margin. Ten per cent, asked for as "%10 alti olsa
+//  her sey cozulecek" - the demand you are shown should sit just under what
+//  you build, not just over it.
+//
+//  Why ten and not more: `overBuilding` warns at a fifth of demand left on
+//  the shelf, and storage is charged per unit per quarter. Ten per cent is
+//  comfortably inside the warning and cheap enough to be the safe default.
+// ============================================================================
+
+/** Safety margin on a "match demand" build, over and above the scrap rate. */
+export const DEMAND_BUFFER = 0.10;
+
+export interface MatchDemandInput {
+    /** Units the market will ask for, less whatever is already on the shelf. */
+    neededUnits: number;
+    /** Share of a build that comes out sellable. */
+    effectiveYield: number;
+    /** Most this line can put through in a quarter. */
+    maxUnits: number;
+}
+
+export interface MatchDemandPlan {
+    /** What to build to cover demand with the margin. Ignores capacity. */
+    target: number;
+    /** What the line can actually build, which is what the button sets. */
+    build: number;
+    /** True when capacity is the binding constraint, not the player's choice. */
+    capped: boolean;
+    /** Sellable units short of demand if `build` is what gets made. */
+    shortfall: number;
+}
+
+/**
+ * The one place that decides what "match demand" means.
+ *
+ * Pure, so the label and the press cannot disagree - they were computed
+ * separately before, which is how the button came to announce a number it
+ * then clamped away.
+ */
+export const matchDemandPlan = (input: MatchDemandInput): MatchDemandPlan => {
+    const needed = Math.max(0, input.neededUnits || 0);
+    const yieldRate = Math.min(1, Math.max(0.01, input.effectiveYield || 1));
+    const max = Math.max(0, input.maxUnits || 0);
+
+    const target = Math.ceil((needed / yieldRate) * (1 + DEMAND_BUFFER));
+    const build = Math.min(max, target);
+    // Measured in SELLABLE units, because that is what a customer walks away
+    // over. The margin is not part of the shortfall: falling back to exactly
+    // covering demand is not being short.
+    const shortfall = Math.max(0, needed - Math.floor(build * yieldRate));
+
+    return { target, build, capped: build < target, shortfall };
+};
+
+// ============================================================================
 //  PAYLASTIRMA — birden fazla urun ayni tesisi kullanir
 // ============================================================================
 //  Kapasite ORTAK. Iki urunun varsa ikisi ayni hatti paylasir; ikisinin

@@ -1896,7 +1896,14 @@ export const tr: Record<string, string> = {
     'board.demandConfidential': '{v1} bunu toplantıdan önce sana özel olarak açtı, fazladan vaktin var.',
     'product.cannotBuildRetooling': 'Bu çeyrek üretemezsin, tesis yenileniyor. Talep var, kapasite yok.',
     'product.cannotBuildNoCrew': 'Bu çeyrek üretemezsin, hatta çalışan yok. Bu talebi kullanmak için personel al.',
+    // SHELVED: superseded by `product.matchDemandShort`, which names the gap
+    // instead of stopping at "this is all the line can do".
     'product.matchDemandCapped': 'Kapasiteye kadar üret · {units}',
+    // The button used to stop at "build to capacity" and leave the player to
+    // discover the hole. It now says how big the hole is, in sellable units,
+    // next to the control that would fix it.
+    'product.matchDemandShort': '{units} üret · {short} adet açık kalır',
+    'product.matchDemandBuffer': 'Talep {demand}. Fire ve talep oynaklığı için %10 pay eklendi.',
     'product.qualityQueued': '{v2} seviyenin sadece {v1} kadarı üretiliyor, {v3} daha yukarısını kaldırmıyor. Gerisi sırada bekliyor, tesisi büyütünce devreye girer.',
     'product.acqCapacityLocked': '{v1} adetlik talebin var ama {v2} üretebiliyorsun. Satın aldığın pay, kapasite büyüdükçe açılır.',
     'alert.marketLockedBody': '{v1} pazarını henüz açamazsın. Halihazırda bulunduğun her pazarın markası {v4} olmalı. En zayıfın {v2}, şu an {v3}. Yayılmadan önce bulunduğun yeri büyüt.',

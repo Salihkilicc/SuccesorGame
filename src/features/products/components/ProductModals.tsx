@@ -24,7 +24,7 @@ import {
     marketingBenchmark,
     shareOfVoice,
 } from '../../../core/market/attraction';
-import { maxUnitsPerQuarter, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
+import { matchDemandPlan, maxUnitsPerQuarter, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
 import { ProductIconBadge } from './ProductIcon';
 import {
     CONTRACT_PARTNERS,
@@ -504,6 +504,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const supplyGap = available - expectedDemand;
     const neededUnits = Math.max(0, expectedDemand - (product.inventory || 0));
 
+    // What "match demand" builds, and what it costs you if the line cannot
+    // reach it. One sum for the label and the press. See production.ts.
+    const demandPlan = matchDemandPlan({ neededUnits, effectiveYield, maxUnits });
+
     // Cubuk olcegi: uretim ve talebin buyugune gore
     const compareMax = Math.max(1, willBuild, expectedDemand);
 
@@ -800,17 +804,45 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     {isRetooling ? t('product.cannotBuildRetooling') : t('product.cannotBuildNoCrew')}
                                 </Text>
                             )}
+                            {/* -----------------------------------------------
+                                THE BUTTON ANNOUNCED A NUMBER IT THEN CLAMPED
+                                -----------------------------------------------
+                                The label compared RAW demand against capacity
+                                and the press set `min(capacity, need/yield)`,
+                                so at need 3800, yield 0.9 and capacity 4050 it
+                                said "build 4222" and set 4050. Two sums, one
+                                button, and the player only saw the promise.
+
+                                One plan now, used by both. See
+                                core/market/production.matchDemandPlan, which
+                                also carries the ten per cent margin: demand
+                                moves while you build, and arriving slightly
+                                short is what costs the reach index.
+                               ----------------------------------------------- */}
                             {expectedDemand > 0 && neededUnits > 0 && maxUnits > 0 && (
-                                <Pressable
-                                    style={({ pressed }) => [styles.matchBtn, pressed && styles.matchBtnPressed]}
-                                    onPress={() => setProductionUnits(Math.min(maxUnits, Math.ceil(neededUnits / effectiveYield)))}
-                                >
-                                    <Text style={styles.matchBtnText}>
-                                        {neededUnits > maxUnits
-                                            ? t('product.matchDemandCapped', { units: formatNumber(maxUnits) })
-                                            : t('product.matchDemand', { units: formatNumber(Math.ceil(neededUnits / effectiveYield)) })}
-                                    </Text>
-                                </Pressable>
+                                <>
+                                    <Pressable
+                                        style={({ pressed }) => [styles.matchBtn, pressed && styles.matchBtnPressed]}
+                                        onPress={() => setProductionUnits(demandPlan.build)}
+                                    >
+                                        <Text style={styles.matchBtnText}>
+                                            {demandPlan.shortfall > 0
+                                                ? t('product.matchDemandShort', {
+                                                    units: formatNumber(demandPlan.build),
+                                                    short: formatNumber(demandPlan.shortfall),
+                                                })
+                                                : t('product.matchDemand', { units: formatNumber(demandPlan.build) })}
+                                        </Text>
+                                    </Pressable>
+                                    {/* Only when the margin is what puts the
+                                        number above demand. A capped build is
+                                        already explaining itself above. */}
+                                    {!demandPlan.capped && (
+                                        <Text style={styles.matchNote}>
+                                            {t('product.matchDemandBuffer', { demand: formatNumber(expectedDemand) })}
+                                        </Text>
+                                    )}
+                                </>
                             )}
 
                             {/* MOVED TO ALERTS: the capacity ceiling, the
