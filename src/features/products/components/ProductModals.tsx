@@ -24,7 +24,7 @@ import {
     marketingBenchmark,
     shareOfVoice,
 } from '../../../core/market/attraction';
-import { matchDemandPlan, maxUnitsPerQuarter, nudgeUnits, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
+import { HOLD_TICK_MS, holdNudge, matchDemandPlan, maxUnitsPerQuarter, nudgeUnits, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
 import { ProductIconBadge } from './ProductIcon';
 import {
     CONTRACT_PARTNERS,
@@ -145,11 +145,20 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
 //  calling setState on a component that is gone.
 // ============================================================================
 
-/** How often a held button repeats. */
-const HOLD_REPEAT_MS = 100;
-
-const useHoldRepeat = (tick: () => void) => {
+/**
+ * A repeat that knows how long the finger has been down.
+ *
+ * THE ELAPSED TIME IS THE POINT. The first version handed the tick nothing,
+ * so every repeat applied a whole tap step and holding compounded ten per
+ * cent ten times a second. Reported as "holding should not rise as if I had
+ * tapped; it should go up little by little, and with acceleration" - which it
+ * cannot do unless the tick knows whether it is the first one or the fiftieth.
+ *
+ * See production.holdNudge for what it does with the number.
+ */
+const useHoldRepeat = (tick: (elapsedMs: number) => void) => {
     const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+    const startedAt = useRef(0);
     const latest = useRef(tick);
     latest.current = tick;
 
@@ -164,7 +173,11 @@ const useHoldRepeat = (tick: () => void) => {
         // Guard against a second start without a stop, which would leak the
         // first interval and quietly double the speed.
         stop();
-        timer.current = setInterval(() => latest.current(), HOLD_REPEAT_MS);
+        startedAt.current = Date.now();
+        timer.current = setInterval(
+            () => latest.current(Date.now() - startedAt.current),
+            HOLD_TICK_MS,
+        );
     }, [stop]);
 
     useEffect(() => stop, [stop]);
@@ -436,8 +449,11 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
         (direction: 1 | -1) => setProductionUnits(v => nudgeUnits(v, direction, maxUnits)),
         [maxUnits],
     );
-    const holdUp = useHoldRepeat(() => bumpProduction(1));
-    const holdDown = useHoldRepeat(() => bumpProduction(-1));
+    // The hold uses its OWN step, not the tap's. A tap is a tenth of the
+    // value; ten of those a second is 2.6x per second and there is no slow
+    // part to aim with. See production.holdNudge.
+    const holdUp = useHoldRepeat(ms => setProductionUnits(v => holdNudge(v, 1, maxUnits, ms)));
+    const holdDown = useHoldRepeat(ms => setProductionUnits(v => holdNudge(v, -1, maxUnits, ms)));
 
     // ---- FASON URETIM ----------------------------------------------------
     //  Kapasite duvarinin etrafindan dolasmanin yolu. Kendi kapasiteni

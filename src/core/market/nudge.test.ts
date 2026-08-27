@@ -22,7 +22,11 @@
 
 import fs from 'fs';
 import path from 'path';
-import { nudgeStep, nudgeUnits, NUDGE_MIN_STEP, NUDGE_RATIO } from './production';
+import {
+    nudgeStep, nudgeUnits, NUDGE_MIN_STEP, NUDGE_RATIO,
+    holdNudge, holdFraction,
+    HOLD_TICK_MS, HOLD_RAMP_MS, HOLD_START_FRACTION, HOLD_MAX_FRACTION,
+} from './production';
 
 const MAX = 800_000;
 
@@ -111,6 +115,88 @@ describe('and where it lands', () => {
     });
 });
 
+// ============================================================================
+//  AND HOLDING IS NOT TAPPING VERY FAST
+// ============================================================================
+//  Reported as "when I hold it, it should not rise as if I had tapped. It
+//  should go up little by little, and with acceleration".
+//
+//  The first hold applied the whole TAP step every 100ms. A tap is a tenth of
+//  the value, so a hold compounded ten per cent ten times a second: 2.6x per
+//  SECOND. The first tick was already a full tap and the second was bigger
+//  than the first, so there was no slow part to aim with.
+// ============================================================================
+
+/** Where a hold has got to after this long, from this starting point. */
+const held = (from: number, ms: number, max = 800_000, dir: 1 | -1 = 1) => {
+    let v = from;
+    for (let t = 0; t < ms; t += HOLD_TICK_MS) v = holdNudge(v, dir, max, t);
+    return v;
+};
+
+describe('holding a stepper', () => {
+    it('starts far smaller than a tap, which is the whole complaint', () => {
+        // One tick of a hold against one tap, at the same value.
+        const oneTick = holdNudge(15_000, 1, 800_000, 0) - 15_000;
+        const oneTap = nudgeUnits(15_000, 1, 800_000) - 15_000;
+        expect(oneTick).toBeLessThan(oneTap / 10);
+    });
+
+    it('and the first half second barely moves, so you can still aim', () => {
+        // Measured. Under a tenth, which is what "azar azar" has to mean at a
+        // control you are trying to land on a number with.
+        expect(held(15_000, 500)).toBeLessThan(15_000 * 1.10);
+        expect(held(15_000, 500)).toBeGreaterThan(15_000);
+    });
+
+    it('and it accelerates, so later seconds cover more than earlier ones', () => {
+        const s1 = held(15_000, 1000) - 15_000;
+        const s2 = held(15_000, 2000) - held(15_000, 1000);
+        const s3 = held(15_000, 3000) - held(15_000, 2000);
+        expect(s2).toBeGreaterThan(s1);
+        expect(s3).toBeGreaterThan(s2);
+    });
+
+    it('and it crosses the whole range in a few seconds rather than instantly', () => {
+        // The old behaviour reached the ceiling from 15,000 in about a second
+        // and a half. Both ends matter: too fast is unusable, too slow is a
+        // control nobody will hold.
+        expect(held(15_000, 2000)).toBeLessThan(800_000);
+        expect(held(15_000, 10_000)).toBe(800_000);
+    });
+
+    it('and the ramp stops ramping, rather than growing without end', () => {
+        expect(holdFraction(0)).toBeCloseTo(HOLD_START_FRACTION, 6);
+        expect(holdFraction(HOLD_RAMP_MS)).toBeCloseTo(HOLD_MAX_FRACTION, 6);
+        expect(holdFraction(HOLD_RAMP_MS * 10)).toBeCloseTo(HOLD_MAX_FRACTION, 6);
+        expect(holdFraction(-500)).toBeCloseTo(HOLD_START_FRACTION, 6);
+    });
+
+    it('and a tick is never worth a whole tap, even at full speed', () => {
+        // Otherwise the hold is the old behaviour again at the far end.
+        expect(HOLD_MAX_FRACTION).toBeLessThan(1);
+        expect(HOLD_START_FRACTION).toBeLessThan(HOLD_MAX_FRACTION);
+    });
+
+    it('and a tick always moves something, so the start of a hold is not dead', () => {
+        // A tenth of a tap at the floor is 30 units; floor(30 * 0.03) would be
+        // zero without the guard, and a button that does nothing for the first
+        // second reads as broken.
+        expect(holdNudge(0, 1, 800_000, 0)).toBeGreaterThan(0);
+        expect(holdNudge(5, 1, 800_000, 0)).toBeGreaterThan(5);
+    });
+
+    it('and it stops at both ends like the tap does', () => {
+        expect(held(800_000, 5000)).toBe(800_000);
+        expect(held(50_000, 20_000, 800_000, -1)).toBe(0);
+    });
+
+    it('and holding down comes back at the same shape it went up', () => {
+        expect(held(200_000, 500, 800_000, -1)).toBeLessThan(200_000);
+        expect(held(200_000, 500, 800_000, -1)).toBeGreaterThan(200_000 * 0.9);
+    });
+});
+
 describe('the wiring', () => {
     const src = fs.readFileSync(
         path.join(__dirname, '..', '..', 'features', 'products', 'components', 'ProductModals.tsx'),
@@ -154,7 +240,23 @@ describe('the wiring', () => {
     });
 
     it('and the repeat interval is the hundred milliseconds it was asked for', () => {
-        expect(src).toMatch(/const HOLD_REPEAT_MS = 100;/);
-        expect(src).toMatch(/setInterval\(\(\) => latest\.current\(\), HOLD_REPEAT_MS\)/);
+        expect(HOLD_TICK_MS).toBe(100);
+        expect(src).toMatch(/HOLD_TICK_MS,\s*\)/);
+    });
+
+    it('and the hold uses the HOLD step, not the tap step', () => {
+        // The rule that would have caught the report. Reusing `nudgeUnits` in
+        // the repeat is what made holding feel like tapping very fast.
+        expect(src).toMatch(/holdNudge\(v, 1, maxUnits, ms\)/);
+        expect(src).toMatch(/holdNudge\(v, -1, maxUnits, ms\)/);
+        expect(src).not.toMatch(/useHoldRepeat\(\(\) => bumpProduction/);
+    });
+
+    it('and the tick is told how long the finger has been down', () => {
+        // Without the elapsed time there is no ramp, and without a ramp there
+        // is no acceleration - only a smaller flat step.
+        expect(src).toMatch(/const startedAt = useRef\(0\)/);
+        expect(src).toMatch(/startedAt\.current = Date\.now\(\)/);
+        expect(src).toMatch(/latest\.current\(Date\.now\(\) - startedAt\.current\)/);
     });
 });

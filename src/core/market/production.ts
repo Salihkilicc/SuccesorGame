@@ -194,6 +194,88 @@ export const nudgeUnits = (
 };
 
 // ============================================================================
+//  AND HOLDING IS NOT TAPPING VERY FAST
+// ============================================================================
+//
+//  Reported as "when I hold it, it should not rise as if I had tapped. It
+//  should go up little by little, and with acceleration".
+//
+//  The first hold applied the whole tap step every 100ms. A tap step is a
+//  tenth of the value, so holding compounded ten per cent ten times a second:
+//  2.6x per SECOND. The first tick was already a full tap and the second was
+//  bigger than the first. There was no slow part to aim with.
+//
+//  A hold is a different gesture from a tap and needs its own size. It starts
+//  at three per cent of a tap and ramps to sixty per cent over two seconds,
+//  so the beginning is fine enough to land on a number and the end is fast
+//  enough to cross the range.
+//
+//  MEASURED, not guessed. I wrote a table here from the constants before
+//  running it and every figure was wrong, so these come off the simulation:
+//
+//                  holding + from 15,000     from 0
+//      0.5s              15,931                606
+//      1.0s              18,091              1,893
+//      2.0s              28,667              6,607
+//      3.0s              51,328             12,883
+//      5.0s             164,592             41,294
+//      8.0s             800,000  ceiling   237,119
+//
+//  The first half second moves six per cent, which is the "azar azar" part,
+//  and the full range takes about eight seconds, which is the acceleration.
+//
+//  THE ALTERNATIVES WERE MEASURED TOO, because a number chosen by feel is a
+//  number nobody can argue with later:
+//
+//      start .08 max .75 ramp 1.5s   half a second already moved 12%
+//      start .02 max .45 ramp 2.5s   eight seconds only reached 308k
+//      start .03 max .35 ramp 2.0s   eight seconds only reached 175k
+// ============================================================================
+
+/** How often a held button repeats. */
+export const HOLD_TICK_MS = 100;
+
+/** How long a hold takes to reach full speed. */
+export const HOLD_RAMP_MS = 2_000;
+
+/** A hold's first ticks are worth this much of one tap. */
+export const HOLD_START_FRACTION = 0.03;
+
+/** And its fastest ticks are worth this much, deliberately under a whole tap. */
+export const HOLD_MAX_FRACTION = 0.60;
+
+/**
+ * How much of a tap one tick of a hold is worth, this far into the press.
+ *
+ * Linear rather than eased. The value it multiplies already grows with the
+ * number, so the movement compounds on its own; an eased ramp on top of a
+ * compounding step is two accelerations and it runs away.
+ */
+export const holdFraction = (elapsedMs: number): number => {
+    const t = Math.min(1, Math.max(0, elapsedMs || 0) / HOLD_RAMP_MS);
+    return HOLD_START_FRACTION + (HOLD_MAX_FRACTION - HOLD_START_FRACTION) * t;
+};
+
+/**
+ * Where one tick of a held button lands.
+ *
+ * At least one unit, so the very start of a hold is never a press that does
+ * nothing at all. Clamped at both ends here, like the tap, because the caller
+ * repeats this ten times a second.
+ */
+export const holdNudge = (
+    current: number,
+    direction: 1 | -1,
+    maxUnits: number,
+    elapsedMs: number,
+): number => {
+    const now = Math.max(0, current || 0);
+    const ceiling = Math.max(0, maxUnits || 0);
+    const step = Math.max(1, Math.floor(nudgeStep(now) * holdFraction(elapsedMs)));
+    return Math.max(0, Math.min(ceiling, now + direction * step));
+};
+
+// ============================================================================
 //  WHAT "MATCH DEMAND" HAS TO ACTUALLY BUILD
 // ============================================================================
 //
