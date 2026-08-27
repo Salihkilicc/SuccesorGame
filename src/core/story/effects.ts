@@ -83,10 +83,10 @@ export type Effect =
     /**
      * Brand value, IN POINTS, and the unit is the whole story.
      *
-     * A point is not a percent. `brandEquilibrium` is share x 43.3, so an
-     * ordinary mid-game company sits somewhere near 170 and an early one near
-     * 40. The 0-100 figure a person pictures when they read "brand" is the
-     * INDEX, which is points / 4.33.
+     * A point is not a percent. `brandEquilibrium` is sqrt(share/100) x 433,
+     * so an ordinary mid-game company sits somewhere near 170 and an early one
+     * near 40. The 0-100 figure a person pictures when they read "brand" is
+     * the INDEX, which is points / 4.33.
      *
      * Every scene in the game was written against that index. Fifty six
      * effects said things like `amount: 3` meaning three points out of a

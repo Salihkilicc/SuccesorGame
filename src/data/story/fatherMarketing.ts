@@ -20,7 +20,7 @@
 //     not growing. Told to a company that is, it is a slow leak.
 //
 //  2. HE THINKS ADVERTISING BUILDS THE BRAND. It does not - it moves you off
-//     the line temporarily. Brand walks towards share x 43.3 and share pulls
+//     the line temporarily. Brand walks towards sqrt(share) x 43.3 and share pulls
 //     it back (brand.ts, brandEquilibrium). What HOLDS brand is serving the
 //     demand you created: servedRatio speeds the climb and, when it is poor,
 //     accelerates the fall. He never mentions delivery, because in his market

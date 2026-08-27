@@ -73,22 +73,53 @@ describe('the two scales', () => {
         expect(indexToPoints(brandIndex(160))).toBeCloseTo(160, 6);
     });
 
-    it('and a modest market share already saturates every reader of the index', () => {
-        // THE DEFECT, as a number. This is why nothing could be felt.
-        const pointsAtSmallShare = brandEquilibrium(2.31);
-        expect(pointsAtSmallShare).toBeGreaterThanOrEqual(100);
-
-        // Fed the points, two different shares are indistinguishable.
-        expect(brandValuationMultiplier(brandEquilibrium(3)))
-            .toBeCloseTo(brandValuationMultiplier(brandEquilibrium(10)), 6);
-        expect(brandFactor(brandEquilibrium(3)))
-            .toBeCloseTo(brandFactor(brandEquilibrium(10)), 6);
+    it('and feeding one to a reader of the other flattens it', () => {
+        // THE DEFECT, as a number. Every reader of the index clamps at 100,
+        // so handing it points instead makes two very different companies
+        // read identically. 30% and 60% of a market are 237 and 335 points.
+        expect(brandValuationMultiplier(brandEquilibrium(30)))
+            .toBeCloseTo(brandValuationMultiplier(brandEquilibrium(60)), 6);
+        expect(brandFactor(brandEquilibrium(30)))
+            .toBeCloseTo(brandFactor(brandEquilibrium(60)), 6);
 
         // Fed the index, they are not.
-        expect(brandValuationMultiplier(brandIndex(brandEquilibrium(3))))
-            .toBeLessThan(brandValuationMultiplier(brandIndex(brandEquilibrium(10))));
-        expect(brandFactor(brandIndex(brandEquilibrium(3))))
-            .toBeLessThan(brandFactor(brandIndex(brandEquilibrium(10))));
+        expect(brandValuationMultiplier(brandIndex(brandEquilibrium(30))))
+            .toBeLessThan(brandValuationMultiplier(brandIndex(brandEquilibrium(60))));
+        expect(brandFactor(brandIndex(brandEquilibrium(30))))
+            .toBeLessThan(brandFactor(brandIndex(brandEquilibrium(60))));
+    });
+
+    it('and a share anybody actually holds does NOT saturate the index', () => {
+        // ----------------------------------------------------------------
+        //  REPORTED AS "BRAND VALUE IS STUCK AT 100 AND WILL NOT MOVE"
+        // ----------------------------------------------------------------
+        //  It was, and the equilibrium was the reason: it ran share x 43.3,
+        //  straight, so a tenth of one market sat exactly on 433 points and
+        //  every reader downstream pinned at maximum for the rest of the run.
+        //  Measured then: 2.31% share was already 100 points and 10% share
+        //  read index 100.
+        //
+        //  The curve is a square root again - see brandEquilibrium - so a
+        //  hundred means the whole market, which is why it is a hundred.
+        // ----------------------------------------------------------------
+        expect(brandIndex(brandEquilibrium(2.31))).toBeLessThan(20);
+        expect(brandIndex(brandEquilibrium(10))).toBeLessThan(40);
+        expect(brandIndex(brandEquilibrium(40))).toBeLessThan(80);
+        // And it is still a real ceiling at the top, not an asymptote.
+        expect(brandIndex(brandEquilibrium(100))).toBeCloseTo(100, 4);
+    });
+
+    it('and each of those shares is still worth more than the last', () => {
+        // Diminishing returns, not vanishing ones. Every step up in share
+        // still moves the index, which is what "brand cannot be raised" was
+        // really complaining about.
+        const idx = (s: number) => brandIndex(brandEquilibrium(s));
+        const steps = [1, 3, 5, 10, 20, 40, 70, 100].map(idx);
+        for (let i = 1; i < steps.length; i++) {
+            expect(steps[i]).toBeGreaterThan(steps[i - 1]);
+        }
+        // And the first slice is worth more than a later one of the same size.
+        expect(idx(10) - idx(0)).toBeGreaterThan(idx(40) - idx(30));
     });
 });
 
@@ -160,7 +191,11 @@ describe('a sponsorship', () => {
 });
 
 describe('a scene that moves the brand', () => {
-    const cats = () => ({ Consumer: brandEquilibrium(5) });
+    // 40% share, which is index 63. It was 5% here, and 5% used to be index 50
+    // on the straight line; on the curve it is 22, so a shock written as -25
+    // could not land in full and this measured the floor instead of the scene.
+    // See brandEquilibrium.
+    const cats = () => ({ Consumer: brandEquilibrium(40) });
 
     it('lands the amount it was authored to land, on the index', () => {
         // `brand: -25` means a quarter of the scale the writer could see.

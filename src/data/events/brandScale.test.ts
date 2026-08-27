@@ -74,7 +74,17 @@ describe('brand effects are written in points', () => {
         // A mid-sized company's entire brand, gone from one sentence, is a
         // scene taking the run away rather than punishing it. The worst in the
         // game is the conviction, and even that leaves something standing.
-        const midGame = brandEquilibrium(4);   // 4% share, about 173 points
+        //
+        // THE REFERENCE MOVED WITH THE CURVE. This read brandEquilibrium(4),
+        // "4% share, about 173 points", back when the equilibrium was a
+        // straight line. On the square root 4% share is 87 points, so the same
+        // sentence now describes a much smaller company and the biggest
+        // authored effect - 54 - reads as most of its reputation.
+        //
+        // The claim is about a MID-SIZED company, so the share is the thing to
+        // restate, not the fraction. 15% of a market is 168 points, which is
+        // the company this rule was written about.
+        const midGame = brandEquilibrium(15);   // about 168 points, index 39
         for (const e of all) {
             expect(Math.abs(e.amount)).toBeLessThan(midGame * 0.4);
         }

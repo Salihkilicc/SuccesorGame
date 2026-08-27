@@ -7,7 +7,7 @@
 //  Reported as "hic kalici degil, 2 quarter suruyor sonra etkisi bitiyor", and
 //  the measurement agreed. A deal added `brandPerQuarter` to the brand VALUE
 //  every quarter of its term, and `advanceCategoryBrand` walks brand towards
-//  `share x BRAND_POINTS_PER_SHARE` at a quarter to a third of the gap per
+//  `sqrt(share) x 43.3` at a quarter to a third of the gap per
 //  tick, so anything added to the value is pulled back out:
 //
 //      a one-off +10 at an 8% share

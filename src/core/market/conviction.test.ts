@@ -83,8 +83,16 @@ describe('the ceiling penalty is durable, which a drain was not', () => {
     it('and the floor comes down with it, so it cannot be parked under', () => {
         // Otherwise a convicted company simply sits on its tier's floor and
         // the penalty is invisible at every level except the very top.
+        //
+        // STARTS AT 21 RATHER THAN 22, AND THE REASON IS A BALANCE CHANGE.
+        // The stockout multiplier was softened from 2.0 to 0.6, so a quarter
+        // of selling nothing against half a million of unmet demand now costs
+        // 1.8 instead of 6. From 22 that lands on 20.2 - above the clean floor
+        // of 20 - so NEITHER company reached a floor and the test was
+        // measuring nothing. The mechanic is unchanged; the scenario just has
+        // to start close enough to the floor to touch it.
         const input = {
-            currentBrand: 22,
+            currentBrand: 21,
             unitsSold: 0,
             unmetDemand: 500_000,
             marketingSpend: 0,

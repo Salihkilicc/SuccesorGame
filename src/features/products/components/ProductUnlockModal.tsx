@@ -34,7 +34,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     //  CATEGORY GATE — earn your way out before you spread
     // ------------------------------------------------------------------
     //  You cannot open a new market until EVERY market you already trade in
-    //  is at CATEGORY_UNLOCK_BRAND (200 points, which is about 4.6% share).
+    //  is at CATEGORY_UNLOCK_BRAND (93 points, which is about 4.6% share).
     //  Opening a fourth category on the back of one strong one while two sit
     //  neglected is exactly the sprawl this gate exists to prevent.
     //

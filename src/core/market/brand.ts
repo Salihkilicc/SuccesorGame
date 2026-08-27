@@ -378,19 +378,93 @@ export const categoryStartingBrand = (corporate: number): number =>
 //
 //      index = min(100, points / BRAND_INDEX_SCALE)
 //
-//  433 points (10% share) = index 100. Past 10% of a market you are already a
-//  household name, so saturating there is the honest behaviour rather than an
-//  arbitrary clamp.
+//  ---------------------------------------------------------------------------
+//  AND THE LINE IS NOT A LINE. IT CURVES.
+//  ---------------------------------------------------------------------------
+//  Reported as "brand value stuck at 100, it does not move any more, it was
+//  not like this before". Measured, with the straight line above:
+//
+//      share  equilibrium (points)   index
+//        1%          43               10
+//        3%         130               30
+//        5%         217               50
+//       10%         433              100    <- and it never moves again
+//       15%         650              100
+//
+//  A tenth of one market made you the most recognised company that can exist,
+//  and every reader downstream - valuation multiple, hiring pull, attraction -
+//  pinned at maximum for the rest of the run. The brand stopped being a game.
+//
+//  The straight line was never the intent. `brandFromMarketShare`, written
+//  first and still in this file, uses a SQUARE ROOT, and its comment says why:
+//  the first 10% of a market is worth far more in recognition than the next
+//  10%, because becoming visible from nothing is harder than becoming more
+//  visible. Moving to points dropped the root and kept the slope, so what had
+//  been a curve with diminishing returns became a ramp that hit the roof.
+//
+//  Restored. The anchor is the same 433 points, but it now sits at TOTAL
+//  domination rather than at a tenth of one market:
+//
+//      share      1%    5%   10%   20%   40%   100%
+//      points     43    97   137   194   274    433
+//      index      10    22    32    45    63    100
+//
+//  Which is the original design's own table: 10% share reads 32, 40% reads 63.
+//  A hundred means you own the market, and that is why it is a hundred.
 // ============================================================================
 
-/** Brand points earned per point of market share. Derived from the design above. */
+/**
+ * Brand points per point of market share, ON THE STRAIGHT LINE.
+ *
+ * SHELVED as the equilibrium rule - see `brandEquilibrium`, which is a square
+ * root now. Kept exported because it is still the honest answer to "what is a
+ * brand point worth" at small share, where the curve and the line agree
+ * closely (1% share: 43 points either way), and several comments and tests
+ * quote it as the unit.
+ */
 export const BRAND_POINTS_PER_SHARE = 43.3;
 
 /** Points -> the 0-100 index every older module expects. */
 export const BRAND_INDEX_SCALE = 4.33;
 
-/** Brand points needed in a category before another category can be opened. */
-export const CATEGORY_UNLOCK_BRAND = 200;
+/**
+ * Brand points needed in a category before another category can be opened.
+ *
+ * RESCALED WITH THE CURVE, to keep meaning what it meant. The gate was written
+ * as "about 4.6% share in every market you already hold" and 200 was that
+ * number on the straight line. On the square root, 200 points is 21% share -
+ * a gate nobody would ever pass, which would have quietly ended category
+ * progression rather than pacing it.
+ *
+ *      sqrt: 4.6% share -> sqrt(0.046) * 433 = 93 points
+ *
+ * The gate did not move. The scale under it did.
+ */
+export const CATEGORY_UNLOCK_BRAND = 93;
+
+/**
+ * The brand a category has to reach before it can never fall back to nothing.
+ *
+ * ---------------------------------------------------------------------------
+ *  THIS USED TO BE THE SAME CONSTANT AS THE GATE, AND THEY ARE NOT ONE FACT
+ * ---------------------------------------------------------------------------
+ *  `earnedFloor` read CATEGORY_UNLOCK_BRAND, so "you may open another market"
+ *  and "you can never fall below this again" were forced to be the same
+ *  number. They only looked like one rule because nothing had ever moved
+ *  either of them.
+ *
+ *  Rescaling the gate for the curve moved this too, and the conviction
+ *  measurement caught it immediately: a permanent floor at 93 points is index
+ *  21.5, so a convicted company and a clean one both stopped falling there
+ *  and three years of a poisoned reputation came out as a gap of 0.7. A floor
+ *  that high does not protect the player, it disarms every punishment in the
+ *  game.
+ *
+ *  Left at 200, which is what it has always been. Reaching it now means
+ *  roughly 21% of a market rather than 4.6%, which is the right shape for a
+ *  promise this permanent: you kept it when you owned the place.
+ */
+export const EARNED_FLOOR_BRAND = 200;
 
 /** How fast brand walks towards its share-implied level, per quarter. */
 export const BRAND_APPROACH = 0.25;
@@ -512,9 +586,24 @@ export const marketingToPoints = (indexDelta: number): number => {
     return d >= 0 ? indexToPoints(d) : indexToPoints(d) * DECAY_CONVERSION_KEPT;
 };
 
-/** The brand level a given market share supports on its own. */
-export const brandEquilibrium = (sharePercent: number): number =>
-    Math.max(0, sharePercent || 0) * BRAND_POINTS_PER_SHARE;
+/**
+ * The brand level a given market share supports on its own.
+ *
+ * ---------------------------------------------------------------------------
+ *  DIMINISHING RETURNS, WHICH IS THE WHOLE POINT
+ * ---------------------------------------------------------------------------
+ *  Going from nothing to 1% of a market is a bigger change in how well known
+ *  you are than going from 39% to 40%. The square root says exactly that, and
+ *  it is the same curve `brandFromMarketShare` has always used.
+ *
+ *  It is also what stops the index pinning: 433 points - index 100 - now
+ *  means the entire market, not a tenth of it. See the table at the top of
+ *  the points section.
+ */
+export const brandEquilibrium = (sharePercent: number): number => {
+    const share = Math.max(0, Math.min(100, sharePercent || 0));
+    return Math.sqrt(share / 100) * BRAND_MAX * BRAND_INDEX_SCALE;
+};
 
 export interface CategoryBrandInput {
     /** Current brand points in this category */
@@ -797,10 +886,13 @@ export const canUnlockAnotherCategory = (
 /**
  * The floor a category has earned.
  *
- * Reaching CATEGORY_UNLOCK_BRAND locks it in permanently. Kept as a map rather
+ * Reaching EARNED_FLOOR_BRAND locks it in permanently. Kept as a map rather
  * than a boolean so a second milestone can be added later without a migration.
+ *
+ * NOT the unlock gate, though it read that constant until the curve landed.
+ * See EARNED_FLOOR_BRAND for what separating them was worth.
  */
 export const earnedFloor = (currentFloor: number | undefined, brand: number): number => {
     const floor = Math.max(0, currentFloor || 0);
-    return brand >= CATEGORY_UNLOCK_BRAND ? Math.max(floor, CATEGORY_UNLOCK_BRAND) : floor;
+    return brand >= EARNED_FLOOR_BRAND ? Math.max(floor, EARNED_FLOOR_BRAND) : floor;
 };

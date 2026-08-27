@@ -243,7 +243,7 @@ export const SPONSOR_OFFERS: SponsorOffer[] = [
 //      a one-off +10 of brand, at an 8% share
 //        q1 +8.3    q2 +6.9    q3 +5.7    q4 +4.8    q6 +3.3
 //
-//  Brand walks towards `share x BRAND_POINTS_PER_SHARE` at a quarter to a
+//  Brand walks towards `sqrt(share) x 43.3` at a quarter to a
 //  third of the gap per tick, so anything added to the VALUE is pulled back
 //  out with a half life of about four quarters. The largest deal in the game
 //  costs 384 million over sixteen quarters, peaks at +39 brand points, and is
