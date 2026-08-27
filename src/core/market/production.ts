@@ -133,6 +133,67 @@ export const resolveTargetUnits = (
 };
 
 // ============================================================================
+//  THE PLUS AND MINUS BUTTONS
+// ============================================================================
+//
+//  Reported as "the production steppers jump by enormous amounts, 15k straight
+//  to 55k". They did: the step was a flat 5% of MAX CAPACITY.
+//
+//      unitStep = max(1, round(maxUnits * 0.05))
+//
+//  So the step was a property of the factory, not of the number under your
+//  thumb. On a line that can do 800,000 a quarter every tap moved 40,000,
+//  whether you were sitting at 15,000 or at 700,000. Near the bottom of the
+//  range the control had about three usable positions.
+//
+//  The step is a tenth of the CURRENT value now, with a floor of a thousand so
+//  it never becomes a control you have to tap forty times. That gives roughly
+//  the same number of taps to cross any part of the range, which is what
+//  "smooth" means for a stepper.
+//
+//  NOT SYMMETRIC, AND THAT IS ARITHMETIC RATHER THAN AN OVERSIGHT. Up ten per
+//  cent then down ten per cent does not return you to where you were, because
+//  the second step is measured against the bigger number: 15,000 up is 16,500
+//  and back down is 14,850.
+//
+//  The drift is exactly one per cent of the value, EVERYWHERE. I first wrote
+//  here that it shrinks at the top; the test measured it at 700,000 and got
+//  the same one per cent, because the round trip is ratio squared and the
+//  number cancels out. Below the floor of a thousand it is larger still.
+//
+//  Left as it is. Making it reversible would mean remembering where a run of
+//  taps started, which is state the button does not have and a rule the
+//  player would have to be told about.
+// ============================================================================
+
+/** Smallest a stepper tap will ever move, so the control stays usable low down. */
+export const NUDGE_MIN_STEP = 1_000;
+
+/** A tap is worth this share of what is already there. */
+export const NUDGE_RATIO = 0.10;
+
+/** How far one tap of plus or minus moves, given where you are now. */
+export const nudgeStep = (current: number): number =>
+    Math.max(NUDGE_MIN_STEP, Math.floor(Math.max(0, current || 0) * NUDGE_RATIO));
+
+/**
+ * Where one tap of plus or minus lands.
+ *
+ * Clamped at both ends here rather than at the call site, because the hold
+ * repeats this every 100ms and a clamp that lives in the component is a clamp
+ * that the repeat can outrun.
+ */
+export const nudgeUnits = (
+    current: number,
+    direction: 1 | -1,
+    maxUnits: number,
+): number => {
+    const now = Math.max(0, current || 0);
+    const ceiling = Math.max(0, maxUnits || 0);
+    return Math.max(0, Math.min(ceiling, now + direction * nudgeStep(now)));
+};
+
+// ============================================================================
 //  WHAT "MATCH DEMAND" HAS TO ACTUALLY BUILD
 // ============================================================================
 //

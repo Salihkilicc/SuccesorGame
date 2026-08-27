@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,7 +24,7 @@ import {
     marketingBenchmark,
     shareOfVoice,
 } from '../../../core/market/attraction';
-import { matchDemandPlan, maxUnitsPerQuarter, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
+import { matchDemandPlan, maxUnitsPerQuarter, nudgeUnits, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
 import { ProductIconBadge } from './ProductIcon';
 import {
     CONTRACT_PARTNERS,
@@ -125,6 +125,53 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
 
 // --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
 // --- DETAIL MODAL (NEW R&D UPGRADE SYSTEM) ---
+// ============================================================================
+//  HOLD TO KEEP GOING
+// ============================================================================
+//  A stepper whose step scales with the value needs a hold, or crossing the
+//  range from the bottom is twenty five taps. `onLongPress` starts a repeat
+//  and `onPressOut` ends it.
+//
+//  TWO REFS, AND BOTH EARN THEIR KEEP:
+//
+//    `timer`   so `onPressOut` can find the interval it has to clear. State
+//              would re-render the whole row on every press.
+//
+//    `latest`  so the interval always calls the CURRENT closure. Captured
+//              once, it would keep adding whatever the step was when the
+//              finger went down, which is the jumping the tap just fixed.
+//
+//  The effect clears on unmount: an interval that outlives the screen goes on
+//  calling setState on a component that is gone.
+// ============================================================================
+
+/** How often a held button repeats. */
+const HOLD_REPEAT_MS = 100;
+
+const useHoldRepeat = (tick: () => void) => {
+    const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+    const latest = useRef(tick);
+    latest.current = tick;
+
+    const stop = useCallback(() => {
+        if (timer.current !== null) {
+            clearInterval(timer.current);
+            timer.current = null;
+        }
+    }, []);
+
+    const start = useCallback(() => {
+        // Guard against a second start without a stop, which would leak the
+        // first interval and quietly double the speed.
+        stop();
+        timer.current = setInterval(() => latest.current(), HOLD_REPEAT_MS);
+    }, [stop]);
+
+    useEffect(() => stop, [stop]);
+
+    return { start, stop };
+};
+
 /**
  * Stand-in used while a product is missing, so the hooks below can run
  * unconditionally. Never rendered — the component returns null first.
@@ -371,8 +418,26 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     );
     const goodUnits = Math.floor(willBuild * effectiveYield);
     const scrapUnits = willBuild - goodUnits;
-    // Bar adimi: kapasitenin %5'i, en az 1
-    const unitStep = Math.max(1, Math.round(maxUnits * 0.05));
+    // SHELVED: the step used to be a share of the FACTORY rather than of the
+    // number under your thumb, so on a big line every tap moved forty thousand
+    // whether you sat at fifteen thousand or at seven hundred thousand. See
+    // core/market/production.nudgeUnits.
+    //   const unitStep = Math.max(1, Math.round(maxUnits * 0.05));
+
+    // ------------------------------------------------------------------
+    //  ONE MOVE, USED BY THE TAP AND BY EVERY REPEAT OF THE HOLD
+    // ------------------------------------------------------------------
+    //  Functional setState on purpose. The hold fires every 100ms and works
+    //  from the value it is handed rather than the one captured when the
+    //  finger went down, so a long press accelerates as the number grows
+    //  instead of adding the same amount over and over.
+    // ------------------------------------------------------------------
+    const bumpProduction = useCallback(
+        (direction: 1 | -1) => setProductionUnits(v => nudgeUnits(v, direction, maxUnits)),
+        [maxUnits],
+    );
+    const holdUp = useHoldRepeat(() => bumpProduction(1));
+    const holdDown = useHoldRepeat(() => bumpProduction(-1));
 
     // ---- FASON URETIM ----------------------------------------------------
     //  Kapasite duvarinin etrafindan dolasmanin yolu. Kendi kapasiteni
@@ -682,7 +747,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
 
                             <View style={styles.sliderRow}>
                                 <Pressable
-                                    onPress={() => setProductionUnits(Math.max(0, productionUnits - unitStep))}
+                                    onPress={() => bumpProduction(-1)}
+                                    onLongPress={holdDown.start}
+                                    onPressOut={holdDown.stop}
+                                    delayLongPress={300}
                                     style={styles.adjBtn}
                                 >
                                     <Text style={styles.adjText}>−</Text>
@@ -692,9 +760,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     <Text style={styles.controlValueUnit}>units per quarter</Text>
                                 </View>
                                 <Pressable
-                                    onPress={() =>
-                                        setProductionUnits(Math.min(maxUnits, productionUnits + unitStep))
-                                    }
+                                    onPress={() => bumpProduction(1)}
+                                    onLongPress={holdUp.start}
+                                    onPressOut={holdUp.stop}
+                                    delayLongPress={300}
                                     style={styles.adjBtn}
                                 >
                                     <Text style={styles.adjText}>+</Text>
