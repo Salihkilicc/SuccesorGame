@@ -146,8 +146,8 @@ export const resolveTargetUnits = (
 //  whether you were sitting at 15,000 or at 700,000. Near the bottom of the
 //  range the control had about three usable positions.
 //
-//  The step is a share of the CURRENT value now, with a floor of a thousand so
-//  it never becomes a control you have to tap forty times. That gives roughly
+//  The step is a share of the CURRENT value now, with a floor under it so it
+//  never becomes a control you have to tap forty times. That gives roughly
 //  the same number of taps to cross any part of the range, which is what
 //  "smooth" means for a stepper.
 //
@@ -160,14 +160,30 @@ export const resolveTargetUnits = (
 //      a tenth         1,500     10,000     70,000   <- bigger than before
 //      a twentieth     1,000      5,000     35,000
 //
-//  So the first fix cured the bottom of the range and made the top worse. A
-//  twentieth lands within an eighth of the old step where the old step was
-//  bearable, and stays fine where it was not.
+//  So the first fix cured the bottom of the range and made the top worse.
 //
 //  A CAP OF FIVE PER CENT OF CAPACITY WAS THE OTHER CANDIDATE and it would
 //  have matched the old number exactly at the top. Rejected: it puts the
 //  factory back into the step, which is the coupling this whole section
 //  exists to remove.
+//
+//  THEN HALVED AGAIN, asked for as "both the normal tap and the hold should
+//  move less". A fortieth, with the floor halved alongside it - below 20,000
+//  the floor is what binds, so moving the ratio on its own would have changed
+//  nothing at exactly the values the reports keep coming from:
+//
+//      tap            15,000    100,000    700,000    taps across the range
+//      a twentieth     1,000      5,000     35,000            81
+//      a fortieth        500      2,500     17,500           160
+//
+//  AND THE HOLD HALVED WITH IT, FOR FREE. A hold tick is a fraction of a tap,
+//  so halving the tap halves the hold and its constants did not move. Making
+//  those smaller too would have compounded the two reductions.
+//
+//  THE COST, STATED RATHER THAN DISCOVERED: crossing the full range is 160
+//  taps, or 41 seconds of holding. That is a lot, and it is the price of a
+//  control fine enough to land on a number. Big moves are what the match
+//  demand button is for.
 //
 //  NOT SYMMETRIC, AND THAT IS ARITHMETIC RATHER THAN AN OVERSIGHT. Up ten per
 //  cent then down ten per cent does not return you to where you were, because
@@ -184,16 +200,23 @@ export const resolveTargetUnits = (
 //  player would have to be told about.
 // ============================================================================
 
-/** Smallest a stepper tap will ever move, so the control stays usable low down. */
-export const NUDGE_MIN_STEP = 1_000;
+/**
+ * Smallest a stepper tap will ever move, so the control stays usable low down.
+ *
+ * Halved with the ratio. Below 20,000 this is what binds, so lowering the
+ * ratio on its own would have changed nothing at exactly the values the
+ * reports keep coming from.
+ */
+export const NUDGE_MIN_STEP = 500;
 
 /**
  * A tap is worth this share of what is already there.
  *
- * A twentieth, not a tenth. See the note above: a tenth was larger than the
- * flat step it replaced anywhere above 400,000.
+ * A fortieth. It was a tenth, then a twentieth, and this is the third pass:
+ * "both the tap and the hold should move less". See the note above for the
+ * cost, which is real and is the whole range taking 160 taps.
  */
-export const NUDGE_RATIO = 0.05;
+export const NUDGE_RATIO = 0.025;
 
 /** How far one tap of plus or minus moves, given where you are now. */
 export const nudgeStep = (current: number): number =>
@@ -235,26 +258,25 @@ export const nudgeUnits = (
 //
 //  MEASURED, not guessed. I wrote a table here from the constants before
 //  running it and every figure was wrong, so these come off the simulation,
-//  holding plus from 15,000:
+//  holding plus from 15,000 with the tap at a fortieth:
 //
-//      1.0s   16,140      still choosing
-//      2.0s   18,729
-//      3.0s   22,721
-//      5.0s   33,748
-//      8.0s   61,104
-//     12.0s  134,888
+//      1.0s   15,568      still choosing
+//      3.0s   18,784
+//      5.0s   22,963
+//      8.0s   30,932
+//     12.0s   46,022
+//     41.0s  800,000  ceiling
 //
-//  The first second moves seven per cent, which is the "azar azar" part, and
-//  it keeps compounding, which is the acceleration.
+//  The first second moves under four per cent, which is the "azar azar" part,
+//  and it keeps compounding, which is the acceleration.
 //
 //  THE ALTERNATIVES WERE MEASURED TOO, because a number chosen by feel is a
-//  number nobody can argue with later. Eight seconds from 15,000 reached:
+//  number nobody can argue with later. Eight seconds from 15,000 reached, at
+//  the ramp this ended up with:
 //
-//      start .08 max .75 ramp 1.5s   the ceiling, and half a second moved 12%
-//      start .03 max .60 ramp 2.0s   127k
-//      start .03 max .40 ramp 2.5s    61k   <- this one
-//      start .02 max .30 ramp 3.0s    42k
-//      start .02 max .20 ramp 3.0s    30k, about a slider
+//      tap a twentieth   61k, ceiling at 21s
+//      tap a fortieth    31k, ceiling at 41s   <- this one
+//      tap a sixtieth    24k, ceiling at 61s
 // ============================================================================
 
 /** How often a held button repeats. */

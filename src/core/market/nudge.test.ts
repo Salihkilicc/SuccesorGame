@@ -19,16 +19,20 @@
 //  roughly the same number of taps to cross any part of the range. That is
 //  what "smooth" means for a stepper.
 //
-//  AND THE SHARE IS A TWENTIETH, NOT A TENTH, BECAUSE I OVERSHOT. Reported
-//  back as "the tap should stay as it was, this time you made THAT one
-//  bigger", and it was true wherever the number was large:
+//  AND THE SHARE CAME DOWN TWICE, BECAUSE I OVERSHOT AND THEN UNDERSHOT.
+//  First "the tap should stay as it was, this time you made THAT one bigger",
+//  which was true wherever the number was large; then "both the tap and the
+//  hold should move less":
 //
-//      one tap        15,000    100,000    700,000
-//      old, flat      40,000     40,000     40,000
-//      a tenth         1,500     10,000     70,000   <- bigger than before
-//      a twentieth     1,000      5,000     35,000
+//      one tap        15,000    100,000    700,000    taps across the range
+//      old, flat      40,000     40,000     40,000            20
+//      a tenth         1,500     10,000     70,000            41
+//      a twentieth     1,000      5,000     35,000            81
+//      a fortieth        500      2,500     17,500           160   <- now
 //
-//  The first fix cured the bottom of the range and made the top worse.
+//  The first pass cured the bottom of the range and made the top worse. The
+//  cost of the third is written down rather than left to be discovered: 160
+//  taps or 41 seconds of holding to cross the whole range.
 // ============================================================================
 
 import fs from 'fs';
@@ -46,7 +50,7 @@ describe('how far one tap moves', () => {
         // THE DEFECT, as the two numbers in the report. The old step at this
         // capacity was 40,000, so 15,000 went to 55,000 in one tap.
         expect(Math.round(MAX * 0.05)).toBe(40_000);
-        expect(nudgeUnits(15_000, 1, MAX)).toBe(16_000);
+        expect(nudgeUnits(15_000, 1, MAX)).toBe(15_500);
     });
 
     it('and it is never bigger than the flat step it replaced', () => {
@@ -65,18 +69,26 @@ describe('how far one tap moves', () => {
     });
 
     it('and it grows with the number, so the top of the range is not forty taps', () => {
-        expect(nudgeStep(700_000)).toBe(35_000);
-        expect(nudgeStep(100_000)).toBe(5_000);
+        expect(nudgeStep(700_000)).toBe(17_500);
+        expect(nudgeStep(100_000)).toBe(2_500);
     });
 
     it('and never gets so small the control stops being usable', () => {
-        // A twentieth of 200 is 10. Crossing the low end at 10 a tap is not a
+        // A fortieth of 200 is 5. Crossing the low end at 5 a tap is not a
         // control, it is a chore. The floor binds all the way up to 20,000.
         expect(nudgeStep(0)).toBe(NUDGE_MIN_STEP);
         expect(nudgeStep(200)).toBe(NUDGE_MIN_STEP);
         expect(nudgeStep(15_000)).toBe(NUDGE_MIN_STEP);
         expect(nudgeStep(20_000)).toBe(NUDGE_MIN_STEP);
-        expect(NUDGE_RATIO).toBeCloseTo(0.05, 6);
+        expect(NUDGE_RATIO).toBeCloseTo(0.025, 6);
+    });
+
+    it('and the floor came down with the ratio, or nothing changed at 15,000', () => {
+        // The trap in the third pass. Below 20,000 the FLOOR is what binds,
+        // so halving the ratio on its own would have left the tap at exactly
+        // the same 1,000 in the part of the range every report came from.
+        expect(NUDGE_MIN_STEP).toBe(500);
+        expect(nudgeStep(15_000)).toBeLessThan(1_000);
     });
 
     it('and takes a similar number of taps to cross any decade', () => {
@@ -121,7 +133,7 @@ describe('and where it lands', () => {
         // remembering where a run of taps began - state the button does not
         // have and a rule the player would have to be told.
         const up = nudgeUnits(100_000, 1, MAX);
-        expect(nudgeUnits(up, -1, MAX)).toBe(99_750);
+        expect(nudgeUnits(up, -1, MAX)).toBe(99_938);
 
         // AND THE DRIFT IS THE SAME EVERYWHERE, WHICH I HAD WRONG. I wrote
         // "a fraction of a per cent at the top" and this measured the same
@@ -185,14 +197,13 @@ describe('holding a stepper', () => {
     });
 
     it('and it is deliberately slow, so the whole range is a long hold', () => {
-        // Measured: 15,000 to the 800,000 ceiling takes 21.1 seconds, and the
-        // ceiling back down to zero takes 24.5. That is the point rather than
-        // a problem - big moves are what the tap and the match demand button
-        // are for, and this control is for landing on a number. The first
-        // version crossed the same range in about a second and a half.
-        expect(held(15_000, 5_000)).toBeLessThan(40_000);
-        expect(held(15_000, 15_000)).toBeLessThan(800_000);
-        expect(held(15_000, 25_000)).toBe(800_000);
+        // Measured: 15,000 to the 800,000 ceiling takes 41 seconds. That is
+        // the point rather than a problem - big moves are what the match
+        // demand button is for, and this control is for landing on a number.
+        // The first version crossed the same range in a second and a half.
+        expect(held(15_000, 5_000)).toBeLessThan(25_000);
+        expect(held(15_000, 20_000)).toBeLessThan(800_000);
+        expect(held(15_000, 50_000)).toBe(800_000);
     });
 
     it('and the ramp stops ramping, rather than growing without end', () => {
@@ -218,7 +229,7 @@ describe('holding a stepper', () => {
 
     it('and it stops at both ends like the tap does', () => {
         expect(held(800_000, 5000)).toBe(800_000);
-        expect(held(50_000, 20_000, 800_000, -1)).toBe(0);
+        expect(held(50_000, 60_000, 800_000, -1)).toBe(0);
     });
 
     it('and holding down comes back at the same shape it went up', () => {
