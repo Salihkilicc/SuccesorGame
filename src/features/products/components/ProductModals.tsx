@@ -783,67 +783,79 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 telling of the same fact. The bar's colour is
                                 the fourth, and that one is glanceable. */}
 
-                            {/* Talebe esitle */}
-                            {/* Stok zaten talebi karsiliyorsa dugme 0 gosteriyordu
-                                ve bozuk gibi duruyordu. Artik sebebini yaziyor. */}
-                            {expectedDemand > 0 && neededUnits <= 0 && (
-                                <Text style={styles.matchNote}>
-                                    {t('product.enoughStock', { units: formatNumber(product.inventory || 0) })}
-                                </Text>
-                            )}
                             {/* -----------------------------------------------
-                                KAPASITE YOKKEN BUTON "0 URET" DIYORDU
+                                THE BUTTON USED TO DISAPPEAR AND NOT SAY WHY
                                 -----------------------------------------------
-                                Tesis yenilenirken ya da kadro sifirlandiginda
-                                maxUnits 0 oluyor ve Math.min(0, ihtiyac) = 0.
-                                Buton bozuk gibi duruyordu. Artik sebebini
-                                soyluyor: uretemiyorsun, talep yok degil.
-                               ----------------------------------------------- */}
-                            {expectedDemand > 0 && neededUnits > 0 && maxUnits <= 0 && (
-                                <Text style={styles.matchNote}>
-                                    {isRetooling ? t('product.cannotBuildRetooling') : t('product.cannotBuildNoCrew')}
-                                </Text>
-                            )}
-                            {/* -----------------------------------------------
-                                THE BUTTON ANNOUNCED A NUMBER IT THEN CLAMPED
-                                -----------------------------------------------
-                                The label compared RAW demand against capacity
-                                and the press set `min(capacity, need/yield)`,
-                                so at need 3800, yield 0.9 and capacity 4050 it
-                                said "build 4222" and set 4050. Two sums, one
-                                button, and the player only saw the promise.
+                                Reported as "the blue match demand button goes
+                                away later in the game, I don't know why".
 
-                                One plan now, used by both. See
-                                core/market/production.matchDemandPlan, which
-                                also carries the ten per cent margin: demand
-                                moves while you build, and arriving slightly
-                                short is what costs the reach index.
+                                Three separate conditions rendered three
+                                different things and the fourth rendered
+                                NOTHING:
+
+                                  demand 0            -> empty space
+                                  stock covers it     -> a dim grey line
+                                  no line to build on -> a dim grey line
+                                  otherwise           -> a solid blue button
+
+                                So two thirds of the time the control was gone
+                                and what replaced it was 11px at 48% white,
+                                which reads as absence rather than as an
+                                answer. The button never moves now. It changes
+                                what it says and stops being pressable, which
+                                is a state the player can see and understand.
+
+                                See production.matchDemandPlan for the number
+                                itself and the ten per cent margin on it.
                                ----------------------------------------------- */}
-                            {expectedDemand > 0 && neededUnits > 0 && maxUnits > 0 && (
-                                <>
-                                    <Pressable
-                                        style={({ pressed }) => [styles.matchBtn, pressed && styles.matchBtnPressed]}
-                                        onPress={() => setProductionUnits(demandPlan.build)}
-                                    >
-                                        <Text style={styles.matchBtnText}>
-                                            {demandPlan.shortfall > 0
-                                                ? t('product.matchDemandShort', {
-                                                    units: formatNumber(demandPlan.build),
-                                                    short: formatNumber(demandPlan.shortfall),
-                                                })
-                                                : t('product.matchDemand', { units: formatNumber(demandPlan.build) })}
-                                        </Text>
-                                    </Pressable>
-                                    {/* Only when the margin is what puts the
-                                        number above demand. A capped build is
-                                        already explaining itself above. */}
-                                    {!demandPlan.capped && (
-                                        <Text style={styles.matchNote}>
-                                            {t('product.matchDemandBuffer', { demand: formatNumber(expectedDemand) })}
-                                        </Text>
-                                    )}
-                                </>
-                            )}
+                            {(() => {
+                                // Which of the four, decided once, so the
+                                // label and the press cannot disagree again.
+                                const stalled =
+                                    expectedDemand <= 0
+                                        ? t('product.matchDemandNoDemand')
+                                        : neededUnits <= 0
+                                            ? t('product.enoughStock', { units: formatNumber(product.inventory || 0) })
+                                            : maxUnits <= 0
+                                                ? (isRetooling ? t('product.cannotBuildRetooling') : t('product.cannotBuildNoCrew'))
+                                                : null;
+
+                                if (stalled !== null) {
+                                    return (
+                                        <View style={[styles.matchBtn, styles.matchBtnIdle]}>
+                                            <Text style={[styles.matchBtnText, styles.matchBtnIdleText]}>
+                                                {stalled}
+                                            </Text>
+                                        </View>
+                                    );
+                                }
+
+                                return (
+                                    <>
+                                        <Pressable
+                                            style={({ pressed }) => [styles.matchBtn, pressed && styles.matchBtnPressed]}
+                                            onPress={() => setProductionUnits(demandPlan.build)}
+                                        >
+                                            <Text style={styles.matchBtnText}>
+                                                {demandPlan.shortfall > 0
+                                                    ? t('product.matchDemandShort', {
+                                                        units: formatNumber(demandPlan.build),
+                                                        short: formatNumber(demandPlan.shortfall),
+                                                    })
+                                                    : t('product.matchDemand', { units: formatNumber(demandPlan.build) })}
+                                            </Text>
+                                        </Pressable>
+                                        {/* Only when the margin is what puts the
+                                            number above demand. A capped build is
+                                            already explaining itself above. */}
+                                        {!demandPlan.capped && (
+                                            <Text style={styles.matchNote}>
+                                                {t('product.matchDemandBuffer', { demand: formatNumber(expectedDemand) })}
+                                            </Text>
+                                        )}
+                                    </>
+                                );
+                            })()}
 
                             {/* MOVED TO ALERTS: the capacity ceiling, the
                                 retooling notice and the quality cap. All
@@ -1469,6 +1481,18 @@ const styles = StyleSheet.create({
     },
     matchBtnPressed: { backgroundColor: theme.colors.highlight, transform: [{ scale: 0.99 }] },
     matchBtnText: { color: theme.colors.primaryText, fontSize: 13, fontWeight: '800' },
+    /**
+     * THE SAME BUTTON, WITH NOTHING TO DO.
+     *
+     * `disabled` is a LIGHT grey on purpose - see the theme note - so the
+     * label stays black, exactly as it is when the button is live. A greyed
+     * button whose text also flips colour reads as a different control.
+     * Keeping the shape and the position is the whole point: the player
+     * reported the button vanishing, and a control that stays put while its
+     * sentence changes cannot vanish.
+     */
+    matchBtnIdle: { backgroundColor: theme.colors.disabled },
+    matchBtnIdleText: { color: theme.colors.onLight, fontWeight: '700' },
 
     mktTrack: {
         height: 8,

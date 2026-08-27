@@ -133,3 +133,75 @@ describe('the wiring', () => {
         expect(src).toMatch(/short: formatNumber\(demandPlan\.shortfall\)/);
     });
 });
+
+// ============================================================================
+//  AND IT DOES NOT DISAPPEAR
+// ============================================================================
+//  Reported as "the blue match demand button goes away later in the game and
+//  I don't know why". Four conditions, three of which rendered something else:
+//
+//      demand 0            -> NOTHING AT ALL, an empty gap
+//      stock covers it     -> an 11px line at 48% white
+//      no line to build on -> an 11px line at 48% white
+//      otherwise           -> a solid blue button
+//
+//  Two thirds of the time the control was gone and what stood in for it read
+//  as absence rather than as an answer. Nothing was broken; the screen just
+//  stopped talking at the moment it had something to say.
+// ============================================================================
+describe('the control stays where it is', () => {
+    const src = fs.readFileSync(
+        path.join(__dirname, '..', '..', 'features', 'products', 'components', 'ProductModals.tsx'),
+        'utf8',
+    );
+
+    it('every reason it cannot act has a sentence, including no demand', () => {
+        for (const key of [
+            'product.matchDemandNoDemand',
+            'product.enoughStock',
+            'product.cannotBuildRetooling',
+            'product.cannotBuildNoCrew',
+        ]) {
+            expect(src).toContain(key);
+        }
+    });
+
+    it('and both languages can say all of them', () => {
+        const tr = fs.readFileSync(path.join(__dirname, '..', 'i18n', 'tr.ts'), 'utf8');
+        const en = fs.readFileSync(path.join(__dirname, '..', 'i18n', 'en.ts'), 'utf8');
+        for (const key of [
+            'product.matchDemandNoDemand',
+            'product.matchDemandShort',
+            'product.matchDemandBuffer',
+        ]) {
+            expect(tr).toContain(`'${key}'`);
+            expect(en).toContain(`'${key}'`);
+        }
+    });
+
+    it('and it keeps the button shape rather than collapsing to a grey line', () => {
+        // The rule that would have caught the original: whatever renders in
+        // the stalled cases carries `matchBtn`, so it occupies the same space.
+        expect(src).toMatch(/\[styles\.matchBtn, styles\.matchBtnIdle\]/);
+        expect(src).toMatch(/matchBtnIdle: \{ backgroundColor: theme\.colors\.disabled \}/);
+    });
+
+    it('and the idle label is dark, because the idle fill is light', () => {
+        // Rule 1. `disabled` is a light grey, so the text on it is onLight -
+        // the same black the live button uses, so greying out does not turn
+        // into a different control.
+        expect(src).toMatch(/matchBtnIdleText: \{ color: theme\.colors\.onLight/);
+    });
+
+    it('and no player facing string in this block uses a dash', () => {
+        const tr = fs.readFileSync(path.join(__dirname, '..', 'i18n', 'tr.ts'), 'utf8');
+        const en = fs.readFileSync(path.join(__dirname, '..', 'i18n', 'en.ts'), 'utf8');
+        const lines = [...tr.split('\n'), ...en.split('\n')]
+            .filter(l => /'product\.matchDemand/.test(l) || /'product\.enoughStock/.test(l));
+        expect(lines.length).toBeGreaterThan(0);
+        for (const l of lines) {
+            expect(l).not.toMatch(/[—–]/);
+            expect(l.replace(/^.*?:/, '')).not.toMatch(/ - /);
+        }
+    });
+});
