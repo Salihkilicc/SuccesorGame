@@ -1857,6 +1857,12 @@ export const useGameStore = create<GameStore>()(
           grossMargin: totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0,
 
           unitsProduced: totalProduction,
+          // The weakest line's reach, because that is the one in trouble and
+          // the report has one row to spend on it. See reportTypes.reachIndex
+          // for what it costs and how long it had no reader.
+          reachIndex: updatedProducts.length > 0
+            ? Math.min(...updatedProducts.map(p => p.reachIndex ?? 1))
+            : undefined,
           unitsSold: totalSales,
           endingInventory: totalEndingStock,
           sellThrough: totalAvailableGoods > 0 ? (totalSales / totalAvailableGoods) * 100 : 0,

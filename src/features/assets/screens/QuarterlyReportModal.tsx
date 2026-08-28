@@ -159,6 +159,33 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   }
 
   // ------------------------------------------------------------------
+  //  THE CUSTOMERS YOU TURNED AWAY DO NOT COME BACK ON THEIR OWN
+  // ------------------------------------------------------------------
+  //  `reachIndex` multiplies straight into the attraction that decides
+  //  market share, and it appeared on no screen at all. Measured over
+  //  twenty four quarters of serving about two thirds of demand, it fell
+  //  1.00 to 0.46 - more than half the company's reach, permanently, with
+  //  nothing naming it.
+  //
+  //  Which is most of "demand is not growing and I do not know why".
+  //  Demand was not failing to grow; it was being destroyed by stockouts
+  //  whose lasting cost was invisible.
+  //
+  //  Shown once it has cost something worth a sentence, and immediately
+  //  AFTER the stockout note: that one is what happened this quarter, this
+  //  one is the bill for it, and the bill only makes sense next to the
+  //  purchase.
+  // ------------------------------------------------------------------
+  const reach = r.reachIndex;
+  if (reach !== undefined && reach < 0.95) {
+    notes.push({
+      tone: 'bad',
+      text: t('obs.reachLost', { v1: formatPercent(Math.round((1 - reach) * 100)) }),
+    });
+  }
+
+
+  // ------------------------------------------------------------------
   //  THE CLOCK, WHILE IT IS RUNNING
   // ------------------------------------------------------------------
   //  First, above everything else on the page, because nothing else on it

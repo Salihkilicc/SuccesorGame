@@ -134,6 +134,29 @@ export interface QuarterReport {
 
     // --- Operasyon ---
     unitsProduced: number;
+
+    /**
+     * How much of this market you can still reach, 0.15 to 1.
+     *
+     * ---------------------------------------------------------------------
+     *  THE MOST PUNISHING NUMBER IN THE GAME AND NOBODY COULD SEE IT
+     * ---------------------------------------------------------------------
+     *  `reachIndex` is computed every quarter, persisted on the product, and
+     *  MULTIPLIED INTO the attraction that decides market share. Turn
+     *  customers away and it falls; serve them and it recovers slowly.
+     *
+     *  It appeared on no screen. Measured over twenty four quarters at the
+     *  full benchmark, serving about two thirds of demand every quarter:
+     *
+     *      q1 0.95   q2 0.90   q4 0.81   q8 0.64   q16 0.47   q24 0.46
+     *
+     *  More than half the company's reach, gone, permanently, with nothing
+     *  anywhere naming it. That is most of "brand and demand are not growing
+     *  and I do not know why": demand was not failing to grow, it was being
+     *  destroyed by stockouts the player was never told had a lasting cost.
+     * ---------------------------------------------------------------------
+     */
+    reachIndex?: number;
     unitsSold: number;
     endingInventory: number;
     /** Tüm ürünler için toplam satış oranı */
