@@ -45,6 +45,7 @@ import { useMessageStore, unreadCount } from '../../core/store/useMessageStore';
 import { useMailStore, unreadMailCount } from '../../core/store/useMailStore';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
+import { getTier } from '../../core/market/capacity';
 import { useNewsStore } from '../../core/store/useNewsStore';
 // SHELVED with the modal in the render - Silicon News is a route now.
 // import { SiliconNewsModal } from '../../features/news';
@@ -52,6 +53,9 @@ import { useStoryStore } from '../../core/store/useStoryStore';
 import { readTitle } from '../../core/story/world';
 import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
 import EndingOverlay from '../../components/story/EndingOverlay';
+import SponsorDroughtWarningModal from '../../components/common/SponsorDroughtWarningModal';
+import { useSponsorshipStore } from '../../core/store/useSponsorshipStore';
+import { DROUGHT_GRACE_QUARTERS, droughtPenalty, shouldWarnDrought } from '../../core/market/sponsorship';
 
 type HomeNavProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList, 'Home'>,
@@ -230,6 +234,14 @@ const HomeScreen = () => {
   const [reportVisible, setReportVisible] = useState(false);
   const [lastReportData, setLastReportData] = useState<ReportFinancialData | null>(null);
 
+  // --- Sponsor Drought Warning State ---
+  // Modal rapor kapandıktan hemen sonra açılır.
+  // Eşik ilk aşıldığında + ardından her 4 çeyrekte bir gösterilir.
+  const [sponsorWarningVisible, setSponsorWarningVisible] = useState(false);
+  const [lastDroughtWarningAt, setLastDroughtWarningAt] = useState<number>(0);
+  const sponsorQuartersWithout = useSponsorshipStore(s => s.quartersWithout);
+  const sponsorActive = useSponsorshipStore(s => s.active);
+
   // ------------------------------------------------------------------
   //  THE BACKSTOP, AND WHY IT IS AN ID RATHER THAN A SCREEN STATE
   // ------------------------------------------------------------------
@@ -324,6 +336,24 @@ const HomeScreen = () => {
         };
         setLastReportData(mappedData);
         setReportVisible(true);
+
+        // ------------------------------------------------------------------
+        //  SPONSOR DROUGHT KONTROLÜ — rapor kapanınca açılır
+        // ------------------------------------------------------------------
+        //  useSponsorshipStore.quartersWithout burada henüz güncellenmiş;
+        //  sponsorship advance tick'te çalışır. Penalty'yi canlı hesaplıyoruz.
+        // ------------------------------------------------------------------
+        const qWithout = useSponsorshipStore.getState().quartersWithout;
+        const isInDrought = !useSponsorshipStore.getState().active && qWithout > DROUGHT_GRACE_QUARTERS;
+        if (isInDrought) {
+          const quarterIndex = result.data?.quarter ?? 0;
+          const isFirst = lastDroughtWarningAt === 0;
+          const isReminder = quarterIndex - lastDroughtWarningAt >= 4;
+          if (isFirst || isReminder) {
+            // Rapor kapandıktan sonra aç
+            setLastDroughtWarningAt(quarterIndex);
+          }
+        }
 
         // IKI FARKLI BITIS. Ikisi de oyunu bitirir ama sebepleri
         // tamamen farkli ve oyuncunun hangisini yasadigini bilmesi
@@ -776,8 +806,37 @@ const HomeScreen = () => {
 
         <QuarterlyReportModal
           visible={reportVisible}
-          onClose={() => setReportVisible(false)}
+          onClose={() => {
+            setReportVisible(false);
+            // ------------------------------------------------------------
+            //  EVERY THIRD QUARTER, NOT EVERY QUARTER
+            // ------------------------------------------------------------
+            //  It fired on every quarter the penalty was biting, which is
+            //  wallpaper rather than a warning: the player learns to tap it
+            //  away and stops reading it. First bite, then every third.
+            //  See market/sponsorship.shouldWarnDrought.
+            // ------------------------------------------------------------
+            const qWithout = useSponsorshipStore.getState().quartersWithout;
+            const active = useSponsorshipStore.getState().active;
+            if (shouldWarnDrought(qWithout, !!active)) {
+              setSponsorWarningVisible(true);
+            }
+          }}
           reportData={lastReportData}
+        />
+
+        {/* --- SPONSOR DROUGHT WARNING --- */}
+        <SponsorDroughtWarningModal
+          visible={sponsorWarningVisible}
+          quartersWithout={sponsorQuartersWithout}
+          // The tier's ceiling, or the modal quotes the flat fallback cap and
+          // shows a penalty the engine is not applying. See
+          // market/sponsorship.DROUGHT_PENALTY_CAP_RATIO.
+          currentPenalty={droughtPenalty(
+            sponsorQuartersWithout,
+            getTier(useStatsStore.getState().facilityTier).brandCeiling,
+          )}
+          onClose={() => setSponsorWarningVisible(false)}
         />
         {/* ----------------------------------------------------------------
             SHELVED: Silicon News is a route.

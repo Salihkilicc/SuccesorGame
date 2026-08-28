@@ -25,10 +25,12 @@
 
 import {
     droughtPenalty,
+    shouldWarnDrought,
     DROUGHT_GRACE_QUARTERS,
     DROUGHT_PENALTY_PER_QUARTER,
     DROUGHT_PENALTY_CAP,
     DROUGHT_PENALTY_CAP_RATIO,
+    DROUGHT_WARN_EVERY,
 } from './sponsorship';
 import { getTier } from './capacity';
 
@@ -118,5 +120,95 @@ describe('the wiring', () => {
         );
         expect(src).toMatch(/getTier\(useStatsStore\.getState\(\)\.facilityTier\)\.brandCeiling/);
         expect(src).toMatch(/droughtPenalty\(get\(\)\.quartersWithout, ceiling\)/);
+    });
+});
+
+// ============================================================================
+//  AND THE WARNING IS NOT WALLPAPER
+// ============================================================================
+//  It fired on every quarter the penalty was biting. A modal that appears
+//  every single quarter is not a warning: the player learns the gesture that
+//  dismisses it and stops reading the words, which is worse than not showing
+//  it, because now the game believes it has told them.
+// ============================================================================
+describe('when the drought warning shows', () => {
+    const dry = (q: number) => shouldWarnDrought(q, false);
+
+    it('never while a deal is live, whatever the counter says', () => {
+        expect(shouldWarnDrought(DROUGHT_GRACE_QUARTERS + 1, true)).toBe(false);
+        expect(shouldWarnDrought(999, true)).toBe(false);
+    });
+
+    it('and never during the grace period, because nothing is being taken yet', () => {
+        // A warning that fires before there is a cost teaches the player that
+        // the warning does not mean much.
+        //
+        // AND THIS TEST DOES NOT GUARD THE `overBy < 1` LINE, which the probe
+        // found: removing it leaves everything green, because `overBy` is
+        // clamped at zero and `(0 - 1) % 3` is -1 rather than 0, so the
+        // modulo excludes the grace period on its own. The line stays as the
+        // readable statement of the rule and because it is what would hold if
+        // the cadence were ever one, but it is belt over braces and saying so
+        // is better than implying it is load bearing.
+        for (let q = 0; q <= DROUGHT_GRACE_QUARTERS; q++) {
+            expect(dry(q)).toBe(false);
+            expect(droughtPenalty(q, 22)).toBe(0);
+        }
+    });
+
+    it('but on the first quarter it bites, which is the one that matters', () => {
+        expect(dry(DROUGHT_GRACE_QUARTERS + 1)).toBe(true);
+        expect(droughtPenalty(DROUGHT_GRACE_QUARTERS + 1, 22)).toBeGreaterThan(0);
+    });
+
+    it('and then every third quarter, not every one', () => {
+        const shown: number[] = [];
+        for (let over = 1; over <= 12; over++) {
+            if (dry(DROUGHT_GRACE_QUARTERS + over)) shown.push(over);
+        }
+        expect(shown).toEqual([1, 4, 7, 10]);
+        expect(DROUGHT_WARN_EVERY).toBe(3);
+    });
+
+    it('and that is a third of the quarters it used to take, measured', () => {
+        let old = 0, now = 0;
+        for (let over = 1; over <= 30; over++) {
+            const q = DROUGHT_GRACE_QUARTERS + over;
+            if (droughtPenalty(q, 22) > 0) old++;
+            if (dry(q)) now++;
+        }
+        expect(old).toBe(30);
+        expect(now).toBe(10);
+    });
+
+    it('and rubbish in does not produce a warning', () => {
+        expect(dry(undefined as any)).toBe(false);
+        expect(dry(-5)).toBe(false);
+    });
+});
+
+describe('and the modal quotes the number the engine is applying', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    it('by passing the tier ceiling, not the flat fallback', () => {
+        // The screen called droughtPenalty with one argument, so it showed
+        // the flat 20 cap while the engine was applying three twentieths of
+        // the tier ceiling. Two numbers for one fact, on the screen whose
+        // whole job is naming it.
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'screens', 'Home', 'HomeScreen.tsx'), 'utf8',
+        );
+        // Non greedy to `.brandCeiling` on purpose: the tier expression has a
+        // `getState()` inside it, so a `[^)]*` class stops at the wrong one.
+        expect(src).toMatch(/droughtPenalty\(\s*sponsorQuartersWithout,\s*getTier\([\s\S]*?\.brandCeiling,?\s*\)/);
+    });
+
+    it('and the cadence comes from the engine rather than the screen', () => {
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'screens', 'Home', 'HomeScreen.tsx'), 'utf8',
+        );
+        expect(src).toMatch(/shouldWarnDrought\(qWithout, !!active\)/);
+        expect(src).not.toMatch(/penalty > 0\) \{\s*setSponsorWarningVisible/);
     });
 });

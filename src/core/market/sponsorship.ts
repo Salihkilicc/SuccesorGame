@@ -155,6 +155,32 @@ export const droughtPenalty = (
     return Math.min(cap, over * DROUGHT_PENALTY_PER_QUARTER);
 };
 
+/**
+ * How often the drought warning is worth showing.
+ *
+ * Every quarter is not a warning, it is wallpaper: the player learns to tap
+ * it away and stops reading it, which is worse than not showing it at all.
+ * The first bite gets a warning, then every third quarter after that.
+ */
+export const DROUGHT_WARN_EVERY = 3;
+
+/**
+ * Should the drought warning be shown this quarter?
+ *
+ * Only while the penalty is actually biting. During the grace period nothing
+ * is being taken, so there is nothing to warn about, and a warning that fires
+ * before there is a cost teaches the player the warning does not mean much.
+ */
+export const shouldWarnDrought = (
+    quartersWithoutSponsor: number,
+    hasActiveDeal: boolean,
+): boolean => {
+    if (hasActiveDeal) return false;
+    const overBy = Math.max(0, (quartersWithoutSponsor || 0) - DROUGHT_GRACE_QUARTERS);
+    if (overBy < 1) return false;
+    return (overBy - 1) % DROUGHT_WARN_EVERY === 0;
+};
+
 // ============================================================================
 //  THIRTY OFFERS
 // ============================================================================
