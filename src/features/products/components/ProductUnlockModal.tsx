@@ -59,7 +59,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         if (active.length === 0 || map[product.category] !== undefined) {
             return { allowed: true, required: 0, have: 0, weakest: undefined as string | undefined };
         }
-        return canUnlockAnotherCategory(map, active, getTier(facilityTier).brandCeiling, gateClearedByCategory);
+        return canUnlockAnotherCategory(map, active, gateClearedByCategory);
     })();
 
     const canAfford = entryGate.allowed && totalRP >= product.unlockRPCost && companyCapital >= product.unlockCashCost;

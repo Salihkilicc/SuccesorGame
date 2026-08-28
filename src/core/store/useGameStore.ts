@@ -1534,7 +1534,7 @@ export const useGameStore = create<GameStore>()(
         const nextCleared: Record<string, boolean> = {
           ...(useStatsStore.getState().gateClearedByCategory || {}),
         };
-        const gateBar = categoryUnlockRequirement(tier.brandCeiling);
+        const gateBar = categoryUnlockRequirement();
 
         // ------------------------------------------------------------------
         //  THE MARKETING LEG IS IN INDEX POINTS, AND IT IS THE MAIN LEVER

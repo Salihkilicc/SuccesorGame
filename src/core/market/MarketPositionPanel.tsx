@@ -2,6 +2,7 @@ import React from 'react';
 import { t, useLocale } from '../../core/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { useMarketPosition } from './useMarketPosition';
+import { brandDisplay } from './brand';
 import { useStatsStore } from '../store/useStatsStore';
 import { formatNumber, formatPercent } from '../utils';
 import CollapsibleSection from '../../components/common/CollapsibleSection';
@@ -90,7 +91,7 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
                         <Text style={styles.summaryValue}>
                             {Math.round((brandByCategory || {})[category ?? ""] ?? 0)}
                         </Text>
-                        <Text style={styles.summaryUnit}>{t('brand.corporateShort', { v1: brandValue.toFixed(0) })}</Text>
+                        <Text style={styles.summaryUnit}>{t('brand.corporateShort', { v1: String(brandDisplay(brandValue)) })}</Text>
                     </View>
                 </View>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { t, useLocale } from '../../../core/i18n';
+import { brandDisplay } from '../../../core/market/brand';
 import {
   Modal,
   Pressable,
@@ -121,7 +122,15 @@ const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanatio
  * A named helper rather than `.toFixed(1)` at three call sites, because the
  * three of them drifting apart is exactly how one of them ended up raw.
  */
-const brandFigure = (v: number | undefined): string => (v ?? 0).toFixed(1);
+/**
+ * A brand number, in the scale the player is shown everywhere else.
+ *
+ * It used to print the raw 0-100 index to one decimal. The rest of the game
+ * shows POINTS now - see brand.brandDisplay and the note above it - and a
+ * report that speaks a different unit from the screen it is reporting on is
+ * the whole confusion this came out of.
+ */
+const brandFigure = (v: number | undefined): string => String(brandDisplay(v ?? 0));
 
 const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; text: string }[] => {
   const notes: { tone: 'bad' | 'warn' | 'good'; text: string }[] = [];

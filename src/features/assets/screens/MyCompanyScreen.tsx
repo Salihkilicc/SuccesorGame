@@ -18,6 +18,7 @@ import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 // from '../../../core/market/equity';` - the quote lives in IpoModal now,
 // which is the only place that should be pricing a listing.
 import { CONTROL_THRESHOLD } from '../../../core/market/governance';
+import { brandDisplay, CATEGORY_UNLOCK_BRAND } from '../../../core/market/brand';
 import { formatCurrency } from '../hooks/NativeEconomy';
 import { useCompanyLogic } from '../hooks/useCompanyLogic';
 
@@ -266,8 +267,11 @@ const MyCompanyScreen = () => {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
               <StatColumn
                 label={t('company.brandValue')}
-                value={`${Math.round(stats.brandValue ?? 0)}`}
-                colorType={(stats.brandValue ?? 0) >= 200 ? 'success' : 'default'}
+                // Points, which is the scale the player remembers and the
+                // scale this line's own 200 threshold was written against.
+                // See brand.brandDisplay.
+                value={`${brandDisplay(stats.brandValue ?? 0)}`}
+                colorType={brandDisplay(stats.brandValue ?? 0) >= CATEGORY_UNLOCK_BRAND ? 'success' : 'default'}
               />
               <VerticalDivider />
               <StatColumn label={t('company.employees')} value={formatCompactNumber(stats.employeeCount)} />
@@ -346,7 +350,19 @@ const MyCompanyScreen = () => {
 
           <TutorialTarget tutorialKey="teamMorale" style={{ marginTop: 12 }}>
             <SectionCard
-              icon={<MaterialCommunityIcons name="heart-pulse" size={20} color="#F43F5E" />}
+              icon={
+                <MaterialCommunityIcons
+                  name="heart-pulse"
+                  size={20}
+                  color={
+                    employeeMorale >= 70
+                      ? theme.colors.highlight
+                      : employeeMorale >= 40
+                      ? theme.colors.primary
+                      : theme.colors.warning
+                  }
+                />
+              }
               title={t('company.teamMorale')}
               subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
               onPress={() => navigation.navigate('TeamMorale')}

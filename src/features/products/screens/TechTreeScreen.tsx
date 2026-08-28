@@ -46,7 +46,7 @@ const TechTreeScreen = () => {
     const gateClearedByCategory = useStatsStore(st => st.gateClearedByCategory);
 
     const activeCategories = Object.keys(brandByCategory || {});
-    const gate = canUnlockAnotherCategory(brandByCategory || {}, activeCategories, getTier(facilityTier).brandCeiling, gateClearedByCategory);
+    const gate = canUnlockAnotherCategory(brandByCategory || {}, activeCategories, gateClearedByCategory);
 
     /** Is this category already one of ours, or would opening it need the gate? */
     const categoryOpen = (category: ProductCategory) =>

@@ -12,7 +12,7 @@ import { Product } from '../data/productsData';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
-import { brandIndex, BRAND_INDEX_SCALE } from '../../../core/market/brand';
+import { indexToPoints, BRAND_INDEX_SCALE } from '../../../core/market/brand';
 import { formatNumber as formatNumberShared, formatMoney, formatPercent, formatRP, formatCompact } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
@@ -370,20 +370,26 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     // KATEGORI markasi — motor bunu kullaniyor (catBrand). Kurumsal marka
     // yalnizca yeni bir kategoriye girerken baslangic degeri verir.
     // ----------------------------------------------------------------------
-    //  POINTS vs INDEX — the scale change left this screen lying again
+    //  POINTS vs INDEX — AND THE COMMENT BELOW IT WAS OUT OF DATE
     // ----------------------------------------------------------------------
-    //  stats.brandValue holds BRAND POINTS now (share x 43.3, so 160 is an
-    //  ordinary mid-game figure). This screen was handing those points
-    //  straight to computeAttraction and availablePartners, both of which
-    //  were written against a 0-100 brand:
-    //    - brandFactor clamps at 100, so every projection ran at maximum brand
-    //    - every contract partner unlocked at once (their gates are 0/25/60)
+    //  It read: "stats.brandValue holds BRAND POINTS now", and converted them
+    //  down with `brandIndex`. That was true for one commit. The tick writes
+    //  `brandValue: brandIdx` - the 0-100 INDEX - so the conversion was being
+    //  applied to a number that had already had it applied.
     //
-    //  `brandPoints` is what the player sees; `brandValue` is what the engine
-    //  is given.
+    //  Measured: a real brand of 52 arrived at `computeAttraction` as 12.
+    //  So the projection on this screen, the one the player reads before
+    //  deciding anything, was computed against a brand a quarter of the size,
+    //  and the contract partners list was gated on the same wrong figure.
+    //
+    //  Which is a large part of "brand does not do anything any more": it did,
+    //  and this screen could not see it.
+    //
+    //  The stat IS the index. `brandPoints` is derived for display, the other
+    //  way round from before.
     // ----------------------------------------------------------------------
-    const brandPoints = useStatsStore(state => state.brandValue);
-    const brandValue = brandIndex(brandPoints);
+    const brandValue = useStatsStore(state => state.brandValue);
+    const brandPoints = indexToPoints(brandValue);
 
     // Kapasite artik tesis kademesinden gelir (core/market/capacity.ts).
     const facilityTier = useStatsStore(state => state.facilityTier);
@@ -1820,7 +1826,7 @@ const styles = StyleSheet.create({
     // Dimmed by the surface. Nothing here is a profit or a loss.
     presetBtnOff: { opacity: 0.45 },
     presetBtnActive: {
-        backgroundColor: '#434B50',
+        backgroundColor: 'rgba(5, 168, 246, 0.15)',
         borderColor: theme.colors.primary,
     },
     presetBtnText: {
@@ -1829,32 +1835,44 @@ const styles = StyleSheet.create({
         color: 'rgba(255, 255, 255, 0.7)',
     },
     presetBtnTextActive: {
-        color: '#FFFFFF',
+        color: '#7DD3FC',
     },
     partnerRow: { gap: 8 },
     partnerChip: {
         backgroundColor: '#323A40', borderRadius: 10, padding: 10,
-        borderWidth: 1, borderColor: 'transparent',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
     },
-    partnerChipActive: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: '#434B50' },
+    partnerChipActive: {
+        borderColor: 'rgba(5, 168, 246, 0.45)',
+        backgroundColor: 'rgba(5, 168, 246, 0.12)',
+    },
     partnerName: { fontSize: 13, color: 'rgba(255,255,255,0.48)', fontWeight: '700' },
-    partnerNameActive: { color: '#FFFFFF' },
-    partnerMeta: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
+    partnerNameActive: { color: '#7DD3FC' },
+    partnerMeta: { fontSize: 10, color: 'rgba(255,255,255,0.58)', marginTop: 2 },
     partnerLocked: { fontSize: 10, color: 'rgba(255,255,255,0.48)', marginTop: 6 },
     contractStepper: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 },
     contractValueBox: { flex: 1, alignItems: 'center' },
-    contractValue: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' },
+    contractValue: { fontSize: 20, fontWeight: '800', color: '#7DD3FC' },
     contractUnitLabel: { fontSize: 10, color: 'rgba(255,255,255,0.48)' },
     stepBtn: {
-        width: 44, height: 44, borderRadius: 10, backgroundColor: '#323A40',
+        width: 44, height: 44, borderRadius: 10, backgroundColor: 'rgba(5, 168, 246, 0.10)',
         alignItems: 'center', justifyContent: 'center',
+        borderWidth: 1, borderColor: 'rgba(5, 168, 246, 0.28)',
     },
-    stepBtnText: { fontSize: 22, color: theme.colors.textPrimary, fontWeight: '800' },
-    contractCompare: { backgroundColor: '#323A40', borderRadius: 10, padding: 12, marginTop: 12, gap: 8 },
+    stepBtnText: { fontSize: 22, color: theme.colors.primary, fontWeight: '800' },
+    contractCompare: {
+        backgroundColor: '#323A40',
+        borderRadius: 10,
+        padding: 12,
+        marginTop: 12,
+        gap: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: theme.colors.primary,
+    },
     cmRow: { flexDirection: 'row', justifyContent: 'space-between' },
-    cmLabel: { fontSize: 12, color: 'rgba(255,255,255,0.48)' },
+    cmLabel: { fontSize: 12, color: 'rgba(255,255,255,0.55)' },
     cmValue: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
-    compareGood: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
+    compareGood: { fontSize: 12, color: theme.colors.highlight, fontWeight: '700' },
     compareBad: { fontSize: 12, color: theme.colors.warning, fontWeight: '700' },
     contractWarn: { fontSize: 11, color: theme.colors.warning, marginTop: 8, fontWeight: '600' },
 
