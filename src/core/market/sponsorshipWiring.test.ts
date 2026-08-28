@@ -191,10 +191,11 @@ describe('the bill lands and the brand follows', () => {
         // 10.345 - noise, in the wrong order.
         //
         // A ceiling only binds when you are at it. Started at the ceiling,
-        // the gap is 1.78 on this fixture and 6.14 on a plain tier one
-        // company - the difference being the enormous companyValue this
-        // fixture needs for the global offers, which lifts the marketing
-        // benchmark and with it the whole brand calculation.
+        // the gap is 0.43 on this fixture with the cap at three twentieths.
+        // It was 1.78 when the cap was two fifths, and it shrank with the
+        // penalty on purpose - see DROUGHT_PENALTY_CAP_RATIO. What matters
+        // is that it stays an order of magnitude above the noise, which ran
+        // to a few hundredths.
         const ceiling = getTier(1).brandCeiling;
         const run = async (quartersWithout: number) => {
             fresh(TIER_MINIMUM_VALUE.global);
@@ -213,7 +214,7 @@ describe('the bill lands and the brand follows', () => {
         expect(longDry).toBeLessThan(inGrace);
         // And by more than the noise that fooled the first fixture, which
         // ran to a few hundredths.
-        expect(inGrace - longDry).toBeGreaterThan(1);
+        expect(inGrace - longDry).toBeGreaterThan(0.3);
     }, 20_000);
 });
 

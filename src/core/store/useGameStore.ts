@@ -9,7 +9,7 @@ import { calculateQuarterlyFinances } from '../../features/assets/logic/EconomyE
 import { applyPartnerBuffs } from '../../logic/relationshipLogic';
 import { FEATURES, isEnabled } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
-import { getMarket, marketCategoryForStock } from '../market/productMarkets';
+import { getMarket, marketNow, marketCategoryForStock } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, meetsMaintenance, updateBrand } from '../market/attraction';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
@@ -585,7 +585,9 @@ export const useGameStore = create<GameStore>()(
         // ------------------------------------------------------------------
 
         byCategory.forEach((group, category) => {
-          const market = getMarket(category);
+          // The market as it is TODAY, not as it was authored. See
+          // productMarkets.marketNow - growthPerQuarter had no reader at all.
+          const market = marketNow(category);
 
           if (!market) {
             // Tanimsiz kategori: pazar yoksa talep de yok. Sessizce sifirlamak
@@ -852,8 +854,11 @@ export const useGameStore = create<GameStore>()(
 
 
             // 5. Costs & Revenue
-            // Storage costs: $5 per unit in NEW inventory
-            const storageCost = newInventory * 5 * quarters;
+            // Storage costs: $3.5 per unit in inventory (was $5 — ~%30 reduction).
+            // Oyuncu "biraz fazla üreteyim, rafta dursa beni batırmaz" diyebilmeli;
+            // aksi halde stoksuz kalmak her zaman aşırı üretimden daha iyi çıkar
+            // ve oyuncu diken üstünde oynar.
+            const storageCost = newInventory * 3.5 * quarters;
 
             // Pazarlama gideri = butce. Satisla carpilmaz.
             const marketingCost = marketingBudget;
@@ -1427,7 +1432,7 @@ export const useGameStore = create<GameStore>()(
         });
 
         const realizedShareOf = (cat: string): number => {
-          const mk = getMarket(cat);
+          const mk = marketNow(cat);
           const size = (mk?.sizeUnitsPerQuarter || 0) * Math.max(1, quarters);
           if (size <= 0) return 0;
           return Math.min(100, ((soldByCategory[cat] || 0) / size) * 100);

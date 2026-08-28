@@ -105,6 +105,18 @@ export const DROUGHT_PENALTY_CAP = 20;
  * The cap, as a share of the ceiling it is eating.
  *
  * ---------------------------------------------------------------------------
+ *  AND SMALLER AGAIN, BECAUSE SPONSORSHIP SHOULD NOT BE COMPULSORY
+ * ---------------------------------------------------------------------------
+ *  Two fifths still made it compulsory. Measured across eight sixty quarter
+ *  runs: every dry one had its brand pinned at the reduced ceiling for the
+ *  whole run - 15.6 index at tier two, in run after run, regardless of how
+ *  the player spent. That is not a penalty for neglecting something, it is a
+ *  subscription.
+ *
+ *  Three twentieths now: 3.3 index at tier one, 7.8 at tier eight. Playing
+ *  without a deal costs you visible ground and never takes your ceiling away.
+ *
+ * ---------------------------------------------------------------------------
  *  TWENTY POINTS OFF A CEILING OF TWENTY TWO IS NOT A PENALTY, IT IS AN END
  * ---------------------------------------------------------------------------
  *  A flat cap means the drought is a scratch on a big company and a death
@@ -121,15 +133,15 @@ export const DROUGHT_PENALTY_CAP = 20;
  *  Which is also what shut the category gate permanently: the gate is a share
  *  of the ceiling, and the drought was taking almost all of the ceiling.
  *
- *  Two fifths now, so it costs the same FRACTION at every tier:
+ *  A share of the ceiling, so it costs the same FRACTION at every tier:
  *
- *      tier 1   ceiling 22   at most 8.8 lost
- *      tier 5   ceiling 38   at most 15.2
- *      tier 8   ceiling 52   at most 20.8
+ *      tier 1   ceiling 22   at most 3.3 lost
+ *      tier 5   ceiling 38   at most 5.7
+ *      tier 8   ceiling 52   at most 7.8
  *
  *  The severity per quarter is untouched. What changes is where it stops.
  */
-export const DROUGHT_PENALTY_CAP_RATIO = 0.40;
+export const DROUGHT_PENALTY_CAP_RATIO = 0.15;
 
 export const droughtPenalty = (
     quartersWithoutSponsor: number,

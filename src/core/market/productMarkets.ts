@@ -211,9 +211,106 @@ const MARKET_BY_CATEGORY = new Map<string, ProductMarket>(
     PRODUCT_MARKETS.map(m => [m.category, m]),
 );
 
-/** Kategoriye göre pazar. Bilinmeyen kategori için undefined. */
+/** Kategoriye göre pazar, BASE haliyle. Bilinmeyen kategori için undefined. */
 export const getMarket = (category: string | undefined): ProductMarket | undefined =>
     category ? MARKET_BY_CATEGORY.get(category) : undefined;
+
+// ============================================================================
+//  THE MARKETS GROW, AND UNTIL NOW ONLY THE SCREEN SAID SO
+// ============================================================================
+//
+//  `growthPerQuarter` has been on every market since they were written, and
+//  MarketPositionPanel tells the player "Market grows 1.5% / quarter" to their
+//  face. Nothing ever grew `sizeUnitsPerQuarter`. Correct data with no reader,
+//  and this one was the growth engine.
+//
+//  WHAT IT COST, MEASURED. Eight sixty quarter runs at every marketing level,
+//  with and without sponsorship, upgrading as fast as the money allowed: all
+//  eight ended at tier two or three with a company worth 4 to 13 million. The
+//  aggressive one went to MINUS 7.6 million. Not for lack of money - for lack
+//  of DEMAND. A tier two line holds 6,653 units a quarter against demand of
+//  about 5,000, so every upgrade after the first buys capacity nobody wants
+//  and an opex bill that arrives anyway.
+//
+//  The demand ceiling for one Consumer product, measured:
+//
+//      brand  quality  marketing   share    units    fits
+//          5        1         1x   0.34%    3,368     T1
+//         22        5         1x   1.01%   10,141     T3
+//         52        5         3x   1.87%   18,649     T5
+//        100        5         3x   2.81%   28,105     T5
+//
+//  Brand at the maximum, quality at the maximum, triple the benchmark, and
+//  you fill a tier five factory. There are twenty tiers. Six through twenty
+//  had no demand in the game to fill them.
+//
+//  ---------------------------------------------------------------------------
+//  SATURATING, NOT COMPOUNDING
+//  ---------------------------------------------------------------------------
+//  Straight compounding is unusable over a dynasty. Deep Tech is authored at
+//  6% a quarter, which is 1,088x after thirty years and 115,000x after fifty.
+//  A market that large makes every other number in the game meaningless.
+//
+//  So the curve approaches a multiple of the starting size instead, and the
+//  rate is calibrated so the EARLY quarters still match what the panel says.
+//  Measured against straight compounding:
+//
+//      Consumer   q20  1.29x vs 1.35x     q120  2.59x vs 6.0x
+//      Deep Tech  q20  2.10x vs 3.2x      q120  5.50x vs 1,088x
+//
+//  The player reads "grows 1.5% a quarter" in the first years and that is what
+//  they get. The difference only appears over a lifetime, where the honest
+//  behaviour is that a market stops being able to double forever.
+// ============================================================================
+
+/** The most any market can grow to, as a multiple of where it started. */
+export const MARKET_GROWTH_CAP = 8;
+
+/**
+ * How big a market is, this many quarters into the run.
+ *
+ * Pure, and takes the quarter rather than reading a clock, so a test can ask
+ * about year thirty without running to it. See `marketNow` for the version
+ * that reads the game.
+ */
+export const marketSizeAt = (market: ProductMarket, quarter: number): number => {
+    const base = Math.max(0, market.sizeUnitsPerQuarter || 0);
+    const rate = (market.growthPerQuarter || 0) / 100;
+    const q = Math.max(0, (quarter || 0) - 1);
+    if (rate === 0 || q === 0) return base;
+
+    // Slope at q=0 is base * rate, so the first years match the stated figure.
+    const room = MARKET_GROWTH_CAP - 1;
+    const k = rate / room;
+    return Math.round(base * (1 + room * (1 - Math.exp(-k * q))));
+};
+
+/** The same market, at the size it has reached by this quarter. */
+export const marketAt = (
+    category: string | undefined,
+    quarter: number,
+): ProductMarket | undefined => {
+    const base = getMarket(category);
+    if (!base) return undefined;
+    const size = marketSizeAt(base, quarter);
+    return size === base.sizeUnitsPerQuarter ? base : { ...base, sizeUnitsPerQuarter: size };
+};
+
+/**
+ * The market as it is right now.
+ *
+ * Reads the clock lazily, because `currentQuarter` lives in the story layer
+ * and importing it here would close a cycle through useGameStore. Falls back
+ * to the base size if the store is not up yet, which is what a test fixture
+ * and the very first render both look like.
+ */
+export const marketNow = (category: string | undefined): ProductMarket | undefined => {
+    let q = 1;
+    try {
+        q = require('../story/world').currentQuarter();
+    } catch { /* store not ready */ }
+    return marketAt(category, q);
+};
 
 /** Rakiplerin toplam payı. Kalanı "diğerleri + oyuncu" demektir. */
 export const competitorShareTotal = (market: ProductMarket): number =>

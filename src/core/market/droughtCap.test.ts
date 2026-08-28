@@ -43,12 +43,23 @@ describe('how far a drought can go', () => {
         }
     });
 
-    it('and at tier one that is under nine, where it used to be twenty', () => {
+    it('and at tier one that is about three, where it used to be twenty', () => {
         // THE DEFECT, as one number. A ceiling of 22 minus 20 is 2.
         const ceiling = getTier(1).brandCeiling;
         expect(ceiling).toBe(22);
         expect(DROUGHT_PENALTY_CAP).toBe(20);          // what it used to be, flat
-        expect(droughtPenalty(forever, ceiling)).toBeCloseTo(8.8, 6);
+        expect(droughtPenalty(forever, ceiling)).toBeCloseTo(3.3, 6);
+    });
+
+    it('and a company that never signs anything is not capped by it', () => {
+        // WHY IT CAME DOWN A SECOND TIME. At two fifths, every dry sixty
+        // quarter run measured had its brand pinned at the reduced ceiling
+        // for the whole run - 15.6 index at tier two, whatever the player
+        // did. That is a subscription, not a penalty.
+        for (const tier of [1, 2, 3, 5, 8]) {
+            const ceiling = getTier(tier).brandCeiling;
+            expect(ceiling - droughtPenalty(forever, ceiling)).toBeGreaterThan(ceiling * 0.8);
+        }
     });
 
     it('and it always leaves most of the ceiling standing', () => {

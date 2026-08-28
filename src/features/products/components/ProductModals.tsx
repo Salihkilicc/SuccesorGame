@@ -16,7 +16,7 @@ import { brandIndex, BRAND_INDEX_SCALE } from '../../../core/market/brand';
 import { formatNumber as formatNumberShared, formatMoney, formatPercent, formatRP, formatCompact } from '../../../core/utils';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
-import { getMarket, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
+import { marketNow, marketDollarSize, marketsByValue } from '../../../core/market/productMarkets';
 import {
     computeAttraction,
     computeShares,
@@ -391,7 +391,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     const tier = getTier(facilityTier);
     const effectiveQuality = Math.min(qualityLevel, tier.qualityCeiling);
     const queuedQuality = Math.max(0, qualityLevel - effectiveQuality);
-    const market = getMarket(product.category);
+    const market = marketNow(product.category);
 
     const maxUnits = maxUnitsPerQuarter(employeeCount, complexity, facilityTier, isRetooling);
     // Kapasite kuculdiyse (eleman cikardin) hedef otomatik kirpilir.

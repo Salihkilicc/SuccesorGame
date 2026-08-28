@@ -25,6 +25,7 @@ import { useGameStore } from '../store/useGameStore';
 import { normalizeQuarterReport } from '../reportTypes';
 import {
     getMarket,
+    marketNow,
     competitorShareTotal,
     PRODUCT_MARKETS,
     type MarketCategory,
@@ -127,7 +128,7 @@ export const getMarketPosition = (
     productLines: { category?: string; sold: number }[],
     acquiredIds: string[] = [],
 ): MarketPosition | null => {
-    const market = getMarket(category);
+    const market = marketNow(category);
     if (!market) return null;
 
     const unitsSold = productLines
