@@ -913,14 +913,45 @@ export const canUnlockAnotherCategory = (
     activeCategories: string[],
     /** The tier's brandCeiling, on the 0-100 index. See categoryUnlockRequirement. */
     brandCeilingIndex?: number,
+    /**
+     * Categories that have met the requirement at some point.
+     *
+     * ---------------------------------------------------------------------
+     *  A GATE YOU CLEARED STAYS CLEARED
+     * ---------------------------------------------------------------------
+     *  The requirement is a share of the FACTORY's ceiling, so building a
+     *  bigger plant raises the bar. Read against today's figure alone, that
+     *  punishes the player for growing: measured over eighty quarters, the
+     *  gate opened at q5 and shut at q6, and in another run opened at q4 and
+     *  shut at q37, purely because the tier went up.
+     *
+     *  I FIRST TRIED THE PEAK and it was only half a fix. Comparing the
+     *  highest the category has ever been against TODAY'S requirement still
+     *  shuts when the bar moves above the peak, which is exactly the case
+     *  being complained about: measured again, opened q34 and shut q37.
+     *
+     *  So the thing to remember is not a number, it is that it HAPPENED.
+     *  "You proved you can run this market" does not stop being true because
+     *  you bought a second factory.
+     *
+     *  Neglect is still punished, just not twice: a market you abandon loses
+     *  brand, share, and revenue on its own.
+     */
+    clearedCategories?: Record<string, boolean>,
 ): { allowed: boolean; weakest?: string; have: number; required: number } => {
     const required = categoryUnlockRequirement(brandCeilingIndex);
     const cats = activeCategories.filter(c => byCategory[c] !== undefined);
     if (cats.length === 0) {
         return { allowed: true, have: 0, required: 0 };
     }
-    let weakest = cats[0];
-    cats.forEach(c => {
+    // A cleared category is satisfied whatever it reads today, so it cannot
+    // be the weakest link and cannot be the one that shuts the gate.
+    const pending = cats.filter(c => !clearedCategories?.[c]);
+    if (pending.length === 0) {
+        return { allowed: true, have: required, required };
+    }
+    let weakest = pending[0];
+    pending.forEach(c => {
         if ((byCategory[c] || 0) < (byCategory[weakest] || 0)) weakest = c;
     });
     const have = byCategory[weakest] || 0;

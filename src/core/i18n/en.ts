@@ -1430,6 +1430,8 @@ export const en: Record<string, string> = {
     'obs.acquisitionsCostYouV': 'Acquisitions cost you {v1} this quarter. Integration lands before the benefits, this is expected early, but it should turn positive within about a year.',
     'obs.brandValueFellV': 'Brand Value fell {v1} points to {v2}. Holding it steady takes about {v3} of marketing per quarter, and that number grows with your revenue. A weaker brand means a smaller share of every market you compete in.',
     'obs.brandValueHasHit': 'Brand Value has hit the ceiling for a {v1} ({v2}). More marketing will not move it, the limit is what you can manufacture, not what you can say.',
+    'obs.marketingUnderUpkeep': 'Your marketing budget is {v1}, and holding the brand where it is costs {v2}. That line grows with your revenue, so the budget that was comfortable last year stops being enough. You were under it this quarter; the brand starts eroding from the next one.',
+    'obs.brandAtFacilityCeiling': 'Brand Value has reached your facility ceiling ({v1}). More marketing will not move this number; raising the tier is what lifts the ceiling.',
     'obs.brandValueRoseV': 'Brand Value rose {v1} points to {v2}. This lifts your share in every category.',
     'obs.capacityUtilizationWasOnly': 'Capacity utilization was only {v1}. You are paying facility overhead and wages for a line you are not using.',
     'obs.grossMarginIsOnly': 'Gross margin is only {v1}. Your production cost is close to your selling price.',

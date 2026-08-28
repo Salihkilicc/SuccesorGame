@@ -149,6 +149,40 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
     });
   }
 
+  // ------------------------------------------------------------------
+  //  THE UPKEEP LINE MOVES UNDER YOU, AND NOTHING USED TO SAY SO
+  // ------------------------------------------------------------------
+  //  The marketing benchmark is a quarter of YOUR OWN revenue, so the more
+  //  successful you are the more it costs simply to stand still. A player
+  //  sets a budget comfortably above the line and their own growth walks the
+  //  line up past it. Measured over sixty quarters with the budget set once
+  //  at 500k and left alone: brand climbed 6.4 to 24.6 by quarter thirty,
+  //  crossed under the line, and fell back to 16 and stayed there.
+  //
+  //  The report already explained a fall AFTER it happened. This fires the
+  //  quarter you go under, while the brand is still where you left it, which
+  //  is the only quarter the warning is worth anything.
+  // ------------------------------------------------------------------
+  const marketingSpend = (r.expenses as any)?.marketing ?? 0;
+  const upkeep = r.brandMaintenance ?? 0;
+  if (upkeep > 0 && marketingSpend < upkeep) {
+    notes.push({
+      tone: 'warn',
+      text: t('obs.marketingUnderUpkeep', {
+        v1: formatMoney(marketingSpend),
+        v2: formatMoney(upkeep),
+      }),
+    });
+  } else if (upkeep > 0 && r.brandCeiling !== undefined && r.brandValue >= r.brandCeiling - 0.5) {
+    // The other silent wall. Measured: a company paying the full benchmark
+    // sat at exactly 26.0 against a ceiling of 26 for quarters on end, and
+    // nothing on this screen said the money was doing nothing.
+    notes.push({
+      tone: 'warn',
+      text: t('obs.brandAtFacilityCeiling', { v1: brandFigure(r.brandCeiling) }),
+    });
+  }
+
   if (r.brandChange < -0.5) {
     notes.push({
       tone: 'bad',

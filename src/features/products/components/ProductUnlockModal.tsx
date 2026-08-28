@@ -32,6 +32,9 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     const { companyCapital, brandValue, update: updateStats } = useStatsStore();
     // The gate is a share of what this factory allows. See brand.categoryUnlockRequirement.
     const facilityTier = useStatsStore(st => st.facilityTier);
+    // Cleared once, cleared for good: a factory upgrade raises the bar and
+    // must not take back a market you already earned the right to leave.
+    const gateClearedByCategory = useStatsStore(st => st.gateClearedByCategory);
 
     // ------------------------------------------------------------------
     //  CATEGORY GATE — earn your way out before you spread
@@ -56,7 +59,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         if (active.length === 0 || map[product.category] !== undefined) {
             return { allowed: true, required: 0, have: 0, weakest: undefined as string | undefined };
         }
-        return canUnlockAnotherCategory(map, active, getTier(facilityTier).brandCeiling);
+        return canUnlockAnotherCategory(map, active, getTier(facilityTier).brandCeiling, gateClearedByCategory);
     })();
 
     const canAfford = entryGate.allowed && totalRP >= product.unlockRPCost && companyCapital >= product.unlockCashCost;

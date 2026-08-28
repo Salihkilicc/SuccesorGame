@@ -17,6 +17,7 @@ import {
   // core/story/gameSink.ts, which is now its caller. The unused import is why
   // the audit called it reachable for weeks.
   advanceCategoryBrand, corporateBrandFrom, brandIndex, indexToPoints, marketingToPoints, earnedFloor,
+  categoryUnlockRequirement,
 } from '../market/brand';
 import { advanceCompetitors } from '../market/competitors';
 import {
@@ -1509,6 +1510,15 @@ export const useGameStore = create<GameStore>()(
 
         const nextByCategory: Record<string, number> = { ...prevByCategory };
 
+        // Which categories have ever met the unlock bar. Recorded as it
+        // happens, because the bar rises with the factory and a player must
+        // not lose a market they already earned the right to leave.
+        // See brand.canUnlockAnotherCategory.
+        const nextCleared: Record<string, boolean> = {
+          ...(useStatsStore.getState().gateClearedByCategory || {}),
+        };
+        const gateBar = categoryUnlockRequirement(tier.brandCeiling);
+
         // ------------------------------------------------------------------
         //  THE MARKETING LEG IS IN INDEX POINTS, AND IT IS THE MAIN LEVER
         // ------------------------------------------------------------------
@@ -1624,6 +1634,7 @@ export const useGameStore = create<GameStore>()(
           });
           nextByCategory[cat] = r.newBrand;
           nextFloors[cat] = earnedFloor(prevFloors[cat], r.newBrand);
+          if (r.newBrand >= gateBar) nextCleared[cat] = true;
         });
 
         const corporateQ = corporateBrandFrom(nextByCategory, activeCategories);
@@ -1706,6 +1717,7 @@ export const useGameStore = create<GameStore>()(
           brandChange: brandIdx - (stats.brandValue || 0),
           brandByCategory: nextByCategory,
           brandFloorByCategory: nextFloors,
+          gateClearedByCategory: nextCleared,
           employeeCount: headcount,
           incomingHires: queuedHires,
           facilityTier: nextTierLevel,

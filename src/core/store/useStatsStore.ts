@@ -104,6 +104,19 @@ export type StatsState = Record<StatKey, number> & {
   brandByCategory: Record<string, number>;
   /** Kategorinin bir kez kazandigi ve bir daha altina dusmedigi marka tabani */
   brandFloorByCategory?: Record<string, number>;
+  /**
+   * Categories whose unlock requirement has been met at some point.
+   *
+   * The category gate is a share of the FACTORY's ceiling, so upgrading the
+   * factory raises the bar. Without a memory, a player who cleared the gate
+   * at tier one and then built a bigger plant found it shut again - punished
+   * for growing. Measured over eighty quarters: opened q5 shut q6, opened q4
+   * shut q37, and with a PEAK instead of a flag, opened q34 shut q37.
+   *
+   * A flag rather than a number, because what has to be remembered is that
+   * it happened. See brand.canUnlockAnotherCategory.
+   */
+  gateClearedByCategory?: Record<string, boolean>;
   /** Son ceyrekteki marka degeri degisimi (+/-) */
   brandChange?: number;
   /** The board's open demand this quarter, already formatted for display. */
@@ -1058,6 +1071,13 @@ export const useStatsStore = create<StatsStore>()(
             });
             state.brandFloorByCategory = floors;
           }
+
+          // An existing save has no record, and the memory has to start
+          // somewhere. Seeding it EMPTY is the safe direction: a player who
+          // has cleared the gate will clear it again on the next quarter that
+          // meets the bar, whereas seeding it full would hand out unlocks
+          // nobody earned.
+          if (!state.gateClearedByCategory) state.gateClearedByCategory = {};
 
           if (!state.brandByCategory || Object.keys(state.brandByCategory).length === 0) {
             const asPoints = Math.round((state.brandValue ?? 8) * BRAND_INDEX_SCALE);

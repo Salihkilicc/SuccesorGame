@@ -165,7 +165,109 @@ describe('the wiring', () => {
             read('features', 'products', 'components', 'ProductUnlockModal.tsx'),
             read('features', 'products', 'screens', 'TechTreeScreen.tsx'),
         ]) {
-            expect(src).toMatch(/canUnlockAnotherCategory\([^)]*getTier\(facilityTier\)\.brandCeiling\)/);
+            expect(src).toMatch(/canUnlockAnotherCategory\([^)]*getTier\(facilityTier\)\.brandCeiling,\s*gateClearedByCategory\)/);
         }
+    });
+
+    it('and the memory too, or upgrading the factory takes the gate away again', () => {
+        for (const src of [
+            read('features', 'products', 'components', 'ProductUnlockModal.tsx'),
+            read('features', 'products', 'screens', 'TechTreeScreen.tsx'),
+        ]) {
+            expect(src).toMatch(/gateClearedByCategory = useStatsStore\(st => st\.gateClearedByCategory\)/);
+        }
+    });
+
+    it('and the tick records it, or there is nothing for them to read', () => {
+        const src = read('core', 'store', 'useGameStore.ts');
+        expect(src).toMatch(/if \(r\.newBrand >= gateBar\) nextCleared\[cat\] = true/);
+        expect(src).toMatch(/gateClearedByCategory: nextCleared/);
+        // And the bar it records against is the one the screens will use.
+        expect(src).toMatch(/const gateBar = categoryUnlockRequirement\(tier\.brandCeiling\)/);
+    });
+});
+
+// ============================================================================
+//  AND A GATE YOU CLEARED STAYS CLEARED
+// ============================================================================
+//  The requirement is a share of the FACTORY's ceiling, so a bigger plant
+//  raises the bar. Read against today's figure alone that punishes the player
+//  for growing. Measured over eighty quarters, three times:
+//
+//      opened q5,   shut q6
+//      opened q4,   shut q37
+//      opened q34,  shut q37     <- with a PEAK instead of a flag
+//
+//  Every time, the only thing that had happened was a tier upgrade. The third
+//  is the one that matters: I tried remembering the highest the category had
+//  ever been and comparing THAT against today's bar, and it still shut,
+//  because the bar had moved above the peak. What has to be remembered is not
+//  a number, it is that it happened.
+// ============================================================================
+describe('a gate you cleared', () => {
+    const CEIL1 = ceilingOf(1);
+    const CEIL3 = ceilingOf(3);
+
+    it('stays cleared when the factory grows and the bar moves up', () => {
+        const need1 = categoryUnlockRequirement(CEIL1);
+        expect(categoryUnlockRequirement(CEIL3)).toBeGreaterThan(need1);
+
+        const today = { Consumer: need1 };
+        // At tier one, open on today's figure alone.
+        expect(canUnlockAnotherCategory(today, ['Consumer'], CEIL1).allowed).toBe(true);
+        // At tier three the bar is higher, so without a memory it shuts.
+        expect(canUnlockAnotherCategory(today, ['Consumer'], CEIL3).allowed).toBe(false);
+        // With the memory it does not.
+        expect(canUnlockAnotherCategory(today, ['Consumer'], CEIL3, { Consumer: true }).allowed).toBe(true);
+    });
+
+    it('and a peak would NOT have been enough, which is why it is a flag', () => {
+        // The half fix, written down. The category's best ever was the tier
+        // one bar; the tier three bar is above it; comparing the two still
+        // shuts the gate.
+        const need1 = categoryUnlockRequirement(CEIL1);
+        const need3 = categoryUnlockRequirement(CEIL3);
+        expect(need1).toBeLessThan(need3);
+    });
+
+    it('and a fall does not take it back', () => {
+        expect(canUnlockAnotherCategory(
+            { Consumer: 1 }, ['Consumer'], CEIL1, { Consumer: true },
+        ).allowed).toBe(true);
+    });
+
+    it('but an uncleared market still shuts it, however strong the others are', () => {
+        // Neglect is still caught. The rule was never "one strong market
+        // carries the rest".
+        const g = canUnlockAnotherCategory(
+            { Consumer: 300, Robotics: 5 }, ['Consumer', 'Robotics'], CEIL1,
+            { Consumer: true },
+        );
+        expect(g.allowed).toBe(false);
+        expect(g.weakest).toBe('Robotics');
+        expect(g.have).toBe(5);
+    });
+
+    it('and a cleared market is never named as the weakest link', () => {
+        // Otherwise the screen tells the player to fix a market that is not
+        // the problem.
+        const g = canUnlockAnotherCategory(
+            { Consumer: 1, Robotics: 50 }, ['Consumer', 'Robotics'], CEIL1,
+            { Consumer: true },
+        );
+        expect(g.weakest).toBe('Robotics');
+    });
+
+    it('and no memory at all behaves exactly as it did before', () => {
+        const need = categoryUnlockRequirement(CEIL1);
+        expect(canUnlockAnotherCategory({ Consumer: need }, ['Consumer'], CEIL1, undefined).allowed).toBe(true);
+        expect(canUnlockAnotherCategory({ Consumer: need - 1 }, ['Consumer'], CEIL1, undefined).allowed).toBe(false);
+    });
+
+    it('and everything cleared is simply open', () => {
+        expect(canUnlockAnotherCategory(
+            { Consumer: 1, Robotics: 1 }, ['Consumer', 'Robotics'], CEIL1,
+            { Consumer: true, Robotics: true },
+        ).allowed).toBe(true);
     });
 });

@@ -1426,6 +1426,8 @@ export const tr: Record<string, string> = {
     'obs.acquisitionsCostYouV': 'Devralmalar bu çeyrek sana {v1} maliyet çıkardı. Entegrasyon faydadan önce gelir, erken dönemde beklenen budur, ama bir yıl içinde artıya dönmeli.',
     'obs.brandValueFellV': 'Marka Değeri {v1} puan düşerek {v2} oldu. Yerinde tutmak çeyrekte yaklaşık {v3} pazarlama ister ve bu rakam cironla birlikte büyür. Zayıf marka, rekabet ettiğin her pazarda daha küçük pay demek.',
     'obs.brandValueHasHit': 'Marka Değeri {v1} için tavana ({v2}) dayandı. Daha fazla pazarlama onu oynatmaz, sınır ne söyleyebildiğin değil, ne üretebildiğin.',
+    'obs.marketingUnderUpkeep': 'Pazarlama bütçen {v1}, markayı yerinde tutmak ise {v2} istiyor. Bu eşik cironla birlikte büyür, yani sen büyüdükçe dünkü bütçe yetmez olur. Bu çeyrek altında kaldın; marka önümüzdeki çeyrekten itibaren erimeye başlar.',
+    'obs.brandAtFacilityCeiling': 'Marka Değeri tesisinin tavanına dayandı ({v1}). Daha fazla pazarlama bu sayıyı yukarı taşımaz; tavanı kaldıran şey kademe yükseltmek.',
     'obs.brandValueRoseV': 'Marka Değeri {v1} puan artarak {v2} oldu. Bu, her kategorideki payını yükseltir.',
     'obs.capacityUtilizationWasOnly': 'Kapasite kullanımı yalnızca {v1} oldu. Kullanmadığın bir hat için tesis gideri ve maaş ödüyorsun.',
     'obs.grossMarginIsOnly': 'Brüt marj yalnızca {v1}. Üretim maliyetin satış fiyatına çok yakın.',
