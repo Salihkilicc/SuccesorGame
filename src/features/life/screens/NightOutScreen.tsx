@@ -51,7 +51,10 @@ const NightOutScreen = () => {
         handleHookupAccept,
         handleOutcomeClose,
         handleNightEndDecision,
-        setPregnancyModalVisible,
+        // SHELVED: the screen used to close the modal itself. The child is
+        // created on dismissal now, so the hook owns it.
+        //   setPregnancyModalVisible,
+        handlePregnancyClose,
         setConclusionModalVisible,
         handleConclusionClose,
         handleHookupGameSuccess,
@@ -115,9 +118,12 @@ const NightOutScreen = () => {
                         navigation.goBack();
                     }}
                 />
+                {/* The child is born when this is dismissed. See
+                    useNightOutSystem.handlePregnancyClose - the modal has been
+                    promising one since it was written and never made one. */}
                 <PregnancyRevealModal
                     visible={pregnancyModalVisible}
-                    onClose={() => setPregnancyModalVisible(false)}
+                    onClose={handlePregnancyClose}
                 />
             </AppLaunchLoader>
         </View>

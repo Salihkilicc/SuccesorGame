@@ -9,6 +9,9 @@ import { Partner } from '../../../love/types';
 
 import { VENUES, REGIONAL_NAMES, RegionCode, Venue } from './data/nightOutVenues';
 import { generateMiniGamePartner, calculateWildNightOutcome } from './logic/nightOutUtils';
+import { useFamilyStore } from '../../../../core/store/useFamilyStore';
+import { newbornFromNightOut, DYNASTY_START_YEAR } from '../../../../core/story/nightOutChild';
+import { currentQuarter } from '../../../../core/story/world';
 
 
 
@@ -305,6 +308,30 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         }
     }, [core, money, updateCore, updateStats]);
 
+    // ------------------------------------------------------------------
+    //  THE CHILD THE MODAL ALREADY PROMISED
+    // ------------------------------------------------------------------
+    //  `triggerPregnancy` has rolled at seven per cent since it was written
+    //  and PregnancyRevealModal tells the player "you are becoming a parent"
+    //  in as many words. Nothing ever created a child: the modal is an icon,
+    //  three sentences and a button, and it does not import the family store.
+    //
+    //  Born when the card is dismissed rather than when it opens, so the
+    //  player reads the news and then it is true, and so a modal that is
+    //  never dismissed cannot leave a half born child in the save.
+    //
+    //  See core/story/nightOutChild.ts for who they are and why their
+    //  loyalty does not start at ninety five.
+    // ------------------------------------------------------------------
+    const handlePregnancyClose = useCallback(() => {
+        setPregnancyModalVisible(false);
+        const q = currentQuarter();
+        useFamilyStore.getState().addChild(newbornFromNightOut({
+            birthYear: DYNASTY_START_YEAR + Math.floor((q - 1) / 4),
+            birthQuarter: ((q - 1) % 4) + 1,
+        }));
+    }, []);
+
     const handleConclusionClose = useCallback(() => {
         setConclusionModalVisible(false);
     }, []);
@@ -347,6 +374,7 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         outcomeType,
         nightEndModalVisible,
         pregnancyModalVisible,
+        handlePregnancyClose,
         conclusionModalVisible,
         conclusionData,
         hookupGameVisible,
