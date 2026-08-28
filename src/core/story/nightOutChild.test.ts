@@ -317,3 +317,17 @@ describe('and both readers of the estate agree', () => {
             .toMatch(/legitimate: c\.legitimate !== false/);
     });
 });
+
+describe('and the closing screen shows the estate for every death', () => {
+    it('including the one where the chair waits for a child', () => {
+        // Found by running a succession end to end: the new ending was not on
+        // the list, so the player who dies leaving a child would have seen no
+        // estate at all - on the ending where the estate is the whole point,
+        // because it is what the child holds while somebody else runs the
+        // company.
+        const src = fs.readFileSync(path.join(__dirname, 'readRecord.ts'), 'utf8');
+        for (const id of ['diedInOffice', 'diedWithHeirTooYoung', 'diedWithoutAnHeir']) {
+            expect(src).toMatch(new RegExp(`'${id}'`));
+        }
+    });
+});

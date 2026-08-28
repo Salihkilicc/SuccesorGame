@@ -44,7 +44,15 @@ import { successorFor } from './mortality';
  * Bankruptcy is deliberately not here. There is nothing to divide and a row
  * reading "Your successor took nothing" would be the game rubbing it in.
  */
-const ENDINGS_WITH_AN_ESTATE = ['diedInOffice', 'diedWithoutAnHeir'];
+// The deaths, all three of them. `diedWithHeirTooYoung` was missing when it
+// was added and the closing screen would have shown that player no estate at
+// all - the one ending where the estate is the entire point, because it is
+// what the child inherits while somebody else runs the company.
+const ENDINGS_WITH_AN_ESTATE = [
+    'diedInOffice',
+    'diedWithHeirTooYoung',
+    'diedWithoutAnHeir',
+];
 
 /** Read a number off a store without letting a missing one end the screen. */
 const safe = <T>(read: () => T, fallback: T): T => {
