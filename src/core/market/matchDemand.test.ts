@@ -179,18 +179,27 @@ describe('the control stays where it is', () => {
         }
     });
 
-    it('and it keeps the button shape rather than collapsing to a grey line', () => {
+    it('and it keeps the SLOT, which is what stops it appearing to vanish', () => {
         // The rule that would have caught the original: whatever renders in
-        // the stalled cases carries `matchBtn`, so it occupies the same space.
+        // the stalled cases still carries `matchBtn`, so it sits in the same
+        // place and nothing on the panel jumps.
         expect(src).toMatch(/\[styles\.matchBtn, styles\.matchBtnIdle\]/);
-        expect(src).toMatch(/matchBtnIdle: \{ backgroundColor: theme\.colors\.disabled \}/);
     });
 
-    it('and the idle label is dark, because the idle fill is light', () => {
-        // Rule 1. `disabled` is a light grey, so the text on it is onLight -
-        // the same black the live button uses, so greying out does not turn
-        // into a different control.
-        expect(src).toMatch(/matchBtnIdleText: \{ color: theme\.colors\.onLight/);
+    it('but it is a sentence, not a control, so it does not shout', () => {
+        // A filled grey slab read as a disabled orange BUTTON and carried as
+        // much weight as the live blue one, for something that is only an
+        // explanation. No fill, small, dim.
+        expect(src).toMatch(/matchBtnIdle: \{ backgroundColor: 'transparent'/);
+        expect(src).toMatch(/matchBtnIdleText: \{[\s\S]{0,200}?color: 'rgba\(255,255,255,0\.38\)'/);
+        // Smaller than the live label, which is 13.
+        expect(src).toMatch(/matchBtnIdleText: \{[\s\S]{0,200}?fontSize: 10\.5/);
+    });
+
+    it('and light on a dark ground, never dark, because there is no fill now', () => {
+        // Rule 1 in the other direction: the slab is gone, so the text sits
+        // on the panel and must not be the black the filled version used.
+        expect(src).not.toMatch(/matchBtnIdleText: \{[\s\S]{0,200}?theme\.colors\.onLight/);
     });
 
     it('and no player facing string in this block uses a dash', () => {

@@ -1576,8 +1576,21 @@ const styles = StyleSheet.create({
      * reported the button vanishing, and a control that stays put while its
      * sentence changes cannot vanish.
      */
-    matchBtnIdle: { backgroundColor: theme.colors.disabled },
-    matchBtnIdleText: { color: theme.colors.onLight, fontWeight: '700' },
+    /**
+     * NOT A BUTTON. A filled grey slab read as a disabled orange control and
+     * shouted as loudly as the live blue one, for a sentence that is only an
+     * explanation. It keeps the SLOT - same padding, same position, so
+     * nothing jumps and the control never appears to vanish - and drops
+     * everything else.
+     */
+    matchBtnIdle: { backgroundColor: 'transparent', paddingVertical: 8 },
+    matchBtnIdleText: {
+        color: 'rgba(255,255,255,0.38)',
+        fontSize: 10.5,
+        fontWeight: '500',
+        lineHeight: 15,
+        textAlign: 'center',
+    },
 
     mktTrack: {
         height: 8,
