@@ -140,7 +140,7 @@ describe('the screens speak that scale', () => {
 
 describe('and the gate is quoted in the same money', () => {
     it('so a player looking at 200 on the screen is looking at the gate', () => {
-        expect(CATEGORY_UNLOCK_BRAND).toBe(260);
+        expect(CATEGORY_UNLOCK_BRAND).toBe(243);
         expect(brandDisplay(brandIndex(CATEGORY_UNLOCK_BRAND))).toBe(CATEGORY_UNLOCK_BRAND);
     });
 });

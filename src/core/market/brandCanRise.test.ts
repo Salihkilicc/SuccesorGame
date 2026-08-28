@@ -89,10 +89,24 @@ describe('a company that markets well', () => {
         expect(run(10, true)).toBeGreaterThan(18);
     });
 
-    it('and it rises every quarter rather than settling immediately', () => {
+    it('and it settles somewhere rather than running away', () => {
+        // IT USED TO CLIMB THE WHOLE WAY and this asserted that. It no longer
+        // does, and the change is deliberate: the ceiling RESISTS now instead
+        // of clamping, so the first quarter overshoots and the following ones
+        // settle back onto a level. Measured on this fixture:
+        //
+        //      q1 20.64   q2 20.39   q3 20.43   then 20.43 forever
+        //
+        // Which is the honest shape of a company pushing against its
+        // factory: it gets a little past what the plant supports and then it
+        // holds there. What matters is that it holds ABOVE where it started
+        // and does not oscillate, which the first version of the resistance
+        // did - see resistedGain.
         const early = run(2, true);
         const later = run(10, true);
-        expect(later).toBeGreaterThan(early);
+        expect(later).toBeGreaterThan(18);
+        expect(Math.abs(later - early)).toBeLessThan(0.5);
+        expect(later).toBeCloseTo(run(20, true), 3);
     });
 
     it('and without the conversion it fell instead, which is what was reported', () => {
@@ -301,7 +315,10 @@ describe('the tier floor', () => {
             path.join(__dirname, '..', 'store', 'useGameStore.ts'), 'utf8',
         );
         expect(TICK).toMatch(
-            /floor: Math\.max\(prevFloors\[cat\] \|\| 0, indexToPoints\(tier\.brandFloor \|\| 0\)\)/,
+            // The penalty subtraction wraps it now - see the note in the tick
+            // about the earned floor coming down with a conviction - so this
+            // matches the inner expression rather than the whole line.
+            /Math\.max\(prevFloors\[cat\] \|\| 0, indexToPoints\(tier\.brandFloor \|\| 0\)\)/,
         );
     });
 

@@ -1605,7 +1605,29 @@ export const useGameStore = create<GameStore>()(
             //  `brandFloor` is on the 0-100 index like everything else that
             //  was being fed in raw.
             // ------------------------------------------------------------
-            floor: Math.max(prevFloors[cat] || 0, indexToPoints(tier.brandFloor || 0)),
+            // ------------------------------------------------------------
+            //  AND THE EARNED FLOOR COMES DOWN WITH A PENALTY TOO
+            // ------------------------------------------------------------
+            //  The tier ceiling RESISTS rather than clamps now, so it no
+            //  longer pushes anybody below a floor they had earned. Which
+            //  broke the conviction: a company that had once touched 200
+            //  points sat on 200 whatever the verdict, and two identical
+            //  companies - one convicted - landed on exactly the same number
+            //  again.
+            //
+            //  `updateBrand` already does this for the TIER floor, in one
+            //  line, for exactly this reason: "the floor cannot rescue a
+            //  conviction, it comes down with the ceiling, or a convicted
+            //  company would simply sit on its tier's floor and the penalty
+            //  would be invisible". The earned floor needed the same thing
+            //  and did not have it, because nothing used to be able to get
+            //  under the tier ceiling anyway.
+            // ------------------------------------------------------------
+            floor: Math.max(
+              0,
+              Math.max(prevFloors[cat] || 0, indexToPoints(tier.brandFloor || 0))
+              - indexToPoints(ceilingPenalty),
+            ),
             // ------------------------------------------------------------
             //  PAY THE UPKEEP AND THE MARKET CANNOT DRAG YOU BACKWARDS
             // ------------------------------------------------------------

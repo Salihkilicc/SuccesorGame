@@ -490,10 +490,10 @@ export const CATEGORY_UNLOCK_CEILING_RATIO = 0.70;
  *  locks in once it has touched it. A floor cannot lift anybody above itself.
  *
  *  IT NO LONGER COINCIDES WITH EARNED_FLOOR_BRAND, and that separation is now
- *  doing work: 200 is the level a market never falls back below, 260 is the
+ *  doing work: 200 is the level a market never falls back below, 243 is the
  *  level that lets you leave it for another.
  */
-export const CATEGORY_UNLOCK_BRAND = 260;
+export const CATEGORY_UNLOCK_BRAND = 243;
 
 /**
  * The brand a category has to reach before it can never fall back to nothing.

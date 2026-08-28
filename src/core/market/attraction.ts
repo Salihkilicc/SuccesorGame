@@ -388,12 +388,22 @@ export const computeShares = (
 
 /** Endeksin inebilecegi taban. Sifir olsaydi urun pazardan tumden silinirdi. */
 export const REACH_FLOOR = 0.15;
-/** Talebi tam karsiladigin ceyrekte kalan aciğin ne kadari kapanir. */
-export const REACH_RECOVERY = 0.12;
-/** Karsilayamadigin oranin ne kadari endeksten dusulur. */
-export const REACH_DECAY = 0.35;
-/** Bu oranin ustunu karsiladiysan "tam karsiladi" sayilir. */
-export const REACH_FULL_THRESHOLD = 0.98;
+/**
+ * Talebi tam karsiladigin ceyrekte kalan aciğin ne kadari kapanir.
+ * Arttirildi (0.12 -> 0.18): bir kotu ceyrekten sonra oyuncu daha hizli toparlaniyor.
+ */
+export const REACH_RECOVERY = 0.18;
+/**
+ * Karsilayamadigin oranin ne kadari endeksten dusulur.
+ * Yarilandi (0.35 -> 0.17): stok tukenmesinin pazar payi erimesi hala gercekci
+ * ama tek ceyrekte geri donulemez bir cukur acmiyor.
+ */
+export const REACH_DECAY = 0.17;
+/**
+ * Bu oranin ustunu karsiladiysan "tam karsiladi" sayilir — %10 hata payi.
+ * 0.98'den 0.90'a indirildi: talebin %90'ini karsilayan oyuncu ceza yemiyor.
+ */
+export const REACH_FULL_THRESHOLD = 0.90;
 
 const clamp01 = (v: number, lo = REACH_FLOOR) => Math.min(1, Math.max(lo, v));
 
@@ -532,6 +542,78 @@ const DEFAULT_BRAND_FLOOR = 5;
  * yaratip karsilayamamak itibar insa etmez, yikar. Simulasyonda bu
  * olmadan "kapasitesiz patlatma" karli cikiyordu — artik cikmiyor.
  */
+/**
+ * How hard it is to climb this last tenth of a point.
+ *
+ * The whole of "harder and harder, but possible". Chosen by sweeping it
+ * against a hundred and twenty quarters of steady spending at a ceiling of
+ * 22, ordinary budget against four times the benchmark:
+ *
+ *  AND THE SWEEP THAT CHOSE IT DID NOT SURVIVE CONTACT WITH THE TICK. In
+ *  isolation, against a steady gain of four a quarter, K mattered enormously:
+ *  15 let heavy spending reach 53.9 against a ceiling of 22, and 150 held it
+ *  to 30.0. In the real game it barely matters at all. Peak brand per tier,
+ *  measured across two hundred quarters:
+ *
+ *      K     T5 (cap 165)   T8 (cap 225)   T9 (cap 242)
+ *      80        166            227            245
+ *      30        168            229            247
+ *      12        170            232            249
+ *
+ *  Because the marketing leg is not a steady four a quarter: it is the gap to
+ *  a clamped `updateBrand`, so it shrinks as the brand rises, and the SHARE
+ *  WALK is pulling the other way the whole time. The settled level is where
+ *  those two meet, and the ceiling resistance is a small term beside them.
+ *
+ *  So this is 30, a middle value, and the honest description of what it buys
+ *  is this: the ceiling is no longer a WALL. Brand sits a few points above it
+ *  and the number moves, instead of reading exactly the ceiling quarter after
+ *  quarter. Making the climb dramatic would mean loosening the walk as well,
+ *  which is a bigger change than this one and should be its own.
+ */
+export const CEILING_RESISTANCE = 30;
+
+/** The 0-100 index really is 0-100, whatever the ceiling says. */
+export const BRAND_MAX_INDEX = 100;
+
+export const resistedGain = (
+    gain: number,
+    current: number,
+    ceiling: number,
+): number => {
+    // A loss is never resisted: falling back to the factory's level is the
+    // factory reasserting itself and it should be quick.
+    if (!(gain > 0)) return gain || 0;
+    if (!(ceiling > 0)) return gain;
+    // A brand that is not a number cannot be above or below anything, and
+    // `Math.max(0, ceiling - NaN)` is NaN, which would poison the whole gain.
+    // Found by my own edge case test rather than by reading.
+    if (!Number.isFinite(current)) return gain;
+
+    // ------------------------------------------------------------------
+    //  ONLY THE PART ABOVE THE CEILING IS RESISTED
+    // ------------------------------------------------------------------
+    //  The first version resisted the WHOLE gain whenever it would land
+    //  above the ceiling. So a company at 18.3 with a ceiling of 22 and a
+    //  gain of 4 had all four points damped, even though 3.7 of them were
+    //  still under the line. Measured, it settled at 18.3 to 18.8 and
+    //  oscillated - BELOW the ceiling it was supposed to be pushing past,
+    //  and worse than the hard clamp it replaced.
+    //
+    //  The gain is split instead. Everything up to the ceiling lands in
+    //  full, so arriving still feels like arriving. Only the excess is
+    //  resisted, by where you already are AND by how far you are trying to
+    //  go in one quarter, so a bigger push buys proportionally less.
+    // ------------------------------------------------------------------
+    const free = Math.min(gain, Math.max(0, ceiling - current));
+    const excess = gain - free;
+    if (excess <= 0) return gain;
+
+    const startedOver = Math.max(0, (current - ceiling) / ceiling);
+    const reach = excess / ceiling;
+    return free + excess / (1 + CEILING_RESISTANCE * (startedOver + reach));
+};
+
 export const updateBrand = (input: BrandUpdateInput): BrandUpdateResult => {
     const reasons: string[] = [];
     const penalty = Math.max(0, input.ceilingPenalty || 0);
@@ -570,14 +652,50 @@ export const updateBrand = (input: BrandUpdateInput): BrandUpdateResult => {
         reasons.push('capped by facility tier');
     }
 
-    // Stok tukenmesi: musteriyi bos cevirmek marka yakar.
+    // Stok tükenmesi: hala kötü, ama tek çeyrekte yıkıcı değil.
+    // Çarpan 2.0'dan 0.6'ya çekildi — ceza kaldırılmadı, tırpanlandı.
+    // Oyuncu "biraz yetiştiremedim" diye şirketini batırmamalı.
     if (input.unmetDemand > 0 && totalWanted > 0) {
-        delta -= (input.unmetDemand / totalWanted) * 2.0;
+        delta -= (input.unmetDemand / totalWanted) * 0.6;
         reasons.push('stockouts');
     }
 
     const clampedDelta = Math.max(-BRAND_MAX_DROP, Math.min(BRAND_MAX_GAIN, delta));
-    const raw = input.currentBrand + clampedDelta;
+
+    // ------------------------------------------------------------------
+    //  THE CEILING RESISTS RATHER THAN STOPS
+    // ------------------------------------------------------------------
+    //  It was a hard clamp: `min(ceiling, ...)`. So a company that reached
+    //  its tier's ceiling sat on exactly that number, quarter after quarter,
+    //  and the only thing that ever moved it was a building project. Measured
+    //  over one run, brand was EXACTLY the ceiling at every tier from two on.
+    //
+    //  Reported as "is it not boring, brand playing on the ceiling all the
+    //  time", and asked for as "it should get harder and harder to climb, but
+    //  it should be possible - give the player the excitement of being able
+    //  to climb".
+    //
+    //  So a gain above the ceiling is divided by how far above it already is,
+    //  as a fraction of the ceiling itself:
+    //
+    //      over = (current - ceiling) / ceiling
+    //      kept = 1 / (1 + CEILING_RESISTANCE * over)
+    //
+    //  At the ceiling nothing is taken, so arriving there still feels like
+    //  arriving. Ten per cent above, a gain is worth two fifths of itself;
+    //  a quarter above, a fifth. It never reaches zero, so there is always a
+    //  budget that buys another tenth of a point, and the decay is always
+    //  pulling the other way - which is what makes the height a thing you
+    //  hold rather than a thing you own.
+    //
+    //  LOSSES ARE NOT RESISTED. Falling back towards the ceiling is the
+    //  factory reasserting itself and it should be quick.
+    // ------------------------------------------------------------------
+    const raw = input.currentBrand + resistedGain(
+        clampedDelta,
+        input.currentBrand,
+        Math.max(0, Math.min(100, input.brandCeiling ?? 100) - penalty),
+    );
 
     const floor = input.brandFloor ?? DEFAULT_BRAND_FLOOR;
     // TAVAN: atolyede premium marka olamazsin. Ne kadar pazarlama
@@ -593,7 +711,10 @@ export const updateBrand = (input: BrandUpdateInput): BrandUpdateResult => {
     // penalty would be invisible at every level except the very top.
     const effectiveFloor = Math.max(0, floor - penalty);
     const floored = clampedDelta < 0 ? Math.max(effectiveFloor, raw) : raw;
-    const newBrand = Math.max(0, Math.min(ceiling, floored));
+    // NOT clamped to the ceiling any more - see `resistedGain`. Still clamped
+    // to BRAND_MAX, because the index is what every reader downstream expects
+    // and 0-100 is what that means.
+    const newBrand = Math.max(0, Math.min(BRAND_MAX_INDEX, floored));
 
     return {
         newBrand: Math.round(newBrand * 10) / 10,

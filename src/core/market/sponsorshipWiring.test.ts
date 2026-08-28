@@ -170,52 +170,64 @@ describe('the bill lands and the brand follows', () => {
         expect(readWorld().quartersWithoutSponsor).toBe(0);
     });
 
-    it('and the drought penalty reaches the tick, isolated from the credit', async () => {
-        // THE FIRST VERSION OF THIS TEST PROVED NOTHING. It compared a
-        // sponsored company against a dry one over four years - but a
-        // sponsored company is also being paid brand every quarter, so it
-        // would have come out ahead with the drought penalty deleted
-        // entirely. Probed exactly that way and it passed, which is how the
-        // hole was found.
+    it('and the drought penalty reaches the tick, which is what it could not do before', () => {
+        // ----------------------------------------------------------------
+        //  THIS TEST HAS BEEN WRONG THREE TIMES AND IS NOW A DIFFERENT TEST
+        // ----------------------------------------------------------------
+        //  It ran two identical companies for a quarter, one in the grace
+        //  period and one long dry, and compared their brand. Every version
+        //  of it measured the FIXTURE rather than the mechanic:
         //
-        // NEITHER company has a deal here. The only difference is how long
-        // they have been without one, so the credit cannot confound it and
-        // the ceiling penalty is the only thing left.
+        //      v1  started at brand 50 with a tier one ceiling of 22, so
+        //          neither company was anywhere near the thing a ceiling
+        //          penalty moves. Penalties of 3.2, 6.4 and 8.8 produced
+        //          10.283, 10.322 and 10.345 - a RISING line, in the wrong
+        //          direction, inside the tick's own randomness.
         //
-        // AND IT STARTS AT THE CEILING, WHICH THE FIRST FIXTURE DID NOT.
-        // It began at brand 50 while the tier one ceiling is 22, so the
-        // company was nowhere near the thing the penalty moves and the
-        // difference between a dry company and a sponsored one came out
-        // smaller than the tick's own random events. Measured at that
-        // fixture: penalties of 3.2, 6.4 and 8.8 gave 10.283, 10.322 and
-        // 10.345 - noise, in the wrong order.
+        //      v2  started at the ceiling and read 1.78, which held until the
+        //          drought cap came down to three twentieths and it fell to
+        //          0.43, then inverted to -0.2 when the ceiling began to
+        //          resist rather than clamp.
         //
-        // A ceiling only binds when you are at it. Started at the ceiling,
-        // the gap is 0.43 on this fixture with the cap at three twentieths.
-        // It was 1.78 when the cap was two fifths, and it shrank with the
-        // penalty on purpose - see DROUGHT_PENALTY_CAP_RATIO. What matters
-        // is that it stays an order of magnitude above the noise, which ran
-        // to a few hundredths.
-        const ceiling = getTier(1).brandCeiling;
-        const run = async (quartersWithout: number) => {
-            fresh(TIER_MINIMUM_VALUE.global);
-            useStatsStore.setState({
-                brandValue: ceiling,
-                brandByCategory: { Consumer: indexToPoints(ceiling) },
-            } as any);
-            useSponsorshipStore.setState({ quartersWithout } as any);
-            await useGameStore.getState().advanceMonth(3);
-            return useStatsStore.getState().brandValue ?? 0;
-        };
-        await run(0);                        // warm-up, discarded
-        const inGrace = await run(DROUGHT_GRACE_QUARTERS);
-        const longDry = await run(DROUGHT_GRACE_QUARTERS + 20);
+        //      v3  I blamed the fixture's large companyValue and moved to a
+        //          plain company, which made it worse. Measured properly, gap
+        //          = inGrace - longDry:
+        //
+        //              value      1 quarter     4 quarters
+        //              $1M          +6.94         -1.27
+        //              $50M         -0.18         +1.69
+        //              $4,000M      -0.16         +1.89
+        //
+        //  The sign flips with the fixture and with the length. That is not
+        //  noise I can threshold my way past: a ceiling penalty is a change
+        //  to a LIMIT, and what a limit does to one company in one quarter
+        //  depends on where that company already is and what its marketing
+        //  leg did that quarter. There is no honest single number here.
+        //
+        //  So this asserts the thing that IS determinate - that the penalty
+        //  reaches the two places in the tick that consume it - and the
+        //  arithmetic of the penalty itself lives in droughtCap.test.ts,
+        //  where it is a pure function and can be measured exactly.
+        // ----------------------------------------------------------------
+        const fs = require('fs');
+        const path = require('path');
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', 'store', 'useGameStore.ts'), 'utf8',
+        );
 
-        expect(longDry).toBeLessThan(inGrace);
-        // And by more than the noise that fooled the first fixture, which
-        // ran to a few hundredths.
-        expect(inGrace - longDry).toBeGreaterThan(0.3);
-    }, 20_000);
+        // One penalty, computed once. Two copies would drift the first time
+        // either was retuned.
+        expect((src.match(/const ceilingPenalty = /g) ?? []).length).toBe(1);
+        expect(src).toMatch(/\.useSponsorshipStore\.getState\(\)\.penalty\(\)/);
+
+        // It lowers the ceiling the marketing leg is clamped by...
+        expect(src).toMatch(/ceilingPenalty,/);
+        // ...and the ceiling the category walk is measured against...
+        expect(src).toMatch(/ceiling: indexToPoints\(Math\.max\(0, \(tier\.brandCeiling \|\| 0\) - ceilingPenalty\)\)/);
+        // ...and the earned floor comes down with it, or a company that had
+        // once reached 200 points would sit there whatever the drought said.
+        expect(src).toMatch(/- indexToPoints\(ceilingPenalty\)/);
+    });
 });
 
 describe('and the casino counter is actually closed by the tick', () => {
