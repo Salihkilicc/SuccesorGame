@@ -150,6 +150,23 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   }
 
   // ------------------------------------------------------------------
+  //  THE CLOCK, WHILE IT IS RUNNING
+  // ------------------------------------------------------------------
+  //  First, above everything else on the page, because nothing else on it
+  //  matters while this is counting. The run used to end on the first
+  //  negative quarter with no warning at all; a grace period nobody can see
+  //  is the same ending with extra steps.
+  // ------------------------------------------------------------------
+  if (r.insolvencyQuartersLeft !== undefined) {
+    notes.push({
+      tone: 'bad',
+      text: r.insolvencyQuartersLeft > 0
+        ? t('obs.insolvencyCountdown', { v1: String(r.insolvencyQuartersLeft) })
+        : t('obs.insolvencyLastCall'),
+    });
+  }
+
+  // ------------------------------------------------------------------
   //  THE UPKEEP LINE MOVES UNDER YOU, AND NOTHING USED TO SAY SO
   // ------------------------------------------------------------------
   //  The marketing benchmark is a quarter of YOUR OWN revenue, so the more

@@ -135,6 +135,13 @@ export type StatsState = Record<StatKey, number> & {
   creditRatingPrev?: string;
   /** Ust uste zararli ceyrek sayisi — guvensizlik oyu bunu okur */
   lossStreak?: number;
+  /**
+   * Consecutive quarters with capital below zero.
+   *
+   * The run used to end on the first one. See market/insolvency.ts for what
+   * that cost and why the grace is four.
+   */
+  quartersInsolvent?: number;
   /** Gecen ceyregin hisse adedi — seyreltmeme sozu bununla olculur */
   totalSharesPrev?: number;
   facilityBuild: FacilityBuild | null;
@@ -349,6 +356,7 @@ export const initialStatsState: StatsState = {
   lossCarryforward: 0,
   creditRatingPrev: '',
   lossStreak: 0,
+  quartersInsolvent: 0,
   totalSharesPrev: 0,
   targetHeadcount: START_EMPLOYEES,
   incomingHires: 0,
@@ -1031,6 +1039,7 @@ export const useStatsStore = create<StatsStore>()(
         lossCarryforward: state.lossCarryforward,
         creditRatingPrev: state.creditRatingPrev,
         lossStreak: state.lossStreak,
+        quartersInsolvent: state.quartersInsolvent,
         totalSharesPrev: state.totalSharesPrev,
         targetHeadcount: state.targetHeadcount,
         incomingHires: state.incomingHires,

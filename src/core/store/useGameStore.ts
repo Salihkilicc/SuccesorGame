@@ -11,6 +11,7 @@ import { FEATURES, isEnabled } from '../featureFlags';
 import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket, marketNow, marketCategoryForStock } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, meetsMaintenance, updateBrand } from '../market/attraction';
+import { advanceInsolvency, INSOLVENCY_GRACE_QUARTERS, insolvencyQuartersLeft } from '../market/insolvency';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
   // applyCorporateShock was imported here and never called - see the note in
@@ -1306,6 +1307,22 @@ export const useGameStore = create<GameStore>()(
         const newCompanyCapital =
           (stats.companyCapital || 0) + netProfit - principalRepaid - bonus.paid - ceoPayThisTick;
 
+        // ------------------------------------------------------------------
+        //  HOW LONG THE DOORS HAVE BEEN SHUTTING
+        // ------------------------------------------------------------------
+        //  Computed ONCE, here, because three places need it: the report the
+        //  player reads, the stat that survives a reload, and the check that
+        //  ends the run. It was computed twice on the first pass and that is
+        //  the shape of every drift bug in this file.
+        //
+        //  See market/insolvency.ts for the grace and what it cost not to
+        //  have one.
+        // ------------------------------------------------------------------
+        const insolventQuarters = advanceInsolvency(
+          stats.quartersInsolvent,
+          newCompanyCapital,
+        );
+
         // 7. PLAYER FINANCIALS (Using Quarterly Economy Engine)
         // Calculate quarterly finances once and apply to player cash
         const quarterlyReport = calculateQuarterlyFinances(
@@ -1841,6 +1858,11 @@ export const useGameStore = create<GameStore>()(
           brandValue: brandIdx,
           brandChange: brandIdx - (stats.brandValue || 0),
           brandMaintenance: marketingBrand.maintenance,
+          // Only while the clock is running, so a solvent company carries no
+          // field for it and the screen has nothing to decide.
+          insolvencyQuartersLeft: newCompanyCapital < 0
+            ? insolvencyQuartersLeft(insolventQuarters)
+            : undefined,
           brandCeiling: tier.brandCeiling,
 
           // --- Borclanma ---
@@ -2063,6 +2085,9 @@ export const useGameStore = create<GameStore>()(
         const ownership = ownershipPercent(playerShares, capShares);
 
         useStatsStore.getState().update({
+          // Written every quarter rather than only the negative ones, because
+          // the whole point is that it RESETS when the company climbs back.
+          quartersInsolvent: insolventQuarters,
           companyCapital: newCompanyCapital,
           money: newPlayerCash,
           // The figures the engine actually collected this quarter, as a
@@ -2843,7 +2868,21 @@ export const useGameStore = create<GameStore>()(
               }
             } catch { /* kurul durumu okunamadi */ }
 
-            if (newCompanyCapital < 0) {
+            // ------------------------------------------------------
+            //  A GRACE PERIOD ON THE ENDING, NOT AN OVERDRAFT
+            // ------------------------------------------------------
+            //  This was `if (newCompanyCapital < 0) return 'bankrupt'`, so a
+            //  single negative quarter ended the run. Measured: a tier three
+            //  company died at q4 on -$0.84M and, allowed to carry on, was
+            //  positive again by q8 and worth $23.69M twelve years later.
+            //
+            //  The capital really is negative for as long as it is negative.
+            //  What is granted is the quarters a company spends in the hands
+            //  of its creditors before the doors are shut. See
+            //  market/insolvency.ts, and note the counter is written every
+            //  quarter, not only the bad ones - it has to RESET.
+            // ------------------------------------------------------
+            if (insolventQuarters > INSOLVENCY_GRACE_QUARTERS) {
               // ------------------------------------------------------
               //  BANKRUPTCY NAMES AN ENDING TOO, NOW
               // ------------------------------------------------------
@@ -2865,7 +2904,7 @@ export const useGameStore = create<GameStore>()(
             }
             return 'active' as const;
           })(),
-          reason: newCompanyCapital < 0 ? 'Company capital is negative' : undefined,
+          reason: insolventQuarters > INSOLVENCY_GRACE_QUARTERS ? 'Company capital is negative' : undefined,
           data: {
             // Rapor verileri (Dynamic calculations)
             reportTotalProduction: totalProduction,

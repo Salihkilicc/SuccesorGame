@@ -1430,6 +1430,8 @@ export const en: Record<string, string> = {
     'obs.acquisitionsCostYouV': 'Acquisitions cost you {v1} this quarter. Integration lands before the benefits, this is expected early, but it should turn positive within about a year.',
     'obs.brandValueFellV': 'Brand Value fell {v1} points to {v2}. Holding it steady takes about {v3} of marketing per quarter, and that number grows with your revenue. A weaker brand means a smaller share of every market you compete in.',
     'obs.brandValueHasHit': 'Brand Value has hit the ceiling for a {v1} ({v2}). More marketing will not move it, the limit is what you can manufacture, not what you can say.',
+    'obs.insolvencyCountdown': 'Company capital is below zero. The creditors are at the door and you have {v1} quarters. Get capital back above zero in that time and the clock resets.',
+    'obs.insolvencyLastCall': 'Company capital is still below zero and this is your last quarter. If it does not turn positive, the company passes to its creditors.',
     'obs.marketingUnderUpkeep': 'Your marketing budget is {v1}, and holding the brand where it is costs {v2}. That line grows with your revenue, so the budget that was comfortable last year stops being enough. You were under it this quarter; the brand starts eroding from the next one.',
     'obs.brandAtFacilityCeiling': 'Brand Value has reached your facility ceiling ({v1}). More marketing will not move this number; raising the tier is what lifts the ceiling.',
     'obs.brandValueRoseV': 'Brand Value rose {v1} points to {v2}. This lifts your share in every category.',

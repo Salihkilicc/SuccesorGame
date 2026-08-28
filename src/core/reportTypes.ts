@@ -180,6 +180,16 @@ export interface QuarterReport {
     /** Tesis kademesinin marka tavani — burada takilirsan sorun uretimde */
     brandCeiling: number;
 
+    /**
+     * Quarters left before insolvency ends the run, when capital is negative.
+     *
+     * Undefined while solvent. Zero means this was the last one. A clock the
+     * player cannot see is the same as no clock, and the complaint that
+     * started this was that the ending arrived without warning.
+     * See market/insolvency.ts.
+     */
+    insolvencyQuartersLeft?: number;
+
     // --- Borçlanma (bkz. core/market/credit.ts) ---
     /** Harf notu — nakit akisindan gelir, degerlemeden degil */
     creditRating?: string;
