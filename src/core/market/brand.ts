@@ -456,28 +456,44 @@ export const CATEGORY_UNLOCK_CEILING_RATIO = 0.70;
  * Brand points needed in a category before another category can be opened.
  *
  * ---------------------------------------------------------------------------
- *  FLAT, AND TWO HUNDRED, WHICH IS WHERE IT STARTED
+ *  TWO HUNDRED AND SIXTY FIVE, WHICH IS THE TIER TEN NUMBER
  * ---------------------------------------------------------------------------
- *  Asked for as "I want to open the second category around a tier twelve
- *  factory, and I want the limit gone". Those turn out to be the same
- *  request. Measured on one run, tier by tier:
+ *  Asked for as "open the second category around a tier twelve factory". I
+ *  set it to 300 for exactly that and then measured what tier twelve costs in
+ *  quarters, which turned out to be the thing that decided it.
  *
- *      the gate a tier proportional rule asks for
- *          T1  67    T5 115    T9 170    T11 197    T12 212
+ *  With the tier ceiling left SOFT - it caps the marketing leg, not the walk -
+ *  the number alone picks the tier, so both had to be measured. Peak brand at
+ *  each tier, playing hard with a sponsorship live, and the quarter that tier
+ *  arrived:
  *
- *  So a flat 200 IS the tier eleven to twelve gate. The same run reached it
- *  at quarter 85 at tier seven and cleared it comfortably by twelve, against
- *  quarter 5 under the proportional rule.
+ *      T7  204 @ q84       T10 264 @ q156
+ *      T8  225 @ q100      T11 281 @ q216
+ *      T9  242 @ q125      T12 303 @ q287
  *
- *  It is also the number the game had before any of this, and the player's
- *  memory of it - "I used to make brand 200 and then move on" - is a memory
- *  of this constant.
+ *  From tier two on the peak IS the ceiling: brand rides it rather than
+ *  climbing past it. So the ceilings are the right thing to compare against,
+ *  and 300 really would have been tier twelve.
  *
- *  IT COINCIDES WITH EARNED_FLOOR_BRAND, deliberately and not by accident:
- *  the market you have proved you can run is the market that never falls back
- *  to nothing. They are separate constants so that either can move alone.
+ *  AND TIER TWELVE IS QUARTER 287, which is seventy two years, against an
+ *  expected lifetime of 208 quarters. The gate would not have opened in the
+ *  first CEO's life at all - three separate two hundred quarter runs never
+ *  reached it. A gate nobody lives to see is not a late gate, it is a removed
+ *  feature.
+ *
+ *  265 sits between the tier nine ceiling of 242 and the tier ten ceiling of
+ *  264, so tier ten is the first factory that can hold it: quarter 156, about
+ *  thirty nine years. Late in one life rather than past the end of it.
+ *
+ *  AND A SPIKE CANNOT BUY IT EARLY. Doubling the marketing budget at tier one
+ *  peaked at exactly 200, which is EARNED_FLOOR_BRAND - the floor a category
+ *  locks in once it has touched it. A floor cannot lift anybody above itself.
+ *
+ *  IT NO LONGER COINCIDES WITH EARNED_FLOOR_BRAND, and that separation is now
+ *  doing work: 200 is the level a market never falls back below, 260 is the
+ *  level that lets you leave it for another.
  */
-export const CATEGORY_UNLOCK_BRAND = 200;
+export const CATEGORY_UNLOCK_BRAND = 260;
 
 /**
  * The brand a category has to reach before it can never fall back to nothing.

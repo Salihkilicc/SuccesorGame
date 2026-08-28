@@ -434,6 +434,22 @@ export const initialStatsState: StatsState = {
   brandChange: 0,
   /** Kategori bazli markalar. Bkz. core/market/brand.ts */
   brandByCategory: {} as Record<string, number>,
+  // ------------------------------------------------------------------
+  //  THESE HAVE TO BE HERE OR A NEW GAME INHERITS THE OLD ONE
+  // ------------------------------------------------------------------
+  //  `reset` is `set(() => ({ ...initialStatsState }))`, and zustand's `set`
+  //  MERGES. A key that is absent from this object is therefore not reset -
+  //  it survives into the next run.
+  //
+  //  Found by running three simulated games back to back: the second and
+  //  third opened the category gate in quarter one at tier one, because
+  //  `gateClearedByCategory` still said the FIRST run had cleared it.
+  //
+  //  `brandFloorByCategory` had the same hole and has had it all along: a
+  //  new company inherited the earned floor of the last one.
+  // ------------------------------------------------------------------
+  brandFloorByCategory: {} as Record<string, number>,
+  gateClearedByCategory: {} as Record<string, boolean>,
 
   stockSplitCount: 0,
   isPublic: false,
@@ -1030,6 +1046,8 @@ export const useStatsStore = create<StatsStore>()(
         brandValue: state.brandValue,
         brandChange: state.brandChange,
         brandByCategory: state.brandByCategory,
+        brandFloorByCategory: state.brandFloorByCategory,
+        gateClearedByCategory: state.gateClearedByCategory,
         factoryCount: state.factoryCount,
         facilityTier: state.facilityTier,
         facilityBuild: state.facilityBuild,

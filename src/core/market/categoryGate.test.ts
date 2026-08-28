@@ -38,6 +38,7 @@ import {
     categoryUnlockRequirement,
     CATEGORY_UNLOCK_BRAND,
     CATEGORY_UNLOCK_CEILING_RATIO,
+    EARNED_FLOOR_BRAND,
     indexToPoints,
     brandEquilibrium,
 } from './brand';
@@ -50,7 +51,7 @@ const ceilingOf = (tier: number) => getTier(tier).brandCeiling;
 describe('what the gate asks for', () => {
     it('is the same number at every tier', () => {
         expect(categoryUnlockRequirement()).toBe(CATEGORY_UNLOCK_BRAND);
-        expect(CATEGORY_UNLOCK_BRAND).toBe(200);
+        expect(CATEGORY_UNLOCK_BRAND).toBe(260);
     });
 
     it('and it takes no arguments, so the signature cannot lie about that', () => {
@@ -59,13 +60,48 @@ describe('what the gate asks for', () => {
         expect(categoryUnlockRequirement.length).toBe(0);
     });
 
-    it('and it lands where a tier eleven to twelve factory sits', () => {
-        // The ratio is kept as the record of what was tried, so the claim can
-        // be checked rather than asserted.
-        const proportional = (tier: number) =>
-            Math.round(indexToPoints(ceilingOf(tier)) * CATEGORY_UNLOCK_CEILING_RATIO);
-        expect(proportional(11)).toBeLessThan(CATEGORY_UNLOCK_BRAND);
-        expect(proportional(12)).toBeGreaterThan(CATEGORY_UNLOCK_BRAND);
+    it('and it clears the tier nine ceiling by a real margin, not two points', () => {
+        // I set this to 265 first. The tier ten ceiling is 264.13, so 265 was
+        // silently the tier ELEVEN gate at quarter 216. Two points of slack is
+        // not a margin, it is a coincidence waiting to be wrong - the same
+        // mistake as the 93 against a ceiling of 95.
+        const nine = indexToPoints(ceilingOf(9));
+        const ten = indexToPoints(ceilingOf(10));
+        expect(CATEGORY_UNLOCK_BRAND - nine).toBeGreaterThan(10);
+        expect(ten - CATEGORY_UNLOCK_BRAND).toBeGreaterThan(3);
+    });
+
+    it('and tier ten is the first factory whose ceiling can hold it', () => {
+        // The tier ceiling is left SOFT - it caps the marketing leg, not the
+        // walk - so the number alone has to pick the tier. Measured: from
+        // tier two on, peak brand IS the ceiling, so the ceilings are the
+        // right thing to compare against.
+        expect(indexToPoints(ceilingOf(9))).toBeLessThan(CATEGORY_UNLOCK_BRAND);
+        expect(indexToPoints(ceilingOf(10))).toBeGreaterThanOrEqual(CATEGORY_UNLOCK_BRAND);
+    });
+
+    it('and that tier arrives inside one lifetime, which tier twelve does not', () => {
+        // MEASURED, and it is why this is not 300. Tier ten lands at quarter
+        // 156; tier twelve at 287, against an expected lifetime of 208
+        // quarters. Three separate two hundred quarter runs never reached
+        // twelve. A gate nobody lives to see is not a late gate, it is a
+        // removed feature.
+        //
+        // Pinned as a relationship rather than a quarter count, because the
+        // quarter count belongs to the run and this belongs to the rule.
+        expect(indexToPoints(ceilingOf(12))).toBeGreaterThan(CATEGORY_UNLOCK_BRAND);
+    });
+
+    it('and a spike cannot buy it early, because the earned floor is lower', () => {
+        // Doubling the budget at tier one peaked at exactly EARNED_FLOOR_BRAND,
+        // and a floor cannot lift anybody above itself.
+        expect(EARNED_FLOOR_BRAND).toBeLessThan(CATEGORY_UNLOCK_BRAND);
+    });
+
+    it('and the two constants no longer coincide, which is now doing work', () => {
+        // 200 is the level a market never falls back below. 300 is the level
+        // that lets you leave it for another.
+        expect(EARNED_FLOOR_BRAND).not.toBe(CATEGORY_UNLOCK_BRAND);
     });
 
     it('and it is well clear of the tier one ceiling, which the 93 was not', () => {
