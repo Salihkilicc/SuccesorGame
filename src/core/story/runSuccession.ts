@@ -109,6 +109,9 @@ export const runSuccession = (): SuccessionPlan | null => {
     const plan = planSuccession({
         children: (family.children ?? []).map(c => ({
             id: c.id, name: c.name, age: c.age, gender: c.gender,
+            // Or the estate the player is SHOWN and the estate they are GIVEN
+            // disagree about an illegitimate child.
+            legitimate: c.legitimate !== false,
         })),
         designatedSuccessorId: family.designatedSuccessorId ?? null,
         lastName: useIdentityStore.getState().lastName,

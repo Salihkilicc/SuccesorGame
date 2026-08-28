@@ -226,6 +226,36 @@ export const ENDINGS: Record<string, Ending> = {
     },
 
     // ----------------------------------------------------------------------
+    //  YOU DIED AND THE CHAIR WAITED
+    // ----------------------------------------------------------------------
+    //  The ending `heirInWaiting` was written for and never got.
+    //
+    //  That function has existed, with a long note explaining it and a full
+    //  set of tests, since it was asked for as "heir kac yasinda olsa da
+    //  gecilmeli". Nothing called it. `runMortality` asked `successorFor`,
+    //  got null for a child under sixteen, and printed `diedWithoutAnHeir` -
+    //  the barren ending - at a family with a child in it. Reported as "I
+    //  choose an heir and I do not get a successor; he was eleven".
+    //
+    //  NOT A CONSOLATION PRIZE. The company really is out of the family's
+    //  hands for those years and the prose has to say so, because the years
+    //  are the cost. What the player gets back is the chair, not the decade.
+    // ----------------------------------------------------------------------
+    diedWithHeirTooYoung: {
+        id: 'diedWithHeirTooYoung',
+        title: 'YOU DIED',
+        body:
+            'The board meets on the Tuesday, and the item is not who runs the '
+            + 'company. It is who runs it until.\n\n'
+            + 'Your child is at school. Somebody explains the arrangement to '
+            + 'them once, carefully, in a room with a jug of water in it, and '
+            + 'they are told they will understand it properly later. They will.\n\n'
+            + 'The interim is competent and the years pass at the speed years '
+            + 'pass. The name stays on the building the whole time, because '
+            + 'there is a child with that name and everybody knows it.',
+    },
+
+    // ----------------------------------------------------------------------
     //  YOU SOLD WHAT YOU WERE GIVEN
     // ----------------------------------------------------------------------
     //  The third face of the same ending, and the cruellest, because it is

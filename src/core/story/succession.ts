@@ -55,6 +55,13 @@ export type Heir = {
     name: string;
     age: number;
     gender: 'Male' | 'Female';
+    /**
+     * Born inside the marriage. Absent means yes.
+     *
+     * Only affects the stock, and only for a child who is not the heir. See
+     * inheritance.ts, `Survivor.legitimate`.
+     */
+    legitimate?: boolean;
 };
 
 export type SuccessionInput = {
@@ -156,7 +163,13 @@ export const planSuccession = (input: SuccessionInput): SuccessionPlan | null =>
     if (!child) return null;
 
     const survivors: Survivor[] = [
-        ...input.children.map(c => ({ id: c.id, kind: 'child' as const })),
+        // `legitimate` decides whether a child who is not the heir takes
+        // stock. `readRecord` passes it and this did not, so the estate the
+        // player was SHOWN and the estate they were GIVEN disagreed about an
+        // illegitimate child. Two readers of one rule is how they drift.
+        ...input.children.map(c => ({
+            id: c.id, kind: 'child' as const, legitimate: c.legitimate !== false,
+        })),
         ...(input.survivingParent ? [{ id: 'parent', kind: 'spouse' as const }] : []),
     ];
 

@@ -43,7 +43,7 @@ import { endingsProgress } from '../../core/story/record';
 import { readRecord } from '../../core/story/readRecord';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { useFamilyStore } from '../../core/store/useFamilyStore';
-import { successorFor } from '../../core/story/mortality';
+import { successorFor, heirInWaiting } from '../../core/story/mortality';
 import { runSuccession } from '../../core/story/runSuccession';
 
 type Props = {
@@ -59,7 +59,7 @@ type Props = {
  * board removal has taken it from you already, and both Pear endings are the
  * player choosing to stop.
  */
-const CONTINUABLE = 'diedInOffice';
+const CONTINUABLE = ['diedInOffice', 'diedWithHeirTooYoung'];
 
 /**
  * Who is standing there, if anybody.
@@ -76,13 +76,16 @@ const CONTINUABLE = 'diedInOffice';
  * the last screen of the game and a thrown error here is no screen at all.
  */
 const heirWaiting = (endingId: string): { id: string; name: string } | null => {
-    if (endingId !== CONTINUABLE) return null;
+    if (!CONTINUABLE.includes(endingId)) return null;
     try {
         const family = useFamilyStore.getState();
-        const found = successorFor(
-            (family.children ?? []).map((c: any) => ({ id: c.id, age: c.age ?? 0 })),
-            family.designatedSuccessorId ?? null,
-        );
+        const candidates = (family.children ?? []).map((c: any) => ({ id: c.id, age: c.age ?? 0 }));
+        // The one who can take it TODAY, or the one the chair waits for. Both
+        // are somebody to carry on as; without the second, an heir under
+        // sixteen left the button hidden and the run over.
+        const found = successorFor(candidates, family.designatedSuccessorId ?? null)
+            ?? heirInWaiting(candidates)?.heir
+            ?? null;
         if (!found) return null;
         const child = (family.children ?? []).find((c: any) => c.id === found.id);
         // First name only. "CARRY ON AS ELENA HALE" on a button is a form.

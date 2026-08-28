@@ -34,7 +34,7 @@
 import { useGameStore } from '../store/useGameStore';
 import { useFamilyStore } from '../store/useFamilyStore';
 import { useStoryStore } from '../store/useStoryStore';
-import { diesThisQuarter, successorFor, type Candidate } from './mortality';
+import { diesThisQuarter, successorFor, heirInWaiting, type Candidate } from './mortality';
 
 export type MortalityOutcome = {
     died: boolean;
@@ -73,13 +73,35 @@ export const runMortality = (roll?: () => number): MortalityOutcome => {
     const children: Candidate[] = (family.children ?? [])
         .map((c: any) => ({ id: c.id, age: c.age ?? 0 }));
 
+    // ------------------------------------------------------------------
+    //  NOBODY OLD ENOUGH TODAY IS NOT NOBODY
+    // ------------------------------------------------------------------
+    //  `heirInWaiting` has existed since it was asked for as "heir kac
+    //  yasinda olsa da gecilmeli", with a long note explaining it and a full
+    //  set of tests. NOTHING CALLED IT. This line asked `successorFor`, got
+    //  null for a child under sixteen, and printed the barren ending at a
+    //  family with a child in it.
+    //
+    //  Reported as "I choose an heir and I do not get a successor; he was
+    //  eleven". The mechanic was written and never wired, which is the
+    //  signature failure in this codebase and this is the seventh one.
+    //
+    //  `planSuccession` already handles the wait and already returns the
+    //  years, so all that was ever missing was the ending naming it.
+    // ------------------------------------------------------------------
     const successor = successorFor(children, family.designatedSuccessorId ?? null);
-    const ending = successor ? 'diedInOffice' : 'diedWithoutAnHeir';
+    const waiting = successor ? null : heirInWaiting(children);
+    const ending = successor
+        ? 'diedInOffice'
+        : waiting ? 'diedWithHeirTooYoung' : 'diedWithoutAnHeir';
 
     story.endGame(ending);
     if (__DEV__) {
-        console.log(`[mortality] died at ${age}, successor: ${successor?.id ?? 'nobody'}`);
+        console.log(
+            `[mortality] died at ${age}, successor: ${successor?.id ?? 'nobody'}`
+            + (waiting ? `, waiting ${waiting.years}y for ${waiting.heir.id}` : ''),
+        );
     }
 
-    return { died: true, successor, ending };
+    return { died: true, successor: successor ?? waiting?.heir ?? null, ending };
 };

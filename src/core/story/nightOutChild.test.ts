@@ -250,3 +250,70 @@ describe('and the player names them', () => {
             .toMatch(/legitimate: c\.legitimate !== false/);
     });
 });
+
+describe('and both readers of the estate agree', () => {
+    it('the succession path honours legitimacy, not only the record screen', () => {
+        // Found by a probe: `readRecord` passed the flag and `planSuccession`
+        // did not, so the estate the player was SHOWN and the estate they
+        // were GIVEN disagreed about an illegitimate child. Two readers of
+        // one rule is how they drift.
+        const { planSuccession } = require('./succession');
+        const plan = planSuccession({
+            children: [
+                { id: 'heir', name: 'Ada Hale', age: 30, gender: 'Female' },
+                { id: 'bastard', name: 'Kai Hale', age: 20, gender: 'Male', legitimate: false },
+            ],
+            lastName: 'Hale',
+            designatedSuccessorId: 'heir',
+            survivingParent: null,
+            estate: { cash: 1_000_000, shares: 1_000 },
+            generation: 1,
+        });
+        expect(plan).not.toBeNull();
+        // `siblings` is the list that gets SEATED on the board, and it is
+        // already filtered to whoever holds stock - so an illegitimate child
+        // is simply not on it. Which is the rule arriving where it matters:
+        // no shares, no seat, no vote against the heir.
+        expect(plan.siblings.find((x: any) => x.id === 'bastard')).toBeUndefined();
+
+        // And the cash half is untouched, which `divideEstate` is the place
+        // that says so. Asserted here too because the seating filter is what
+        // hides it, and a reader of this file would otherwise conclude the
+        // child was cut out of everything.
+        const { divideEstate } = require('../market/../story/inheritance');
+        const bequests = divideEstate(
+            { cash: 1_000_000, shares: 1_000 },
+            [
+                { id: 'heir', kind: 'child', legitimate: true },
+                { id: 'bastard', kind: 'child', legitimate: false },
+            ],
+            'heir',
+        );
+        const paid = bequests.find((b: any) => b.id === 'bastard');
+        expect(paid.shares).toBe(0);
+        expect(paid.cash).toBeGreaterThan(0);
+    });
+
+    it('and a legitimate sibling still takes stock on that same path', () => {
+        const { planSuccession } = require('./succession');
+        const plan = planSuccession({
+            children: [
+                { id: 'heir', name: 'Ada Hale', age: 30, gender: 'Female' },
+                { id: 'other', name: 'Lena Hale', age: 20, gender: 'Female' },
+            ],
+            lastName: 'Hale',
+            designatedSuccessorId: 'heir',
+            survivingParent: null,
+            estate: { cash: 1_000_000, shares: 1_000 },
+            generation: 1,
+        });
+        // A legitimate sibling IS seated, which is what makes the absence
+        // above mean something.
+        expect(plan.siblings.find((x: any) => x.id === 'other').shares).toBeGreaterThan(0);
+    });
+
+    it('and the runner hands the flag over, or the plan never sees it', () => {
+        expect(fs.readFileSync(path.join(__dirname, 'runSuccession.ts'), 'utf8'))
+            .toMatch(/legitimate: c\.legitimate !== false/);
+    });
+});

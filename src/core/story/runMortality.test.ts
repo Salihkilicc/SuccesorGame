@@ -68,17 +68,61 @@ describe('the quarter it does', () => {
         expect(runMortality(certainly).successor?.id).toBe('b');
     });
 
-    it('with nobody old enough, you died without an heir', () => {
-        // Which has to be reachable, or naming a successor costs nothing.
+    it('with a child too young, the chair WAITS rather than the run ending', () => {
+        // THE DEFECT, and this test used to encode it. `heirInWaiting` has
+        // existed since it was asked for as "heir kac yasinda olsa da
+        // gecilmeli", with a long note and a full set of tests, and nothing
+        // called it - so a family with a nine year old in it got the barren
+        // ending. Reported as "I choose an heir and I do not get a successor;
+        // he was eleven".
         setup(80, [kid('a', 9)]);
+        const out = runMortality(certainly);
+        expect(useStoryStore.getState().ending).toBe('diedWithHeirTooYoung');
+        // And the child is named, so the overlay has somebody to offer.
+        expect(out.successor?.id).toBe('a');
+    });
+
+    it('and a newborn is still somebody, because that is the case that needed it', () => {
+        setup(80, [kid('a', 0)]);
+        expect(runMortality(certainly).ending).toBe('diedWithHeirTooYoung');
+    });
+
+    it('but with no family at all it really is the barren ending', () => {
+        // Which has to stay reachable, or the ending is unreachable writing.
+        setup(80, []);
         const out = runMortality(certainly);
         expect(out.successor).toBeNull();
         expect(useStoryStore.getState().ending).toBe('diedWithoutAnHeir');
     });
 
-    it('and with no family at all, the same', () => {
-        setup(80, []);
-        expect(runMortality(certainly).ending).toBe('diedWithoutAnHeir');
+    it('and the overlay offers the chair for the waiting ending too', () => {
+        // The other half of the same bug. `CONTINUABLE` was one string, so
+        // even once the ending was named the button that carries the dynasty
+        // on would not have appeared, and the run would have ended anyway.
+        const fs = require('fs');
+        const path = require('path');
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'components', 'story', 'EndingOverlay.tsx'), 'utf8',
+        );
+        expect(src).toMatch(/const CONTINUABLE = \['diedInOffice', 'diedWithHeirTooYoung'\]/);
+        // And it asks who is waiting, not only who can take it today.
+        expect(src).toMatch(/heirInWaiting\(candidates\)\?\.heir/);
+    });
+
+    it('and the succession plan already knew how to wait, which is the sting', () => {
+        // `planSuccession` has handled this from the start and returns the
+        // years. All that was ever missing was an ending naming it.
+        const { planSuccession } = require('./succession');
+        const plan = planSuccession({
+            children: [{ id: 'a', name: 'Ada Hale', age: 9, gender: 'Female' }],
+            lastName: 'Hale',
+            designatedSuccessorId: 'a',
+            survivingParent: null,
+            estate: { cash: 100, shares: 100 },
+            generation: 1,
+        });
+        expect(plan).not.toBeNull();
+        expect(plan.yearsHeld).toBeGreaterThan(0);
     });
 
     it('and both of the endings it can name exist', () => {
