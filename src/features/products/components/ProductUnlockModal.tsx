@@ -6,6 +6,7 @@ import { UnlockableProduct } from '../data/unlockableProductsData';
 import { getMarket } from '../../../core/market/productMarkets';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { canUnlockAnotherCategory } from '../../../core/market/brand';
+import { getTier } from '../../../core/market/capacity';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store';
 import GameButton from '../../../components/common/GameButton';
@@ -29,12 +30,16 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     const { unlockProduct } = useProductStore();
     const { totalRP, spendRP } = useLaboratoryStore();
     const { companyCapital, brandValue, update: updateStats } = useStatsStore();
+    // The gate is a share of what this factory allows. See brand.categoryUnlockRequirement.
+    const facilityTier = useStatsStore(st => st.facilityTier);
 
     // ------------------------------------------------------------------
     //  CATEGORY GATE — earn your way out before you spread
     // ------------------------------------------------------------------
     //  You cannot open a new market until EVERY market you already trade in
-    //  is at CATEGORY_UNLOCK_BRAND (93 points, which is about 4.6% share).
+    //  is at seven tenths of what THIS FACTORY allows: 67 points at tier one,
+    //  115 at tier five. It was a flat 93, which sat two points under the tier
+    //  one ceiling of 95 and was therefore not a gate but a coin toss.
     //  Opening a fourth category on the back of one strong one while two sit
     //  neglected is exactly the sprawl this gate exists to prevent.
     //
@@ -51,7 +56,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
         if (active.length === 0 || map[product.category] !== undefined) {
             return { allowed: true, required: 0, have: 0, weakest: undefined as string | undefined };
         }
-        return canUnlockAnotherCategory(map, active);
+        return canUnlockAnotherCategory(map, active, getTier(facilityTier).brandCeiling);
     })();
 
     const canAfford = entryGate.allowed && totalRP >= product.unlockRPCost && companyCapital >= product.unlockCashCost;

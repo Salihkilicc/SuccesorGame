@@ -32,6 +32,8 @@ import { useCasinoRiskStore } from '../store/useCasinoRiskStore';
 import { readWorld } from '../story/world';
 import { postSponsorOffer, OFFER_EVERY_QUARTERS } from './postSponsorOffer';
 import { offerById, DROUGHT_GRACE_QUARTERS, TIER_MINIMUM_VALUE } from './sponsorship';
+import { getTier } from './capacity';
+import { indexToPoints } from './brand';
 
 const fresh = (companyValue = 1_000_000) => {
     useGameStore.setState({ ...initialGameState, _hasHydrated: true, currentMonth: 121, age: 55 });
@@ -179,8 +181,27 @@ describe('the bill lands and the brand follows', () => {
         // NEITHER company has a deal here. The only difference is how long
         // they have been without one, so the credit cannot confound it and
         // the ceiling penalty is the only thing left.
+        //
+        // AND IT STARTS AT THE CEILING, WHICH THE FIRST FIXTURE DID NOT.
+        // It began at brand 50 while the tier one ceiling is 22, so the
+        // company was nowhere near the thing the penalty moves and the
+        // difference between a dry company and a sponsored one came out
+        // smaller than the tick's own random events. Measured at that
+        // fixture: penalties of 3.2, 6.4 and 8.8 gave 10.283, 10.322 and
+        // 10.345 - noise, in the wrong order.
+        //
+        // A ceiling only binds when you are at it. Started at the ceiling,
+        // the gap is 1.78 on this fixture and 6.14 on a plain tier one
+        // company - the difference being the enormous companyValue this
+        // fixture needs for the global offers, which lifts the marketing
+        // benchmark and with it the whole brand calculation.
+        const ceiling = getTier(1).brandCeiling;
         const run = async (quartersWithout: number) => {
             fresh(TIER_MINIMUM_VALUE.global);
+            useStatsStore.setState({
+                brandValue: ceiling,
+                brandByCategory: { Consumer: indexToPoints(ceiling) },
+            } as any);
             useSponsorshipStore.setState({ quartersWithout } as any);
             await useGameStore.getState().advanceMonth(3);
             return useStatsStore.getState().brandValue ?? 0;
@@ -190,6 +211,9 @@ describe('the bill lands and the brand follows', () => {
         const longDry = await run(DROUGHT_GRACE_QUARTERS + 20);
 
         expect(longDry).toBeLessThan(inGrace);
+        // And by more than the noise that fooled the first fixture, which
+        // ran to a few hundredths.
+        expect(inGrace - longDry).toBeGreaterThan(1);
     }, 20_000);
 });
 

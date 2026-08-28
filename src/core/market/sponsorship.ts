@@ -94,12 +94,53 @@ export const tiersOpenAt = (companyValue: number): SponsorTier[] =>
 export const DROUGHT_GRACE_QUARTERS = 12;
 /** Ceiling points lost per quarter of drought after the grace period. */
 export const DROUGHT_PENALTY_PER_QUARTER = 0.8;
-/** And it stops somewhere, because a slow game over is not a mechanic. */
+/**
+ * SHELVED as a flat number, kept as the fallback when no ceiling is known.
+ *
+ * And it stops somewhere, because a slow game over is not a mechanic.
+ */
 export const DROUGHT_PENALTY_CAP = 20;
 
-export const droughtPenalty = (quartersWithoutSponsor: number): number => {
+/**
+ * The cap, as a share of the ceiling it is eating.
+ *
+ * ---------------------------------------------------------------------------
+ *  TWENTY POINTS OFF A CEILING OF TWENTY TWO IS NOT A PENALTY, IT IS AN END
+ * ---------------------------------------------------------------------------
+ *  A flat cap means the drought is a scratch on a big company and a death
+ *  sentence on a small one. Tier one's brand ceiling is 22, so a full drought
+ *  took it to 2 and there was nothing the player could do about it from
+ *  inside that tier.
+ *
+ *  Measured at tier one with the marketing budget at three times the
+ *  benchmark, over forty quarters:
+ *
+ *      no sponsorship     95 points in q10, then 88, 64, 35, 22
+ *      one kept live      95 to 112 the whole way, never below 95
+ *
+ *  Which is also what shut the category gate permanently: the gate is a share
+ *  of the ceiling, and the drought was taking almost all of the ceiling.
+ *
+ *  Two fifths now, so it costs the same FRACTION at every tier:
+ *
+ *      tier 1   ceiling 22   at most 8.8 lost
+ *      tier 5   ceiling 38   at most 15.2
+ *      tier 8   ceiling 52   at most 20.8
+ *
+ *  The severity per quarter is untouched. What changes is where it stops.
+ */
+export const DROUGHT_PENALTY_CAP_RATIO = 0.40;
+
+export const droughtPenalty = (
+    quartersWithoutSponsor: number,
+    /** The tier's brandCeiling, on the 0-100 index. Flat cap if not given. */
+    brandCeilingIndex?: number,
+): number => {
     const over = Math.max(0, (quartersWithoutSponsor || 0) - DROUGHT_GRACE_QUARTERS);
-    return Math.min(DROUGHT_PENALTY_CAP, over * DROUGHT_PENALTY_PER_QUARTER);
+    const cap = brandCeilingIndex !== undefined && brandCeilingIndex > 0
+        ? brandCeilingIndex * DROUGHT_PENALTY_CAP_RATIO
+        : DROUGHT_PENALTY_CAP;
+    return Math.min(cap, over * DROUGHT_PENALTY_PER_QUARTER);
 };
 
 // ============================================================================

@@ -428,6 +428,45 @@ export const BRAND_POINTS_PER_SHARE = 43.3;
 export const BRAND_INDEX_SCALE = 4.33;
 
 /**
+ * The gate, as a share of what the FACTORY allows.
+ *
+ * ---------------------------------------------------------------------------
+ *  A FIXED GATE TWO POINTS UNDER THE TIER ONE CEILING IS NOT A GATE
+ * ---------------------------------------------------------------------------
+ *  Reported as "I cannot move from phones to another market without upgrading
+ *  the factory, and getting that far in Consumer is hard". Measured, and it
+ *  was worse than that:
+ *
+ *      the gate                    93 points
+ *      the tier one brand ceiling  95 points
+ *
+ *  Two points of margin, and that margin was an accident of mine: the 93 came
+ *  from converting "about 4.6% share" onto the square root curve last session
+ *  without checking it against the ceiling it would have to fit under.
+ *
+ *  Share cannot carry you there either. 93 points needs 4.62% of Consumer,
+ *  which is 46,200 units a quarter; a tier one line makes 4,050. Eleven times
+ *  over. So at tier one only MARKETING can open the gate, and marketing stops
+ *  at the tier ceiling, two points above it.
+ *
+ *  Measured over forty quarters at tier one with the budget at three times
+ *  the benchmark: the gate opened once, in quarter ten, at exactly 95 points,
+ *  and never again.
+ *
+ *  A share of the ceiling instead. Seven tenths, so there is room to reach it
+ *  AND hold it, and so the rule says the same thing at every tier: you are
+ *  genuinely running this market before you spread into another.
+ *
+ *      tier 1   ceiling 95 points   gate 66
+ *      tier 3   ceiling 130         gate 91
+ *      tier 5   ceiling 165         gate 115
+ *      tier 8   ceiling 225         gate 157
+ */
+export const CATEGORY_UNLOCK_CEILING_RATIO = 0.70;
+
+/**
+ * SHELVED as the gate itself, kept as the fallback when no ceiling is known.
+ *
  * Brand points needed in a category before another category can be opened.
  *
  * RESCALED WITH THE CURVE, to keep meaning what it meant. The gate was written
@@ -862,10 +901,20 @@ export const applyCorporateShock = (
  * above CATEGORY_UNLOCK_BRAND - you cannot open a fourth market on the back
  * of one strong one while two others sit neglected.
  */
+export const categoryUnlockRequirement = (brandCeilingIndex?: number): number => {
+    if (brandCeilingIndex === undefined || !(brandCeilingIndex > 0)) {
+        return CATEGORY_UNLOCK_BRAND;
+    }
+    return Math.round(indexToPoints(brandCeilingIndex) * CATEGORY_UNLOCK_CEILING_RATIO);
+};
+
 export const canUnlockAnotherCategory = (
     byCategory: Record<string, number>,
     activeCategories: string[],
+    /** The tier's brandCeiling, on the 0-100 index. See categoryUnlockRequirement. */
+    brandCeilingIndex?: number,
 ): { allowed: boolean; weakest?: string; have: number; required: number } => {
+    const required = categoryUnlockRequirement(brandCeilingIndex);
     const cats = activeCategories.filter(c => byCategory[c] !== undefined);
     if (cats.length === 0) {
         return { allowed: true, have: 0, required: 0 };
@@ -876,10 +925,10 @@ export const canUnlockAnotherCategory = (
     });
     const have = byCategory[weakest] || 0;
     return {
-        allowed: have >= CATEGORY_UNLOCK_BRAND,
+        allowed: have >= required,
         weakest,
         have,
-        required: CATEGORY_UNLOCK_BRAND,
+        required,
     };
 };
 

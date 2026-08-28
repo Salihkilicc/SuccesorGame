@@ -131,7 +131,26 @@ export const useSponsorshipStore = create<Store>()(
                 };
             },
 
-            penalty: () => (get().active ? 0 : droughtPenalty(get().quartersWithout)),
+            // ------------------------------------------------------------
+            //  THE CAP IS A SHARE OF THE CEILING IT IS EATING
+            // ------------------------------------------------------------
+            //  A flat 20 was a scratch on a big company and the end of a
+            //  small one: tier one's brand ceiling is 22, so a full drought
+            //  took it to 2 and shut the category gate for good. Read here
+            //  rather than passed in, because every caller of `penalty()`
+            //  would otherwise have to know about facility tiers.
+            //  See market/sponsorship.DROUGHT_PENALTY_CAP_RATIO.
+            // ------------------------------------------------------------
+            penalty: () => {
+                if (get().active) return 0;
+                let ceiling: number | undefined;
+                try {
+                    const { useStatsStore } = require('./useStatsStore');
+                    const { getTier } = require('../market/capacity');
+                    ceiling = getTier(useStatsStore.getState().facilityTier).brandCeiling;
+                } catch { /* stats store not ready */ }
+                return droughtPenalty(get().quartersWithout, ceiling);
+            },
 
             glow: () => {
                 const { active } = get();

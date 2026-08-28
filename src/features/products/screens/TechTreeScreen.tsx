@@ -9,6 +9,7 @@ import { useProductStore } from '../../../core/store/useProductStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { canUnlockAnotherCategory } from '../../../core/market/brand';
+import { getTier } from '../../../core/market/capacity';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
 import { ProductIconBadge, getCategoryColor, getCategoryIconName } from '../components/ProductIcon';
@@ -40,9 +41,11 @@ const TechTreeScreen = () => {
     const totalRP = useLaboratoryStore(st => st.totalRP);
     const companyCapital = useStatsStore(st => st.companyCapital);
     const brandByCategory = useStatsStore(st => st.brandByCategory);
+    // See brand.categoryUnlockRequirement: the gate scales with the factory.
+    const facilityTier = useStatsStore(st => st.facilityTier);
 
     const activeCategories = Object.keys(brandByCategory || {});
-    const gate = canUnlockAnotherCategory(brandByCategory || {}, activeCategories);
+    const gate = canUnlockAnotherCategory(brandByCategory || {}, activeCategories, getTier(facilityTier).brandCeiling);
 
     /** Is this category already one of ours, or would opening it need the gate? */
     const categoryOpen = (category: ProductCategory) =>
