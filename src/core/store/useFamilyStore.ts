@@ -69,6 +69,15 @@ export interface Child {
     id: string;
     name: string;
     gender: 'Male' | 'Female';
+    /**
+     * Born inside the marriage.
+     *
+     * Absent means yes, so every existing save and every child born the
+     * ordinary way is unaffected. Only a child from a night out sets it
+     * false, and the one thing it changes is the share register: see
+     * story/inheritance.ts, `Survivor.legitimate`.
+     */
+    legitimate?: boolean;
     age: number;
     birthYear?: number;
     birthQuarter?: number;

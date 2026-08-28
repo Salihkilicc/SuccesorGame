@@ -133,8 +133,10 @@ describe('the wiring', () => {
     });
 
     it('and dismissing the card is what actually creates the child', () => {
-        // THE DEFECT. `addChild` appeared nowhere in this flow.
-        expect(hook()).toMatch(/useFamilyStore\.getState\(\)\.addChild\(newbornFromNightOut\(/);
+        // THE DEFECT. `addChild` appeared nowhere in this flow. It is called
+        // one naming step later now, so the rule is that it is called at all
+        // and that the pregnancy card is what starts the chain.
+        expect(hook()).toMatch(/useFamilyStore\.getState\(\)\.addChild\(/);
         expect(screen()).toMatch(/onClose=\{handlePregnancyClose\}/);
     });
 
@@ -148,5 +150,103 @@ describe('the wiring', () => {
         expect(hook()).toMatch(/currentQuarter\(\)/);
         expect(hook()).toMatch(/DYNASTY_START_YEAR \+ Math\.floor\(\(q - 1\) \/ 4\)/);
         expect(DYNASTY_START_YEAR).toBe(2026);
+    });
+});
+
+// ============================================================================
+//  AND WHOSE CHILD IT IS DECIDES WHAT THEY INHERIT
+// ============================================================================
+//  Asked for as "if it is not the heir it should get no shares, because it is
+//  illegitimate; a child born to your wife should get shares even if it is not
+//  the heir".
+//
+//  The estate already split the two currencies for a reason - the others get
+//  PAID, the heir gets CONTROL - so this rides on the split that was already
+//  there rather than adding a second rule beside it. Cash is untouched.
+// ============================================================================
+describe('who is on the share register afterwards', () => {
+    const { divideEstate, HEIR_STOCK_SHARE } = require('./inheritance');
+    const legit = (id: string) => ({ id, kind: 'child' as const, legitimate: true });
+    const bastard = (id: string) => ({ id, kind: 'child' as const, legitimate: false });
+    const estate = { cash: 1_000_000, shares: 1_000 };
+
+    it('a child from your wife takes stock even when it is not the heir', () => {
+        const out = divideEstate(estate, [legit('a'), legit('b')], 'a');
+        expect(out.find((b: any) => b.id === 'b').shares).toBe(1_000 * (1 - HEIR_STOCK_SHARE));
+    });
+
+    it('but a child from a night out does not', () => {
+        // THE RULE. It is still in the will and still in the family; it is
+        // simply not on the register.
+        const out = divideEstate(estate, [legit('a'), bastard('b')], 'a');
+        expect(out.find((b: any) => b.id === 'b').shares).toBe(0);
+    });
+
+    it('and it is still PAID the same as everybody else', () => {
+        // Cutting them out of the money as well would make the rule about
+        // punishing them rather than about who runs the company.
+        const out = divideEstate(estate, [legit('a'), bastard('b')], 'a');
+        expect(out.find((b: any) => b.id === 'b').cash)
+            .toBe(out.find((b: any) => b.id === 'a').cash);
+    });
+
+    it('unless you CHOOSE them, and then they inherit exactly as any heir does', () => {
+        // The point of it being a choice. You can put the company in the hands
+        // of the child nobody expected; the cost is that you had to decide to.
+        const out = divideEstate(estate, [bastard('a'), legit('b')], 'a');
+        expect(out.find((b: any) => b.id === 'a').kind).toBe('heir');
+        expect(out.find((b: any) => b.id === 'a').shares).toBe(1_000 * HEIR_STOCK_SHARE);
+    });
+
+    it('and the stock that would have gone to them goes to the heir, not nowhere', () => {
+        // The register has to keep adding up. A share that belongs to nobody
+        // is a company that quietly shrinks every generation.
+        const out = divideEstate(estate, [legit('a'), bastard('b'), bastard('c')], 'a');
+        expect(out.reduce((n: number, b: any) => n + b.shares, 0)).toBe(1_000);
+        expect(out.find((b: any) => b.id === 'a').shares).toBe(1_000);
+    });
+
+    it('and with no heir at all the illegitimate ones still take none', () => {
+        // The underage branch. Nobody is in charge, but that does not promote
+        // anybody either.
+        const out = divideEstate(estate, [legit('a'), bastard('b')], null);
+        expect(out.find((b: any) => b.id === 'b').shares).toBe(0);
+        expect(out.find((b: any) => b.id === 'a').shares).toBe(1_000);
+    });
+
+    it('and a child with no flag at all is treated as legitimate', () => {
+        // Every existing save. Absent must never mean disinherited.
+        const out = divideEstate(estate, [{ id: 'a', kind: 'child' }, { id: 'b', kind: 'child' }], 'a');
+        expect(out.find((b: any) => b.id === 'b').shares).toBeGreaterThan(0);
+    });
+
+    it('and the night out child is the one that carries the flag', () => {
+        expect(newbornFromNightOut(ctx).legitimate).toBe(false);
+    });
+});
+
+describe('and the player names them', () => {
+    const read = (...p: string[]) =>
+        fs.readFileSync(path.join(__dirname, '..', '..', ...p), 'utf8');
+    const hook = () => read('features', 'life', 'components', 'NightOut', 'useNightOutSystem.ts');
+    const screen = () => read('features', 'life', 'screens', 'NightOutScreen.tsx');
+
+    it('the child is drawn once and named after, not re-rolled by the card', () => {
+        // Opening a naming screen twice must not be a way to shop for a
+        // better child.
+        expect(hook()).toMatch(/setPendingNewborn\(newbornFromNightOut\(/);
+        expect(hook()).toMatch(/const child = pendingNewborn;/);
+    });
+
+    it('and skipping the name still births the child', () => {
+        // A naming card that can lose you an heir on a stray tap is not a
+        // mechanic.
+        expect(screen()).toMatch(/onSkip=\{confirmNewbornName\}/);
+        expect(screen()).toMatch(/onConfirm=\{confirmNewbornName\}/);
+    });
+
+    it('and the reader hands the flag to the estate, or the rule does nothing', () => {
+        expect(read('core', 'story', 'readRecord.ts'))
+            .toMatch(/legitimate: c\.legitimate !== false/);
     });
 });

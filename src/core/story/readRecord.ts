@@ -76,7 +76,12 @@ const readEstate = (): EstateSummary | undefined => {
 
         const children = (family.children ?? []);
         const survivors: Survivor[] = [
-            ...children.map((c: any) => ({ id: c.id, kind: 'child' as const })),
+            // `legitimate` decides whether a child who is not the heir takes
+            // stock. Forgetting it here would silently enfranchise every one
+            // of them, which is the whole rule.
+            ...children.map((c: any) => ({
+                id: c.id, kind: 'child' as const, legitimate: c.legitimate !== false,
+            })),
             ...(family.partner ? [{ id: 'partner', kind: 'spouse' as const }] : []),
         ];
 

@@ -10,6 +10,7 @@ import NightOutOutcomeModal from '../components/NightOut/NightOutOutcomeModal';
 import HookupGameModal from '../components/NightOut/HookupGameModal';
 import NightEndModal from '../components/NightOut/NightEndModal';
 import PregnancyRevealModal from '../components/NightOut/PregnancyRevealModal';
+import BabyNamingModal from '../../love/components/BabyNamingModal';
 import NightConclusionModal from '../components/NightOut/NightConclusionModal';
 
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
@@ -55,6 +56,11 @@ const NightOutScreen = () => {
         // created on dismissal now, so the hook owns it.
         //   setPregnancyModalVisible,
         handlePregnancyClose,
+        namingModalVisible,
+        pendingNewborn,
+        newbornName,
+        setNewbornName,
+        confirmNewbornName,
         setConclusionModalVisible,
         handleConclusionClose,
         handleHookupGameSuccess,
@@ -124,6 +130,17 @@ const NightOutScreen = () => {
                 <PregnancyRevealModal
                     visible={pregnancyModalVisible}
                     onClose={handlePregnancyClose}
+                />
+                {/* The player names them. Skipping still births the child with
+                    the drawn name - a naming card that can lose you an heir on
+                    a stray tap is not a mechanic. */}
+                <BabyNamingModal
+                    visible={namingModalVisible}
+                    pendingChildGender={pendingNewborn?.gender ?? 'Male'}
+                    childName={newbornName}
+                    onChangeName={setNewbornName}
+                    onConfirm={confirmNewbornName}
+                    onSkip={confirmNewbornName}
                 />
             </AppLaunchLoader>
         </View>

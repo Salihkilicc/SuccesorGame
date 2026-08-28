@@ -103,6 +103,9 @@ export const newbornFromNightOut = (
             health: span(85, 15),
             creativity: span(55, 35),
         },
+        // NOT from your wife, whatever your marital status was that night.
+        // The only thing it changes is the stock: see inheritance.ts.
+        legitimate: false,
         relationshipWithPlayer: NIGHT_OUT_CHILD_RELATIONSHIP,
         isSuccessorCandidate: false,
         traits: ['Unplanned'],

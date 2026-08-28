@@ -57,6 +57,31 @@ export type Survivor = {
     id: string;
     /** Every child inherits, including one too young to run anything. */
     kind: 'child';
+    /**
+     * Born inside the marriage.
+     *
+     * ---------------------------------------------------------------------
+     *  WHO GETS STOCK AND WHO ONLY GETS PAID
+     * ---------------------------------------------------------------------
+     *  A child from a night out is not a child from your wife, and the
+     *  family's block of shares is the one thing that cannot be handed
+     *  around without the company changing hands. So an illegitimate child
+     *  who was NOT chosen as heir inherits cash and no stock.
+     *
+     *  Chosen as heir, they inherit exactly as any heir does. That is the
+     *  point of it being a choice: you can put the company in the hands of
+     *  the child nobody expected, and the cost is that you had to decide to.
+     *
+     *  CASH IS UNTOUCHED, and this is the part worth being careful about.
+     *  The file already splits the two currencies for a reason - the others
+     *  get PAID, the heir gets CONTROL - and cutting an illegitimate child
+     *  out of the money as well would make the rule about punishing them
+     *  rather than about who runs the company.
+     *
+     *  Defaults to true when absent, so every existing save and every child
+     *  born the ordinary way is unaffected.
+     */
+    legitimate?: boolean;
 } | {
     id: string;
     kind: 'spouse';
@@ -159,11 +184,17 @@ export const divideEstate = (
     //  the board rather than a rival for it.
     // ------------------------------------------------------------------
     const heir = heirId ? children.find(c => c.id === heirId) : undefined;
-    const others = children.filter(c => c.id !== heir?.id);
+    // An illegitimate child who was not chosen takes no stock. See `legitimate`.
+    const others = children.filter(
+        c => c.id !== heir?.id && (c.kind === 'child' ? c.legitimate !== false : true),
+    );
+    const cutOut = children.filter(
+        c => c.id !== heir?.id && (c.kind === 'child' ? c.legitimate === false : false),
+    );
 
     // The heir first, so `splitWhole` gives them the odd share. Everything
     // else about this list is in family order.
-    const stockOrder = heir ? [heir, ...others] : children;
+    const stockOrder = heir ? [heir, ...others] : others;
     const weights = heir
         ? [
             others.length > 0 ? HEIR_STOCK_SHARE : 1,
@@ -171,7 +202,7 @@ export const divideEstate = (
         ]
         // Nobody is in charge, so nobody is favoured. This is the branch that
         // makes an underage family lose the company.
-        : children.map(() => 1);
+        : others.map(() => 1);
     const stock = splitWhole(shares, weights);
 
     const out: Bequest[] = stockOrder.map((child, i) => ({
@@ -180,6 +211,12 @@ export const divideEstate = (
         cash: perChild,
         shares: stock[i] ?? 0,
     }));
+
+    // Paid, not enfranchised. They are still in the will and still in the
+    // family; they are simply not on the share register.
+    for (const child of cutOut) {
+        out.push({ id: child.id, kind: 'child', cash: perChild, shares: 0 });
+    }
 
     if (spouse) out.push({ id: spouse.id, kind: 'spouse', cash: spouseCash, shares: 0 });
     return out;

@@ -9,7 +9,7 @@ import { Partner } from '../../../love/types';
 
 import { VENUES, REGIONAL_NAMES, RegionCode, Venue } from './data/nightOutVenues';
 import { generateMiniGamePartner, calculateWildNightOutcome } from './logic/nightOutUtils';
-import { useFamilyStore } from '../../../../core/store/useFamilyStore';
+import { useFamilyStore, type Child } from '../../../../core/store/useFamilyStore';
 import { newbornFromNightOut, DYNASTY_START_YEAR } from '../../../../core/story/nightOutChild';
 import { currentQuarter } from '../../../../core/story/world';
 
@@ -25,6 +25,9 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     const [outcomeModalVisible, setOutcomeModalVisible] = useState(false);
     const [nightEndModalVisible, setNightEndModalVisible] = useState(false);
     const [pregnancyModalVisible, setPregnancyModalVisible] = useState(false);
+    const [namingModalVisible, setNamingModalVisible] = useState(false);
+    const [pendingNewborn, setPendingNewborn] = useState<Omit<Child, 'id'> | null>(null);
+    const [newbornName, setNewbornName] = useState('');
     const [conclusionModalVisible, setConclusionModalVisible] = useState(false);
     const [hookupGameVisible, setHookupGameVisible] = useState(false);
     const [isHangarOpen, setIsHangarOpen] = useState(false);
@@ -325,12 +328,34 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
     // ------------------------------------------------------------------
     const handlePregnancyClose = useCallback(() => {
         setPregnancyModalVisible(false);
+        // The child is drawn now and NAMED next: everything about them is
+        // settled here so the naming screen cannot re-roll a better one by
+        // being opened twice.
         const q = currentQuarter();
-        useFamilyStore.getState().addChild(newbornFromNightOut({
+        setPendingNewborn(newbornFromNightOut({
             birthYear: DYNASTY_START_YEAR + Math.floor((q - 1) / 4),
             birthQuarter: ((q - 1) % 4) + 1,
         }));
+        setNewbornName('');
+        setNamingModalVisible(true);
     }, []);
+
+    /**
+     * The player names them, and the child is born.
+     *
+     * An empty name is not refused: `addChild` falls back to a default rather
+     * than dropping the child, because a naming card that can be dismissed is
+     * a naming card somebody will dismiss, and losing an heir to a stray tap
+     * is not a mechanic.
+     */
+    const confirmNewbornName = useCallback(() => {
+        const child = pendingNewborn;
+        setNamingModalVisible(false);
+        setPendingNewborn(null);
+        if (!child) return;
+        const typed = newbornName.trim();
+        useFamilyStore.getState().addChild(typed ? { ...child, name: typed } : child);
+    }, [pendingNewborn, newbornName]);
 
     const handleConclusionClose = useCallback(() => {
         setConclusionModalVisible(false);
@@ -375,6 +400,11 @@ export const useNightOutSystem = (triggerEncounter?: (context: string) => boolea
         nightEndModalVisible,
         pregnancyModalVisible,
         handlePregnancyClose,
+        namingModalVisible,
+        pendingNewborn,
+        newbornName,
+        setNewbornName,
+        confirmNewbornName,
         conclusionModalVisible,
         conclusionData,
         hookupGameVisible,
