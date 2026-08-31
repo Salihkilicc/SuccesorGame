@@ -218,8 +218,15 @@ describe('and poker awards the pot after the last card lands', () => {
             .toMatch(/setTimeout\(\(\) => settle\(from\), SHOWDOWN_MS\);\s*timers\.current\.push\(id\)/);
     });
 
-    it('and the pause is long enough for a card to land and be looked at', () => {
-        expect(SHOWDOWN_MS).toBeGreaterThan(CARD_SHOW_MS);
-        expect(SHOWDOWN_MS).toBeLessThan(STREET_BEAT_MS * 2);
+    it('and the pause is long enough to turn five hands over and read them', () => {
+        // The upper bound was STREET_BEAT_MS * 2 when there was nothing to
+        // look at but the last board card. The opponents' hands go face up
+        // now, so the pause has to cover the turn AND the reading - see
+        // pokerShowdown.test.ts. A bound that stops the pause growing when
+        // the thing it is waiting for grew is a bound measuring the wrong
+        // quantity.
+        expect(SHOWDOWN_MS).toBeGreaterThan(CARD_SHOW_MS + STREET_BEAT_MS);
+        // And still short enough that a fast player is not held hostage.
+        expect(SHOWDOWN_MS).toBeLessThan(2500);
     });
 });

@@ -30,6 +30,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
 import { avatarHue, initialsOf, type SeatKind } from '../../../core/casino/pokerTable';
 import type { Action } from '../../../core/casino/pokerBots';
+import type { Card } from '../../../core/casino/blackjack';
+import AnimatedCard from './AnimatedCard';
+
+/**
+ * How wide a card is at the showdown.
+ *
+ * Two of them plus the gap has to fit inside a seat, which is 86 points. See
+ * the `width` prop on AnimatedCard for why this is a size rather than a
+ * separate mini card component.
+ */
+export const SHOWN_CARD_W = 27;
 
 type Props = {
     id: string;
@@ -47,6 +58,23 @@ type Props = {
     folded?: boolean;
     /** The room's accent, for the active ring. */
     tint: string;
+    // ----------------------------------------------------------------------
+    //  THE SHOWDOWN
+    // ----------------------------------------------------------------------
+    //  Asked for as "let us see the winners' hands at the end in poker".
+    //
+    //  Until now the opponents' cards were never shown at all: the hand ended,
+    //  a line of status text named the winning hand, and the player had no way
+    //  to check it or to learn anything from it. Poker is a game of reading
+    //  people and there was nothing to read - which is most of why the table
+    //  felt like it was resolving rather than being played.
+    // ----------------------------------------------------------------------
+    /** Their two cards, at the showdown. Undefined until then. */
+    hole?: Card[];
+    /** What those cards make. "Two Pair", "Flush". */
+    handName?: string;
+    /** They won or shared the pot. */
+    winner?: boolean;
 };
 
 const money = (n: number): string => {
@@ -71,7 +99,9 @@ const KIND_LABEL: Record<SeatKind, string> = {
 
 const PokerSeat = ({
     id, name, kind, company, stack, lastAction, lastAmount, active, folded, tint,
+    hole, handName, winner,
 }: Props) => {
+    const showing = !!hole && hole.length > 0;
     const hue = avatarHue(id);
     // A dark, desaturated fill so white initials always clear it. The identity
     // is in the HUE; the lightness is fixed so no seat is ever unreadable.
@@ -83,8 +113,8 @@ const PokerSeat = ({
             <View
                 style={[
                     styles.avatar,
-                    { backgroundColor: fill, borderColor: active ? tint : ring },
-                    active && styles.avatarActive,
+                    { backgroundColor: fill, borderColor: active || winner ? tint : ring },
+                    (active || winner) && styles.avatarActive,
                 ]}
             >
                 <Text style={styles.initials}>{initialsOf(name)}</Text>
@@ -98,8 +128,34 @@ const PokerSeat = ({
             )}
             <Text style={styles.stack}>{money(stack)}</Text>
 
-            {/* What they just did. The thing that makes it a table. */}
-            {!!lastAction && (
+            {/* ------------------------------------------------------------
+                THE SHOWDOWN, or what they just did. Never both: once the
+                cards are face up, "CALL 8M" is history and the hand is the
+                only thing worth the space.
+               ------------------------------------------------------------ */}
+            {showing ? (
+                <View style={styles.shown}>
+                    <View style={styles.shownCards}>
+                        {hole!.map((c, i) => (
+                            <AnimatedCard
+                                key={`${c.rank}${c.suit}`}
+                                card={c}
+                                index={i}
+                                width={SHOWN_CARD_W}
+                                fromY={-24}
+                            />
+                        ))}
+                    </View>
+                    {!!handName && (
+                        <Text
+                            numberOfLines={1}
+                            style={[styles.handName, winner && { color: tint }]}
+                        >
+                            {handName.toUpperCase()}
+                        </Text>
+                    )}
+                </View>
+            ) : !!lastAction && (
                 <View style={[styles.bubble, { borderColor: `${tint}55` }]}>
                     <Text style={styles.bubbleText} numberOfLines={1}>
                         {lastAction === 'raise' ? `RAISE ${money(lastAmount || 0)}`
@@ -156,6 +212,22 @@ const styles = StyleSheet.create({
         color: theme.colors.textSecondary,
         fontSize: 10,
         fontWeight: '700',
+    },
+    shown: { alignItems: 'center', marginTop: 3 },
+    shownCards: { flexDirection: 'row', gap: 3 },
+    /**
+     * What the cards make.
+     *
+     * The winner's is in the room's colour and everybody else's is muted, so
+     * who took it is legible before the words are read. TEXT ONLY - green and
+     * red belong to profit and loss and nothing else in this game.
+     */
+    handName: {
+        marginTop: 2,
+        color: theme.colors.textMuted,
+        fontSize: 7,
+        fontWeight: '800',
+        letterSpacing: 0.2,
     },
     bubble: {
         marginTop: 3,

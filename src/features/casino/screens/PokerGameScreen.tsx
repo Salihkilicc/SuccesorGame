@@ -26,6 +26,7 @@ import CasinoHeader from '../components/CasinoHeader';
 import GameResultPopup from '../components/GameResultPopup';
 import AnimatedCard from '../components/AnimatedCard';
 import PokerTable, { seatPosition } from '../components/PokerTable';
+import { HUMAN_SEAT } from '../../../core/casino/pokerRound';
 import PokerSeat from '../components/PokerSeat';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
@@ -67,6 +68,16 @@ const PokerGameScreen = () => {
     const tint = currentLocation.theme.primary;
     const seatCount = opponents.length;
 
+    /**
+     * What your own two cards made, once the hand is shown down.
+     *
+     * `HUMAN_SEAT` rather than the string 'you', so the seat the player sits
+     * in is defined in one place. See core/casino/pokerRound.ts.
+     */
+    const yourId = round?.players?.[HUMAN_SEAT]?.id;
+    const yourHand = round?.reveal?.find(r => r.id === yourId)?.rank.name;
+    const youWon = !!yourId && !!round?.winners?.includes(yourId);
+
     return (
         <View style={styles.container}>
             <CasinoHeader
@@ -96,6 +107,18 @@ const PokerGameScreen = () => {
                     {opponents.map((o, i) => {
                         const p = round?.players?.[i + 1];
                         const at = seatPosition(i, seatCount);
+                        // ------------------------------------------------
+                        //  WHOSE CARDS GO FACE UP
+                        // ------------------------------------------------
+                        //  `reveal` is exactly the players who were still in
+                        //  when the last bet was called, which is exactly who
+                        //  has to show. It is EMPTY when everybody else
+                        //  folded - the engine already knows that a pot
+                        //  nobody paid to see is a pot nobody shows their
+                        //  cards for - so this needs no rule of its own.
+                        //  See core/casino/pokerRound.ts -> finish.
+                        // ------------------------------------------------
+                        const shown = round?.reveal?.find(r => r.id === o.id);
                         return (
                             <View
                                 key={o.id}
@@ -118,6 +141,9 @@ const PokerGameScreen = () => {
                                     active={!!round && !round.done && round.turn === i + 1}
                                     folded={!!p?.folded}
                                     tint={tint}
+                                    hole={shown ? p?.hole : undefined}
+                                    handName={shown?.rank.name}
+                                    winner={!!round?.winners?.includes(o.id)}
                                 />
                             </View>
                         );
@@ -145,6 +171,24 @@ const PokerGameScreen = () => {
                     <Text style={styles.yourStack}>
                         {t('casino.you')} · {money(round?.players?.[0]?.stack ?? 0)}
                     </Text>
+
+                    {/* ----------------------------------------------------
+                        AND WHAT YOUR OWN CARDS MADE
+
+                        Left out of the first version and it was the more
+                        useful half: a player who cannot see that their two
+                        pair lost to a flush has not been told anything by
+                        being shown the flush. Named for both sides or it
+                        teaches nobody.
+                       ---------------------------------------------------- */}
+                    {!!yourHand && (
+                        <Text
+                            style={[styles.yourHand, youWon && { color: tint }]}
+                            numberOfLines={1}
+                        >
+                            {yourHand.toUpperCase()}
+                        </Text>
+                    )}
                 </View>
 
                 {/* ---------------------------------------------------------
@@ -231,6 +275,14 @@ const styles = StyleSheet.create({
     boardCard: {},
     you: { alignItems: 'center', marginTop: 6, gap: 4 },
     holeRow: { flexDirection: 'row', gap: 6 },
+    /** What your cards made. Muted when you lost, the room's colour when you won. */
+    yourHand: {
+        marginTop: 2,
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: 0.6,
+    },
     yourStack: {
         color: theme.colors.textSecondary,
         fontSize: 11,

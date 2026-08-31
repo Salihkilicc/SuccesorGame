@@ -70,8 +70,14 @@ export const BOARD_CARD_MS = 170;
  * look at it. Without it the river card and the result arrive together, which
  * is the same complaint blackjack had: being told the answer while the thing
  * that decided it is still moving.
+ *
+ * RAISED FROM 900 WHEN THE HANDS WENT FACE UP. There was nothing to look at
+ * before - the opponents' cards were never shown - so the pause only had to
+ * cover the last board card. Now up to five hands turn over and each carries
+ * what it made, and a player who is meant to learn something from that needs
+ * time to read it. The cards take CARD_SHOW_MS to turn; the rest is reading.
  */
-export const SHOWDOWN_MS = 900;
+export const SHOWDOWN_MS = 1700;
 
 export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
     const { money, setField } = useStatsStore();

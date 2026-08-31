@@ -70,7 +70,21 @@ interface AnimatedCardProps {
    */
   fromX?: number;
   fromY?: number;
+  /**
+   * How wide the card is, in points.
+   *
+   * A PROP RATHER THAN A SECOND COMPONENT. The showdown shows five opponents'
+   * hands inside seats 86 points wide, and a full size card does not fit -
+   * but a separate MiniCard would be a second card that has to be taught the
+   * flip, the deal and the backface all over again, and would drift from this
+   * one the first time either changed. Everything below scales off this.
+   */
+  width?: number;
 }
+
+/** The full size card, and the ratio everything else keeps. */
+export const CARD_W = 62;
+export const CARD_H = 88;
 
 /** How long a card takes to travel from the deck to its place. */
 export const DEAL_MS = 260;
@@ -92,8 +106,11 @@ export const TURN_AT = 130;
 export const CARD_SHOW_MS = TURN_AT + FLIP_MS;
 
 const AnimatedCard = ({
-  card, index, hidden = false, baseDelay = 0, fromX = 0, fromY = 0,
+  card, index, hidden = false, baseDelay = 0, fromX = 0, fromY = 0, width = CARD_W,
 }: AnimatedCardProps) => {
+  /** Everything on the card in proportion, so a mini card is not a squashed one. */
+  const k = width / CARD_W;
+  const height = CARD_H * k;
   const travel = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.85)).current;
@@ -186,6 +203,7 @@ const AnimatedCard = ({
     <Animated.View
       style={[
         styles.slot,
+        { width, height },
         {
           opacity,
           transform: [{ perspective: 800 }, { translateX }, { translateY }, { scale }],
@@ -196,12 +214,13 @@ const AnimatedCard = ({
       <Animated.View
         style={[
           styles.card, styles.hiddenCard,
+          { borderRadius: 8 * k },
           { transform: [{ perspective: 800 }, { rotateY: faceDownSpin }] },
         ]}
       >
-        <View style={styles.hiddenPattern}>
-          <View style={styles.hiddenInner}>
-            <Text style={styles.hiddenIcon}>🂠</Text>
+        <View style={[styles.hiddenPattern, { borderRadius: 6 * k, margin: 3 * k }]}>
+          <View style={[styles.hiddenInner, { width: 36 * k, height: 36 * k, borderRadius: 18 * k }]}>
+            <Text style={[styles.hiddenIcon, { fontSize: 22 * k }]}>🂠</Text>
           </View>
         </View>
       </Animated.View>
@@ -210,32 +229,36 @@ const AnimatedCard = ({
       <Animated.View
         style={[
           styles.card,
+          { borderRadius: 8 * k },
           { transform: [{ perspective: 800 }, { rotateY: faceUpSpin }] },
         ]}
       >
         {/* Top-left rank + suit */}
-        <View style={styles.cornerTop}>
-          <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
-          <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
+        <View style={[styles.cornerTop, { top: 4 * k, left: 5 * k }]}>
+          <Text style={[styles.cornerRank, { color: textColor, fontSize: 13 * k, lineHeight: 15 * k }]}>{card.rank}</Text>
+          <Text style={[styles.cornerSuit, { color: textColor, fontSize: 10 * k, lineHeight: 12 * k }]}>{card.suit}</Text>
         </View>
 
         {/* Center suit (large) */}
-        <Text style={[styles.centerSuit, { color: textColor }]}>{card.suit}</Text>
+        <Text style={[styles.centerSuit, { color: textColor, fontSize: 26 * k }]}>{card.suit}</Text>
 
-        {/* Bottom-right rank + suit (inverted) */}
-        <View style={styles.cornerBottom}>
-          <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
-          <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
-        </View>
+        {/* Bottom-right rank + suit (inverted).
+            SHELVED ON A MINI CARD. Two corners on a 26 point card is four
+            pieces of type inside a space that fits one legibly, and the
+            bottom one is the redundant copy - it exists so a card fanned in
+            a real hand can be read from either end, which nothing here does. */}
+        {k > 0.7 && (
+          <View style={styles.cornerBottom}>
+            <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
+            <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
+          </View>
+        )}
       </Animated.View>
     </Animated.View>
   );
 };
 
 export default AnimatedCard;
-
-const CARD_W = 62;
-const CARD_H = 88;
 
 const styles = StyleSheet.create({
   /**
@@ -245,6 +268,8 @@ const styles = StyleSheet.create({
    * measured and the card cannot change width halfway through its turn.
    */
   slot: {
+    // Width and height are set inline from the `width` prop; these are the
+    // defaults so the style is complete on its own.
     width: CARD_W,
     height: CARD_H,
     shadowColor: '#000',
