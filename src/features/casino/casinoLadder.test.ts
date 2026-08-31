@@ -34,6 +34,7 @@ import {
     MAX_REP_PER_BET,
     reputationForBet,
 } from './data/casinoData';
+import { chipsFor, maxBetFor } from './data/casinoStakes';
 import { MACAU_REPUTATION, HIGH_ROLLER_REPUTATION } from '../../core/story/title';
 
 const byId = (id: string) => CASINO_LOCATIONS.find(l => l.id === id)!;
@@ -47,19 +48,25 @@ describe('the ladder', () => {
         }
     });
 
-    it('asks a hundred to leave the first room', () => {
-        // The one gate the player actually climbs at five points a spin.
-        expect(CASINO_LOCATIONS[1].requirement).toBe(100);
+    it('asks sixty to leave the first room', () => {
+        // The one gate the player actually climbs at five points a spin, and
+        // it came down from a hundred: "make progress easier".
+        expect(CASINO_LOCATIONS[1].requirement).toBe(60);
     });
 
-    it('and four hundred for every one after', () => {
-        // Two hundred was the alternative and it is one hand at the top of
-        // Istanbul's chip range, which is how the ladder collapsed the first
-        // time. Four hundred is the smallest step that still costs more than
-        // a single maximum bet at the bottom of each tier.
-        for (let i = 2; i < CASINO_LOCATIONS.length; i++) {
-            const step = CASINO_LOCATIONS[i].requirement - CASINO_LOCATIONS[i - 1].requirement;
-            expect(step).toBe(400);
+    it('and a widening step for every one after', () => {
+        // A FLAT step was the old answer and it was too much of it: 400 a gate
+        // over six gates is 42 quarters of maximum standing. The shape that
+        // mattered was that each gate costs more than the last, and that is
+        // kept - 60, 120, 180, 240 - at a third of the total distance.
+        const steps: number[] = [];
+        for (let i = 1; i < CASINO_LOCATIONS.length; i++) {
+            steps.push(CASINO_LOCATIONS[i].requirement - CASINO_LOCATIONS[i - 1].requirement);
+        }
+        expect(steps).toEqual([60, 120, 180, 240]);
+        for (let i = 1; i < steps.length; i++) {
+            const step = steps[i];
+            expect(step).toBeGreaterThan(steps[i - 1]);
         }
     });
 
@@ -98,11 +105,15 @@ describe('what one bet is worth', () => {
         //  worth a thousand points against a gate of four hundred. The
         //  cheapest bet available cleared the next room four times over.
         // ----------------------------------------------------------------
-        for (const room of CASINO_LOCATIONS) {
-            const smallest = Math.min(...room.chips);
-            const largest = Math.max(...room.chips);
-            expect(reputationForBet(smallest)).toBeLessThanOrEqual(MAX_REP_PER_BET);
-            expect(reputationForBet(largest)).toBeLessThanOrEqual(MAX_REP_PER_BET);
+        // The chips are DERIVED from the player's fortune now rather than
+        // listed on the room, so this asks at several fortunes instead of
+        // reading a fixed rail. See data/casinoStakes.ts.
+        for (const money of [0, 10_000_000, 2_000_000_000_000]) {
+            for (const room of CASINO_LOCATIONS) {
+                const rail = chipsFor(room, money);
+                expect(reputationForBet(Math.min(...rail))).toBeLessThanOrEqual(MAX_REP_PER_BET);
+                expect(reputationForBet(Math.max(...rail))).toBeLessThanOrEqual(MAX_REP_PER_BET);
+            }
         }
         expect(reputationForBet(50_000_000_000)).toBe(MAX_REP_PER_BET);
     });
@@ -118,16 +129,24 @@ describe('what one bet is worth', () => {
         // Sixteen maximum bets to cross a four hundred gate, against twenty
         // spins to leave Athens at five a spin. The rooms are earned by
         // turning up rather than by the size of one chip.
-        const step = 400;
-        expect(Math.ceil(step / MAX_REP_PER_BET)).toBe(16);
+        // The gates are 60/120/180/240 now rather than a flat 400, so this
+        // pins the WIDEST one: ten maximum bets, against twenty spins to
+        // leave Athens. See the ladder note in casinoData.ts.
+        const widest = CASINO_LOCATIONS[CASINO_LOCATIONS.length - 1].requirement
+            - CASINO_LOCATIONS[CASINO_LOCATIONS.length - 2].requirement;
+        expect(widest).toBe(240);
+        expect(Math.ceil(widest / MAX_REP_PER_BET)).toBe(10);
     });
 
     it('while the first room is still the quick one it was', () => {
         // Athens tops out at a 50,000 chip, which is under the cap, so
         // nothing about the opening changed.
+        // Athens' floor is a 50,000 ceiling, which is under the cap, so a
+        // player with nothing still climbs at five a spin. And the first gate
+        // came down from 100 to 60, which is what "make it easier" meant.
         const athens = CASINO_LOCATIONS[0];
-        expect(reputationForBet(Math.max(...athens.chips))).toBe(5);
-        expect(CASINO_LOCATIONS[1].requirement / 5).toBe(20);
+        expect(reputationForBet(maxBetFor(athens, 0))).toBe(5);
+        expect(CASINO_LOCATIONS[1].requirement / 5).toBe(12);
     });
 
     it('and no logic file works it out for itself any more', () => {
@@ -148,7 +167,12 @@ describe('the two titles that hang off it', () => {
         // to match. The rooms moved and they did not, so "Known in Macau"
         // would have arrived a quarter of the way up the ladder.
         expect(MACAU_REPUTATION).toBe(byId('macau').requirement);
-        expect(HIGH_ROLLER_REPUTATION).toBe(byId('london').requirement);
+        // London was SHELVED when the ladder came down to five rooms, and
+        // this pointed at it: `roomRequirement` fell through to its hardcoded
+        // 900, which is above Macau's own gate, so the high roller title would
+        // have arrived AFTER the Macau one or never at all. Caught here;
+        // nothing on screen would have shown it.
+        expect(HIGH_ROLLER_REPUTATION).toBe(byId('monte_carlo').requirement);
     });
 
     it('and they still arrive in the right order', () => {
@@ -280,12 +304,13 @@ describe('the quarter has an allowance', () => {
     });
 
     it('and a whole ladder takes years rather than an afternoon', () => {
-        // 400 a gate at 50 a quarter is eight quarters, and the walk from
-        // Athens to Macau is about ten years of turning up. The MONEY is
-        // untouched - you can still lose a fortune in one sitting. It is the
-        // standing that takes a career, which is the right way round.
+        // Twelve quarters at 50 a quarter, which is about three years of
+        // turning up. It WAS forty two - ten and a half years - and that is
+        // what "it is absurdly hard to make progress" was measuring. The
+        // MONEY is untouched: you can still lose a fortune in one sitting.
         const quartersForTheLadder = CASINO_LADDER_TOP / MAX_REP_PER_QUARTER;
-        expect(quartersForTheLadder).toBeGreaterThanOrEqual(40);
+        expect(quartersForTheLadder).toBe(12);
+        expect(quartersForTheLadder).toBeGreaterThanOrEqual(8);
     });
 
     it('and asking for nothing is not a way to bank something', () => {

@@ -32,6 +32,7 @@ export type StatKey =
   | 'companySharePrice'
   | 'companyDailyChange'
   | 'previousSharePrice'
+  | 'sharePriceReference'
   | 'earningsPower'
   | 'lossCarryforward'
   | 'companyRevenueMonthly'
@@ -323,6 +324,15 @@ export const initialStatsState: StatsState = {
   companyDailyChange: 0,
   /** Gecen ceyregin hisse fiyati — degisim yuzdesi buradan hesaplanir */
   previousSharePrice: (START_COMPANY_CAPITAL * 1.5) / 10_000_000,
+  /**
+   * THE UNAFFECTED PRICE — what the stock was worth before whatever moved it.
+   *
+   * Rises with the price instantly and falls only a fraction of the gap each
+   * quarter, and it is what a board member prices a control block against.
+   * Without it, crashing the company on purpose bought the whole register for
+   * a rounding error. See core/market/buyout.ts -> decayReference.
+   */
+  sharePriceReference: (START_COMPANY_CAPITAL * 1.5) / 10_000_000,
   casinoReputation: 0,
 
   // Geçmiş yok: ilk çeyrek raporu oyuncunun kendi kararlarını göstersin.
@@ -1038,6 +1048,7 @@ export const useStatsStore = create<StatsStore>()(
         companyDebtTotal: state.companyDebtTotal,
         companyOwnership: state.companyOwnership,
         companySharePrice: state.companySharePrice,
+        sharePriceReference: state.sharePriceReference,
         companyRevenueMonthly: state.companyRevenueMonthly,
         companyExpensesMonthly: state.companyExpensesMonthly,
         companyCapital: state.companyCapital,

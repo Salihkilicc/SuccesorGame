@@ -27,6 +27,7 @@ import { handleBuyLuxury } from '../../../logic/personalEventsLogic';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
+import { t, useLocale } from '../../../core/i18n';
 
 const getCategoryTheme = (category: string) => {
     switch (category) {
@@ -48,6 +49,7 @@ const getCategoryTheme = (category: string) => {
 };
 
 export const CartScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const { cart, removeFromCart, purchaseCart } = useAssetStore();
     const { money, spendMoney } = useStatsStore();
@@ -65,8 +67,8 @@ export const CartScreen = () => {
     const handleCheckoutStart = () => {
         if (!canAfford) {
             Alert.alert(
-                'Insufficient Funds',
-                `You need $${(calculatedTotal - money).toLocaleString()} more to complete this acquisition.`,
+                t('shop.insufficientFunds'),
+                t('shop.insufficientFundsDesc', { needed: (calculatedTotal - money).toLocaleString() }),
             );
             return;
         }
@@ -127,7 +129,7 @@ export const CartScreen = () => {
         <View style={styles.root}>
             {/* Screen Header with Back Arrow, Subtitle and Category Rule */}
             <ScreenHeader
-                title="ACQUISITION CART"
+                title={t('shop.cartTitle')}
                 subtitle="ORDER REVIEW & SETTLEMENT"
                 category="company"
             />
@@ -207,22 +209,22 @@ export const CartScreen = () => {
                         <Text style={styles.summaryTitle}>ACQUISITION BREAKDOWN</Text>
 
                         <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Subtotal ({cart.length} items):</Text>
+                            <Text style={styles.summaryLabel}>{t('shop.subtotal')} ({cart.length}):</Text>
                             <Text style={styles.summaryValue}>{formatCurrency(subtotal)}</Text>
                         </View>
 
                         <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Armored Logistics & Vault Escort:</Text>
+                            <Text style={styles.summaryLabel}>{t('shop.shippingEscort')}:</Text>
                             <Text style={styles.summaryValue}>{formatCurrency(shippingCost)}</Text>
                         </View>
 
                         <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Luxury Duty / Tax (8%):</Text>
+                            <Text style={styles.summaryLabel}>{t('shop.luxuryTax')}:</Text>
                             <Text style={styles.summaryValue}>{formatCurrency(luxuryTax)}</Text>
                         </View>
 
                         <View style={styles.totalRow}>
-                            <Text style={styles.totalLabel}>TOTAL ACQUISITION COST</Text>
+                            <Text style={styles.totalLabel}>{t('shop.totalAcquisition')}</Text>
                             <Text style={styles.totalValue}>{formatCurrency(calculatedTotal)}</Text>
                         </View>
                     </View>
@@ -245,7 +247,7 @@ export const CartScreen = () => {
                         onPress={handleCheckoutStart}
                     >
                         <Text style={styles.checkoutButtonText}>
-                            {canAfford ? 'AUTHORIZE TRANSFER' : 'INSUFFICIENT FUNDS'}
+                            {canAfford ? t('shop.checkout') : t('shop.insufficientFunds')}
                         </Text>
                     </Pressable>
                 </View>

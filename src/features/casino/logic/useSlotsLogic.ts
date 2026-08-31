@@ -4,6 +4,8 @@ import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { SLOT_CONFIG, SlotVariant, miniOdds, symbolByIcon, iconStrip, symbolsFor } from './slotsData';
 import { CASINO_LOCATIONS } from '../data/casinoData';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
+import { casinoAlert } from '../../../data/i18n/casinoText';
+import { spinSlot, type SlotSpin } from '../../../core/casino/slots';
 
 export type Grid = [string, string, string][];
 
@@ -14,6 +16,33 @@ const getRandomSymbol = (symbols: string[]) => {
 };
 
 // Helper to generate a completely random grid (for animation)
+// ==========================================================================
+//  THE CLOCK, IN ONE PLACE
+// ==========================================================================
+//  Module scope rather than inside the hook, because the reels need the same
+//  numbers the payout timer uses and two copies of a timing is how a reel
+//  lands after the money has already been paid.
+// ==========================================================================
+
+/** How long the reels blur before the first one stops. */
+export const SPIN_MS = 520;
+/** The gap between one reel stopping and the next. */
+export const REEL_GAP = 200;
+/** How long a reel takes to settle onto its face. */
+export const SETTLE_MS = 260;
+/**
+ * And the extra the LAST reel takes when the first two already match.
+ *
+ * The whole of the anticipation. It changes no odds at all - the outcome was
+ * decided before anything moved - it only spends the one moment in the spin
+ * where the answer is still genuinely coming. Every machine in every casino
+ * does this, and it is the reason the third reel is worth watching.
+ */
+export const HANG_MS = 450;
+
+/** A plain index into the face list. */
+const rnd = (n: number): number => Math.min(n - 1, Math.max(0, Math.floor(Math.random() * n)));
+
 const generateRandomGrid = (symbols: string[]): Grid => {
   return Array.from({ length: 3 }, () => [
     getRandomSymbol(symbols),
@@ -51,6 +80,18 @@ export const useSlotsLogic = (
     () => symbolsFor(config, faces),
     [variant, faces.join(',')],
   );
+  /**
+   * THE REEL STRIP, AS ONE ARRAY THAT DOES NOT CHANGE IDENTITY.
+   *
+   * Reported as "the slot plays by itself now and then while it is sitting
+   * still". It was: `iconStrip(symbols)` was called in the returned state
+   * object, so it built a NEW array on every render. The Reel's effect has
+   * that array in its dependency list, so every render re-ran the effect and
+   * the reel replayed its landing animation - a machine spinning with nobody
+   * touching it.
+   */
+  const symbolIcons = useMemo(() => iconStrip(symbols), [symbols]);
+
   const maxBetLimit = customMaxBet ?? config.maxBet;
 
   const { money, spendMoney, earnMoney } = useStatsStore();
@@ -68,6 +109,10 @@ export const useSlotsLogic = (
   const lossStreak = useRef(0);
   /** The grid that actually landed, for the payout to read. */
   const targetGridRef = useRef<Grid | null>(null);
+  /** What the engine decided, kept for the timer that pays it out. */
+  const spinRef = useRef<SlotSpin | null>(null);
+  /** True while the last reel is hanging, so the reel can be told to wait. */
+  const [hold, setHold] = useState(false);
 
   useEffect(() => {
     setGrid(generateRandomGrid(iconStrip(symbols)));
@@ -132,130 +177,86 @@ export const useSlotsLogic = (
   };
 
   // Step 1: Determine Outcome (The Math)
-  const determineOutcome = (): OutcomeTier => {
-    const r = Math.random();
+  // ==========================================================================
+  //  THE SPIN, AND WHY IT IS A TENTH OF ITS OLD LENGTH
+  // ==========================================================================
+  //  Reported as "the slots are very slow, one spin every four seconds, they
+  //  spin and spin". MEASURED, the old sequence was:
+  //
+  //      setTimeout(2000)          the blur
+  //      + reel stagger 0/300/600  the stops
+  //      + 400                     the last settle
+  //      + setTimeout(1140)        "suspense", after everything had landed
+  //      = 4.14 seconds a spin
+  //
+  //  And for the whole first two seconds it called `setGrid` from a
+  //  `setInterval` every ninety milliseconds - a full React re-render of the
+  //  machine, eleven times a second, on the JavaScript thread. That is the
+  //  other half of the complaint: the spinning is what made it slow.
+  //
+  //  The blur is the REEL'S job now and it runs on the UI thread; this hook
+  //  sets no grid state while anything is moving.
+  //
+  //  ORDINARY SPIN: 520 + 400 + 260 = 1.18 seconds.
+  //
+  //  THE 1140ms OF SUSPENSE IS GONE, and the anticipation replaces it. A flat
+  //  wait after the reels have stopped is not suspense, it is a pause: the
+  //  player can already see what they got. Real suspense is the third reel
+  //  hanging while the first two match, which is the one moment where the
+  //  answer is genuinely still coming.
+  // ==========================================================================
 
-    // Tier 1: Jackpot
-    if (r < ODDS.JACKPOT) return 'JACKPOT';
-
-    // Tier 2: Mini Win (Cumulative)
-    if (r < ODDS.JACKPOT + ODDS.MINI) return 'MINI';
-
-    // Tier 3: Loss
-    return 'LOSS';
-  };
-
-  // Step 2: Generate the Grid (The Visual)
-  const generateForcedGrid = (outcome: OutcomeTier): Grid => {
-    // Robust symbol getter
-    const getSafeSymbol = (): string => {
-      const syms = iconStrip(symbols);
-      if (!syms || syms.length === 0) return iconStrip(symbols)[0] ?? 'help-circle-outline';
-      return syms[Math.floor(Math.random() * syms.length)] || syms[0];
-    };
-
-    // Safe helper to pick a DIFFERENT valid symbol
-    const getDifferentSymbol = (exclude: string[]): string => {
-      const syms = iconStrip(symbols);
-      if (!syms || syms.length < 2) return getSafeSymbol(); // Not enough symbols to diff
-
-      // Filter out excluded items
-      const candidates = syms.filter(s => !exclude.includes(s));
-
-      // If no candidates (rare), just pick random valid one
-      if (candidates.length === 0) return getSafeSymbol();
-
-      return candidates[Math.floor(Math.random() * candidates.length)];
-    };
-
-    const syms = iconStrip(symbols);
-    // Safety check: ensure we have symbols
-    if (!syms || syms.length === 0) {
-      return [['?', '?', '?'], ['?', '?', '?'], ['?', '?', '?']];
-    }
-
-    let payline: [string, string, string];
-
-    if (outcome === 'JACKPOT') {
-      // 3 Matches
-      const symbol = getSafeSymbol();
-      payline = [symbol, symbol, symbol];
-    } else if (outcome === 'MINI') {
-      // 2 Matches (Force 3rd to differ)
-      const A = getSafeSymbol();
-      // B must be different from A
-      let B = getDifferentSymbol([A]);
-
-      // Randomly position the mismatch
-      const pattern = Math.random();
-      if (pattern < 0.33) payline = [A, A, B];
-      else if (pattern < 0.66) payline = [A, B, A];
-      else payline = [B, A, A];
-    } else {
-      // LOSS LOGIC (Strictly Unique / No Win)
-      let s1 = getSafeSymbol();
-
-      // Ensure s2 != s1
-      let s2 = getDifferentSymbol([s1]);
-
-      // Ensure s3 != s1 AND s3 != s2 (Strictly 3 different symbols for visual clarity)
-      let s3 = getDifferentSymbol([s1, s2]);
-
-      payline = [s1, s2, s3];
-    }
-
-    // Decoration Rows (Pure Random)
-    return [
-      [getSafeSymbol(), getSafeSymbol(), getSafeSymbol()],
-      payline,
-      [getSafeSymbol(), getSafeSymbol(), getSafeSymbol()],
-    ];
-  };
+  /** See SPIN_MS, REEL_GAP, SETTLE_MS and HANG_MS at the top of this file. */
+  /**
+   * And the extra the LAST reel takes when the first two already match.
+   *
+   * The whole of the anticipation. It changes no odds at all - the outcome was
+   * decided before anything moved - it only spends the one moment in the spin
+   * where the answer is still coming. Every machine in every casino does this
+   * and it is the reason the third reel is worth watching.
+   */
 
   const handleSpin = () => {
-    if (bet <= 0) return Alert.alert('Place Bet', 'Select a chip to play!');
+    if (bet <= 0) return casinoAlert('Place Bet', 'Select a chip to play!');
     if (isSpinning) return;
-    if (!spendMoney(bet)) return Alert.alert('Funds', "You don't have enough cash!");
+    if (!spendMoney(bet)) return casinoAlert('Funds', "You don't have enough cash!");
 
-    // 1. Decide Outcome
-    const outcome = determineOutcome();
-    // 2. Prepare Visuals
-    const targetGrid = generateForcedGrid(outcome);
-    // And remember it, because the payout is now decided by which symbol
-    // came up rather than by a flat multiple. The ref rather than state
-    // because processResult runs from a timer, after this closure is gone.
+    // DECIDED HERE, BEFORE ANYTHING MOVES. See core/casino/slots.ts.
+    const spin = spinSlot(config);
+    spinRef.current = spin;
+
+    const icons = symbolIcons;
+    const face = (i: number) => icons[i] ?? icons[0];
+    const targetGrid: Grid = [
+      [face(rnd(icons.length)), face(rnd(icons.length)), face(rnd(icons.length))],
+      [face(spin.payline[0]), face(spin.payline[1]), face(spin.payline[2])],
+      [face(rnd(icons.length)), face(rnd(icons.length)), face(rnd(icons.length))],
+    ];
     targetGridRef.current = targetGrid;
+
+    // The last reel hangs when there is something to hang for: the first two
+    // faces match, so the third one still decides it.
+    const hanging = spin.payline[0] === spin.payline[1];
+    setHold(hanging);
 
     setIsSpinning(true);
     setShowResult(false);
     setMessage('Spinning...');
     setLastResult(null);
 
-    // Animation loop (visual only)
-    const interval = setInterval(() => {
-      setGrid(generateRandomGrid(iconStrip(symbols)));
-    }, 90);
-
-    const spinDuration = 2000;
-
-    // 3. Execute Spin Sequence
+    // ONE state write while it spins, not eleven a second.
     setTimeout(() => {
-      clearInterval(interval);
-
-      // STOP: Show forced grid
       setGrid(targetGrid);
       setIsSpinning(false);
+    }, SPIN_MS);
 
-      // DELAY: Suspense
-      setTimeout(() => {
-        // PROCESS RESULT (Based on Outcome, not grid reading)
-        processResult(outcome);
-      }, 1140);
-
-    }, spinDuration);
+    const lastReelStops = SPIN_MS + REEL_GAP * 2 + (hanging ? HANG_MS : 0) + SETTLE_MS;
+    setTimeout(() => processResult(spin), lastReelStops);
   };
 
-  const processResult = (outcome: OutcomeTier) => {
+  const processResult = (spin: SlotSpin) => {
+    const outcome: OutcomeTier =
+      spin.outcome === 'jackpot' ? 'JACKPOT' : spin.outcome === 'second' ? 'MINI' : 'LOSS';
     let winAmount = 0;
     let resultType: 'win' | 'loss' = 'loss';
 
@@ -324,10 +325,15 @@ export const useSlotsLogic = (
   return {
     state: {
       grid, bet, isSpinning, message, showResult, lastResult, money,
+      /** True while the last reel is hanging on a matching pair. */
+      hold,
+      /** What each reel waits before it settles, so the screen has one source. */
+      reelDelays: [0, REEL_GAP, REEL_GAP * 2 + (hold ? HANG_MS : 0)] as const,
+      settleMs: SETTLE_MS,
       config: { ...config, maxBet: maxBetLimit },
       // The zipped faces, so the screen draws exactly what the payout read.
       symbols,
-      symbolIcons: iconStrip(symbols),
+      symbolIcons,
     },
     actions: { handleSpin, setBetAmount, hideResult }
   };

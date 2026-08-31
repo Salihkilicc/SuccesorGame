@@ -200,7 +200,9 @@ const resetInMemoryStores = () => {
     // members from INITIAL_BOARD_MEMBERS.
     try {
         const { useShareholderStore } = require('../features/shareholders/stores/useShareholderStore');
-        useShareholderStore.getState().initializeGame();
+        // FORCED: a new game is the one caller allowed to destroy a register
+        // that has been played. See capTableUntouched.
+        useShareholderStore.getState().initializeGame(true);
     } catch (e) {
         console.warn('[newGame] Kurul yeniden kurulamadi', e);
     }

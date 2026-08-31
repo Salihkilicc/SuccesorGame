@@ -31,6 +31,7 @@ import {
     type StoryFlag,
 } from '../story/state';
 import { nextPriority, type Pending } from '../story/inbox';
+import type { SuspiciousBuy, Judgement } from '../story/manipulation';
 import { emptyHistory, type EventHistory } from '../events/types';
 import { emptyLockState, type LockState } from '../tutorial/locks';
 
@@ -98,6 +99,23 @@ export type StoryState = {
      * come back to a running company they no longer own.
      */
     ending: string | null;
+    /**
+     * PURCHASES MADE WHILE THE COMPANY WAS ON THE FLOOR.
+     *
+     * Written at the time and judged years later, because what separates a
+     * manufactured collapse from a real one is whether the price comes back.
+     * See core/story/manipulation.ts.
+     *
+     * Persisted, and it has to be: the whole mechanic is that the file stays
+     * open across the run. Entries older than the window are dropped by the
+     * tick so a long game does not carry a growing list.
+     */
+    manipulationLedger: SuspiciousBuy[];
+    /**
+     * The verdict once a case has been brought, so the screen can show it and
+     * so it is only ever brought once.
+     */
+    manipulationVerdict: Judgement | null;
     /**
      * WHERE THE PLAYER GOT TO IN A SCENE THEY HAVE NOT FINISHED.
      *
@@ -198,6 +216,8 @@ export const initialStoryState: StoryState = {
     eventHistory: emptyHistory(),
     seenScenes: [],
     ending: null,
+    manipulationLedger: [],
+    manipulationVerdict: null,
     sceneProgress: {},
     _hasHydrated: false,
 };
@@ -304,6 +324,9 @@ export const useStoryStore = create<StoryStore>()(
                 eventHistory: emptyHistory(),
                 seenScenes: [],
                 ending: null,
+                // A new chief executive is not on trial for the last one.
+                manipulationLedger: [],
+                manipulationVerdict: null,
                 // A new company plays the same scenes again from the top.
                 sceneProgress: {},
                 _hasHydrated: true,
@@ -316,6 +339,8 @@ export const useStoryStore = create<StoryStore>()(
                 dials: state.dials, flags: state.flags, pending: state.pending,
                 locks: state.locks, eventHistory: state.eventHistory,
                 seenScenes: state.seenScenes, ending: state.ending,
+                manipulationLedger: state.manipulationLedger,
+                manipulationVerdict: state.manipulationVerdict,
                 sceneProgress: state.sceneProgress,
             }),
             /**
@@ -340,6 +365,10 @@ export const useStoryStore = create<StoryStore>()(
                     eventHistory: p.eventHistory ?? emptyHistory(),
                     seenScenes: p.seenScenes ?? [],
                     ending: p.ending ?? null,
+                    // Saves written before the ledger existed have none, and
+                    // `undefined.filter` on the first tick would throw.
+                    manipulationLedger: p.manipulationLedger ?? [],
+                    manipulationVerdict: p.manipulationVerdict ?? null,
                 };
             },
             onRehydrateStorage: () => (state) => {

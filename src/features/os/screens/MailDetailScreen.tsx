@@ -27,6 +27,12 @@ import { useSponsorshipStore } from '../../../core/store/useSponsorshipStore';
 import { offerById, sponsorPeak } from '../../../core/market/sponsorship';
 import { formatMoney } from '../../../core/utils';
 import AnimatedBubble from '../../../components/story/AnimatedBubble';
+import { t, useLocale } from '../../../core/i18n';
+import {
+    translateSenderName,
+    translateMailSubject,
+    translateMailBody,
+} from '../../../data/i18n/mailMessagesText';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -38,6 +44,7 @@ const getInitials = (name: string): string =>
 // another the moment you opened the mail.
 
 const MailDetailScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
     const mailId = route.params?.mailId;
@@ -73,6 +80,10 @@ const MailDetailScreen = () => {
 
     if (!mail) return null;
 
+    const displayFromName = translateSenderName(mail.fromName);
+    const displaySubject = translateMailSubject(mail.subject, mail.conversationId);
+    const displayBody = translateMailBody(mail.body, mail.conversationId);
+
     const demand = negotiation?.reply?.kind === 'demand'
         ? negotiation.reply.demand
         : undefined;
@@ -92,14 +103,14 @@ const MailDetailScreen = () => {
         ? priceFor(negotiation, demand.extraPremium) : undefined;
 
     const meetLabel =
-        !demand ? 'Agree.'
+        !demand ? t('mail.agree')
             : demand.kind === 'price'
                 ? (price
-                    ? `Pay it — ${formatMoney(price)}.`
-                    : `Pay it — ${Math.round(demand.extraPremium * 100)}% over the usual premium.`)
-                : demand.kind === 'seat' ? 'Give them the seat.'
-                    : demand.kind === 'reputation' ? 'Accept the condition.'
-                        : owning ? 'Agree.' : 'Sign it.';
+                    ? t('mail.payPrice', { price: formatMoney(price) })
+                    : t('mail.payPremium', { pct: String(Math.round(demand.extraPremium * 100)) }))
+                : demand.kind === 'seat' ? t('mail.giveSeat')
+                    : demand.kind === 'reputation' ? t('mail.improveStanding', { floor: String(demand.floor) })
+                        : owning ? t('mail.agree') : t('mail.signPartnership');
 
     // Flat, and the same figure the acquisition screen prints and the engine
     // charges. The resistance curve is shelved - see HOSTILE_MULTIPLE in
@@ -157,8 +168,8 @@ const MailDetailScreen = () => {
             Alert.alert(
                 negotiation.targetName,
                 owning
-                    ? 'Closed.'
-                    : 'Signed. You are not buying them today, but the next letter you write to this board will land on a warmer desk.',
+                    ? t('mail.closed')
+                    : t('mail.partnershipSignedAlert'),
                 [{ text: 'OK', onPress: () => navigation.goBack() }],
             );
             return;
@@ -197,20 +208,9 @@ const MailDetailScreen = () => {
             [
                 { text: 'Not yet', style: 'cancel' },
                 {
-                    text: 'Do it',
+                    text: t('mail.doIt'),
                     onPress: () => {
                         withdrawOffer(negotiation.id);
-                        // The bid itself is placed on the acquisition screen,
-                        // which owns financing, the cash check and the board
-                        // vote. Two doors into executeAcquisition is how the
-                        // last negotiation screen ended up moving money the
-                        // engine never saw - see the note in NegotiationModal.
-                        //
-                        // IT USED TO NAVIGATE TO 'Assets' WITH `hostileFor`,
-                        // and nothing anywhere read that param - Assets is the
-                        // tab, and the acquisition screen is 'HostileTakeover'
-                        // on the root stack. So the rudest, most expensive
-                        // decision in the game dropped the player on a list.
                         navigation.navigate('HostileTakeover', {
                             acquire: {
                                 targetId: negotiation.targetId,
@@ -232,7 +232,7 @@ const MailDetailScreen = () => {
     if (conversation) {
         return (
             <View style={styles.root}>
-                <ScreenHeader title={mail.fromName} subtitle={mail.subject} onBack={() => navigation.goBack()} />
+                <ScreenHeader title={displayFromName} subtitle={displaySubject} onBack={() => navigation.goBack()} />
                 <ConversationRunner
                     conversation={conversation}
                     variant="mail"
@@ -262,8 +262,8 @@ const MailDetailScreen = () => {
     return (
         <View style={styles.root}>
             <ScreenHeader
-                title={mail.fromName}
-                subtitle="Mail"
+                title={displayFromName}
+                subtitle={t('mail.title')}
                 onBack={() => navigation.goBack()}
             />
 
@@ -271,9 +271,9 @@ const MailDetailScreen = () => {
                 {/* Subject */}
                 <AnimatedBubble delay={0}>
                     <View style={styles.subjectRow}>
-                        <Text style={styles.detailSubject}>{mail.subject}</Text>
+                        <Text style={styles.detailSubject}>{displaySubject}</Text>
                         <View style={styles.inboxBadge}>
-                            <Text style={styles.inboxBadgeText}>Inbox</Text>
+                            <Text style={styles.inboxBadgeText}>{t('mail.inbox')}</Text>
                         </View>
                     </View>
                 </AnimatedBubble>
@@ -286,10 +286,10 @@ const MailDetailScreen = () => {
                         </View>
                         <View style={styles.senderInfo}>
                             <View style={styles.senderNameRow}>
-                                <Text style={styles.detailFromName}>{mail.fromName}</Text>
+                                <Text style={styles.detailFromName}>{displayFromName}</Text>
                                 <Text style={styles.detailTime}>{formatMonth(mail.atMonth)}</Text>
                             </View>
-                            <Text style={styles.detailToMe}>to me ▾</Text>
+                            <Text style={styles.detailToMe}>{t('mail.toMe')}</Text>
                         </View>
                     </View>
                 </AnimatedBubble>
@@ -297,43 +297,33 @@ const MailDetailScreen = () => {
                 {/* Body */}
                 <AnimatedBubble delay={100}>
                     <View style={styles.bodySection}>
-                        <Text style={styles.bodyText}>{mail.body}</Text>
+                        <Text style={styles.bodyText}>{displayBody}</Text>
                     </View>
                 </AnimatedBubble>
                 
                 {/* ==========================================================
                     THE TWO OPTIONS
-                    ==========================================================
-                    Exactly two, and the second one always leads to a second
-                    pair rather than doing anything - the same discipline the
-                    story graph enforces on every card in the game (see the
-                    two-choice limit in core/story/graph.ts). A negotiation
-                    screen with five buttons is a menu; two is a decision.
-
-                    They appear only on a letter that is genuinely waiting on
-                    an answer. A refusal arrives closed, so it has no buttons -
-                    which is how the player learns that "no" was not an opening
-                    position. */}
+                    ========================================================== */}
                 {negotiation && (
                     <View style={styles.negotiationBox}>
-                        <Text style={styles.negotiationLabel}>THEY ARE WAITING ON YOU</Text>
+                        <Text style={styles.negotiationLabel}>{t('mail.waitingOnYou')}</Text>
                         {stage === 'first' ? (
                             <>
                                 <Pressable style={styles.optionPrimary} onPress={onMeet}>
                                     <Text style={styles.optionPrimaryText}>{meetLabel}</Text>
                                 </Pressable>
                                 <Pressable style={styles.option} onPress={() => setStage('second')}>
-                                    <Text style={styles.optionText}>No.</Text>
+                                    <Text style={styles.optionText}>{t('mail.no')}</Text>
                                 </Pressable>
                             </>
                         ) : (
                             <>
                                 <Pressable style={styles.option} onPress={onWithdraw}>
-                                    <Text style={styles.optionText}>Withdraw the offer.</Text>
+                                    <Text style={styles.optionText}>{t('mail.withdrawTheOffer')}</Text>
                                 </Pressable>
                                 <Pressable style={styles.optionDanger} onPress={onHostile}>
                                     <Text style={styles.optionDangerText}>
-                                        Go to their shareholders — {hostileLabel}
+                                        {t('mail.goToShareholders', { hostileLabel })}
                                     </Text>
                                 </Pressable>
                             </>
@@ -341,12 +331,10 @@ const MailDetailScreen = () => {
                     </View>
                 )}
 
-                {/* The sponsorship letter's two answers. Signing replaces
-                    nothing, because there is nothing signed - the offer is
-                    only live while the company's name is on nothing. */}
+                {/* The sponsorship letter's two answers. */}
                 {sponsorOffer && (
                     <View style={styles.negotiationBox}>
-                        <Text style={styles.negotiationLabel}>THEY ARE WAITING ON YOU</Text>
+                        <Text style={styles.negotiationLabel}>{t('mail.waitingOnYou')}</Text>
                         <Pressable
                             style={styles.optionPrimary}
                             onPress={() => {
@@ -354,23 +342,22 @@ const MailDetailScreen = () => {
                                 navigation.goBack();
                             }}>
                             <Text style={styles.optionPrimaryText}>
-                                Sign it — {formatMoney(sponsorOffer.quarterlyCost)} a quarter
+                                {t('mail.signSponsor', { cost: formatMoney(sponsorOffer.quarterlyCost) })}
                             </Text>
                         </Pressable>
-                        {/* What it costs in total and what it does, because the
-                            button alone made this a decision taken blind: a
-                            price per quarter with no term next to it and no
-                            idea what the name is worth. See
-                            core/market/sponsorship.ts - the lift arrives whole
-                            and fades across the term. */}
                         <Text style={styles.sponsorTerms}>
-                            {`${sponsorOffer.quarters} quarters · ${formatMoney(sponsorOffer.quarterlyCost * sponsorOffer.quarters)} in all`}
+                            {t('mail.sponsorCostSummary', {
+                                quarters: String(sponsorOffer.quarters),
+                                total: formatMoney(sponsorOffer.quarterlyCost * sponsorOffer.quarters),
+                            })}
                         </Text>
                         <Text style={styles.sponsorTerms}>
-                            {`Lifts the brand about ${Math.round(sponsorPeak(sponsorOffer))} points at once, fading to nothing by the end of the term`}
+                            {t('mail.sponsorBrandSummary', {
+                                pts: String(Math.round(sponsorPeak(sponsorOffer))),
+                            })}
                         </Text>
                         <Pressable style={styles.option} onPress={() => navigation.goBack()}>
-                            <Text style={styles.optionText}>Not this one.</Text>
+                            <Text style={styles.optionText}>{t('mail.notThisOne')}</Text>
                         </Pressable>
                     </View>
                 )}
@@ -379,15 +366,15 @@ const MailDetailScreen = () => {
                 <View style={styles.replyActionRow}>
                     <View style={styles.replyBtn}>
                         <MaterialCommunityIcons name="reply" size={20} color={theme.colors.textSecondary} />
-                        <Text style={styles.replyBtnText}>Reply</Text>
+                        <Text style={styles.replyBtnText}>{t('mail.reply')}</Text>
                     </View>
                     <View style={styles.replyBtn}>
                         <MaterialCommunityIcons name="reply-all" size={20} color={theme.colors.textSecondary} />
-                        <Text style={styles.replyBtnText}>Reply all</Text>
+                        <Text style={styles.replyBtnText}>{t('mail.replyAll')}</Text>
                     </View>
                     <View style={styles.replyBtn}>
                         <MaterialCommunityIcons name="share" size={20} color={theme.colors.textSecondary} />
-                        <Text style={styles.replyBtnText}>Forward</Text>
+                        <Text style={styles.replyBtnText}>{t('mail.forward')}</Text>
                     </View>
                 </View>
             </ScrollView>

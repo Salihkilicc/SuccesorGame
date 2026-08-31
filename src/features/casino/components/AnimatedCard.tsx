@@ -12,33 +12,56 @@ interface AnimatedCardProps {
   card: CardData;
   index: number;
   hidden?: boolean;
-  /** Base delay before this card animates in (ms). Stagger = index * 150 added. */
+  /** Base delay before this card animates in (ms). Stagger = index * DEAL_GAP added. */
   baseDelay?: number;
+  /**
+   * WHERE THE DECK IS, relative to this card's resting place.
+   *
+   * The whole of "there should be a table and it should feel real". A card
+   * that fades up from forty pixels below is a number appearing; a card that
+   * travels from the deck in the corner has been DEALT. Both numbers are in
+   * pixels and the card animates from them to zero.
+   */
+  fromX?: number;
+  fromY?: number;
 }
 
-const AnimatedCard = ({ card, index, hidden = false, baseDelay = 0 }: AnimatedCardProps) => {
-  const translateY = useRef(new Animated.Value(40)).current;
+/** How long a card takes to travel from the deck to its place. */
+export const DEAL_MS = 260;
+/** And the gap between one card being dealt and the next. */
+export const DEAL_GAP = 120;
+/** How long the hole card takes to turn over. */
+export const FLIP_MS = 300;
+
+const AnimatedCard = ({
+  card, index, hidden = false, baseDelay = 0, fromX = 0, fromY = 0,
+}: AnimatedCardProps) => {
+  const travel = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.85)).current;
+  /** 0 face down, 1 face up. Only the hole card ever moves it. */
+  const flip = useRef(new Animated.Value(hidden ? 0 : 1)).current;
 
   useEffect(() => {
-    const staggerDelay = baseDelay + index * 150;
+    const staggerDelay = baseDelay + index * DEAL_GAP;
 
-    translateY.setValue(40);
+    travel.setValue(1);
     opacity.setValue(0);
     scale.setValue(0.85);
 
     const anim = Animated.parallel([
-      Animated.timing(translateY, {
+      Animated.timing(travel, {
         toValue: 0,
-        duration: 350,
+        duration: DEAL_MS,
         delay: staggerDelay,
-        easing: Easing.out(Easing.back(1.2)),
+        // Out of a shoe and onto the felt. `back` overshoots, which is what a
+        // card sliding to a stop against the others actually does.
+        easing: Easing.out(Easing.back(1.1)),
         useNativeDriver: true,
       }),
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 250,
+        duration: 160,
         delay: staggerDelay,
         useNativeDriver: true,
       }),
@@ -54,7 +77,29 @@ const AnimatedCard = ({ card, index, hidden = false, baseDelay = 0 }: AnimatedCa
     anim.start();
 
     return () => anim.stop();
-  }, [card.rank, card.suit, index, baseDelay]);
+  }, [card.rank, card.suit, index, baseDelay, fromX, fromY]);
+
+  // ----------------------------------------------------------------------
+  //  AND THE HOLE CARD TURNS OVER
+  // ----------------------------------------------------------------------
+  //  Separate from the deal on purpose: it happens much later, when the
+  //  player stands, and it is the single most dramatic moment at the table.
+  //  It used to be a hard swap between two different components.
+  // ----------------------------------------------------------------------
+  useEffect(() => {
+    Animated.timing(flip, {
+      toValue: hidden ? 0 : 1,
+      duration: FLIP_MS,
+      easing: Easing.inOut(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, [hidden]);
+
+  const translateX = travel.interpolate({ inputRange: [0, 1], outputRange: [0, fromX] });
+  const translateY = travel.interpolate({ inputRange: [0, 1], outputRange: [0, fromY] });
+  /** A quarter turn each way, so the two faces swap at the halfway point. */
+  const faceUpSpin = flip.interpolate({ inputRange: [0, 1], outputRange: ['180deg', '360deg'] });
+  const faceDownSpin = flip.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
 
   const isRed = ['♥', '♦'].includes(card.suit);
   const textColor = isRed ? '#C0392B' : '#1C242C';
@@ -66,7 +111,10 @@ const AnimatedCard = ({ card, index, hidden = false, baseDelay = 0 }: AnimatedCa
           styles.card,
           styles.hiddenCard,
           {
-            transform: [{ translateY }, { scale }],
+            transform: [
+              { translateX }, { translateY }, { scale },
+              { perspective: 800 }, { rotateY: faceDownSpin },
+            ],
             opacity,
           },
         ]}
@@ -85,7 +133,10 @@ const AnimatedCard = ({ card, index, hidden = false, baseDelay = 0 }: AnimatedCa
       style={[
         styles.card,
         {
-          transform: [{ translateY }, { scale }],
+          transform: [
+            { translateX }, { translateY }, { scale },
+            { perspective: 800 }, { rotateY: faceUpSpin },
+          ],
           opacity,
         },
       ]}

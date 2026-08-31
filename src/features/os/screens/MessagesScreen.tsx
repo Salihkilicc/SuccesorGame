@@ -14,6 +14,12 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMessageStore, type Thread } from '../../../core/store/useMessageStore';
+import { t, useLocale } from '../../../core/i18n';
+import {
+    translateRole,
+    translateSenderName,
+    translateMessageText,
+} from '../../../data/i18n/mailMessagesText';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -31,6 +37,13 @@ const formatMonth = (m: number) => `M${m}`;
 const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void }) => {
     const last = thread.messages[thread.messages.length - 1];
     const unread = thread.unread > 0;
+    const displayName = translateSenderName(thread.name);
+    const displayRole = translateRole(thread.role);
+    const previewText = last
+        ? (last.from === 'player'
+            ? `${t('messages.you')}${translateMessageText(last.text)}`
+            : translateMessageText(last.text))
+        : '';
 
     return (
         <Pressable
@@ -71,15 +84,15 @@ const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void })
                     <Text
                         style={[styles.rowName, unread && styles.rowNameUnread]}
                         numberOfLines={1}>
-                        {thread.name}
+                        {displayName}
                     </Text>
                     {last && <Text style={styles.rowTime}>{formatMonth(last.atMonth)}</Text>}
                 </View>
-                <Text style={styles.rowRole}>{thread.role}</Text>
+                <Text style={styles.rowRole}>{displayRole}</Text>
                 <Text
                     style={[styles.rowPreview, unread && styles.rowPreviewUnread]}
                     numberOfLines={2}>
-                    {last ? (last.from === 'player' ? `You: ${last.text}` : last.text) : ''}
+                    {previewText}
                 </Text>
             </View>
         </Pressable>
@@ -87,6 +100,7 @@ const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void })
 };
 
 const MessagesScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const threads = useMessageStore(s => s.threads);
     const markRead = useMessageStore(s => s.markRead);
@@ -94,19 +108,19 @@ const MessagesScreen = () => {
 
     return (
         <View style={styles.root}>
-            <ScreenHeader title="Messages" onBack={() => navigation.goBack()} />
+            <ScreenHeader title={t('nav.messages')} onBack={() => navigation.goBack()} />
 
             <ScrollView contentContainerStyle={[styles.list, { paddingBottom: NAV_BAR_CLEARANCE }]}>
                 {threads.length === 0 ? (
-                    <Text style={styles.empty}>No messages yet.</Text>
+                    <Text style={styles.empty}>{t('messages.empty')}</Text>
                 ) : (
-                    threads.map(t => (
+                    threads.map(tRow => (
                         // `removeThread` has existed since the father's death
                         // and was reachable only by dying. This is the gesture
                         // that was missing, not the function.
                         <SwipeToDelete
-                            key={t.id}
-                            label={`your conversation with ${t.name}`}
+                            key={tRow.id}
+                            label={t('messages.conversationWith', { name: translateSenderName(tRow.name) })}
                             // ------------------------------------------------
                             //  A THREAD WITH A SCENE ON IT IS NOT CLUTTER
                             // ------------------------------------------------
@@ -121,13 +135,13 @@ const MessagesScreen = () => {
                             //  a full swipe rather than a flick, and the panel
                             //  behind says which kind of row this is.
                             // ------------------------------------------------
-                            guarded={!!t.conversationId}
-                            onDelete={() => removeThread(t.id)}>
+                            guarded={!!tRow.conversationId}
+                            onDelete={() => removeThread(tRow.id)}>
                             <ThreadRow
-                                thread={t}
+                                thread={tRow}
                                 onPress={() => {
-                                    markRead(t.id);
-                                    navigation.navigate('MessageThread', { threadId: t.id });
+                                    markRead(tRow.id);
+                                    navigation.navigate('MessageThread', { threadId: tRow.id });
                                 }}
                             />
                         </SwipeToDelete>

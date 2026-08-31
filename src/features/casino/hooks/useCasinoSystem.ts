@@ -1,21 +1,41 @@
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { usePlayerStore } from '../../../core/store';
-import { CASINO_LOCATIONS, LocationId, CasinoLocation } from '../data/casinoData';
+import { useStatsStore } from '../../../core/store/useStatsStore';
+import { useCasinoRiskStore } from '../../../core/store/useCasinoRiskStore';
+import { CASINO_LOCATIONS, LocationId, CasinoLocation, VIP_LOCATION } from '../data/casinoData';
+import { VIP_LOCATION_ID, canSeeVip, vipEntry } from '../data/vipRoom';
+import { currentQuarter } from '../../../core/story/world';
 
 export const useCasinoSystem = () => {
     // Switch to PlayerStore (DNA Page Source)
     const { reputation, updateReputation } = usePlayerStore();
     const casinoReputation = reputation.casino;
+    const cash = useStatsStore(s => s.money);
 
-    // Local state for the currently selected location.
-    // Default to the first location (Athens).
-    const [currentLocationId, setCurrentLocationId] = useState<LocationId>('athens');
+    // ----------------------------------------------------------------------
+    //  THE ROOM IS SHARED STATE, WHICH IT WAS NOT
+    // ----------------------------------------------------------------------
+    //  This was `useState` in here, and every screen calls this hook
+    //  separately - so the lobby, the slots, the blackjack table and the
+    //  roulette wheel each had their own copy, all of them starting at Athens.
+    //  Travelling to Macau and then opening a game put the player back at the
+    //  cheapest table in the game, with the cheapest chips, and nothing said
+    //  so. See useCasinoRiskStore.currentLocationId.
+    // ----------------------------------------------------------------------
+    const currentLocationId = useCasinoRiskStore(s => s.currentLocationId) as LocationId;
+    const setCurrentLocationId = useCasinoRiskStore(s => s.setCurrentLocationId);
+    const lastVipQuarter = useCasinoRiskStore(s => s.lastVipQuarter);
+    const recordVipVisit = useCasinoRiskStore(s => s.recordVipVisit);
 
-    // Derive the current location object
-    const currentLocation = useMemo(
-        () => CASINO_LOCATIONS.find((l) => l.id === currentLocationId) || CASINO_LOCATIONS[0],
-        [currentLocationId]
+    /** The VIP room is not in the ladder array. See data/vipRoom.ts. */
+    const inVip = currentLocationId === VIP_LOCATION_ID;
+
+    const currentLocation: CasinoLocation = useMemo(
+        () => (inVip
+            ? VIP_LOCATION
+            : CASINO_LOCATIONS.find((l) => l.id === currentLocationId) || CASINO_LOCATIONS[0]),
+        [currentLocationId, inVip],
     );
 
     // Determine unlocked locations based on reputation
@@ -27,6 +47,12 @@ export const useCasinoSystem = () => {
     // Auto-switch logic: If the current location becomes locked (e.g., Rep drops),
     // switch to the highest tier available.
     useEffect(() => {
+        // The VIP room is gated by MONEY and a cooldown rather than by
+        // standing, so it is never in `unlockedLocations` and this would throw
+        // the player straight back out of a room they paid ten billion to
+        // enter.
+        if (inVip) return;
+
         const isCurrentUnlocked = unlockedLocations.some((l) => l.id === currentLocationId);
 
         // Strict checking as per requirements (locked if below rep)
@@ -37,7 +63,38 @@ export const useCasinoSystem = () => {
                 setCurrentLocationId(highestUnlocked.id);
             }
         }
-    }, [unlockedLocations, currentLocationId]);
+    }, [unlockedLocations, currentLocationId, inVip, setCurrentLocationId]);
+
+    // ----------------------------------------------------------------------
+    //  THE VIP DOOR
+    // ----------------------------------------------------------------------
+    /** Whether the button is drawn at all. A billion in cash. */
+    const vipVisible = canSeeVip(cash);
+    /** Whether it opens tonight, and why not when it does not. */
+    const vipDoor = useMemo(
+        () => vipEntry(cash, lastVipQuarter, currentQuarter()),
+        [cash, lastVipQuarter],
+    );
+
+    /**
+     * Walk in, and stamp the visit.
+     *
+     * The stamp happens HERE rather than on the first bet, because the
+     * cooldown is on the invitation and not on the gambling: a player who
+     * walks in, looks at the numbers and walks out has used their visit. That
+     * is what makes the decision cost something before it is made.
+     */
+    const enterVip = useCallback((): boolean => {
+        if (!vipDoor.allowed) return false;
+        recordVipVisit(currentQuarter());
+        setCurrentLocationId(VIP_LOCATION_ID);
+        return true;
+    }, [vipDoor.allowed, recordVipVisit, setCurrentLocationId]);
+
+    const leaveVip = useCallback(() => {
+        const highest = unlockedLocations[unlockedLocations.length - 1];
+        setCurrentLocationId(highest ? highest.id : 'athens');
+    }, [unlockedLocations, setCurrentLocationId]);
 
     // Calculate Reputation Change
     const calculateReputationChange = useCallback((isWin: boolean) => {
@@ -61,6 +118,12 @@ export const useCasinoSystem = () => {
         setCurrentLocationId,
         unlockedLocations,
         calculateReputationChange,
-        casinoReputation
+        casinoReputation,
+        // ---- the VIP room ----
+        inVip,
+        vipVisible,
+        vipDoor,
+        enterVip,
+        leaveVip,
     };
 };

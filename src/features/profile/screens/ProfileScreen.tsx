@@ -28,8 +28,10 @@ import { FamilySuccessionList } from '../components/FamilySuccessionList';
 import { LuxoNetVipBanner } from '../components/LuxoNetVipBanner';
 import { EncounterModal } from '../../love/components/EncounterModal';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
+import { t, useLocale } from '../../../core/i18n';
 
 export const ProfileScreen: React.FC = () => {
+    useLocale();
     const {
         ceoFullName,
         companyName,
@@ -65,8 +67,8 @@ export const ProfileScreen: React.FC = () => {
             <View style={styles.safeArea}>
                 {/* Screen Header with Blue Underline and Page Subtitle */}
                 <ScreenHeader
-                    title="PERSONAL LIFE"
-                    subtitle="DYNASTY & SUCCESSION"
+                    title={t('profile.personalLife')}
+                    subtitle={t('profile.dynastySuccession')}
                     category="company"
                 />
 
@@ -88,7 +90,7 @@ export const ProfileScreen: React.FC = () => {
                     />
 
                     {/* Middle: Romance & Partner Subheader & Row */}
-                    <Text style={styles.sectionHeader}>ROMANCE & PARTNER</Text>
+                    <Text style={styles.sectionHeader}>{t('profile.romancePartner')}</Text>
                     <PartnerCard
                         partner={partner}
                         onPress={openPartnerModal}

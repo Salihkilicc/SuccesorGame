@@ -143,33 +143,35 @@ const StepperBar: React.FC<Props> = ({
             </View>
 
             {/* Yüzde kısayolları — küçük */}
-            <View style={styles.pctRow}>
-                {percents.map(p => {
-                    const targetValue = Math.round((safeMax * p) / 100);
-                    const active = Math.abs(targetValue - value) <= Math.max(1, safeMax * 0.005);
-                    return (
+            {percents.length > 0 && (
+                <View style={styles.pctRow}>
+                    {percents.map(p => {
+                        const targetValue = Math.round((safeMax * p) / 100);
+                        const active = Math.abs(targetValue - value) <= Math.max(1, safeMax * 0.005);
+                        return (
+                            <Pressable
+                                key={p}
+                                style={[styles.pctChip, active && styles.pctChipActive]}
+                                onPress={() => apply(targetValue)}
+                            >
+                                <Text style={[styles.pctText, active && styles.pctTextActive]}>
+                                    {p === 100 ? 'Max' : `${p}%`}
+                                </Text>
+                            </Pressable>
+                        );
+                    })}
+                    {softLimit !== undefined && softLimit <= safeMax && (
                         <Pressable
-                            key={p}
-                            style={[styles.pctChip, active && styles.pctChipActive]}
-                            onPress={() => apply(targetValue)}
+                            style={[styles.pctChip, styles.pctChipAccent]}
+                            onPress={() => apply(softLimit)}
                         >
-                            <Text style={[styles.pctText, active && styles.pctTextActive]}>
-                                {p === 100 ? 'Max' : `${p}%`}
+                            <Text style={[styles.pctText, styles.pctTextAccent]}>
+                                {softLimitLabel || 'Needed'}
                             </Text>
                         </Pressable>
-                    );
-                })}
-                {softLimit !== undefined && softLimit <= safeMax && (
-                    <Pressable
-                        style={[styles.pctChip, styles.pctChipAccent]}
-                        onPress={() => apply(softLimit)}
-                    >
-                        <Text style={[styles.pctText, styles.pctTextAccent]}>
-                            {softLimitLabel || 'Needed'}
-                        </Text>
-                    </Pressable>
-                )}
-            </View>
+                    )}
+                </View>
+            )}
         </View>
     );
 };

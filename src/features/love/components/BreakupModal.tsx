@@ -33,7 +33,7 @@ const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: Bre
 
                     <View>
                         <Text style={styles.message}>
-                            You were caught cheating on <Text style={styles.highlight}>{safePartnerName}</Text>!
+                            {t('love.caughtCheatingOn', { name: safePartnerName })}
                         </Text>
                     </View>
 
@@ -43,7 +43,7 @@ const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: Bre
                         <View style={styles.costContainer}>
                             <Text style={styles.costLabel}>{t('love.divorceSettlement')}</Text>
                             <Text style={styles.costValue}>-${settlementCost.toLocaleString()}</Text>
-                            <Text style={styles.costSub}>50% of your current wealth</Text>
+                            <Text style={styles.costSub}>{t('love.halfWealthLost')}</Text>
                         </View>
                     ) : null}
 

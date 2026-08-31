@@ -31,14 +31,16 @@ const getTierColor = (tier: SocialTier): string => {
   }
 };
 
+import { translateSocialClass, translateOccupation } from '../../../data/i18n/profileLoveShopText';
+
 const getTierLabel = (tier: SocialTier): string => {
   switch (tier) {
-    case 'HIGH_SOCIETY': return 'High Society';
-    case 'CORPORATE_ELITE': return 'Corporate Elite';
-    case 'UNDERGROUND': return 'Underground';
-    case 'BLUE_COLLAR': return 'Blue Collar';
-    case 'STUDENT_LIFE': return 'Student';
-    case 'ARTISTIC': return 'Artistic';
+    case 'HIGH_SOCIETY': return translateSocialClass('High Society');
+    case 'CORPORATE_ELITE': return translateSocialClass('Corporate Elite');
+    case 'UNDERGROUND': return translateSocialClass('Underground');
+    case 'BLUE_COLLAR': return translateSocialClass('Blue Collar');
+    case 'STUDENT_LIFE': return translateSocialClass('Student');
+    case 'ARTISTIC': return translateSocialClass('Artistic');
     default: return tier;
   }
 };
@@ -59,6 +61,7 @@ const formatCurrency = (amount: number): string => {
 // --- COMPONENT ---
 
 const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
+  useLocale();
   const isDeepPersona = isDeepPersonaPartner(partner);
 
   // Stats
@@ -69,9 +72,9 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
   // Derived Info
   const name = partner.name;
   const initial = name[0] || '?';
-  const jobTitle = isDeepPersona ? partner.job.title : t('love.unemployed');
+  const jobTitle = isDeepPersona ? translateOccupation(partner.job.title) : t('love.unemployed');
   const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
-  const statusLabel = (partner as PartnerProfile).isMarried ? 'Married' : 'Dating';
+  const statusLabel = (partner as PartnerProfile).isMarried ? t('partner.married') : t('partner.dating');
   const statusColor = (partner as PartnerProfile).isMarried ? '#05A8F6' : '#FF8A8A';
 
   return (

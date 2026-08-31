@@ -142,58 +142,38 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
             />
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.screenPad}>
                 {/* ══ MORAL ŞERİDİ ══ */}
-                <View style={styles.stripe}>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.label}>{t('ui.morale')}</Text>
-                        <Text style={styles.big}>{morale.toFixed(0)}</Text>
-                        <Text style={styles.sub}>{t('company.payAloneSustainsV1', { v1: target.toFixed(0) })}</Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.label}>{t('ui.output')}</Text>
-                        {/* Below 1 the team is producing less than you are
-                            paying for, which is the loss red's widened case:
-                            it is costing you. At or above, blue. */}
-                        <Text style={[styles.big, {
-                            color: efficiency >= 1 ? theme.colors.up : theme.colors.negative,
-                        }]}>
-                            ×{efficiency.toFixed(2)}
-                        </Text>
-                        <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
-                    </View>
-                </View>
+                {(() => {
+                    const moraleColor = morale >= 70 ? theme.colors.highlight : morale >= 50 ? theme.colors.textPrimary : theme.colors.warning;
+                    return (
+                        <>
+                            <View style={styles.stripe}>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.label}>{t('ui.morale')}</Text>
+                                    <Text style={[styles.big, { color: moraleColor }]}>{morale.toFixed(0)}</Text>
+                                    <Text style={styles.sub}>{t('company.payAloneSustainsV1', { v1: target.toFixed(0) })}</Text>
+                                </View>
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <Text style={styles.label}>{t('ui.output')}</Text>
+                                    <Text style={[styles.big, {
+                                        color: efficiency >= 1 ? theme.colors.up : theme.colors.warning,
+                                    }]}>
+                                        ×{efficiency.toFixed(2)}
+                                    </Text>
+                                    <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
+                                </View>
+                            </View>
 
-                <View style={styles.moraleTrack}>
-                    {/* --------------------------------------------------
-                        TWO STEPS, AT THE THRESHOLD THE ENGINE ACTUALLY USES
-
-                        This was three tiers - under 40, under 65, above -
-                        painted with two colours, and the two bad ones were
-                        the SAME hex. So 39 and 64 looked identical while
-                        meaning different things, and neither 40 nor 65
-                        corresponds to anything in the engine.
-
-                        FIFTY DOES. Below it attrition doubles
-                        (workforce.ts, attritionRate) and the quarter takes a
-                        production penalty (useGameStore). That is the line
-                        worth drawing, so it is the only one drawn.
-
-                        I tried a three-step ladder first and measured it:
-                        the only palette colour between the grey and the blue
-                        is blueDeep, which reads 1.74 against this track -
-                        invisible. The brighter alternatives are brighter
-                        than the healthy blue, which would invert the ladder.
-                        A middle you cannot see is worse than no middle.
-
-                        Fills, so no signal tokens - see the production bar.
-                       -------------------------------------------------- */}
-                    <View style={[styles.moraleFill, {
-                        width: `${morale}%`,
-                        backgroundColor: morale < 50 ? theme.colors.disabled : theme.colors.primary,
-                    }]} />
-                    {/* Maasin tasidigi seviye isareti */}
-                    <View style={[styles.moraleMarker, { left: `${target}%` }]} />
-                </View>
-                <Text style={styles.note}>{WORKFORCE_EXPLANATIONS.morale}</Text>
+                            <View style={styles.moraleTrack}>
+                                <View style={[styles.moraleFill, {
+                                    width: `${morale}%`,
+                                    backgroundColor: morale < 50 ? theme.colors.warning : morale >= 70 ? theme.colors.highlight : theme.colors.primary,
+                                }]} />
+                                {/* Maasin tasidigi seviye isareti */}
+                                <View style={[styles.moraleMarker, { left: `${target}%` }]} />
+                            </View>
+                        </>
+                    );
+                })()}
 
                 {/* ══ MAAŞ ══ */}
                 <CollapsibleSection
@@ -324,7 +304,23 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                             morale −3 every quarter it stays on
                         </Text>
                     </View>
-                    <Switch value={overtimeEnabled} onValueChange={setOvertime} />
+                    {/* An unstyled Switch is iOS green when it is on. Green is
+                        reserved for "you made money" (theme rule 4), and this
+                        toggle has nothing to do with profit - it is a mode,
+                        and a mode that is ON is the accent blue everywhere
+                        else in the app. Same colours SettingsScreen already
+                        uses, so there is one answer to "what does on look
+                        like" rather than two. */}
+                    <Switch
+                        value={overtimeEnabled}
+                        onValueChange={setOvertime}
+                        trackColor={{
+                            false: theme.colors.surfaceRaised,
+                            true: theme.colors.primary,
+                        }}
+                        thumbColor={overtimeEnabled ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
+                        ios_backgroundColor={theme.colors.surfaceRaised}
+                    />
                 </View>
 
                 {avgTenure > 0 && (

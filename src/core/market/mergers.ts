@@ -485,8 +485,76 @@ export const MERGER_EXPLANATIONS = {
 //  cikmanin bedeli vardir.
 // ============================================================================
 
-/** Elden cikarirken piyasa degerinin bu kadari alinir. */
-export const DIVESTITURE_DISCOUNT = 0.15;
+// ============================================================================
+//  A COMPANY IS NOT A SHARE. YOU CANNOT PUT IT BACK THE SAME AFTERNOON.
+// ============================================================================
+//
+//  Asked for as "buy a company and sell it straight away for more, there is no
+//  commission in between", and then decided as: two quarters before it can be
+//  sold at all, and a commission that falls the longer you held it.
+//
+//  BOTH HALVES ARE THE SAME ARGUMENT. Selling a subsidiary is not a market
+//  order; it is a process. A buyer has to be found, the books have to be
+//  opened, and the first question anybody asks is why it is for sale after six
+//  months. That question is the discount. Five years later nobody asks it,
+//  because the answer is visible in the accounts.
+//
+//  So the commission is heaviest exactly where the abuse is and lightest where
+//  the honest exit is, which a flat rate cannot do: a flat rate that stops the
+//  flip also taxes the player who spent a decade building the thing.
+// ============================================================================
+
+/**
+ * Quarters before a subsidiary can be sold at all.
+ *
+ * A hard refusal rather than a punitive price, because a price the player can
+ * pay is a price somebody will pay - and a same quarter round trip is not
+ * something the game should have an exchange rate for.
+ */
+export const DIVESTITURE_LOCK_QUARTERS = 2;
+
+/** What it costs to leave at the first legal moment. */
+export const DIVESTITURE_DISCOUNT_MAX = 0.35;
+/** And what it settles at once the company is plainly yours. */
+export const DIVESTITURE_DISCOUNT_MIN = 0.12;
+/**
+ * How long the discount takes to walk down.
+ *
+ * Twenty quarters, five years. Long enough that it cannot be waited out as a
+ * tactic, short enough that a player who genuinely built something is not
+ * still paying for the purchase when they leave.
+ */
+export const DIVESTITURE_DECAY_QUARTERS = 20;
+
+/**
+ * Kept as the FLOOR under its old name, because things still import it.
+ * The 0.15 it used to be was the whole schedule; it is now the far end of one.
+ */
+export const DIVESTITURE_DISCOUNT = DIVESTITURE_DISCOUNT_MIN;
+
+/** Can it be sold yet, and if not, how many quarters are left. */
+export const divestitureLock = (
+    quartersHeld: number,
+): { locked: boolean; quartersLeft: number } => {
+    const held = Math.max(0, Math.floor(quartersHeld || 0));
+    const left = Math.max(0, DIVESTITURE_LOCK_QUARTERS - held);
+    return { locked: left > 0, quartersLeft: left };
+};
+
+/**
+ * The commission on the way out, as a fraction.
+ *
+ * Linear from MAX at the lock to MIN at the end of the decay. Linear rather
+ * than a curve on purpose: the player has to be able to look at this quarter's
+ * figure and the next one and see where it is going.
+ */
+export const divestitureDiscount = (quartersHeld: number): number => {
+    const held = Math.max(0, Math.floor(quartersHeld || 0));
+    const past = Math.max(0, held - DIVESTITURE_LOCK_QUARTERS);
+    const ratio = Math.min(1, past / DIVESTITURE_DECAY_QUARTERS);
+    return DIVESTITURE_DISCOUNT_MAX
+        - (DIVESTITURE_DISCOUNT_MAX - DIVESTITURE_DISCOUNT_MIN) * ratio;
+};
 
 export interface DivestitureQuote {
     /** Hedefin bugunku adil degeri (kazanc gucune gore) */
@@ -495,6 +563,12 @@ export interface DivestitureQuote {
     proceeds: number;
     /** Odedigin fiyata gore kar/zarar */
     gainOrLoss: number;
+    /** The commission applied, as a fraction, so the screen can name it. */
+    discount: number;
+    /** True while it cannot be sold at all. */
+    locked: boolean;
+    /** Quarters until it can be. */
+    quartersLeft: number;
 }
 
 export const quoteDivestiture = (deal: AcquisitionDeal): DivestitureQuote => {
@@ -505,8 +579,20 @@ export const quoteDivestiture = (deal: AcquisitionDeal): DivestitureQuote => {
             ? deal.targetAnnualEbit * 18
             : deal.fairValue * 0.4;
     const currentFairValue = Math.max(0, impliedValue);
-    const proceeds = currentFairValue * (1 - DIVESTITURE_DISCOUNT);
-    return { currentFairValue, proceeds, gainOrLoss: proceeds - deal.price };
+    const held = deal.quartersSinceClose || 0;
+    const { locked, quartersLeft } = divestitureLock(held);
+    const discount = divestitureDiscount(held);
+    // A locked holding quotes zero rather than a tempting number, or the
+    // screen shows a price the store will refuse to honour.
+    const proceeds = locked ? 0 : currentFairValue * (1 - discount);
+    return {
+        currentFairValue,
+        proceeds,
+        gainOrLoss: proceeds - deal.price,
+        discount,
+        locked,
+        quartersLeft,
+    };
 };
 
 // ============================================================================

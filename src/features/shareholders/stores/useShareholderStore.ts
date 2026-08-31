@@ -145,8 +145,16 @@ interface BuyoutResult {
     askingPricePerShare: number;
     /** THE WHOLE HOLDING. This is the one an offer is measured against. */
     askingTotal: number;
-    /** PER SHARE, before any premium. */
+    /** PER SHARE, before any premium. The MARKET price. */
     basePrice: number;
+    /**
+     * True when the holding is being priced off the unaffected price rather
+     * than off today's ticker, which is the only reason the ask can sit above
+     * the market. The screen has to say so or the number looks broken.
+     */
+    pricedOffReference: boolean;
+    /** PER SHARE, what the premium is actually applied to. */
+    referencePerShare: number;
     reluctanceFactor: number;
     traitMultiplier: number;
     totalPremium: number; // As percentage (e.g., 0.75 = 75% premium)
@@ -190,7 +198,8 @@ interface ShareholderState {
     sharkLoans: SharkLoan[]; // Active predatory loans
 
     // Actions
-    initializeGame: () => void;
+    /** `force` rebuilds a played register; without it a played register is left alone. */
+    initializeGame: (force?: boolean) => void;
     recalculateBoardMood: () => void;
     evaluatePlayerAction: (actionType: 'DIVIDEND' | 'DILUTION' | 'ACQUISITION' | 'HOLD_CASH') => void;
     appointDirectorFromNetwork: (networkContact: NetworkContact, shareCount?: number) => { success: boolean; message: string };
@@ -448,6 +457,56 @@ export const INITIAL_BOARD_MEMBERS: BoardMember[] = [
     },
 ];
 
+// ============================================================================
+//  WINNING LOOKED EXACTLY LIKE NEVER HAVING STARTED
+// ============================================================================
+//
+//  Reported as "when I take 80 or 100 per cent of the shares my holding
+//  suddenly resets to 35". Reproduced through the real store, buying each
+//  director out in turn:
+//
+//      35.0% -> 52.0% -> 66.0% -> 77.0% -> 92.0% -> 100.0%   members 0
+//      then the company screen mounts                        35.0%
+//
+//  `negotiateSharePurchase` SPLICES a director out of `members` once their
+//  block reaches zero, so taking the whole board leaves the array empty. And
+//  MyCompanyScreen carried:
+//
+//      if (!members || members.length === 0) initializeGame();
+//
+//  written for a save that predated the board, where an empty array means
+//  "never built". After a buyout an empty array means the opposite: you own
+//  all of it. The one state the guard was there to repair is also the win
+//  condition, and it could not tell them apart, so it rebuilt the board from
+//  INITIAL_BOARD_MEMBERS and handed the player back their 3.5M opening block.
+//
+//  A flag would need a migration for saves already written. It does not need
+//  one: a cap table that has never been touched is exactly the three opening
+//  numbers together, and every route out of the opening breaks at least one.
+//  Buy the board personally and `playerShareCount` rises; buy it through the
+//  treasury and the shares are retired, so `totalShares` falls instead. Both
+//  are caught, and so is every old save.
+// ============================================================================
+
+/** The player's opening block, derived rather than written down twice. */
+export const START_PLAYER_SHARES =
+    TOTAL_SHARES - INITIAL_BOARD_MEMBERS.reduce((sum, m) => sum + m.shareCount, 0);
+
+/**
+ * True only for a register nothing has happened to yet.
+ *
+ * NOT "the board is empty". An empty board is the shape of a finished buyout
+ * as well as of a game that never began.
+ */
+export const capTableUntouched = (s: {
+    members?: { shareCount: number }[];
+    totalShares?: number;
+    playerShareCount?: number;
+}): boolean =>
+    (s.members?.length ?? 0) === 0
+    && (s.totalShares ?? 0) === TOTAL_SHARES
+    && (s.playerShareCount ?? 0) === START_PLAYER_SHARES;
+
 
 // ============================================================================
 //  CHARACTER — what a director wants, and what they will not let go
@@ -507,7 +566,9 @@ export const useShareholderStore = create<ShareholderState>()(
             // ========================================================================
             members: [] as BoardMember[],
             totalShares: TOTAL_SHARES,
-            playerShareCount: 3_500_000, // 35% of 10M - a minority, on purpose
+            // Derived, so this and `initializeGame` cannot drift apart - and
+            // `capTableUntouched` compares against the same one number.
+            playerShareCount: START_PLAYER_SHARES, // 35% of 10M - a minority, on purpose
             boardMood: 'Conservative',
             boardStance: 'Neutral' as const,
             sharkLoans: [] as SharkLoan[], // No loans initially
@@ -531,7 +592,21 @@ export const useShareholderStore = create<ShareholderState>()(
             demandQuietUntil: 0,
             lastNoConfidenceQuarter: -99,
 
-            initializeGame: () => {
+            initializeGame: (force = false) => {
+                // ----------------------------------------------------------
+                //  IT REFUSES TO WIPE A REGISTER THAT HAS BEEN PLAYED
+                // ----------------------------------------------------------
+                //  The screen guard that called this on an empty board was
+                //  the reported bug, but the danger is the function rather
+                //  than the caller: anything that calls it on a live save
+                //  hands the player back their opening 35%. Starting a new
+                //  game passes `force`, which is the only case that should
+                //  ever be destroying a cap table.
+                // ----------------------------------------------------------
+                if (!force && !capTableUntouched(get())) {
+                    return;
+                }
+
                 const members = INITIAL_BOARD_MEMBERS;
 
                 // Calculate player shares
@@ -763,6 +838,9 @@ export const useShareholderStore = create<ShareholderState>()(
                     { trust: member.trust, trait: member.trait, shareCount: member.shareCount },
                     currentStockPrice,
                     member.name,
+                    // A control block is priced off the unaffected price, not
+                    // off whatever the ticker says today. See buyout.ts.
+                    useStatsStore.getState().sharePriceReference || 0,
                 );
 
                 return {
@@ -771,6 +849,9 @@ export const useShareholderStore = create<ShareholderState>()(
                     askingPricePerShare: ask.askPerShare,
                     askingTotal: ask.askTotal,
                     basePrice: ask.marketPerShare,
+                    /** True when the ask is above the ticker because of the unaffected price. */
+                    pricedOffReference: ask.pricedOffReference,
+                    referencePerShare: ask.basePerShare,
                     reluctanceFactor: Math.max(0, Math.min(1, (100 - member.trust) / 100)),
                     traitMultiplier: ask.canSell
                         ? ask.premium - Math.max(0, Math.min(1, (100 - member.trust) / 100))
@@ -1388,13 +1469,18 @@ export const useShareholderStore = create<ShareholderState>()(
                 //  Stats is the source, because it is what the screen shows.
                 //  See core/market/buyout.ts for the rest of the argument.
                 // ------------------------------------------------------------
-                const { money, spendMoney, companySharePrice } = useStatsStore.getState();
+                const { money, spendMoney, companySharePrice, sharePriceReference } =
+                    useStatsStore.getState();
                 const marketPerShare = companySharePrice || 0;
 
                 const ask = buyoutAsk(
                     { trust: member.trust, trait: member.trait, shareCount: actualBuyAmount },
                     marketPerShare,
                     member.name,
+                    // Same reference the quote used, or the screen and the
+                    // charge disagree - which is the bug this file already
+                    // has a long note about.
+                    sharePriceReference || 0,
                 );
 
                 if (!ask.canSell) {

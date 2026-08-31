@@ -105,20 +105,16 @@ type Props = {
         disabled?: boolean;
         /**
          * A MaterialCommunityIcons name, drawn in the row's left gutter.
-         *
-         * Optional, and it should stay that way: a row still has to be
-         * readable with its label alone, because an icon is a reminder of a
-         * choice rather than the choice itself. Added because the pay panel
-         * was three paragraphs stacked on each other and the eye had no
-         * handle to pick a row by. See CeoPayPanel.
          */
         icon?: string;
         /**
+         * Optional color theme for the choice card.
+         * 'brand' uses the warm orange (#FFA94D) theme.
+         * 'primary' uses the signature blue (#05A8F6 / #7DD3FC) theme.
+         */
+        tone?: 'default' | 'brand' | 'primary' | 'accent' | 'danger';
+        /**
          * The figure this choice comes down to, shown large on the right.
-         *
-         * A decision like a salary is A NUMBER, and burying it mid-sentence in
-         * `description` makes the player parse prose to compare three options.
-         * When present the description keeps only the consequences.
          */
         value?: string;
     }[];
@@ -183,45 +179,92 @@ const ConfirmPanel = ({
 
                 {!!choices?.length && (
                     <View style={styles.choices}>
-                        {choices.map((c, i) => (
-                            <Pressable
-                                key={i}
-                                onPress={c.disabled ? undefined : c.onPress}
-                                disabled={c.disabled}
-                                style={({ pressed }) => [
-                                    styles.choice,
-                                    c.disabled && styles.choiceOff,
-                                    pressed && !c.disabled && styles.btnPressed,
-                                ]}>
-                                <View style={styles.choiceHead}>
-                                    {!!c.icon && (
-                                        <MaterialCommunityIcons
-                                            name={c.icon}
-                                            size={20}
-                                            color={c.disabled ? theme.colors.textMuted : theme.colors.textPrimary}
-                                        />
-                                    )}
-                                    <Text
-                                        style={[
-                                            styles.choiceLabel,
-                                            styles.choiceLabelFlex,
-                                            c.disabled && styles.choiceLabelOff,
-                                        ]}>
-                                        {c.label}
-                                    </Text>
-                                    {!!c.value && (
+                        {choices.map((c, i) => {
+                            const isBrand = c.tone === 'brand';
+                            const isPrimary = c.tone === 'primary';
+                            const isDanger = c.tone === 'danger';
+
+                            const toneIconColor = c.disabled
+                                ? theme.colors.textMuted
+                                : isBrand
+                                ? '#FFA94D'
+                                : isPrimary
+                                ? '#05A8F6'
+                                : isDanger
+                                ? theme.colors.destructive
+                                : theme.colors.textPrimary;
+
+                            const toneLabelColor = c.disabled
+                                ? theme.colors.textMuted
+                                : isBrand
+                                ? '#FFA94D'
+                                : isPrimary
+                                ? '#7DD3FC'
+                                : isDanger
+                                ? theme.colors.destructive
+                                : theme.colors.textPrimary;
+
+                            return (
+                                <Pressable
+                                    key={i}
+                                    onPress={c.disabled ? undefined : c.onPress}
+                                    disabled={c.disabled}
+                                    style={({ pressed }) => [
+                                        styles.choice,
+                                        isBrand && styles.choiceBrand,
+                                        isPrimary && styles.choicePrimary,
+                                        isDanger && styles.choiceDanger,
+                                        c.disabled && styles.choiceOff,
+                                        pressed && !c.disabled && styles.btnPressed,
+                                    ]}>
+                                    <View style={styles.choiceHead}>
+                                        {!!c.icon && (
+                                            <View style={[
+                                                styles.choiceIconBadge,
+                                                isBrand && styles.choiceIconBadgeBrand,
+                                                isPrimary && styles.choiceIconBadgePrimary,
+                                                isDanger && styles.choiceIconBadgeDanger,
+                                            ]}>
+                                                <MaterialCommunityIcons
+                                                    name={c.icon}
+                                                    size={18}
+                                                    color={toneIconColor}
+                                                />
+                                            </View>
+                                        )}
                                         <Text
-                                            style={[styles.choiceValue, c.disabled && styles.choiceLabelOff]}
-                                            numberOfLines={1}>
-                                            {c.value}
+                                            style={[
+                                                styles.choiceLabel,
+                                                styles.choiceLabelFlex,
+                                                { color: toneLabelColor },
+                                                c.disabled && styles.choiceLabelOff,
+                                            ]}>
+                                            {c.label}
+                                        </Text>
+                                        {!!c.value && (
+                                            <Text
+                                                style={[styles.choiceValue, c.disabled && styles.choiceLabelOff]}
+                                                numberOfLines={1}>
+                                                {c.value}
+                                            </Text>
+                                        )}
+                                        {!c.disabled && (
+                                            <MaterialCommunityIcons
+                                                name="chevron-right"
+                                                size={18}
+                                                color={isBrand ? '#FFA94D' : isPrimary ? '#05A8F6' : theme.colors.textMuted}
+                                                style={{ marginLeft: 4 }}
+                                            />
+                                        )}
+                                    </View>
+                                    {!!c.description && (
+                                        <Text style={[styles.choiceDesc, !!c.icon && styles.choiceDescWithIcon]}>
+                                            {c.description}
                                         </Text>
                                     )}
-                                </View>
-                                {!!c.description && (
-                                    <Text style={styles.choiceDesc}>{c.description}</Text>
-                                )}
-                            </Pressable>
-                        ))}
+                                </Pressable>
+                            );
+                        })}
                     </View>
                 )}
 
@@ -307,8 +350,37 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceHigh,
         borderRadius: theme.radius.md,
         padding: theme.spacing.md,
-        borderWidth: StyleSheet.hairlineWidth,
+        borderWidth: 1,
         borderColor: theme.colors.border,
+    },
+    choiceBrand: {
+        backgroundColor: 'rgba(255, 169, 77, 0.08)',
+        borderColor: 'rgba(255, 169, 77, 0.35)',
+    },
+    choicePrimary: {
+        backgroundColor: 'rgba(5, 168, 246, 0.08)',
+        borderColor: 'rgba(5, 168, 246, 0.35)',
+    },
+    choiceDanger: {
+        backgroundColor: 'rgba(255, 138, 138, 0.08)',
+        borderColor: 'rgba(255, 138, 138, 0.35)',
+    },
+    choiceIconBadge: {
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    choiceIconBadgeBrand: {
+        backgroundColor: 'rgba(255, 169, 77, 0.16)',
+    },
+    choiceIconBadgePrimary: {
+        backgroundColor: 'rgba(5, 168, 246, 0.16)',
+    },
+    choiceIconBadgeDanger: {
+        backgroundColor: 'rgba(255, 138, 138, 0.16)',
     },
     // Dimmed by the SURFACE rather than by the text, so the reason underneath
     // stays as readable as it is on a live row. A greyed explanation is an
@@ -321,7 +393,8 @@ const styles = StyleSheet.create({
     choiceLabelFlex: { flex: 1 },
     choiceValue: { color: theme.colors.textPrimary, fontWeight: '900', fontSize: theme.typography.subtitle },
     choiceLabelOff: { color: theme.colors.textMuted },
-    choiceDesc: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, marginTop: 3, lineHeight: 16 },
+    choiceDesc: { color: theme.colors.textSecondary, fontSize: theme.typography.caption + 1, marginTop: 4, lineHeight: 16 },
+    choiceDescWithIcon: { paddingLeft: 40 },
     actions: { flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.xs },
     btn: { flex: 1, paddingVertical: theme.spacing.md, borderRadius: theme.radius.md, alignItems: 'center' },
     btnCancel: {

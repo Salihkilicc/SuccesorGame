@@ -52,6 +52,27 @@ export interface CasinoRiskState {
     streak: number;
     /** Longest run this campaign, for the scene to be able to say it. */
     longestStreak: number;
+    /**
+     * THE QUARTER THE PLAYER LAST WALKED INTO THE VIP ROOM.
+     *
+     * `null` for somebody who has never been. It lives here rather than in the
+     * casino system because this is the store that already knows when a
+     * quarter ends, and the cooldown is the only thing that makes a bet of a
+     * hundred per cent of everything a decision rather than a retry.
+     * See features/casino/data/vipRoom.ts.
+     */
+    lastVipQuarter: number | null;
+    /**
+     * WHICH ROOM THE PLAYER IS IN.
+     *
+     * It used to be `useState` inside `useCasinoSystem`, which every screen
+     * calls separately - so each screen had its OWN copy and every one of them
+     * started at Athens. Travelling to Macau in the lobby and then opening
+     * blackjack put you back at the cheapest table in the game with the
+     * cheapest chips, silently. Found while wiring the VIP room, which cannot
+     * work at all without this.
+     */
+    currentLocationId: string;
     _hasHydrated: boolean;
 }
 
@@ -68,6 +89,10 @@ type Store = CasinoRiskState & {
     bankReputation: (amount: number) => number;
     /** Called by the tick. Rolls the quarter over. */
     closeQuarter: (quarters?: number) => void;
+    /** Stamp the VIP visit. The cooldown counts from here. */
+    recordVipVisit: (quarter: number) => void;
+    /** Walk into a room. */
+    setCurrentLocationId: (id: string) => void;
     reset: () => void;
 };
 
@@ -76,6 +101,8 @@ export const initialCasinoRiskState: CasinoRiskState = {
     repThisQuarter: 0,
     streak: 0,
     longestStreak: 0,
+    lastVipQuarter: null,
+    currentLocationId: 'athens',
     _hasHydrated: false,
 };
 
@@ -86,6 +113,11 @@ export const useCasinoRiskStore = create<Store>()(
             setHasHydrated: v => set({ _hasHydrated: v }),
 
             recordVisit: () => set(s => (s.visitedThisQuarter ? s : { visitedThisQuarter: true })),
+
+            recordVipVisit: (quarter: number) =>
+                set({ lastVipQuarter: Math.max(0, Math.floor(quarter || 0)) }),
+
+            setCurrentLocationId: (id: string) => set({ currentLocationId: id }),
 
             bankReputation: (amount: number) => {
                 const asked = Math.max(0, Math.floor(amount || 0));
@@ -129,6 +161,10 @@ export const useCasinoRiskStore = create<Store>()(
                 repThisQuarter: state.repThisQuarter,
                 streak: state.streak,
                 longestStreak: state.longestStreak,
+                // Or the cooldown lasts exactly as long as the app stays open,
+                // which is not a cooldown.
+                lastVipQuarter: state.lastVipQuarter,
+                currentLocationId: state.currentLocationId,
             }),
             onRehydrateStorage: () => state => { state?.setHasHydrated(true); },
         },

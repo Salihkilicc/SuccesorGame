@@ -34,6 +34,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import AdBannerCarousel from '../components/AdBannerCarousel';
 import ShopPreviewCard from '../components/ShopPreviewCard';
+import { t, useLocale } from '../../../core/i18n';
 
 const { width } = Dimensions.get('window');
 const GRID_CARD_WIDTH = (width - 32 - 12) / 2;
@@ -115,7 +116,33 @@ const getCategoryTheme = (category: string) => {
 };
 
 export const ShoppingScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
+
+    const getCategoryName = (id: string, fallback: string) => {
+        switch (id) {
+            case 'ALL': return t('shop.overview');
+            case 'VEHICLE': return t('shop.vehicles');
+            case 'REAL_ESTATE': return t('shop.realEstate');
+            case 'WATCH': return t('shop.watches');
+            case 'JEWELRY': return t('shop.jewelry');
+            case 'MARINE': return t('shop.marine');
+            case 'AIRCRAFT': return t('shop.aircraft');
+            default: return fallback;
+        }
+    };
+
+    const getCategoryDesc = (id: string, fallback: string) => {
+        switch (id) {
+            case 'VEHICLE': return t('shop.descVehicles');
+            case 'REAL_ESTATE': return t('shop.descRealEstate');
+            case 'WATCH': return t('shop.descWatches');
+            case 'JEWELRY': return t('shop.descJewelry');
+            case 'MARINE': return t('shop.descMarine');
+            case 'AIRCRAFT': return t('shop.descAircraft');
+            default: return fallback;
+        }
+    };
     // Display only, and it was displaying the wrong wallet: `core.money` is
     // the one nothing in the game credits. Shopping is flagged off, so this
     // was never seen - which is exactly how it would have survived the sweep
@@ -248,7 +275,7 @@ export const ShoppingScreen = () => {
 
                 <View style={styles.cashRow}>
                     <View>
-                        <Text style={styles.cashLabel}>AVAILABLE LIQUIDITY</Text>
+                        <Text style={styles.cashLabel}>{t('profile.sovereignReserve')}</Text>
                         <Text style={styles.cashFigure}>{formatPrice(playerMoney)}</Text>
                     </View>
                 </View>
@@ -261,7 +288,7 @@ export const ShoppingScreen = () => {
 
             {/* Luxury Departments Grid */}
             <View style={styles.section}>
-                <Text style={styles.sectionHeader}>LUXURY DEPARTMENTS</Text>
+                <Text style={styles.sectionHeader}>{t('shop.portfolio')}</Text>
                 <View style={styles.categoryGrid}>
                     {CATEGORIES.map((cat, catIdx) => (
                         <Pressable
@@ -279,9 +306,9 @@ export const ShoppingScreen = () => {
                                     color={cat.color}
                                 />
                             </View>
-                            <Text style={styles.categoryName}>{cat.name}</Text>
+                            <Text style={styles.categoryName}>{getCategoryName(cat.id, cat.name)}</Text>
                             <Text style={styles.categoryDesc} numberOfLines={1}>
-                                {cat.desc}
+                                {getCategoryDesc(cat.id, cat.desc)}
                             </Text>
                         </Pressable>
                     ))}
@@ -463,7 +490,7 @@ export const ShoppingScreen = () => {
                                             isInCart && styles.buyTextInCart,
                                         ]}
                                     >
-                                        {owned ? 'OWNED' : isInCart ? 'IN CART' : 'ACQUIRE'}
+                                        {owned ? t('shop.owned') : isInCart ? t('shop.inCart') : t('shop.acquire')}
                                     </Text>
                                 </Pressable>
                             </View>
@@ -478,7 +505,7 @@ export const ShoppingScreen = () => {
         <View style={styles.root}>
             {/* Screen Header with Back Arrow, Dynamic Subtitle and Category Underline */}
             <ScreenHeader
-                title="LUXONET STORE"
+                title={t('shop.store')}
                 subtitle={headerSubtitle}
                 category="company"
                 onBack={handleBack}
@@ -517,7 +544,7 @@ export const ShoppingScreen = () => {
                                             isActive && styles.catPillTextActive,
                                         ]}
                                     >
-                                        {tab.name.toUpperCase()}
+                                        {getCategoryName(tab.id, tab.name).toUpperCase()}
                                     </Text>
                                 </Pressable>
                             );

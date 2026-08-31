@@ -108,18 +108,25 @@ export type SlotConfig = {
     maxBet: number;
 };
 
-/**
- * What every machine returns over a long enough evening.
- *
- * Ninety four per cent, which is an ordinary real-world figure and about
- * forty points kinder than what was here. The house still wins; it stops
- * being the worst trade in the game by an order of magnitude.
- *
- * Every machine is tuned to this same number - see slotsData.test.ts, which
- * checks it rather than trusting it - so the three of them differ in how the
- * evening FEELS and not in what it costs.
- */
-export const TARGET_RTP = 0.94;
+// ============================================================================
+//  THE MATHS LIVES IN core/casino/slots.ts NOW
+// ============================================================================
+//  `meanJackpot`, `miniOdds`, `expectedReturn` and `isBalanced` were all here,
+//  in the same file as the icon names and the subtitles, because the machine's
+//  return and the machine's face were never separated. Re-exported rather than
+//  re-declared: this file is the CITY, the engine is the MACHINE, and two
+//  copies of a payout solver is how the last several bugs happened.
+// ============================================================================
+
+export {
+    TARGET_RTP,
+    meanJackpot,
+    expectedReturn,
+    isBalanced,
+} from '../../../core/casino/slots';
+
+/** Kept under its old name because the tests and the tuning notes use it. */
+export { secondOdds as miniOdds } from '../../../core/casino/slots';
 
 /**
  * The colour of each rung, cheapest first.
@@ -181,7 +188,10 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         icon: 'chart-line',
         subtitle: 'Small print, small margins, all night long',
         payouts: [3, 4, 5, 6, 9] as const,
-        twoKindMultiplier: 1.5,
+        // RESHAPED. See core/casino/slots.ts: x1.5 was your stake back with a
+        // tip, not a win. Doubling it costs nothing - `miniOdds` re-solves -
+        // and the machine goes from 34% tiny wins to 28% real ones.
+        twoKindMultiplier: 2,
         jackpotOdds: 0.11,
         minBet: 10,
         maxBet: 30_000,
@@ -195,7 +205,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         icon: 'gavel',
         subtitle: 'Motions carried, seats taken, minutes kept',
         payouts: [4, 6, 8, 11, 16] as const,
-        twoKindMultiplier: 1.4,
+        twoKindMultiplier: 2.5,
         jackpotOdds: 0.06,
         minBet: 10,
         maxBet: 60_000,
@@ -214,7 +224,7 @@ export const SLOT_CONFIG: Record<SlotVariant, SlotConfig> = {
         icon: 'crown',
         subtitle: 'Rings, wills, and the name on the building',
         payouts: [8, 14, 22, 40, 100] as const,
-        twoKindMultiplier: 1.2,
+        twoKindMultiplier: 3,
         jackpotOdds: 0.018,
         minBet: 10,
         maxBet: 100_000,
@@ -234,64 +244,3 @@ export const colourOfIcon = (symbols: SlotSymbol[], icon: string): string =>
 export const symbolByIcon = (symbols: SlotSymbol[], icon: string): SlotSymbol | undefined =>
     symbols.find(s => s.icon === icon);
 
-/**
- * What a machine actually returns per unit staked.
- *
- * Three of a kind is equally likely to be any symbol, so a jackpot is worth
- * the AVERAGE of the payout table. Two of a kind pays the flat two-kind rate.
- *
- * Exported because a number this important should be checkable rather than
- * asserted in a comment - see slotsData.test.ts, which measures all three.
- */
-export const meanJackpot = (config: SlotConfig): number => {
-    // The tuple is always five long, so the old empty guard is a comparison
-    // TypeScript can prove is never true. Kept as a divide-by-zero guard on
-    // the ARITHMETIC rather than on the length.
-    const payouts = config.payouts;
-    const total = payouts.reduce((a, b) => a + b, 0);
-    return payouts.length > 0 ? total / payouts.length : 0;
-};
-
-/**
- * The chance of two of a kind, SOLVED rather than stored.
- *
- * This is the whole reason the machines can be trusted. Three numbers decide
- * a return - the payout table, the jackpot rate and the two-kind rate - and
- * the old file had all three typed by hand and none of them multiplied
- * together, which is how it ended up taking forty five per cent. Fixing the
- * numbers once would have fixed nothing: the next person to make the crown
- * pay more would have put it straight back.
- *
- * So two of the three are the design and the third falls out of them:
- *
- *      jackpot x meanPayout  +  mini x twoKind  =  TARGET_RTP
- *
- * Edit a payout and the machine rebalances itself.
- */
-export const miniOdds = (config: SlotConfig): number => {
-    const two = Math.max(0.01, config.twoKindMultiplier);
-    const fromJackpot = config.jackpotOdds * meanJackpot(config);
-    const remaining = TARGET_RTP - fromJackpot;
-    // Never negative, and never so generous that the two rates cannot both
-    // fit inside one spin.
-    return Math.max(0, Math.min(1 - config.jackpotOdds, remaining / two));
-};
-
-export const expectedReturn = (config: SlotConfig): number =>
-    config.jackpotOdds * meanJackpot(config) + miniOdds(config) * config.twoKindMultiplier;
-
-/**
- * Whether a machine can actually be balanced, and the limit of the trick above.
- *
- * Solving the two-kind rate absorbs a payout edit only while there is slack to
- * absorb it with. Once the jackpot leg ALONE exceeds the target - a rare enough
- * face paying enough that one in fifty spins returns more than the whole
- * budget - the second prize goes to zero and the machine still pays out more
- * than it takes. That is a misconfiguration rather than a bug, and this is how
- * it says so instead of quietly running at a hundred and thirty per cent.
- *
- * Checked for all three in slotsData.test.ts, so a tuning pass cannot ship one
- * that is broken this way.
- */
-export const isBalanced = (config: SlotConfig): boolean =>
-    config.jackpotOdds * meanJackpot(config) <= TARGET_RTP;

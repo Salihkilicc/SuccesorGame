@@ -16,6 +16,9 @@ import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { colourOfIcon } from '../logic/slotsData';
+import { translateCasinoStatus } from '../../../data/i18n/casinoText';
+import { chipsFor, maxBetFor } from '../data/casinoStakes';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 const { width } = Dimensions.get('window');
 
@@ -29,10 +32,19 @@ const SlotsGameScreen = () => {
   // Get current location logic to apply theme & limits
   const { currentLocation, casinoReputation } = useCasinoSystem();
 
+  // ----------------------------------------------------------------------
+  //  THE CEILING IS A SHARE OF WHAT YOU HAVE NOW
+  // ----------------------------------------------------------------------
+  //  Read straight from the store rather than from `state.money` below,
+  //  which is this machine's own running balance and does not exist yet on
+  //  the line that needs it. See data/casinoStakes.ts.
+  // ----------------------------------------------------------------------
+  const playerMoney = useStatsStore(s => s.money);
+
   // Logic Hook - Pass location max bet
-  const { state, actions } = useSlotsLogic(variant, initialBet, currentLocation.maxBet, currentLocation.slotFaces);
+  const { state, actions } = useSlotsLogic(variant, initialBet, maxBetFor(currentLocation, playerMoney), currentLocation.slotFaces);
   // Ensure we define config locally or from state, to avoid TS errors if state structure changed differently
-  const { grid, bet, isSpinning, message, showResult, lastResult, money, config } = state;
+  const { grid, bet, isSpinning, message, showResult, lastResult, money, config, reelDelays, settleMs } = state;
 
   // Win Animation State (Standard Animated)
   // `winScale` and `winOpacity` drove the BIG WIN curtain and are shelved with
@@ -96,7 +108,7 @@ const SlotsGameScreen = () => {
         {/* INFO ROW */}
         <View style={styles.infoRow}>
           <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>
-            {message.toUpperCase()}
+            {translateCasinoStatus(message).toUpperCase()}
           </Text>
         </View>
 
@@ -112,7 +124,10 @@ const SlotsGameScreen = () => {
                 colourOf={(icon) => colourOfIcon(state.symbols, icon)}
                 tint={currentLocation.theme.primary}
                 isSpinning={state.isSpinning}
-                delay={colIdx * 300} // Staggered stop
+                // ONE SOURCE for the stagger. The last reel waits longer when the
+                // first two match: see logic/useSlotsLogic.ts -> HANG_MS.
+                delay={reelDelays[colIdx] ?? 0}
+                settleMs={settleMs}
               />
             ))}
           </View>
@@ -126,7 +141,7 @@ const SlotsGameScreen = () => {
 
           {/* Chip Selector */}
           <CustomChipSelector
-            chips={currentLocation.chips}
+            chips={chipsFor(currentLocation, money)}
             selectedChip={bet}
             onSelect={(val) => actions.setBetAmount(val)}
             gameTheme={currentLocation.theme}
@@ -147,7 +162,7 @@ const SlotsGameScreen = () => {
                 pressed && styles.spinButtonPressed,
                 (isSpinning || bet <= 0) && styles.disabledButton
               ]}>
-              <Text style={styles.spinText}>{isSpinning ? '...' : 'SPIN'}</Text>
+              <Text style={styles.spinText}>{isSpinning ? '...' : t('casino.spin')}</Text>
             </Pressable>
           </View>
         </View>

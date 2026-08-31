@@ -14,6 +14,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { PartnerProfile } from '../../../data/relationshipTypes';
+import { t, useLocale } from '../../../core/i18n';
+import { translateSocialClass } from '../../../data/i18n/profileLoveShopText';
 
 interface PartnerCardProps {
     partner: PartnerProfile | null;
@@ -24,6 +26,7 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
     partner,
     onPress,
 }) => {
+    useLocale();
     if (!partner) {
         return (
             <Pressable
@@ -34,9 +37,9 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
                     <MaterialCommunityIcons name="heart-plus" size={24} color="#05A8F6" />
                 </View>
                 <View style={styles.infoBlock}>
-                    <Text style={styles.emptyTitle}>FIND A ROMANTIC PARTNER</Text>
+                    <Text style={styles.emptyTitle}>{t('partner.findPartner')}</Text>
                     <Text style={styles.emptySubtitle}>
-                        VIP Lounge, Galas & Elite Encounters
+                        {t('partner.findPartnerSub')}
                     </Text>
                 </View>
                 <MaterialCommunityIcons
@@ -57,6 +60,9 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
         .substring(0, 2)
         .toUpperCase();
 
+    const statusLabel = isMarried ? t('partner.married') : t('partner.dating');
+    const socialClassLabel = translateSocialClass(partner.stats.socialClass);
+
     return (
         <Pressable
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
@@ -73,14 +79,16 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
                     {partner.name}
                 </Text>
                 <Text style={styles.partnerSub}>
-                    Partner • {isMarried ? 'Married' : 'Dating'} • {partner.stats.socialClass}
+                    {t('partner.partner')} • {statusLabel} • {socialClassLabel}
                 </Text>
             </View>
 
             {/* Relationship Score Pill + Chevron */}
             <View style={styles.rightBlock}>
                 <View style={styles.lovePill}>
-                    <Text style={styles.loveText}>{lovePercent}% Love</Text>
+                    <Text style={styles.loveText}>
+                        {t('partner.lovePercent', { pct: String(lovePercent) })}
+                    </Text>
                 </View>
                 <MaterialCommunityIcons
                     name="chevron-right"

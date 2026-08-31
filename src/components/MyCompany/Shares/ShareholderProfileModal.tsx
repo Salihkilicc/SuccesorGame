@@ -276,6 +276,9 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
             { trust: member.trust, trait: member.trait, shareCount },
             stockPrice,
             member.name,
+            // The unaffected price, or this bar quotes odds against an ask
+            // the store will not honour. See core/market/buyout.ts.
+            useStatsStore.getState().sharePriceReference || 0,
         );
         if (!ask.canSell) return 0;
         return Math.round(acceptanceChance(calculateOfferPrice(), ask.askTotal) * 100);

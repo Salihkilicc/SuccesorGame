@@ -15,6 +15,12 @@ import { CASINO_LOCATIONS, LocationId, CasinoLocation } from '../data/casinoData
 import { t, useLocale } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
 import { formatCompact } from '../../../core/utils';
+import {
+  translateCasinoLocationName,
+  translateCasinoLocationSubtitle,
+} from '../../../data/i18n/casinoText';
+import { maxBetFor } from '../data/casinoStakes';
+import { useStatsStore } from '../../../core/store/useStatsStore';
 
 interface CasinoLocationModalProps {
     visible: boolean;
@@ -32,6 +38,11 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
     onSelectLocation,
 }) => {
     useLocale();
+    /**
+     * The ceiling is a share of what the player has, so this list has to know
+     * how rich they are. It used to print a constant. See data/casinoStakes.ts.
+     */
+    const playerMoney = useStatsStore(st => st.money);
 
     return (
         <Modal
@@ -48,7 +59,7 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
                     <View style={styles.header}>
                         <View style={styles.headerLeft}>
                             <MaterialCommunityIcons name="map-marker-radius" size={20} color={theme.colors.primary} />
-                            <Text style={styles.title}>{t('ui.travelTo') || 'SELECT CASINO DESTINATION'}</Text>
+                            <Text style={styles.title}>{t('casino.selectDestination')}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeBtn} activeOpacity={0.7}>
                             <MaterialCommunityIcons name="close" size={18} color="#FFFFFF" />
@@ -123,10 +134,10 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
                                                     { color: isLocked ? theme.colors.textMuted : '#FFFFFF' },
                                                 ]}
                                             >
-                                                {loc.name.toUpperCase()}
+                                                {translateCasinoLocationName(loc.name).toUpperCase()}
                                             </Text>
                                             <Text style={[styles.locSub, { color: isLocked ? theme.colors.textMuted : loc.theme.textColor }]}>
-                                                • {loc.subTitle}
+                                                • {translateCasinoLocationSubtitle(loc.subTitle)}
                                             </Text>
                                         </View>
 
@@ -135,16 +146,16 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
                                                 <View style={styles.lockedPill}>
                                                     <MaterialCommunityIcons name="shield-lock-outline" size={12} color={theme.colors.negative} />
                                                     <Text style={styles.lockedText}>
-                                                        Req: {loc.requirement} Casino Rep
+                                                        {t('casino.reqRep').replace('{rep}', String(loc.requirement))}
                                                     </Text>
                                                 </View>
                                             ) : (
                                                 <View style={styles.maxBetPill}>
                                                     <Text style={[styles.maxBetLabel, { color: loc.theme.primary }]}>
-                                                        MAX BET:
+                                                        {t('casino.maxBet')}:
                                                     </Text>
                                                     <Text style={styles.maxBetValue}>
-                                                        ${formatCompact(loc.maxBet)}
+                                                        ${formatCompact(maxBetFor(loc, playerMoney))}
                                                     </Text>
                                                 </View>
                                             )}
@@ -155,7 +166,7 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
                                     {isSelected ? (
                                         <View style={[styles.currentBadge, { backgroundColor: loc.theme.primary }]}>
                                             <MaterialCommunityIcons name="check" size={14} color="#000000" />
-                                            <Text style={styles.currentBadgeText}>{t('ui.current') || 'ACTIVE'}</Text>
+                                            <Text style={styles.currentBadgeText}>{t('casino.active')}</Text>
                                         </View>
                                     ) : isUnlocked ? (
                                         <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.textMuted} />

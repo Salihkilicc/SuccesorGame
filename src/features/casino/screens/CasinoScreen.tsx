@@ -1,5 +1,5 @@
 // src/features/casino/screens/CasinoScreen.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -17,12 +17,39 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import { useCasinoHomeLogic } from '../logic/useCasinoHomeLogic';
 import CasinoLocationModal from '../components/CasinoLocationModal';
 import { GameRoomCard } from '../components/GameRoomCard';
-import { CASINO_LADDER_TOP } from '../data/casinoData';
+import { CASINO_LADDER_TOP, VIP_LOCATION } from '../data/casinoData';
+import {
+  translateCasinoLocationName,
+  translateCasinoLocationSubtitle,
+  translateCasinoRank,
+  translateCasinoBadge,
+} from '../../../data/i18n/casinoText';
+import { chipsFor, maxBetFor } from '../data/casinoStakes';
+import { useCasinoSystem } from '../hooks/useCasinoSystem';
+import ConfirmPanel from '../../../components/common/ConfirmPanel';
 
 const CasinoScreen: React.FC = () => {
   useLocale();
 
   const { state, actions } = useCasinoHomeLogic();
+  /**
+   * The VIP door. Money and a cooldown, not standing, so it comes from the
+   * casino system rather than from the room ladder. See data/vipRoom.ts.
+   */
+  const { inVip, vipVisible, vipDoor, enterVip, leaveVip } = useCasinoSystem();
+  const [vipPanel, setVipPanel] = useState<string | null>(null);
+
+  const handleVipPress = () => {
+    if (inVip) { leaveVip(); return; }
+    if (enterVip()) return;
+    // A refusal has to SAY something. A button that does nothing when tapped
+    // is the same defect as a rule nothing reads.
+    setVipPanel(
+      vipDoor.reason === 'tooSoon'
+        ? t('casino.vipSoonBody', { v1: vipDoor.quartersLeft })
+        : t('casino.vipLockedBody'),
+    );
+  };
   const {
     currentLocation,
     currentLocationId,
@@ -57,7 +84,7 @@ const CasinoScreen: React.FC = () => {
         >
           {/* ── 1. SINGLE DEDICATED CASINO DESTINATION CARD ── */}
           <Text style={styles.sectionTitle}>
-            {(t('ui.selectedCasino') || 'CASINO DESTINATION').toUpperCase()}
+            {t('casino.destination').toUpperCase()}
           </Text>
 
           <View
@@ -86,7 +113,7 @@ const CasinoScreen: React.FC = () => {
 
               <View style={styles.destinationDetails}>
                 <Text style={styles.cityName}>
-                  {currentLocation.name.toUpperCase()}
+                  {translateCasinoLocationName(currentLocation.name).toUpperCase()}
                 </Text>
                 <Text
                   style={[
@@ -94,9 +121,41 @@ const CasinoScreen: React.FC = () => {
                     { color: currentLocation.theme.textColor },
                   ]}
                 >
-                  {currentLocation.subTitle}
+                  {translateCasinoLocationSubtitle(currentLocation.subTitle)}
                 </Text>
               </View>
+
+              {/* ------------------------------------------------------
+                  THE DOOR WITH NO SIGN ON IT
+
+                  Asked for as "if cash is over a billion put a VIP button
+                  top right". It appears a long way before it opens - ten
+                  billion is the door - and that gap is deliberate: you are
+                  meant to know the room is there and not be able to use it.
+
+                  Everything it needs is decided in data/vipRoom.ts; this
+                  only draws it and reports the refusal.
+                 ------------------------------------------------------ */}
+              {vipVisible && (
+                <TouchableOpacity
+                  style={[styles.vipButton, !vipDoor.allowed && styles.vipButtonShut]}
+                  onPress={handleVipPress}
+                  activeOpacity={0.75}
+                >
+                  <MaterialCommunityIcons
+                    name="crown-outline"
+                    size={14}
+                    color={VIP_LOCATION.theme.primary}
+                  />
+                  <Text style={[styles.vipButtonText, { color: VIP_LOCATION.theme.primary }]}>
+                    {vipDoor.allowed
+                      ? t('casino.vipEnter')
+                      : vipDoor.reason === 'tooSoon'
+                        ? t('casino.vipSoon', { v1: vipDoor.quartersLeft })
+                        : t('casino.vipLocked')}
+                  </Text>
+                </TouchableOpacity>
+              )}
 
               {/* ONLY SINGLE PLACE TO TRAVEL / SWITCH CITY */}
               <TouchableOpacity
@@ -121,7 +180,7 @@ const CasinoScreen: React.FC = () => {
                     { color: currentLocation.theme.primary },
                   ]}
                 >
-                  {t('ui.travelTo') || 'TRAVEL'}
+                  {t('casino.travel')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -130,24 +189,24 @@ const CasinoScreen: React.FC = () => {
 
             <View style={styles.destinationStatsRow}>
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>MAX BET</Text>
+                <Text style={styles.statLabel}>{t('casino.maxBet')}</Text>
                 <Text style={styles.statValue}>
-                  ${formatCompact(currentLocation.maxBet)}
+                  ${formatCompact(maxBetFor(currentLocation, money))}
                 </Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>MIN CHIP</Text>
+                <Text style={styles.statLabel}>{t('casino.minChip')}</Text>
                 <Text
                   style={[
                     styles.statValue,
                     { color: currentLocation.theme.textColor },
                   ]}
                 >
-                  ${formatCompact(currentLocation.chips[0])}
+                  ${formatCompact(chipsFor(currentLocation, money)[0])}
                 </Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>TIER</Text>
+                <Text style={styles.statLabel}>{t('casino.tier')}</Text>
                 <Text
                   style={[styles.statValue, { color: theme.colors.brand }]}
                 >
@@ -161,7 +220,7 @@ const CasinoScreen: React.FC = () => {
           <View style={styles.statusCard}>
             <View style={styles.statusRow}>
               <View style={styles.balanceBlock}>
-                <Text style={styles.statusLabel}>CHIPS BALANCE</Text>
+                <Text style={styles.statusLabel}>{t('casino.chipsBalance')}</Text>
                 <View style={styles.cashWrapper}>
                   <MaterialCommunityIcons
                     name="cash-multiple"
@@ -173,7 +232,7 @@ const CasinoScreen: React.FC = () => {
               </View>
 
               <View style={styles.repBlock}>
-                <Text style={styles.statusLabel}>VIP STATUS</Text>
+                <Text style={styles.statusLabel}>{t('casino.vipStatus')}</Text>
                 <View style={styles.repBadge}>
                   <MaterialCommunityIcons
                     name="star-circle"
@@ -186,7 +245,7 @@ const CasinoScreen: React.FC = () => {
                       { color: currentLocation.theme.textColor },
                     ]}
                   >
-                    {getRepRank(casinoReputation).toUpperCase()}
+                    {translateCasinoRank(getRepRank(casinoReputation)).toUpperCase()}
                   </Text>
                 </View>
               </View>
@@ -214,59 +273,59 @@ const CasinoScreen: React.FC = () => {
 
           {/* ── 3. HIGH ROLLER GAME SUITE ── */}
           <Text style={styles.sectionTitle}>
-            {(t('ui.highRollerSuite') || 'HIGH ROLLER SUITE').toUpperCase()}
+            {t('casino.highRollerSuite').toUpperCase()}
           </Text>
 
           <View style={styles.gamesContainer}>
             {/* BLACKJACK 21 */}
             <GameRoomCard
-              title={t('ui.blackjack') || 'BLACKJACK 21'}
-              subtitle={t('ui.highStakesTables') || 'Classic 3:2 Multi-Hand VIP Tables'}
+              title={t('casino.blackjack21')}
+              subtitle={t('casino.highStakesTables')}
               themeColor={currentLocation.theme.primary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="cards-spade"
-              badgeText="3:2 PAYOUT"
+              badgeText={translateCasinoBadge('3:2 PAYOUT')}
               onPress={() =>
-                actions.handleGamePress('BlackjackGame', { title: t('ui.blackjack21') })
+                actions.handleGamePress('BlackjackGame', { title: t('casino.blackjack21') })
               }
             />
 
             {/* EUROPEAN ROULETTE */}
             <GameRoomCard
-              title={t('ui.roulette') || 'ROULETTE ROYALE'}
-              subtitle={t('ui.europeanAmerican') || 'Single-Zero European Wheel & Straight Bets'}
+              title={t('casino.rouletteRoyale')}
+              subtitle={t('casino.singleZeroEuropean')}
               themeColor={currentLocation.theme.secondary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="circle-slice-8"
-              badgeText="35:1 SINGLE ZERO"
+              badgeText={translateCasinoBadge('35:1 SINGLE ZERO')}
               onPress={() =>
-                actions.handleGamePress('RouletteGame', { title: t('ui.europeanRoulette') })
+                actions.handleGamePress('RouletteGame', { title: t('casino.rouletteRoyale') })
               }
             />
 
             {/* PROGRESSIVE SLOTS */}
             <GameRoomCard
-              title={t('ui.slots') || 'CYBER SLOTS'}
-              subtitle={t('ui.progressiveJackpots') || 'Multi-Payline Mega Jackpots & Wilds'}
+              title={t('casino.cyberSlots')}
+              subtitle={t('casino.multiPaylineMega')}
               themeColor={currentLocation.theme.primary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="slot-machine"
-              badgeText="MEGA JACKPOT"
+              badgeText={translateCasinoBadge('MEGA JACKPOT')}
               onPress={() =>
-                actions.handleGamePress('SlotsGame', { title: t('ui.slots') })
+                actions.handleGamePress('SlotsGame', { title: t('casino.cyberSlots') })
               }
             />
 
             {/* TEXAS HOLD'EM POKER */}
             <GameRoomCard
-              title={t('ui.poker') || "TEXAS HOLD'EM"}
-              subtitle={t('ui.texasHoldEm') || 'High Stakes No-Limit Private Lounge'}
+              title={t('casino.texasHoldem')}
+              subtitle={t('casino.highStakesNoLimit')}
               themeColor={currentLocation.theme.secondary}
               accentGlow={currentLocation.theme.accentGlow}
               iconName="cards-club"
-              badgeText="NO LIMIT VIP"
+              badgeText={translateCasinoBadge('NO LIMIT VIP')}
               onPress={() =>
-                actions.handleGamePress('PokerGame', { title: "Texas Hold'em" })
+                actions.handleGamePress('PokerGame', { title: t('casino.texasHoldem') })
               }
             />
           </View>
@@ -281,6 +340,15 @@ const CasinoScreen: React.FC = () => {
           onSelectLocation={actions.setCurrentLocationId}
         />
       </View>
+
+      {/* The refusal, in words. See handleVipPress. */}
+      <ConfirmPanel
+        visible={!!vipPanel}
+        title={t('casino.vipTitle')}
+        summary={vipPanel || ''}
+        confirmLabel="OK"
+        onCancel={() => setVipPanel(null)}
+      />
     </View>
   );
 };
@@ -288,6 +356,30 @@ const CasinoScreen: React.FC = () => {
 export default CasinoScreen;
 
 const styles = StyleSheet.create({
+  /**
+   * Gold on near black, and the only control in the casino that is not tinted
+   * by the room it sits in. It belongs to the other room, not this one.
+   */
+  vipButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#EFC94C',
+    backgroundColor: 'rgba(239, 201, 76, 0.12)',
+    marginRight: 8,
+  },
+  /** Dimmed rather than recoloured: the label keeps its gold either way. */
+  vipButtonShut: { opacity: 0.45 },
+  vipButtonText: {
+    fontSize: 10.5,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+
   root: {
     flex: 1,
     backgroundColor: theme.colors.background,

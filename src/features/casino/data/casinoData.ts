@@ -32,10 +32,41 @@
 //  rooms would have been unreachable at any stake.
 // ============================================================================
 
+// ============================================================================
+//  AND THEN IT WAS SEVEN ROOMS TOO MANY AND TWO ROOMS TOO LONG
+// ============================================================================
+//
+//  Reported as "cut the reputation you need between casinos, it is absurdly
+//  hard to make progress, and take the ladder down to five".
+//
+//  Seven rooms at 0/100/500/900/1300/1700/2100, earned at MAX_REP_PER_QUARTER
+//  a quarter, is forty two quarters of maximum effort to reach the top - ten
+//  and a half years of turning up, in a game whose whole run is about two
+//  hundred quarters. The reasoning above is right about WHY the rungs widen;
+//  it was wrong about how far apart they should be.
+//
+//  Five rooms now: a humble start, a regional house, the American spectacle,
+//  the European one, and the summit. LONDON and SINGAPORE are SHELVED rather
+//  than deleted, in place below.
+//
+//      Athens        0        the door
+//      Istanbul     60        1.2 quarters
+//      Las Vegas   180        3.6
+//      Monte Carlo 360        7.2
+//      Macau       600       12      about three years
+//
+//  Three years to the top instead of ten and a half, and each gate still
+//  costs more than the one before it.
+// ============================================================================
+
 export type LocationId =
   | 'athens'
   | 'istanbul'
   | 'las_vegas'
+  /** The VIP room. Not on the ladder at all - see data/vipRoom.ts. */
+  | 'vip_noir'
+  // SHELVED with the rooms themselves. The ids stay so an old save naming one
+  // still type checks on its way through.
   | 'london'
   | 'singapore'
   | 'monte_carlo'
@@ -59,9 +90,16 @@ export type CasinoLocation = {
   name: string;
   subTitle: string;
   requirement: number;
-  maxBet: number;
+  /**
+   * The share of the player's money one hand can cost here.
+   *
+   * Replaces a fixed `maxBet`, which could only ever be right for one
+   * bankroll. See casinoStakes.ts.
+   */
+  maxBetPercent: number;
+  /** And the floor under it, so a broke player can still sit down. */
+  minMaxBet: number;
   theme: CasinoTheme;
-  chips: number[];
   /**
    * The five faces its slot machines show, cheapest first.
    *
@@ -92,10 +130,10 @@ export type CasinoLocation = {
  * now asks for 2100, so the clamp had to move or Monte Carlo and Macau were
  * gated behind a number the game refused to let you reach.
  */
-export const REPUTATION_CEILING = 2500;
+export const REPUTATION_CEILING = 900;
 
 /** What the progress bar is a fraction OF. The last room, not a round number. */
-export const CASINO_LADDER_TOP = 2100;
+export const CASINO_LADDER_TOP = 600;
 
 // ============================================================================
 //  AND HOW FAST YOU CLIMB IT
@@ -165,7 +203,8 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
     name: 'Athens',
     subTitle: 'The Agora',
     requirement: 0,
-    maxBet: 1_000_000,
+    maxBetPercent: 0.005,
+    minMaxBet: 50_000,
     theme: {
       primary: '#05A8F6',
       secondary: '#EFC94C',
@@ -178,15 +217,15 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       icon: 'pillar',
       flag: '🇬🇷',
     },
-    chips: [1000, 5000, 10000, 50000],
     slotFaces: ['cash', 'wallet-outline', 'bank-outline', 'diamond-stone', 'pillar'] as const,
   },
   {
     id: 'istanbul',
     name: 'Istanbul',
     subTitle: 'Bosphorus Royale',
-    requirement: 100,
-    maxBet: 5_000_000,
+    requirement: 60,
+    maxBetPercent: 0.01,
+    minMaxBet: 250_000,
     theme: {
       primary: '#3FC9C0',
       secondary: '#FFA94D',
@@ -199,15 +238,15 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       icon: 'mosque',
       flag: '🇹🇷',
     },
-    chips: [50000, 100000, 500000, 2500000],
     slotFaces: ['cash-multiple', 'treasure-chest', 'star-circle', 'ring', 'mosque'] as const,
   },
   {
     id: 'las_vegas',
     name: 'Las Vegas',
     subTitle: 'Neon Palace',
-    requirement: 500,
-    maxBet: 25_000_000,
+    requirement: 180,
+    maxBetPercent: 0.02,
+    minMaxBet: 1_000_000,
     theme: {
       primary: '#C4B5FD',
       secondary: '#F09BD0',
@@ -220,57 +259,55 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       icon: 'dice-multiple',
       flag: '🇺🇸',
     },
-    chips: [100000, 500000, 2500000, 10000000],
     slotFaces: ['dice-5-outline', 'cash', 'bell-ring-outline', 'diamond-stone', 'dice-multiple'] as const,
   },
-  {
-    id: 'london',
-    name: 'London',
-    subTitle: 'The Crown Club',
-    requirement: 900,
-    maxBet: 100_000_000,
-    theme: {
-      primary: '#93A0F7',
-      secondary: '#EFC94C',
-      chipColor: '#93A0F7',
-      gradient: ['#6366F1', '#3730A3'],
-      bgGradient: ['#1C2038', '#1C242C', '#181A28'],
-      accentGlow: 'rgba(147, 160, 247, 0.25)',
-      badgeBg: 'rgba(147, 160, 247, 0.15)',
-      textColor: '#C7D2FE',
-      icon: 'crown',
-      flag: '🇬🇧',
-    },
-    chips: [500000, 2500000, 10000000, 50000000],
-    slotFaces: ['cash-multiple', 'watch', 'bank', 'ring', 'crown'] as const,
-  },
-  {
-    id: 'singapore',
-    name: 'Singapore',
-    subTitle: 'Marina Bay Heights',
-    requirement: 1300,
-    maxBet: 1_000_000_000,
-    theme: {
-      primary: '#4ADE80',
-      secondary: '#7DD3FC',
-      chipColor: '#4ADE80',
-      gradient: ['#10B981', '#065F46'],
-      bgGradient: ['#142B22', '#1C242C', '#13201B'],
-      accentGlow: 'rgba(74, 222, 128, 0.25)',
-      badgeBg: 'rgba(74, 222, 128, 0.15)',
-      textColor: '#86EFAC',
-      icon: 'city-variant',
-      flag: '🇸🇬',
-    },
-    chips: [2500000, 10000000, 50000000, 500000000],
-    slotFaces: ['cash', 'chip', 'bank-outline', 'diamond-stone', 'city-variant'] as const,
-  },
+  // {
+  // id: 'london',
+  // name: 'London',
+  // subTitle: 'The Crown Club',
+  // requirement: 900,
+  // maxBet: 100_000_000,
+  // theme: {
+  // primary: '#93A0F7',
+  // secondary: '#EFC94C',
+  // chipColor: '#93A0F7',
+  // gradient: ['#6366F1', '#3730A3'],
+  // bgGradient: ['#1C2038', '#1C242C', '#181A28'],
+  // accentGlow: 'rgba(147, 160, 247, 0.25)',
+  // badgeBg: 'rgba(147, 160, 247, 0.15)',
+  // textColor: '#C7D2FE',
+  // icon: 'crown',
+  // flag: '🇬🇧',
+  // },
+  // slotFaces: ['cash-multiple', 'watch', 'bank', 'ring', 'crown'] as const,
+  // },
+  // {
+  // id: 'singapore',
+  // name: 'Singapore',
+  // subTitle: 'Marina Bay Heights',
+  // requirement: 1300,
+  // maxBet: 1_000_000_000,
+  // theme: {
+  // primary: '#4ADE80',
+  // secondary: '#7DD3FC',
+  // chipColor: '#4ADE80',
+  // gradient: ['#10B981', '#065F46'],
+  // bgGradient: ['#142B22', '#1C242C', '#13201B'],
+  // accentGlow: 'rgba(74, 222, 128, 0.25)',
+  // badgeBg: 'rgba(74, 222, 128, 0.15)',
+  // textColor: '#86EFAC',
+  // icon: 'city-variant',
+  // flag: '🇸🇬',
+  // },
+  // slotFaces: ['cash', 'chip', 'bank-outline', 'diamond-stone', 'city-variant'] as const,
+  // },
   {
     id: 'monte_carlo',
     name: 'Monte Carlo',
     subTitle: 'Le Grand Casino',
-    requirement: 1700,
-    maxBet: 10_000_000_000,
+    requirement: 360,
+    maxBetPercent: 0.035,
+    minMaxBet: 5_000_000,
     theme: {
       primary: '#EFC94C',
       secondary: '#FFA94D',
@@ -283,15 +320,15 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       icon: 'diamond-stone',
       flag: '🇲🇨',
     },
-    chips: [10000000, 50000000, 500000000, 5000000000],
     slotFaces: ['cash-multiple', 'watch', 'treasure-chest', 'castle', 'diamond-stone'] as const,
   },
   {
     id: 'macau',
     name: 'Macau',
     subTitle: "Dragon's Ascendancy",
-    requirement: 2100,
-    maxBet: 100_000_000_000,
+    requirement: 600,
+    maxBetPercent: 0.05,
+    minMaxBet: 10_000_000,
     theme: {
       primary: '#FF8A8A',
       secondary: '#FFA94D',
@@ -304,7 +341,74 @@ export const CASINO_LOCATIONS: CasinoLocation[] = [
       icon: 'fire',
       flag: '🇲🇴',
     },
-    chips: [100000000, 1000000000, 10000000000, 50000000000],
     slotFaces: ['cash', 'treasure-chest', 'tower-fire', 'diamond-stone', 'fire'] as const,
   },
 ];
+
+// ============================================================================
+//  AND ONE ROOM THAT IS NOT ON THE LADDER AT ALL
+// ============================================================================
+//
+//  Asked for as "build a casino you can play with a percentage of your whole
+//  fortune, only people over ten billion get in, once every five quarters, and
+//  make it extremely premium: gold, black, silver and purple".
+//
+//  IT IS KEPT OUT OF `CASINO_LOCATIONS` ON PURPOSE. That array is the LADDER:
+//  every screen that draws a progress bar, a room list, an unlock check or a
+//  reputation gate walks it, and this room is gated by money and a cooldown
+//  rather than by standing. Putting it in the array would give it a
+//  `requirement` it does not have and a place on a bar it does not belong on.
+//
+//  It is a location in every other respect - the games, the chips, the header
+//  and the themes all take one - so it is the same shape, exported on its own.
+//  See data/vipRoom.ts for who gets in and what the stakes are.
+//
+//  THE LOOK. Gold on black with silver and violet, the palette that was asked
+//  for and the only one in this file that does not belong to a city. Every
+//  other room is somewhere; this one is a door in a corridor with no sign on
+//  it. The faces follow: no landmark, no flag, just the objects themselves.
+// ============================================================================
+
+export const VIP_LOCATION: CasinoLocation = {
+  id: 'vip_noir',
+  name: 'Noir',
+  subTitle: 'By Invitation',
+  // Not on the ladder. Zero rather than a large number so that a screen which
+  // reads it by accident lets the player in rather than locking a room they
+  // have already paid ten billion to see.
+  requirement: 0,
+  // The stakes here are FOUR shares of everything, up to all of it, so these
+  // two exist only to satisfy the same type as every other room.
+  // See vipRoom.VIP_BET_FRACTIONS.
+  maxBetPercent: 1,
+  minMaxBet: 1_000_000_000,
+  theme: {
+    primary: '#EFC94C',
+    secondary: '#C4B5FD',
+    chipColor: '#D8D8DE',
+    gradient: ['#EFC94C', '#8C7318'],
+    // Nearly black, and darker than anywhere else in the game. That is the
+    // whole effect: the gold has to be the only thing lit.
+    bgGradient: ['#14100A', '#0E0E12', '#12101A'],
+    accentGlow: 'rgba(239, 201, 76, 0.30)',
+    badgeBg: 'rgba(239, 201, 76, 0.12)',
+    textColor: '#F5E6A8',
+    icon: 'crown-outline',
+    flag: '',
+  },
+  slotFaces: ['silverware-variant', 'watch', 'diamond-stone', 'chess-king', 'crown-outline'] as const,
+};
+
+// ============================================================================
+//  SHELVED: THE TWO ROOMS THAT CAME OUT
+// ============================================================================
+//  London (The Crown Club) and Singapore (Marina Bay Heights) are commented
+//  out in place inside the array rather than deleted. Asked for as "take the
+//  casino down to five", and the rest of that sentence was "we are going to
+//  rework the whole thing anyway, treat this as preparation" - so the themes,
+//  the slot faces and the copy are all still there to be picked back up.
+//
+//  Bringing one back is: uncomment it, and give it a `requirement`, a
+//  `maxBetPercent` and a `minMaxBet` between its neighbours. Nothing reads the
+//  list by length or by index.
+// ============================================================================

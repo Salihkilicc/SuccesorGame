@@ -170,11 +170,21 @@ const roomRequirement = (id: string, fallback: number): number => {
     }
 };
 
-/** Macau, the seventh room, and the only one worth a title. */
-export const MACAU_REPUTATION = roomRequirement('macau', 2100);
+/** Macau, the last room, and the only one worth a title. */
+export const MACAU_REPUTATION = roomRequirement('macau', 600);
 
-/** London, the fourth. Far enough in to be a habit rather than an evening. */
-export const HIGH_ROLLER_REPUTATION = roomRequirement('london', 900);
+/**
+ * The room before it. Far enough in to be a habit rather than an evening.
+ *
+ * It used to be London, and London has been SHELVED with the ladder's cut
+ * from seven rooms to five - so this pointed at a room that no longer exists
+ * and silently fell through to its hardcoded 900, which is now ABOVE Macau's
+ * own gate. The high roller title would have arrived after the Macau one, or
+ * never. A test caught it; nothing on screen would have.
+ *
+ * Anchored to Monte Carlo now, which is the room London used to be.
+ */
+export const HIGH_ROLLER_REPUTATION = roomRequirement('monte_carlo', 360);
 
 /** More children than most people have relatives. */
 export const LARGE_FAMILY = 20;

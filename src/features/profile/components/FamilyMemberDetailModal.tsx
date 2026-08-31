@@ -23,6 +23,13 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { PartnerProfile, Child } from '../../../core/store/useFamilyStore';
+import { t, useLocale } from '../../../core/i18n';
+import {
+    translateSocialClass,
+    translateOccupation,
+    translateEducationLevel,
+    translateTrait,
+} from '../../../data/i18n/profileLoveShopText';
 
 export type SelectedMember =
     | { type: 'partner'; data: PartnerProfile }
@@ -53,6 +60,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
     onDesignateSuccessor,
     onAdjustAllowance,
 }) => {
+    useLocale();
     if (!member) return null;
 
     const isPartner = member.type === 'partner';
@@ -79,7 +87,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                     {/* Modal Top Bar */}
                     <View style={styles.topBar}>
                         <Text style={styles.topBarTitle}>
-                            {isPartner ? 'PARTNER' : 'FAMILY MEMBER'}
+                            {isPartner ? t('partner.dossier') : t('family.familyMember')}
                         </Text>
                         <Pressable style={styles.closeBtn} onPress={onClose}>
                             <MaterialCommunityIcons name="close" size={20} color={theme.colors.textPrimary} />
@@ -99,8 +107,8 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                 <Text style={styles.memberName}>{name}</Text>
                                 <Text style={styles.memberSub}>
                                     {isPartner
-                                        ? `${partner!.stats.occupation} • Age ${partner!.stats.age}`
-                                        : `${child!.role} • Age ${child!.age} (${child!.educationLevel})`}
+                                        ? `${translateOccupation(partner!.stats.occupation)} • ${t('family.age', { age: String(partner!.stats.age) })}`
+                                        : `${child!.role} • ${t('family.age', { age: String(child!.age) })} (${translateEducationLevel(child!.educationLevel)})`}
                                 </Text>
                             </View>
                             <View style={styles.badgesCol}>
@@ -108,7 +116,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                     <>
                                         <View style={styles.socialBadge}>
                                             <Text style={styles.socialBadgeText}>
-                                                {partner!.stats.socialClass.toUpperCase()}
+                                                {translateSocialClass(partner!.stats.socialClass).toUpperCase()}
                                             </Text>
                                         </View>
                                         <View
@@ -123,14 +131,14 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                                     partner!.isMarried && styles.marriedBadgeText,
                                                 ]}
                                             >
-                                                {partner!.isMarried ? 'MARRIED' : 'DATING'}
+                                                {partner!.isMarried ? t('partner.married').toUpperCase() : t('partner.dating').toUpperCase()}
                                             </Text>
                                         </View>
                                     </>
                                 ) : (
                                     isDesignatedSuccessor && (
                                         <View style={styles.primaryHeirBadge}>
-                                            <Text style={styles.primaryHeirText}>PRIMARY SUCCESSOR</Text>
+                                            <Text style={styles.primaryHeirText}>{t('family.primarySuccessor')}</Text>
                                         </View>
                                     )
                                 )}
@@ -141,7 +149,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                         <View style={styles.sectionCard}>
                             <View style={styles.sectionHeaderRow}>
                                 <Text style={styles.sectionTitle}>
-                                    {isPartner ? 'AFFECTION & DEVOTION' : 'FAMILY BOND'}
+                                    {isPartner ? t('partner.affectionDevotion') : t('family.familyBond')}
                                 </Text>
                                 <Text style={styles.meterValueText}>
                                     {isPartner ? partner!.love : child!.relationshipWithPlayer}%
@@ -167,34 +175,34 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                             <>
                                 {/* Deep Psychometrics Grid */}
                                 <View style={styles.sectionCard}>
-                                    <Text style={styles.sectionTitle}>PSYCHOMETRICS & TRAITS</Text>
+                                    <Text style={styles.sectionTitle}>{t('partner.psychometrics')}</Text>
                                     <View style={styles.statsGrid}>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>CRAZY</Text>
+                                            <Text style={styles.statTileLabel}>{t('partner.crazy')}</Text>
                                             <Text style={[styles.statTileValue, { color: '#E5983B' }]}>
                                                 {partner.stats.crazy}%
                                             </Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>JEALOUSY</Text>
+                                            <Text style={styles.statTileLabel}>{t('partner.jealousy')}</Text>
                                             <Text style={[styles.statTileValue, { color: '#05A8F6' }]}>
                                                 {partner.stats.jealousy}%
                                             </Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>LOOKS</Text>
+                                            <Text style={styles.statTileLabel}>{t('partner.looks')}</Text>
                                             <Text style={styles.statTileValue}>{partner.stats.looks}</Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>INTELLIGENCE</Text>
+                                            <Text style={styles.statTileLabel}>{t('partner.intelligence')}</Text>
                                             <Text style={styles.statTileValue}>{partner.stats.intelligence}</Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>WEALTH</Text>
+                                            <Text style={styles.statTileLabel}>{t('partner.wealth')}</Text>
                                             <Text style={styles.statTileValue}>{partner.stats.familyWealth}</Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>LIBIDO</Text>
+                                            <Text style={styles.statTileLabel}>{t('partner.libido')}</Text>
                                             <Text style={styles.statTileValue}>{partner.stats.libido}%</Text>
                                         </View>
                                     </View>
@@ -204,9 +212,9 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                 {partner.finances && (
                                     <View style={styles.sectionCard}>
                                         <View style={styles.rowBetween}>
-                                            <Text style={styles.sectionTitle}>MONTHLY UPKEEP</Text>
+                                            <Text style={styles.sectionTitle}>{t('partner.monthlyUpkeep')}</Text>
                                             <Text style={styles.upkeepValue}>
-                                                ${partner.finances.monthlyCost.toLocaleString()} / mo
+                                                {t('partner.monthlyCost', { cost: partner.finances.monthlyCost.toLocaleString() })}
                                             </Text>
                                         </View>
                                     </View>
@@ -214,7 +222,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
 
                                 {/* Partner Interaction Buttons */}
                                 <View style={styles.actionsContainer}>
-                                    <Text style={styles.sectionTitle}>INTERACTIONS</Text>
+                                    <Text style={styles.sectionTitle}>{t('partner.interactions')}</Text>
                                     <View style={styles.actionButtonsCol}>
                                         {onDatePartner && (
                                             <Pressable
@@ -222,10 +230,10 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                                 onPress={() => {
                                                     onDatePartner();
                                                     onClose();
-                                                }}
+                                                 }}
                                             >
                                                 <MaterialCommunityIcons name="glass-cocktail" size={18} color="#05A8F6" />
-                                                <Text style={styles.btnSurfaceText}>Exclusive Date Night ($2.5k)</Text>
+                                                <Text style={styles.btnSurfaceText}>{t('partner.exclusiveDateNight')}</Text>
                                             </Pressable>
                                         )}
 
@@ -238,7 +246,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                                 }}
                                             >
                                                 <MaterialCommunityIcons name="gift-outline" size={18} color="#05A8F6" />
-                                                <Text style={styles.btnSurfaceText}>Send Luxury Gift ($15k)</Text>
+                                                <Text style={styles.btnSurfaceText}>{t('partner.sendLuxuryGift')}</Text>
                                             </Pressable>
                                         )}
 
@@ -251,7 +259,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                                 }}
                                             >
                                                 <MaterialCommunityIcons name="ring" size={18} color="#FBBF24" />
-                                                <Text style={styles.btnAmberText}>Propose Marriage</Text>
+                                                <Text style={styles.btnAmberText}>{t('partner.proposeMarriage')}</Text>
                                             </Pressable>
                                         )}
 
@@ -265,7 +273,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                             >
                                                 <MaterialCommunityIcons name="heart-broken" size={18} color={theme.colors.textSecondary} />
                                                 <Text style={styles.btnDestructiveText}>
-                                                    {partner.isMarried ? 'File for Divorce' : 'Break Up'}
+                                                    {partner.isMarried ? t('partner.fileForDivorce') : t('partner.breakUp')}
                                                 </Text>
                                             </Pressable>
                                         )}
@@ -281,36 +289,36 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                             <>
                                 {/* Succession Aptitude Stats */}
                                 <View style={styles.sectionCard}>
-                                    <Text style={styles.sectionTitle}>SUCCESSION SUITABILITY</Text>
+                                    <Text style={styles.sectionTitle}>{t('family.successionSuitability')}</Text>
                                     <View style={styles.statsGrid}>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>BUSINESS ACUMEN</Text>
+                                            <Text style={styles.statTileLabel}>{t('family.businessAcumen')}</Text>
                                             <Text style={[styles.statTileValue, { color: '#E5983B' }]}>
                                                 {child.stats.businessAcumen}
                                             </Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>INTELLECT</Text>
+                                            <Text style={styles.statTileLabel}>{t('family.intellect')}</Text>
                                             <Text style={[styles.statTileValue, { color: '#05A8F6' }]}>
                                                 {child.stats.intellect}
                                             </Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>AMBITION</Text>
+                                            <Text style={styles.statTileLabel}>{t('family.ambition')}</Text>
                                             <Text style={[styles.statTileValue, { color: '#05A8F6' }]}>
                                                 {child.stats.ambition}
                                             </Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>CHARM</Text>
+                                            <Text style={styles.statTileLabel}>{t('family.charm')}</Text>
                                             <Text style={styles.statTileValue}>{child.stats.charm}</Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>LOYALTY</Text>
+                                            <Text style={styles.statTileLabel}>{t('family.loyalty')}</Text>
                                             <Text style={styles.statTileValue}>{child.stats.loyalty}</Text>
                                         </View>
                                         <View style={styles.statTile}>
-                                            <Text style={styles.statTileLabel}>HEALTH</Text>
+                                            <Text style={styles.statTileLabel}>{t('family.health')}</Text>
                                             <Text style={styles.statTileValue}>{child.stats.health}</Text>
                                         </View>
                                     </View>
@@ -319,11 +327,11 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                 {/* Traits List */}
                                 {child.traits && child.traits.length > 0 && (
                                     <View style={styles.sectionCard}>
-                                        <Text style={styles.sectionTitle}>SPECIAL TRAITS</Text>
+                                        <Text style={styles.sectionTitle}>{t('family.specialTraits')}</Text>
                                         <View style={styles.traitsWrap}>
                                             {child.traits.map((trait, index) => (
                                                 <View key={index} style={styles.traitChip}>
-                                                    <Text style={styles.traitText}>{trait}</Text>
+                                                    <Text style={styles.traitText}>{translateTrait(trait)}</Text>
                                                 </View>
                                             ))}
                                         </View>
@@ -334,7 +342,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                 <View style={styles.sectionCard}>
                                     <View style={styles.rowBetween}>
                                         <View>
-                                            <Text style={styles.sectionTitle}>QUARTERLY SUPPORT</Text>
+                                            <Text style={styles.sectionTitle}>{t('family.quarterlySupport')}</Text>
                                             <Text style={styles.allowanceValue}>
                                                 ${child.allowance.toLocaleString()}
                                             </Text>
@@ -360,7 +368,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
 
                                 {/* Child Interaction Buttons */}
                                 <View style={styles.actionsContainer}>
-                                    <Text style={styles.sectionTitle}>DYNASTY ACTIONS</Text>
+                                    <Text style={styles.sectionTitle}>{t('family.dynastyActions')}</Text>
                                     <View style={styles.actionButtonsCol}>
                                         {onDesignateSuccessor && !isDesignatedSuccessor && (
                                             <Pressable
@@ -371,7 +379,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                                                 }}
                                             >
                                                 <MaterialCommunityIcons name="crown" size={18} color="#FBBF24" />
-                                                <Text style={styles.btnAmberText}>Designate as Primary Successor</Text>
+                                                <Text style={styles.btnAmberText}>{t('family.designateSuccessor')}</Text>
                                             </Pressable>
                                         )}
                                     </View>

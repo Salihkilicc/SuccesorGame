@@ -105,6 +105,61 @@ export const ENDINGS: Record<string, Ending> = {
     },
 
     // ----------------------------------------------------------------------
+    //  YOU BROKE IT SO YOU COULD BUY IT
+    // ----------------------------------------------------------------------
+    //  The ending the player asked for, in their words: "either close the
+    //  route, or let them go to prison for it." See core/story/manipulation.ts
+    //  for how it is proved, which is the part that took the thinking.
+    //
+    //  There is no moment of being caught in this, and that is the whole
+    //  design of it. The purchase was legal on the day. What convicts is the
+    //  RECOVERY - the company coming back proves there was never anything
+    //  wrong with it - so the ending has to be about time passing rather than
+    //  about a door being kicked in.
+    //
+    //  It also has to avoid telling the player off. They found a hole in a
+    //  simulation and used it, which is a reasonable thing to do to a
+    //  simulation. So the prose stays with procedure and with the one thing
+    //  that is actually sad here: it worked, and the working is the evidence.
+    // ----------------------------------------------------------------------
+    convictedOfManipulation: {
+        id: 'convictedOfManipulation',
+        title: 'THE RECOVERY WAS THE EVIDENCE',
+        body:
+            'Nobody stopped you at the time. The purchase cleared, the register '
+            + 'was amended, and for two years you ran a company you had bought at '
+            + 'the bottom of its own collapse.\n\n'
+            + 'Then it recovered. Quickly, and completely, and in front of '
+            + 'everyone. A company that comes back that fast was never as broken '
+            + 'as its share price said, and the only person who could have known '
+            + 'that in advance is the one who bought.\n\n'
+            + 'The file took eleven months to build and forty minutes to read '
+            + 'out. What you notice, sitting there, is that none of it is '
+            + 'disputed. Every figure in the indictment is one of yours.',
+    },
+
+    // ----------------------------------------------------------------------
+    //  THE SAME CASE, SURVIVED
+    // ----------------------------------------------------------------------
+    //  Not an ending in the strict sense - the dynasty continues - but it uses
+    //  the same door the board already uses to remove a chief executive,
+    //  because being barred from the chair is exactly that with a different
+    //  reason attached.
+    // ----------------------------------------------------------------------
+    barredForManipulation: {
+        id: 'barredForManipulation',
+        title: 'BARRED FROM THE CHAIR',
+        body:
+            'The settlement is agreed on a Thursday and announced on a Friday, '
+            + 'which is how these things are announced.\n\n'
+            + 'No admission, no conviction, and a bar on holding a directorship '
+            + 'that runs longer than you will want to count. You keep the shares. '
+            + 'You keep the house. What you are not allowed to do, ever again, is '
+            + 'sit in the chair your father sat in.\n\n'
+            + 'Somebody else will run it now. You will be able to watch.',
+    },
+
+    // ----------------------------------------------------------------------
     //  THE MONEY RAN OUT
     // ----------------------------------------------------------------------
     //  This was 'gameover.bankruptBody' and it read, in full: "The money ran

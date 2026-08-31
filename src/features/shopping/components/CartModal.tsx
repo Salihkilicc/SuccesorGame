@@ -19,6 +19,7 @@ import { theme } from '../../../core/theme';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { t, useLocale } from '../../../core/i18n';
 
 interface CartModalProps {
     visible: boolean;
@@ -49,6 +50,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     onClose,
     onProceedToCheckout,
 }) => {
+    useLocale();
     const { cart, removeFromCart } = useAssetStore();
     const { money } = useStatsStore();
 
@@ -64,8 +66,8 @@ export const CartModal: React.FC<CartModalProps> = ({
 
         if (!canAfford) {
             Alert.alert(
-                'Insufficient Funds',
-                `You need $${(orderTotal - money).toLocaleString()} more to complete this acquisition.`,
+                t('shop.insufficientFunds'),
+                t('shop.insufficientFundsDesc', { needed: (orderTotal - money).toLocaleString() }),
             );
             return;
         }
@@ -87,7 +89,7 @@ export const CartModal: React.FC<CartModalProps> = ({
             <View style={styles.container}>
                 {/* Official Game Screen Header */}
                 <ScreenHeader
-                    title="ACQUISITION CART"
+                    title={t('shop.cartTitle')}
                     subtitle="ORDER REVIEW & SETTLEMENT"
                     category="company"
                     onBack={onClose}
@@ -123,7 +125,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                                     <View style={styles.itemThumbnail}>
                                         <MaterialCommunityIcons
                                             name={getCategoryIcon(item.category)}
-                                            size={22}
+                                            size={20}
                                             color="#05A8F6"
                                         />
                                     </View>
@@ -162,22 +164,22 @@ export const CartModal: React.FC<CartModalProps> = ({
                             <Text style={styles.summaryTitle}>ACQUISITION BREAKDOWN</Text>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Subtotal ({cart.length} items):</Text>
+                                <Text style={styles.summaryLabel}>{t('shop.subtotal')} ({cart.length}):</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(subtotal)}</Text>
                             </View>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Armored Logistics & Vault Escort:</Text>
+                                <Text style={styles.summaryLabel}>{t('shop.shippingEscort')}:</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(shippingCost)}</Text>
                             </View>
 
                             <View style={styles.summaryRow}>
-                                <Text style={styles.summaryLabel}>Luxury Duty / Tax (8%):</Text>
+                                <Text style={styles.summaryLabel}>{t('shop.luxuryTax')}:</Text>
                                 <Text style={styles.summaryValue}>{formatCurrency(luxuryTax)}</Text>
                             </View>
 
                             <View style={styles.totalRow}>
-                                <Text style={styles.totalLabel}>TOTAL ACQUISITION COST</Text>
+                                <Text style={styles.totalLabel}>{t('shop.totalAcquisition')}</Text>
                                 <Text style={styles.totalValue}>{formatCurrency(orderTotal)}</Text>
                             </View>
                         </View>
@@ -200,7 +202,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                             onPress={handleProceedToCheckout}
                         >
                             <Text style={styles.checkoutButtonText}>
-                                {canAfford ? 'AUTHORIZE TRANSFER' : 'INSUFFICIENT FUNDS'}
+                                {canAfford ? t('shop.checkout') : t('shop.insufficientFunds')}
                             </Text>
                         </Pressable>
                     </View>

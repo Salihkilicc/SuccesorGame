@@ -8,7 +8,7 @@ import { theme } from '../../../core/theme';
 import { useProductStore } from '../../../core/store/useProductStore';
 import { useLaboratoryStore } from '../../../core/store/useLaboratoryStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import { canUnlockAnotherCategory } from '../../../core/market/brand';
+import { canUnlockAnotherCategory, CATEGORY_UNLOCK_BRAND } from '../../../core/market/brand';
 import { getTier } from '../../../core/market/capacity';
 import { UnlockableProduct, ProductCategory } from '../data/unlockableProductsData';
 import { ProductUnlockModal } from '../components';
@@ -89,6 +89,66 @@ const TechTreeScreen = () => {
                 contentContainerStyle={{ paddingBottom: 150 }}
                 showsVerticalScrollIndicator={false}
             >
+                {/* ------------------------------------------------------------
+                    THE GATE, ONE MARKET PER LINE
+
+                    The corporate brand on the home screen is a WEIGHTED
+                    AVERAGE over the markets you trade in, and this gate reads
+                    the WEAKEST one. Those are never the same number and the
+                    average is always the kinder of the two, so the figure the
+                    player checked could not tell them whether the gate was
+                    open. Worse, opening a second market DROPS the average
+                    while the gate is unmoved, which reads as the brand
+                    collapsing for no reason.
+
+                    So the average is not shown here at all. Every market gets
+                    its own line and its own distance to the bar, and the one
+                    holding you back is named.
+                   ------------------------------------------------------------ */}
+                {activeCategories.length > 0 && (
+                    <View style={styles.gatePanel}>
+                        <View style={styles.gatePanelHead}>
+                            <Text style={styles.gatePanelTitle}>{t('product.gatePanelTitle')}</Text>
+                            <Text style={styles.gatePanelBar}>
+                                {t('product.gatePanelBar', { v1: CATEGORY_UNLOCK_BRAND })}
+                            </Text>
+                        </View>
+
+                        {activeCategories.map(cat => {
+                            const points = Math.round((brandByCategory || {})[cat] || 0);
+                            const cleared = !!(gateClearedByCategory || {})[cat];
+                            const done = cleared || points >= CATEGORY_UNLOCK_BRAND;
+                            const fill = Math.min(100, (points / CATEGORY_UNLOCK_BRAND) * 100);
+                            return (
+                                <View key={cat} style={styles.gateRow}>
+                                    <Text style={styles.gateRowName} numberOfLines={1}>{cat}</Text>
+                                    <View style={styles.gateTrack}>
+                                        {/* Blue when it is there, brand orange while it
+                                            climbs. Neither is green: clearing a gate is
+                                            not a profit (theme rule 4). */}
+                                        <View style={[styles.gateFill, {
+                                            width: `${fill}%`,
+                                            backgroundColor: done ? theme.colors.primary : theme.colors.brand,
+                                        }]} />
+                                    </View>
+                                    <Text style={[styles.gateRowValue, done && styles.gateRowValueDone]}>
+                                        {done ? t('product.gateRowCleared') : `${points}`}
+                                    </Text>
+                                </View>
+                            );
+                        })}
+
+                        <Text style={styles.gatePanelFoot}>
+                            {gate.allowed
+                                ? t('product.gatePanelOpen')
+                                : t('product.gatePanelShut', {
+                                    v1: gate.weakest || '',
+                                    v2: Math.max(0, Math.round(gate.required - gate.have)),
+                                })}
+                        </Text>
+                    </View>
+                )}
+
                 {categories.map((category) => {
                     const products = groupedProducts[category] || [];
                     if (products.length === 0) return null;
@@ -397,6 +457,75 @@ const styles = StyleSheet.create({
         color: theme.colors.warning,
         fontSize: 11.5,
         lineHeight: 16,
+    },
+
+    // ---- the category gate panel ----
+    gatePanel: {
+        marginHorizontal: theme.spacing.lg,
+        marginTop: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        padding: 12,
+        borderRadius: 14,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+    },
+    gatePanelHead: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    gatePanelTitle: {
+        color: theme.colors.textPrimary,
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+    },
+    gatePanelBar: {
+        color: theme.colors.brandMuted,
+        fontSize: 10.5,
+        fontWeight: '700',
+    },
+    gateRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 6,
+    },
+    gateRowName: {
+        width: 78,
+        color: theme.colors.textSecondary,
+        fontSize: 11,
+    },
+    gateTrack: {
+        flex: 1,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        overflow: 'hidden',
+    },
+    gateFill: {
+        height: '100%',
+        borderRadius: 3,
+    },
+    gateRowValue: {
+        width: 62,
+        textAlign: 'right',
+        color: theme.colors.brand,
+        fontSize: 11.5,
+        fontWeight: '800',
+    },
+    /** Cleared reads in the accent, not the brand orange, so it stops being a
+     *  number you are still chasing. */
+    gateRowValueDone: {
+        color: theme.colors.primary,
+    },
+    gatePanelFoot: {
+        marginTop: 9,
+        color: theme.colors.textMuted,
+        fontSize: 10.5,
+        lineHeight: 15,
     },
 });
 

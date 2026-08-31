@@ -67,7 +67,7 @@ describe('every ending is a record in this file', () => {
         }
     });
 
-    it('and the eight that exist are the eight that can happen', () => {
+    it('and the ten that exist are the ten that can happen', () => {
         // Reachability checks that every `ending` EFFECT names a real record.
         // Nothing checked the other direction, and an ending nobody can reach
         // is writing that will never be read.
@@ -76,8 +76,13 @@ describe('every ending is a record in this file', () => {
         // runMortality.ts picks between them - so they would be invisible to
         // that audit in both directions. This list is the only thing that
         // sees them.
+        // The two manipulation verdicts are named by core/story/
+        // runManipulation.ts, which is a third decider alongside the story
+        // effects and the tick.
         expect(Object.keys(ENDINGS).sort()).toEqual([
+            'barredForManipulation',
             'boughtPear',
+            'convictedOfManipulation',
             'diedInOffice',
             'diedWithHeirTooYoung',
             'diedWithoutAnHeir',

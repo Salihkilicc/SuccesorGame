@@ -29,7 +29,23 @@ import { useStoryStore, initialStoryState } from '../store/useStoryStore';
 import { useCorporateFinanceStore } from '../../features/finance/stores/useCorporateFinanceStore';
 import { gameSink } from '../story/gameSink';
 import { readWorld } from '../story/world';
-import { quoteDivestiture, DIVESTITURE_DISCOUNT } from './mergers';
+import { quoteDivestiture, divestitureDiscount, DIVESTITURE_LOCK_QUARTERS } from './mergers';
+
+/**
+ * Move a holding past the two quarter lock.
+ *
+ * A subsidiary cannot be sold at all in its first two quarters now, so every
+ * test below that buys and then sells has to age the deal the way the tick
+ * does. See core/market/mergers.ts -> divestitureLock.
+ */
+const age = (id: string, quarters = DIVESTITURE_LOCK_QUARTERS + 6) => {
+    useCorporateFinanceStore.setState(st => ({
+        subsidiaries: (st.subsidiaries as any[]).map(s =>
+            s.id === id && s.deal
+                ? { ...s, deal: { ...s.deal, quartersSinceClose: quarters } }
+                : s),
+    }) as any);
+};
 import { testAll } from '../story/conditions';
 import {
     portfolioVultureEvent, VULTURE_MULTIPLE, PEAR_MULTIPLE, SQUEEZE_THRESHOLD,
@@ -63,6 +79,7 @@ describe('the story can see what the player holds', () => {
         // The whole reason `owns` is a condition and not a flag.
         fresh();
         buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        age('tech_skynet');
         useCorporateFinanceStore.getState().sellSubsidiary('tech_skynet');
         expect(readWorld().subsidiaries).not.toContain('tech_skynet');
     });
@@ -89,6 +106,10 @@ describe('the money that arrives is the money the letter promised', () => {
     it('the fund pays its number, not the market number', () => {
         fresh();
         buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        // Aged past the lock so there IS a market price to be worse than. A
+        // locked holding quotes zero, and "worse than nothing" is not the
+        // comparison this test is about.
+        age('tech_skynet');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
         const quote = quoteDivestiture(sub.deal);
         const before = useStatsStore.getState().companyCapital ?? 0;
@@ -104,6 +125,7 @@ describe('the money that arrives is the money the letter promised', () => {
     it('and Pear pays more than a market sale would, which is also the point', () => {
         fresh();
         buy('tech_streamify', 'Streamify', 1_240_000_000, 'Medium');
+        age('tech_streamify');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
         const quote = quoteDivestiture(sub.deal);
         const before = useStatsStore.getState().companyCapital ?? 0;
@@ -120,6 +142,7 @@ describe('the money that arrives is the money the letter promised', () => {
         // meant before this prompt: fair value less the divestiture discount.
         fresh();
         buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        age('tech_skynet');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
         const quote = quoteDivestiture(sub.deal);
         const before = useStatsStore.getState().companyCapital ?? 0;
@@ -128,7 +151,10 @@ describe('the money that arrives is the money the letter promised', () => {
 
         const got = (useStatsStore.getState().companyCapital ?? 0) - before;
         expect(got).toBeCloseTo(quote.proceeds, 0);
-        expect(got).toBeCloseTo(quote.currentFairValue * (1 - DIVESTITURE_DISCOUNT), 0);
+        // The commission is a schedule now rather than one number, so this
+        // asks for the rate that applies to THIS holding's age.
+        expect(got).toBeCloseTo(
+            quote.currentFairValue * (1 - divestitureDiscount(sub.deal.quartersSinceClose)), 0);
     });
 
     it('and the company leaves the portfolio either way', () => {

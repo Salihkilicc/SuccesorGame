@@ -3,41 +3,40 @@ import { useState, useRef, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
+import { casinoAlert } from '../../../data/i18n/casinoText';
+import {
+    dealerPlay,
+    freshDeck,
+    handValue,
+    settle,
+    shuffle,
+    type Card,
+} from '../../../core/casino/blackjack';
 
 // --- TİPLER VE SABİTLER ---
-export type Card = {
-    rank: string;
-    suit: string;
-    value: number;
-};
+/**
+ * Re-exported rather than re-declared.
+ *
+ * This file had its own `Card` shape - `rank: string` - beside the engine's
+ * `rank: Rank`, which is the looser of the two and would have let a typo
+ * through. One definition, in the file that knows what a card is worth.
+ */
+export type { Card } from '../../../core/casino/blackjack';
 
 type RoundState = 'idle' | 'player' | 'done';
 
-const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'] as const;
-const SUITS = ['♠', '♥', '♦', '♣'] as const;
-
-// Helper: Kart Değeri
-const rankValue = (rank: string) => {
-    if (rank === 'A') return 11;
-    if (['K', 'Q', 'J'].includes(rank)) return 10;
-    return parseInt(rank, 10);
-};
-
-// Helper: Deste Oluştur
-const createDeck = (): Card[] => {
-    const deck: Card[] = [];
-    SUITS.forEach(suit => {
-        RANKS.forEach(rank => {
-            deck.push({ rank, suit, value: rankValue(rank) });
-        });
-    });
-    // Fisher-Yates Shuffle
-    for (let i = deck.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-    return deck;
-};
+// ============================================================================
+//  THE RULES LIVE IN core/casino/blackjack.ts NOW
+// ============================================================================
+//  The deck, the shuffle, the ace demotion and the dealer's draw were all in
+//  this file, and none of them could be tested: the shuffle was inline in a
+//  handler and the dealer's whole hand was a `while` loop inside `stand`.
+//
+//  The dealer's draw mattered most. It returned only the finished hand, so the
+//  screen had no way to lay the cards down one at a time - a dealer who
+//  arrives at nineteen instantly is a number appearing, not a dealer.
+//  `dealerPlay` returns the cards IN ORDER now.
+// ============================================================================
 
 // Helper: Sayı Sınırlama
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
@@ -57,18 +56,16 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
     const [status, setStatus] = useState('Place your bet and deal.');
     const [resultPopup, setResultPopup] = useState<{ type: 'win' | 'loss' | 'push', amount: number } | null>(null);
     const lossStreak = useRef(0);
+    /**
+     * How many cards the dealer drew on the last stand.
+     *
+     * The table staggers them so they arrive one at a time; without it the
+     * dealer goes from two cards to five in a single frame.
+     */
+    const [dealerDrawn, setDealerDrawn] = useState(0);
 
-    // --- HESAPLAMA FONKSİYONLARI ---
-    const calculateHand = (cards: Card[]) => {
-        let total = cards.reduce((sum, card) => sum + card.value, 0);
-        let aces = cards.filter(card => card.rank === 'A').length;
-        while (total > 21 && aces > 0) {
-            total -= 10;
-            aces -= 1;
-        }
-        const isBlackjack = cards.length === 2 && total === 21;
-        return { total, isBlackjack };
-    };
+    /** See core/casino/blackjack.ts. */
+    const calculateHand = handValue;
 
     const playerTotal = useMemo(() => calculateHand(playerCards).total, [playerCards]);
     const dealerTotal = useMemo(() => calculateHand(dealerCards).total, [dealerCards]);
@@ -159,21 +156,21 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
             setResultPopup(null);
             if (roundState === 'player') return;
             if (bet <= 0) {
-                Alert.alert('Place Bet', 'Please place a bet on the table.');
+                casinoAlert('Place Bet', 'Please place a bet on the table.');
                 return;
             }
             if (money < bet) {
-                Alert.alert('Not enough cash', 'Lower your bet or build more bankroll.');
+                casinoAlert('Not enough cash', 'Lower your bet or build more bankroll.');
                 return;
             }
 
-            const freshDeck = createDeck();
-            const nextPlayer = [freshDeck.pop()!, freshDeck.pop()!];
-            const nextDealer = [freshDeck.pop()!, freshDeck.pop()!];
+            const dealt = shuffle(freshDeck());
+            const nextPlayer = [dealt.pop()!, dealt.pop()!];
+            const nextDealer = [dealt.pop()!, dealt.pop()!];
 
             setPlayerCards(nextPlayer);
             setDealerCards(nextDealer);
-            setDeck(freshDeck);
+            setDeck(dealt);
             setRoundState('player');
             setStatus('Your move: HIT or STAND.');
 
@@ -205,26 +202,16 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
 
         stand: () => {
             if (roundState !== 'player') return;
-            let nextDeck = [...deck];
-            let nextDealer = [...dealerCards];
 
-            // Krupiye 17 olana kadar çeker
-            while (calculateHand(nextDealer).total < 17) {
-                const draw = nextDeck.pop();
-                if (!draw) break;
-                nextDealer = [...nextDealer, draw];
-            }
+            // ONE CALL, and it hands back the cards IN ORDER so the table can
+            // lay them down one at a time. See core/casino/blackjack.ts.
+            const play = dealerPlay(dealerCards, deck);
+            setDealerCards(play.cards);
+            setDeck(play.deck);
+            setDealerDrawn(play.drawn.length);
 
-            setDealerCards(nextDealer);
-            setDeck(nextDeck);
-
-            const pTotal = calculateHand(playerCards).total;
-            const dTotal = calculateHand(nextDealer).total;
-
-            if (dTotal > 21) resolveRound('win');
-            else if (pTotal > dTotal) resolveRound('win');
-            else if (dTotal > pTotal) resolveRound('lose');
-            else resolveRound('push');
+            // And one call for who won, rather than four branches here.
+            resolveRound(settle(playerCards, play.cards, bet).outcome);
         },
 
         adjustBet: (delta: number) => {
@@ -246,6 +233,7 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
             resultPopup,
             playerTotal,
             dealerTotal,
+            dealerDrawn,
             money
         },
         actions

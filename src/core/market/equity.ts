@@ -649,13 +649,43 @@ export interface BuybackQuote {
     premiumPercent: number;
 }
 
+/**
+ * THE LAST DOOR ON THE CRASH AND BUY EXPLOIT.
+ *
+ * Reported as "I can wreck the company on purpose and then buy the shares
+ * cheaply". The BOARD stopped selling at the bottom of an engineered hole when
+ * `buyoutAsk` learned about the unaffected price - but this function did not,
+ * and it is the other way to increase your ownership: the company buys its own
+ * float and retires it, so your percentage rises without buying anything from
+ * anybody.
+ *
+ * MEASURED at the time, on a listed company with a four million share float:
+ *
+ *      healthy   $502.08 a share   retiring the whole float   $3,012.50M
+ *      q8          $0.95                                          $5.71M
+ *      q12         $0.14                                          $0.85M
+ *
+ * A three and a half thousand fold discount for breaking your own company. It
+ * does not hand you control on its own - the board's block is untouched - but
+ * it is the same trick through a different door and it was left open.
+ *
+ * So the same rule applies: a company does not get to retire its own stock at
+ * a price it engineered. `unaffectedPrice` is the reference from
+ * core/market/buyout.ts, and omitting it prices off spot exactly as before.
+ */
 export const quoteBuyback = (
     budget: number,
     currentPrice: number,
     totalShares: number,
     playerShares: number,
     publicShares: number,
+    unaffectedPrice: number = 0,
 ): BuybackQuote => {
+    // The higher of the ticker and what the stock was worth before the fall.
+    const spot = Math.max(0, currentPrice || 0);
+    const unaffected = Math.max(0, Number.isFinite(unaffectedPrice) ? unaffectedPrice : 0);
+    currentPrice = Math.max(spot, unaffected);
+
     if (!(currentPrice > 0) || publicShares <= 0 || budget <= 0) {
         return {
             shares: 0, averagePrice: currentPrice, totalCost: 0,

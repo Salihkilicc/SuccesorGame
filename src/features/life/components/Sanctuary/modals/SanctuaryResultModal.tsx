@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     },
     barFill: {
         height: '100%',
-        backgroundcolor: '#CFD0D2', // Green for enjoyment
+        backgroundColor: '#CFD0D2', // Green for enjoyment
     },
     statsContainer: {
         flexDirection: 'row',

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
+import { casinoAlert } from '../../../data/i18n/casinoText';
 
 // --- TİPLER ---
 export type Card = {
@@ -142,11 +143,11 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       // 1. AŞAMA: Kart Dağıt
       setResultPopup(null);
       if (baseBet <= 0) {
-        Alert.alert('Place Bet', 'The ante is required to play.');
+        casinoAlert('Place Bet', 'The ante is required to play.');
         return;
       }
       if (money < baseBet) {
-        Alert.alert('Not enough cash', 'You need ' + baseBet + ' to start.');
+        casinoAlert('Not enough cash', 'You need ' + baseBet + ' to start.');
         return;
       }
 
@@ -174,7 +175,7 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
       // 2. AŞAMA: Turn (Bahis 2x)
       // Uses baseBet as the increment unit
       if (money < baseBet) {
-        Alert.alert('Not enough cash', 'You need more funds to continue.');
+        casinoAlert('Not enough cash', 'You need more funds to continue.');
         return;
       }
       setField('money', money - baseBet);
@@ -191,7 +192,7 @@ export const usePokerLogic = (initialBet: number = 1000000) => {
     } else if (gamePhase === 'turn') {
       // 3. AŞAMA: River (Bahis 3x)
       if (money < baseBet) {
-        Alert.alert('Not enough cash', 'You need more funds to continue.');
+        casinoAlert('Not enough cash', 'You need more funds to continue.');
         return;
       }
       setField('money', money - baseBet);

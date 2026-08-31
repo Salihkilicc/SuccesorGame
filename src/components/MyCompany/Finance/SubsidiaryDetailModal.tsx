@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useCorporateFinanceStore, SubsidiaryStrategy } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { outlookOf } from '../../../core/market/subsidiaryStrategy';
 import { theme } from '../../../core/theme';
 import SellCompanyModal from '../Actions/SellCompanyModal';
 import { formatMoney } from '../../../core/utils';
@@ -201,6 +202,37 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                             </View>
                         </View>
 
+                        {/* ------------------------------------------------
+                            THE OUTLOOK
+
+                            Asked for as "make the threshold visible, but do
+                            not make it too obvious or it gets simple". So
+                            this is a WORD, not a number: it moves as the
+                            dials move, and the player learns the shape of the
+                            rule by walking into its edge. Printing "R&D needs
+                            4" would answer the question once and for every
+                            company at the same time.
+
+                            Live off the LOCAL strategy rather than the saved
+                            one, or it only tells you what you already did.
+                            See core/market/subsidiaryStrategy.ts.
+                           ------------------------------------------------ */}
+                        {(() => {
+                            const outlook = outlookOf(company.sector, strategy);
+                            const tone =
+                                outlook === 'neglected' ? theme.colors.warning
+                                    : outlook === 'underResourced' ? theme.colors.textMuted
+                                        : theme.colors.primary;
+                            return (
+                                <View style={styles.outlookRow}>
+                                    <Text style={styles.outlookLabel}>{t('empire.outlook')}</Text>
+                                    <Text style={[styles.outlookValue, { color: tone }]}>
+                                        {t(`empire.outlook.${outlook}`)}
+                                    </Text>
+                                </View>
+                            );
+                        })()}
+
                         {/* Strategy Section */}
                         <View style={styles.sectionHeader}>
                             <Text style={styles.sectionTitle}>{t('finance.corporateStrategy')}</Text>
@@ -261,6 +293,29 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
 };
 
 const styles = StyleSheet.create({
+    outlookRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+        marginBottom: 12,
+    },
+    outlookLabel: {
+        color: 'rgba(255,255,255,0.50)',
+        fontSize: 10.5,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+    },
+    outlookValue: {
+        fontSize: 13,
+        fontWeight: '800',
+    },
+
     overlay: {
         flex: 1,
         justifyContent: 'center',

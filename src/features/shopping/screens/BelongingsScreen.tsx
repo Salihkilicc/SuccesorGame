@@ -27,6 +27,7 @@ import { useIdentityStore } from '../../../core/store/useIdentityStore';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import AssetCard from '../components/AssetCard';
+import { t, useLocale } from '../../../core/i18n';
 
 const { width } = Dimensions.get('window');
 const GAP = 10;
@@ -60,6 +61,7 @@ const FilterChip = ({
 );
 
 export const BelongingsScreen = () => {
+    useLocale();
     const identity = useIdentityStore();
     const {
         filteredItems,
@@ -73,18 +75,18 @@ export const BelongingsScreen = () => {
     const cardHolderName = `${identity.firstName || 'SALIH'} HALE`.toUpperCase();
 
     const FILTERS: { label: string; value: typeof selectedCategory }[] = [
-        { label: 'ALL', value: 'ALL' },
-        { label: 'REAL ESTATE', value: 'REAL_ESTATE' },
-        { label: 'VEHICLES', value: 'VEHICLE' },
-        { label: 'COLLECTION', value: 'COLLECTION' },
+        { label: t('shop.filterAll'), value: 'ALL' },
+        { label: t('shop.filterRealEstate'), value: 'REAL_ESTATE' },
+        { label: t('shop.filterVehicles'), value: 'VEHICLE' },
+        { label: t('shop.filterCollection'), value: 'COLLECTION' },
     ];
 
     return (
         <View style={styles.root}>
             {/* Screen Header with Back Arrow and Blue Rule and Subtitle */}
             <ScreenHeader
-                title="INVENTORY"
-                subtitle="PORTFOLIO & ASSET VAULT"
+                title={t('shop.inventory')}
+                subtitle={t('shop.portfolio')}
                 category="company"
             />
 
@@ -95,7 +97,7 @@ export const BelongingsScreen = () => {
                     <View style={styles.cardHeader}>
                         <View>
                             <Text style={styles.cardBrand}>LUXONET</Text>
-                            <Text style={styles.cardSubtitle}>SOVEREIGN RESERVE</Text>
+                            <Text style={styles.cardSubtitle}>{t('shop.sovereignReserve')}</Text>
                         </View>
                         <View style={styles.contactlessWrap}>
                             <MaterialCommunityIcons

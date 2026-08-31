@@ -5,19 +5,20 @@ import { t, useLocale } from '../../core/i18n';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../core/theme';
 
-const NEWS_ITEMS = [
-  'Markets rally on tech optimism.',
-  'Crypto volatility spikes.',
-  'Government bonds stabilize after rate decision.',
-  'Energy stocks slide as oil cools.',
-  'Healthcare outperforms on defensive buying.',
-  'AI chip demand continues to surprise.',
-  'Investors weigh currency swings in emerging markets.',
+const getNewsItems = () => [
+  t('news.marketRally'),
+  t('news.cryptoVolatility'),
+  t('news.bondsStabilize'),
+  t('news.energySlide'),
+  t('news.healthcareDefensive'),
+  t('news.aiChipDemand'),
+  t('news.currencySwings'),
 ];
 
 const FinancialNewsButton = () => {
-    useLocale();
+  useLocale();
   const [visible, setVisible] = useState(false);
+  const newsItems = getNewsItems();
 
   return (
     <>
@@ -43,7 +44,7 @@ const FinancialNewsButton = () => {
               </Pressable>
             </View>
             <View style={{ gap: theme.spacing.sm }}>
-              {NEWS_ITEMS.map(item => (
+              {newsItems.map(item => (
                 <Text key={item} style={styles.newsItem}>
                   • {item}
                 </Text>

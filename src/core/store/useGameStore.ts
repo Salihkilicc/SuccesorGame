@@ -87,6 +87,8 @@ import {
   updateEarningsPower,
   volatilityDamping,
 } from '../market/equity';
+import { decayReference } from '../market/buyout';
+import { runManipulationWatch } from '../story/runManipulation';
 import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { enforceSharkDeadlines, absoluteMonth } from '../../features/shareholders/hooks/useDebtEnforcer';
 import { useUserStore } from './useUserStore';
@@ -2112,6 +2114,28 @@ export const useGameStore = create<GameStore>()(
 
         const ownership = ownershipPercent(playerShares, capShares);
 
+        // ------------------------------------------------------------------
+        //  THE LEDGER OF PURCHASES MADE WHILE THE COMPANY WAS ON THE FLOOR
+        // ------------------------------------------------------------------
+        //  Written now, judged years from now. Nothing is decided here except
+        //  whether this quarter is worth remembering, because at this moment
+        //  there is no way to tell a manufactured collapse from a real one -
+        //  that only becomes visible if the price comes back.
+        //
+        //  The price recorded is the one the buying HAPPENED at, which is the
+        //  price the quarter opened with, not the one it closes with.
+        //  See core/story/manipulation.ts.
+        // ------------------------------------------------------------------
+        runManipulationWatch({
+          quarter: require('../story/world').currentQuarter(),
+          priceAtBuy: prevPrice,
+          referenceAtBuy: stats.sharePriceReference ?? prevPrice,
+          priceNow: newSharePrice,
+          ownershipBefore: stats.companyOwnership ?? ownership,
+          ownershipAfter: ownership,
+          personalWealth: newPlayerCash,
+        });
+
         useStatsStore.getState().update({
           // Written every quarter rather than only the negative ones, because
           // the whole point is that it RESETS when the company climbs back.
@@ -2125,6 +2149,14 @@ export const useGameStore = create<GameStore>()(
           companyValue: valuation,
           companySharePrice: newSharePrice,
           previousSharePrice: prevPrice,
+          // The price a control block is measured against. Follows a rising
+          // price at once and a falling one slowly, which is what stops a
+          // deliberate collapse from putting the register on sale.
+          // See core/market/buyout.ts -> decayReference.
+          sharePriceReference: decayReference(
+            stats.sharePriceReference ?? prevPrice,
+            newSharePrice,
+          ),
           companyDailyChange: changePercent,
           companyOwnership: ownership,
           netWorth: newPlayerCash + valuation * (ownership / 100),

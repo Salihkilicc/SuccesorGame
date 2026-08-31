@@ -13,6 +13,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import { t, useLocale } from '../../../core/i18n';
 
 interface LuxoNetVipBannerProps {
     onPress: () => void;
@@ -30,6 +31,7 @@ export const LuxoNetVipBanner: React.FC<LuxoNetVipBannerProps> = ({
     onInventoryPress,
     luxurySummary,
 }) => {
+    useLocale();
     return (
         <Pressable
             style={({ pressed }) => [styles.bannerCard, pressed && styles.pressed]}
@@ -42,11 +44,11 @@ export const LuxoNetVipBanner: React.FC<LuxoNetVipBannerProps> = ({
                 </View>
 
                 <View style={styles.titleBlock}>
-                    <Text style={styles.vaultTitle}>LUXONET STORE</Text>
+                    <Text style={styles.vaultTitle}>{t('shop.store')}</Text>
                 </View>
 
                 <View style={styles.enterButton}>
-                    <Text style={styles.enterText}>ENTER</Text>
+                    <Text style={styles.enterText}>{t('shop.enter')}</Text>
                     <MaterialCommunityIcons name="chevron-right" size={16} color="#FBBF24" />
                 </View>
             </View>
@@ -64,18 +66,18 @@ export const LuxoNetVipBanner: React.FC<LuxoNetVipBannerProps> = ({
                     }}
                 >
                     <MaterialCommunityIcons name="treasure-chest" size={14} color="#FBBF24" />
-                    <Text style={styles.inventoryBtnText}>INVENTORY</Text>
+                    <Text style={styles.inventoryBtnText}>{t('shop.inventory')}</Text>
                 </Pressable>
 
                 <View style={styles.metricTile}>
-                    <Text style={styles.metricLabel}>PORTFOLIO</Text>
+                    <Text style={styles.metricLabel}>{t('shop.portfolio')}</Text>
                     <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
                         {luxurySummary.totalValueFormatted}
                     </Text>
                 </View>
 
                 <View style={styles.metricTile}>
-                    <Text style={styles.metricLabel}>PRESTIGE</Text>
+                    <Text style={styles.metricLabel}>{t('shop.prestige')}</Text>
                     <Text style={[styles.metricValue, { color: '#FBBF24' }]}>
                         {luxurySummary.prestige}
                     </Text>

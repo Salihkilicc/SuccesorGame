@@ -34,6 +34,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { t, useLocale } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
+import { translateCasinoBadge } from '../../../data/i18n/casinoText';
 
 interface GameRoomCardProps {
     title: string;
@@ -57,6 +58,7 @@ export const GameRoomCard: React.FC<GameRoomCardProps> = ({
     badgeText,
 }) => {
     useLocale();
+    const displayBadge = badgeText ? translateCasinoBadge(badgeText) : '';
 
     return (
         <Pressable
@@ -92,9 +94,9 @@ export const GameRoomCard: React.FC<GameRoomCardProps> = ({
             />
 
             {/* Top Badge (Stakes / Type) */}
-            {badgeText && !locked && (
+            {displayBadge !== '' && !locked && (
                 <View style={[styles.topBadge, { backgroundColor: 'rgba(28, 36, 44, 0.7)', borderColor: themeColor }]}>
-                    <Text style={[styles.topBadgeText, { color: themeColor }]}>{badgeText}</Text>
+                    <Text style={[styles.topBadgeText, { color: themeColor }]}>{displayBadge}</Text>
                 </View>
             )}
 
@@ -116,7 +118,7 @@ export const GameRoomCard: React.FC<GameRoomCardProps> = ({
                 ) : (
                     <View style={styles.lockBadge}>
                         <MaterialCommunityIcons name="lock" size={14} color={theme.colors.textMuted} />
-                        <Text style={styles.lockText}>{t('ui.comingSoon') || 'LOCKED'}</Text>
+                        <Text style={styles.lockText}>{t('ui.locked') || 'LOCKED'}</Text>
                     </View>
                 )}
             </View>

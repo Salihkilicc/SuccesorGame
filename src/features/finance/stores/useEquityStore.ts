@@ -217,7 +217,13 @@ export const useEquityStore = create<EquityState>()(
             executeBuyback: (amountToSpend, currentValuation, spendCashFn) => {
                 const cap = readCapTable();
                 const price = useStatsStore.getState().companySharePrice || 0;
-                const q = quoteBuyback(amountToSpend, price, cap.totalShares, cap.playerShares, cap.publicShares);
+                // AND THE UNAFFECTED PRICE, or crashing the company on purpose
+                // buys the whole float back for a rounding error. Same rule
+                // the boardroom already follows. See core/market/equity.ts.
+                const reference = useStatsStore.getState().sharePriceReference || 0;
+                const q = quoteBuyback(
+                    amountToSpend, price, cap.totalShares, cap.playerShares, cap.publicShares, reference,
+                );
 
                 if (q.shares <= 0) {
                     return { sharesBurned: 0, newOwnershipPercent: get().getPlayerOwnership() };

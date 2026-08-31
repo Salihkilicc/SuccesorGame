@@ -19,6 +19,7 @@ import InfoDot from '../../../components/common/InfoDot';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { DetailLine, DetailRule } from '../../../components/common/Disclosure';
 import { theme } from '../../../core/theme';
+import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
 import { EXPENSE_EXPLANATIONS, type QuarterReport, normalizeQuarterReport } from '../../../core/reportTypes';
 
 // ============================================================================
@@ -572,6 +573,8 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   const rawReport = useGameStore(state => state.lastQuarterReport);
   const report = React.useMemo(() => normalizeQuarterReport(rawReport), [rawReport]);
   const companyName = useStatsStore(s => s.companyName);
+  /** The subsidiaries, for the empire section at the foot of the bill. */
+  const empire = useCorporateFinanceStore(st => st.subsidiaries);
 
   // --------------------------------------------------------------------
   //  EVERY HOOK IN HERE RUNS BEFORE THE BAIL-OUT, AND THAT IS THE POINT
@@ -1164,6 +1167,55 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               )}
             </CollapsibleSection>
 
+            {/* ══ İMPARATORLUK ══
+                ----------------------------------------------------------
+                 WHAT THE SUBSIDIARIES DID, AND WHY
+
+                 Reported as "nobody understands My Empire". The list screen
+                 showed a name and a percentage; the strategy screen showed
+                 four dials. Nothing anywhere joined them, so the percentage
+                 read as weather.
+
+                 One sentence per company, written by the quarterly
+                 evaluation itself rather than guessed at here, so the
+                 explanation cannot drift from the rule that produced it.
+                 See core/market/subsidiaryStrategy.ts -> noteFor.
+
+                 Last on purpose: it is the part of the bill that only
+                 exists once the player has built something.
+                ---------------------------------------------------------- */}
+            {empire.length > 0 && (
+              <CollapsibleSection
+                title={t('empire.reportTitle')}
+                note={t('empire.reportNote')}
+                summary={`${empire.length}`}
+                summaryColor="rgba(255,255,255,0.48)"
+              >
+                {empire.map(s => (
+                  <View key={s.id} style={styles.empireRow}>
+                    <View style={styles.empireHead}>
+                      <Text style={styles.empireName} numberOfLines={1}>{s.name}</Text>
+                      {/* TEXT, and blue or grey rather than green or red:
+                          a subsidiary moving is not the company's profit
+                          and loss, which is what those two colours are for
+                          (theme rule 4). */}
+                      <Text style={[
+                        styles.empireChange,
+                        { color: s.lastChangePercent >= 0 ? theme.colors.up : theme.colors.down },
+                      ]}>
+                        {s.lastChangePercent > 0 ? '+' : ''}{s.lastChangePercent.toFixed(1)}%
+                      </Text>
+                    </View>
+                    <Text style={styles.empireNote}>
+                      {t(s.lastNote?.key || 'empire.noteGrowing', s.lastNote?.dial
+                        ? { v1: t(`empire.dial.${s.lastNote.dial}`) }
+                        : undefined)}
+                    </Text>
+                  </View>
+                ))}
+              </CollapsibleSection>
+            )}
+
           </ScrollView>
 
           <View style={styles.footerActions}>
@@ -1184,6 +1236,34 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 export default QuarterlyReportModal;
 
 const styles = StyleSheet.create({
+  empireRow: {
+    paddingVertical: 9,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+  },
+  empireHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  empireName: {
+    flex: 1,
+    color: theme.colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  empireChange: {
+    fontSize: 12.5,
+    fontWeight: '800',
+  },
+  empireNote: {
+    marginTop: 3,
+    color: 'rgba(255,255,255,0.50)',
+    fontSize: 11,
+    lineHeight: 15.5,
+  },
+
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(28,36,44,0.85)',

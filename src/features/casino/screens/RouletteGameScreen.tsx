@@ -10,7 +10,10 @@ import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 import RouletteTable from '../components/RouletteTable';
+import RouletteWheel from '../components/RouletteWheel';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
+import { translateCasinoStatus } from '../../../data/i18n/casinoText';
+import { chipsFor, maxBetFor } from '../data/casinoStakes';
 
 const RouletteGameScreen = () => {
     useLocale();
@@ -26,7 +29,7 @@ const RouletteGameScreen = () => {
   const {
     money, selectedChip, bets, totalBetAmount,
     lastResult, history, status, isSpinning,
-    spinResult, lastWinnings, resultPopup
+    spinResult, pendingResult, lastWinnings, resultPopup
   } = state;
 
   // Spin animation
@@ -107,30 +110,44 @@ const RouletteGameScreen = () => {
 
       <GameResultPopup result={resultPopup} onHide={actions.closePopup} />
 
+      {/* ------------------------------------------------------------------
+          THE WHEEL IS PINNED, NOT SCROLLED
+
+          Reported as "when I place a bet the wheel stays up at the top" - the
+          betting table is tall, so laying a chip scrolls the wheel off screen
+          and the spin happens somewhere the player cannot see. Which makes the
+          animation pointless for the one moment it exists for.
+
+          So it sits OUTSIDE the ScrollView and the table scrolls underneath
+          it. Smaller too - 168 rather than 230 - because a wheel that is always
+          there can afford to be modest, and it leaves the table room.
+         ------------------------------------------------------------------ */}
+      <View style={styles.wheelStage}>
+        <RouletteWheel
+          size={168}
+          result={pendingResult ?? spinResult}
+          spinning={isSpinning}
+          tint={currentLocation.theme.primary}
+        />
+        {isSpinning && (
+          <Text style={styles.spinningText}>{t('casino.spinning')}</Text>
+        )}
+      </View>
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* STATUS + HISTORY */}
         <View style={styles.topRow}>
           <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>
-            {status.toUpperCase()}
+            {translateCasinoStatus(status).toUpperCase()}
           </Text>
         </View>
 
         {/* History Row */}
         {history.length > 0 && (
           <View style={styles.historyRow}>
-            <Text style={styles.historyLabel}>LAST:</Text>
+            <Text style={styles.historyLabel}>{t('casino.last')}</Text>
             {history.map(renderResultPill)}
-          </View>
-        )}
-
-        {/* SPIN RESULT DISPLAY */}
-        {isSpinning && (
-          <View style={styles.spinningContainer}>
-            <Animated.View style={[styles.wheelIcon, { transform: [{ rotate: spinRotateInterp }] }]}>
-              <Text style={styles.wheelEmoji}>🎡</Text>
-            </Animated.View>
-            <Text style={styles.spinningText}>Spinning...</Text>
           </View>
         )}
 
@@ -177,7 +194,7 @@ const RouletteGameScreen = () => {
         <View style={styles.controlsSection}>
           {/* CHIP SELECTOR */}
           <CustomChipSelector
-            chips={currentLocation.chips}
+            chips={chipsFor(currentLocation, money)}
             selectedChip={selectedChip}
             onSelect={actions.selectChip}
             gameTheme={currentLocation.theme}
@@ -186,10 +203,10 @@ const RouletteGameScreen = () => {
           <View style={styles.bottomControls}>
             <View style={styles.summaryRow}>
               <View style={styles.betDisplay}>
-                <Text style={styles.betLabel}>TOTAL BET</Text>
+                <Text style={styles.betLabel}>{t('ui.totalBet')}</Text>
                 <Text style={styles.betValueText}>${totalBetAmount.toLocaleString()}</Text>
                 {bets.length > 0 && (
-                  <Text style={styles.betCount}>{bets.length} bet{bets.length > 1 ? 's' : ''}</Text>
+                  <Text style={styles.betCount}>{bets.length} {bets.length > 1 ? t('casino.bets') : t('casino.bet')}</Text>
                 )}
               </View>
 
@@ -199,7 +216,7 @@ const RouletteGameScreen = () => {
                   onPress={actions.clearBets}
                   style={({ pressed }) => [styles.clearBtn, pressed && { opacity: 0.7 }]}
                 >
-                  <Text style={styles.clearBtnText}>CLEAR</Text>
+                  <Text style={styles.clearBtnText}>{t('casino.clear')}</Text>
                 </Pressable>
               )}
             </View>
@@ -233,6 +250,15 @@ const RouletteGameScreen = () => {
 export default RouletteGameScreen;
 
 const styles = StyleSheet.create({
+  wheelStage: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
+  },
+
   container: { flex: 1, backgroundColor: '#1C242C' },
   content: { padding: theme.spacing.md, gap: 12, paddingBottom: NAV_BAR_CLEARANCE },
 

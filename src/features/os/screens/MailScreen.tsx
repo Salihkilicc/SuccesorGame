@@ -16,6 +16,12 @@ import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
 import { useNegotiationStore } from '../../../core/store/useNegotiationStore';
+import { t, useLocale } from '../../../core/i18n';
+import {
+    translateSenderName,
+    translateMailSubject,
+    translateMailBody,
+} from '../../../data/i18n/mailMessagesText';
 
 const formatMonth = (m: number) => `M${m}`;
 
@@ -30,6 +36,9 @@ const getInitials = (name: string): string =>
 
 const MailRow = ({ mail, onPress }: { mail: Mail; onPress: () => void }) => {
     const isUnread = !mail.isRead;
+    const displayFromName = translateSenderName(mail.fromName);
+    const displaySubject = translateMailSubject(mail.subject, mail.conversationId);
+    const displayPreview = translateMailBody(mail.body, mail.conversationId).replace(/\n/g, ' ');
     
     return (
         <Pressable
@@ -50,17 +59,17 @@ const MailRow = ({ mail, onPress }: { mail: Mail; onPress: () => void }) => {
             <View style={styles.rowBody}>
                 <View style={styles.rowTop}>
                     <Text style={[styles.fromName, isUnread && styles.textUnread]} numberOfLines={1}>
-                        {mail.fromName}
+                        {displayFromName}
                     </Text>
                     <Text style={[styles.time, isUnread && styles.textUnreadTime]}>
                         {formatMonth(mail.atMonth)}
                     </Text>
                 </View>
                 <Text style={[styles.subject, isUnread && styles.textUnread]} numberOfLines={1}>
-                    {mail.subject}
+                    {displaySubject}
                 </Text>
                 <Text style={styles.preview} numberOfLines={1}>
-                    {mail.body.replace(/\n/g, ' ')}
+                    {displayPreview}
                 </Text>
             </View>
         </Pressable>
@@ -68,6 +77,7 @@ const MailRow = ({ mail, onPress }: { mail: Mail; onPress: () => void }) => {
 };
 
 const MailScreen = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const inbox = useMailStore(s => s.inbox);
     const markRead = useMailStore(s => s.markRead);
@@ -139,14 +149,14 @@ const MailScreen = () => {
 
     return (
         <View style={styles.root}>
-            <ScreenHeader title="Mail" onBack={() => navigation.goBack()} />
+            <ScreenHeader title={t('mail.title')} onBack={() => navigation.goBack()} />
 
             <View style={styles.searchHeader}>
                 <View style={styles.searchBar}>
                     <MaterialCommunityIcons name="magnify" size={22} color={theme.colors.textMuted} style={{ marginRight: 8 }} />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder="Search in mail"
+                        placeholder={t('mail.searchPlaceholder')}
                         placeholderTextColor={theme.colors.textMuted}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
@@ -157,18 +167,18 @@ const MailScreen = () => {
                 </View>
             </View>
 
-            <Text style={styles.inboxLabel}>PRIMARY</Text>
+            <Text style={styles.inboxLabel}>{t('mail.primary')}</Text>
 
             <ScrollView contentContainerStyle={{ paddingBottom: NAV_BAR_CLEARANCE }}>
                 {filteredInbox.length === 0 ? (
-                    <Text style={styles.empty}>Nothing in Primary.</Text>
+                    <Text style={styles.empty}>{t('mail.emptyPrimary')}</Text>
                 ) : (
                     filteredInbox.map(m => (
                         // `deleteMail` had been on the store since it was
                         // written, with nothing calling it.
                         <SwipeToDelete
                             key={m.id}
-                            label={`"${m.subject}"`}
+                            label={`"${translateMailSubject(m.subject, m.conversationId)}"`}
                             guarded={isGuarded(m)}
                             onDelete={() => binMail(m)}>
                             <MailRow
@@ -193,7 +203,7 @@ const MailScreen = () => {
                 <View style={styles.fabIconWrap}>
                     <MaterialCommunityIcons name="pencil" size={22} color={theme.colors.brand} />
                 </View>
-                <Text style={styles.fabText}>Compose</Text>
+                <Text style={styles.fabText}>{t('mail.compose')}</Text>
             </Pressable>
         </View>
     );

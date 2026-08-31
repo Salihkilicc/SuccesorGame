@@ -91,11 +91,21 @@ const MyCompanyScreen = () => {
     }
   }, [stats.companyValue, syncStockPrice]);
 
-  // Initialize Board Members if empty
+  // --------------------------------------------------------------------
+  //  BUILD THE BOARD ONLY IF IT WAS NEVER BUILT
+  // --------------------------------------------------------------------
+  //  This tested `members.length === 0`, which is true both for a save from
+  //  before the board existed AND for a player who has just bought every
+  //  director out. It could not tell winning from never having started, so
+  //  taking 100% of the company reset the holding to the opening 35%.
+  //
+  //  `initializeGame` now refuses on a register that has been played, so
+  //  this call is safe whatever the array says; the condition stays only to
+  //  keep it from running on every render.
+  // --------------------------------------------------------------------
   const { members, initializeGame, totalShares, playerShareCount } = useShareholderStore();
   useEffect(() => {
     if (!members || members.length === 0) {
-      console.log('[MyCompanyScreen] Initializing board members...');
       initializeGame();
     }
   }, [members, initializeGame]);

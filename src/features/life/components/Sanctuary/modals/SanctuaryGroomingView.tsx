@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.48)',
     },
     activeBuffBadge: {
-        backgroundcolor: '#CFD0D2',
+        backgroundColor: '#CFD0D2',
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 8,

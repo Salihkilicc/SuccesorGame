@@ -89,15 +89,6 @@ const ProposalWizardView: React.FC<Props> = ({
         const isSuccess = proposalResult.success;
         return (
             <View style={{ alignItems: 'center', gap: 16, padding: 16, width: '100%' }}>
-                {/* ------------------------------------------------------
-                    NOT THE PROFIT COLOURS, AND NOT A SIXTY POINT EMOJI
-
-                    It was green for yes and red for no, in a game where
-                    those two mean money in and money out and nothing else -
-                    rule 3 in core/theme.ts. Getting married is not a
-                    quarter. The word carries it, and the icon says which
-                    without borrowing a meaning from the balance sheet.
-                   ------------------------------------------------------ */}
                 <View style={styles.resultBadge}>
                     <MaterialCommunityIcons
                         name={isSuccess ? 'ring' : 'heart-broken-outline'}
@@ -106,7 +97,7 @@ const ProposalWizardView: React.FC<Props> = ({
                     />
                 </View>
                 <Text style={[styles.modalSubtitle, { fontSize: 22, color: theme.colors.textPrimary }]}>
-                    {isSuccess ? 'JUST MARRIED' : 'REJECTED'}
+                    {isSuccess ? t('love.justMarried') : t('love.rejected')}
                 </Text>
                 <Text style={{ color: theme.colors.textPrimary, textAlign: 'center', fontSize: 15, lineHeight: 22 }}>
                     {proposalResult.message}
@@ -115,12 +106,8 @@ const ProposalWizardView: React.FC<Props> = ({
                     style={[styles.actionButton, { backgroundColor: theme.colors.accent, marginTop: 12, width: '100%', justifyContent: 'center' }]}
                     onPress={onClose}
                 >
-                    {/* `onLight`, not white. `accent` is a LIGHT fill and
-                        white on it measures 2.65 - see the note on it in
-                        core/theme.ts: the fill's own colour is unreadable as
-                        text and the text on it has to be black. */}
                     <Text style={[styles.actionButtonText, { color: theme.colors.onLight, fontWeight: '800', textAlign: 'center' }]}>
-                        {isSuccess ? 'Celebrate & Close' : 'Close'}
+                        {isSuccess ? t('love.celebrateAndClose') : t('love.close')}
                     </Text>
                 </Pressable>
             </View>
@@ -134,11 +121,11 @@ const ProposalWizardView: React.FC<Props> = ({
                 <Text style={styles.modalSubtitle}>{t('love.sheSaidYesKindOf')}</Text>
 
                 <Text style={{ color: theme.colors.textSecondary, textAlign: 'center' }}>
-                    She is emotional and waiting for the ring. This is your moment.
+                    {t('love.emotionalWaiting')}
                     {"\n\n"}
                     <Text style={{ fontWeight: 'bold', color: theme.colors.textPrimary }}>{t('love.doYouWantToAsk')}</Text>
                     {"\n"}
-                    (Protects assets, but might offend her)
+                    {t('love.protectsAssets')}
                 </Text>
 
                 <Pressable
@@ -149,32 +136,30 @@ const ProposalWizardView: React.FC<Props> = ({
                         color={theme.colors.textPrimary}
                     />
                     <View style={{ flex: 1 }}>
-                        <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>Sign a prenup</Text>
-                        <Text style={styles.choiceNote}>Protects what you built. She will notice.</Text>
+                        <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>{t('love.signPrenup')}</Text>
+                        <Text style={styles.choiceNote}>{t('love.signPrenupDesc')}</Text>
                     </View>
                 </Pressable>
 
                 <Pressable
                     style={[styles.actionButton, styles.choiceRow, { backgroundColor: theme.colors.accent }]}
                     onPress={() => onDecidePrenup(false)}>
-                    {/* `onLight`. `accent` is a LIGHT fill and white on it
-                        measures 2.65 - see core/theme.ts rule 1. */}
                     <MaterialCommunityIcons
                         name="hand-heart-outline" size={20}
                         color={theme.colors.onLight}
                     />
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.actionButtonText, { color: theme.colors.onLight, fontWeight: '700' }]}>
-                            No prenup
+                            {t('love.noPrenup')}
                         </Text>
                         <Text style={[styles.choiceNote, { color: theme.colors.onLight, opacity: 0.75 }]}>
-                            Everything you own is half hers from today.
+                            {t('love.noPrenupDesc')}
                         </Text>
                     </View>
                 </Pressable>
 
                 <Pressable style={styles.cancelButton} onPress={onClose}>
-                    <Text style={styles.cancelButtonText}>Cancel Proposal</Text>
+                    <Text style={styles.cancelButtonText}>{t('love.cancelProposal')}</Text>
                 </Pressable>
             </View>
         );
@@ -220,7 +205,7 @@ const ProposalWizardView: React.FC<Props> = ({
                     </Pressable>
                 ))}
                 <Pressable style={styles.cancelButton} onPress={() => onSetIsPickingRing(false)}>
-                    <Text style={styles.cancelButtonText}>Back to Proposal</Text>
+                    <Text style={styles.cancelButtonText}>{t('love.backToProposal')}</Text>
                 </Pressable>
             </View>
         );
@@ -231,28 +216,7 @@ const ProposalWizardView: React.FC<Props> = ({
         <View style={{ gap: 16 }}>
             <Text style={styles.modalSubtitle}>{t('love.planProposal')}</Text>
 
-            {/* ------------------------------------------------------------
-                A LIST, BECAUSE THE PRICES ARE THE DECISION
-
-                SHELVED, the carousel this replaces: two arrow buttons and
-                one venue at a time, cycling through twelve. Reaching the
-                last took eleven taps and no two were ever side by side,
-                so the only thing worth comparing - fifteen thousand for
-                fifteen per cent against a hundred thousand for thirty -
-                could not be compared.
-
-                    <View style={styles.locationPicker}>
-                        <Pressable onPress={() => onCycleLocation('prev')} ...>
-                        <View style={styles.locationInfo}> ... </View>
-                        <Pressable onPress={() => onCycleLocation('next')} ...>
-                    </View>
-
-                The ones you cannot afford stay on the list, dimmed. A row
-                that vanishes teaches nothing and a price you cannot see is
-                not a thing to grow towards - same argument as the
-                financing routes on the acquisition screen.
-               ------------------------------------------------------------ */}
-            <Text style={styles.modalSubtitle}>Where</Text>
+            <Text style={styles.modalSubtitle}>{t('love.where')}</Text>
             <ScrollView style={styles.venueList} nestedScrollEnabled>
                 {PROPOSAL_LOCATIONS.map((place, index) => {
                     const affordable = money >= place.cost;
@@ -275,8 +239,8 @@ const ProposalWizardView: React.FC<Props> = ({
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.venueName} numberOfLines={1}>{place.name}</Text>
                                 <Text style={styles.venueMeta}>
-                                    {place.cost === 0 ? 'Costs nothing' : `$${place.cost.toLocaleString()}`}
-                                    {place.bonus > 0 ? `   ·   +${place.bonus}% she says yes` : ''}
+                                    {place.cost === 0 ? t('love.costsNothing') : `$${place.cost.toLocaleString()}`}
+                                    {place.bonus > 0 ? `   ·   ${t('love.sheSaysYes', { bonus: String(place.bonus) })}` : ''}
                                 </Text>
                             </View>
                             {chosen && (
@@ -299,8 +263,6 @@ const ProposalWizardView: React.FC<Props> = ({
                         <MaterialCommunityIcons
                             name="ring" size={18} color={theme.colors.textMuted}
                         />
-                        {/* Not the loss colour. Owning no ring is a thing to
-                            go and fix, not a loss - rule 3 in core/theme.ts. */}
                         <Text style={[styles.actionButtonText, { color: theme.colors.textSecondary }]}>
                             {t('love.noRing')}
                         </Text>
@@ -315,7 +277,7 @@ const ProposalWizardView: React.FC<Props> = ({
                         />
                         <View>
                             <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>
-                                {selectedRing?.name ?? 'Ring Selected'}
+                                {selectedRing?.name ?? t('love.ringSelected')}
                             </Text>
                             <Text style={{ color: theme.colors.textPrimary, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>{t('love.tapToChange')}</Text>
                         </View>
@@ -334,13 +296,12 @@ const ProposalWizardView: React.FC<Props> = ({
                     { backgroundColor: theme.colors.accent, marginTop: 8, opacity: (canAfford && ownedRings.length > 0) ? 1 : 0.5, justifyContent: 'center' }
                 ]}
                 onPress={onStartProposal}>
-                {/* And the third. `accent` is a light fill; white on it is 2.65. */}
                 <Text style={[styles.actionButtonText, { color: theme.colors.onLight, fontWeight: '800', letterSpacing: 1, textAlign: 'center' }]}>{t('love.propose2')}</Text>
             </Pressable>
 
             {/* Close Button */}
             <Pressable style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t('love.cancel')}</Text>
             </Pressable>
         </View>
     );

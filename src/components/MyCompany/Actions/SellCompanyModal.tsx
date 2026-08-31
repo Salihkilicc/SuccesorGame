@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Modal, Pressable, Alert, ToastAndroid, Platform } from 'react-native';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
+import { quoteDivestiture, DIVESTITURE_DISCOUNT_MAX } from '../../../core/market/mergers';
 import { formatMoney as formatMoneyExact } from '../../../core/utils';
 import { theme } from '../../../core/theme';
 
@@ -19,16 +20,33 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     // Default to valuation if company exists, otherwise 0
     const [askingPrice, setAskingPrice] = useState(0);
 
+    // ----------------------------------------------------------------------
+    //  THE SAME QUOTE THE STORE WILL USE
+    // ----------------------------------------------------------------------
+    //  This screen priced everything off `company.valuation`, which is WHAT
+    //  YOU PAID - premium included - while the rest of the game exits at a
+    //  fair value derived from the target's own earnings, less a commission.
+    //  So the screen offered a round trip at cost and the store paid it.
+    //
+    //  Both now read `quoteDivestiture`. See core/market/mergers.ts.
+    // ----------------------------------------------------------------------
+    const quote = company?.deal ? quoteDivestiture(company.deal) : undefined;
+    const fairValue = quote ? quote.currentFairValue : (company?.valuation ?? 0);
+    const commission = quote ? quote.discount : DIVESTITURE_DISCOUNT_MAX;
+    const locked = !!quote?.locked;
+
     useEffect(() => {
         if (company) {
-            setAskingPrice(company.valuation);
+            setAskingPrice(Math.round(fairValue));
         }
-    }, [company, visible]);
+    }, [company, visible, fairValue]);
 
     if (!company) return null;
 
-    const currentValuation = company.valuation;
-    const markup = (askingPrice - currentValuation) / currentValuation;
+    const currentValuation = fairValue;
+    const markup = currentValuation > 0 ? (askingPrice - currentValuation) / currentValuation : 1;
+    /** What actually lands in the company account if they say yes. */
+    const netProceeds = Math.max(0, askingPrice * (1 - commission));
 
     // Probability Formula: 0.80 - (markup * 2.0)
     // Clamped between 0 and 1 for calculation
@@ -58,11 +76,14 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
         const result = attemptToSellCompany(company.id, askingPrice);
 
         if (result.success) {
-            // Success Logic
+            // WHAT LANDED, not what was agreed. The store returns the net and
+            // this used to announce the asking price, so the figure in the
+            // alert and the figure in the account were different numbers.
+            const got = result.price ?? netProceeds;
             if (Platform.OS === 'android') {
-                ToastAndroid.show(`Sold for ${formatMoney(askingPrice)}!`, ToastAndroid.LONG);
+                ToastAndroid.show(`Sold for ${formatMoney(got)}!`, ToastAndroid.LONG);
             } else {
-                Alert.alert(t('alert.offerAccepted'), `You successfully sold ${company.name} for ${formatMoney(askingPrice)}.`);
+                Alert.alert(t('alert.offerAccepted'), `You successfully sold ${company.name} for ${formatMoney(got)}.`);
             }
             onClose();
         } else {
@@ -94,6 +115,21 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
                     <View style={styles.valuationContainer}>
                         <Text style={styles.label}>{t('action.currentValuation')}</Text>
                         <Text style={styles.valuationValue}>{formatMoney(currentValuation)}</Text>
+                        {/* THE TWO NUMBERS THAT WERE NOT HERE. A commission
+                            the player only meets in their bank balance is the
+                            same defect as a price the screen does not charge. */}
+                        {locked ? (
+                            <Text style={styles.lockNote}>
+                                {t('action.saleLocked', { v1: quote!.quartersLeft })}
+                            </Text>
+                        ) : (
+                            <Text style={styles.commissionNote}>
+                                {t('action.saleCommission', {
+                                    v1: Math.round(commission * 100),
+                                    v2: formatMoney(netProceeds),
+                                })}
+                            </Text>
+                        )}
                     </View>
 
                     {/* Asking Price Controls */}
@@ -142,7 +178,12 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
                         </Pressable>
 
                         <Pressable
-                            style={({ pressed }) => [styles.submitBtn, pressed && styles.btnPressed]}
+                            disabled={locked}
+                            style={({ pressed }) => [
+                                styles.submitBtn,
+                                pressed && styles.btnPressed,
+                                locked && styles.submitBtnOff,
+                            ]}
                             onPress={handleSubmit}
                         >
                             <Text style={styles.submitBtnText}>{t('action.submitOffer')}</Text>
@@ -318,5 +359,21 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         fontSize: 16,
         letterSpacing: 1,
+    },
+    /** Dimmed rather than recoloured: the label does not change colour with it. */
+    submitBtnOff: { opacity: 0.4 },
+    commissionNote: {
+        marginTop: 6,
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        lineHeight: 15,
+        textAlign: 'center',
+    },
+    lockNote: {
+        marginTop: 6,
+        color: theme.colors.warning,
+        fontSize: 11.5,
+        lineHeight: 16,
+        textAlign: 'center',
     },
 });

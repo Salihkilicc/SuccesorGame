@@ -1,8 +1,8 @@
-// src/features/news/components/SiliconNewsButton.tsx
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { useNewsStore } from '../../../core/store/useNewsStore';
 import { SiliconNewsModal } from './SiliconNewsModal';
+import { t, useLocale } from '../../../core/i18n';
 
 export interface SiliconNewsButtonProps {
   label?: string;
@@ -11,10 +11,12 @@ export interface SiliconNewsButtonProps {
 }
 
 export const SiliconNewsButton: React.FC<SiliconNewsButtonProps> = ({
-  label = 'WIRE',
+  label,
   onPressOverride,
   compact = false,
 }) => {
+  useLocale();
+  const displayLabel = label ?? t('news.wire');
   const [modalVisible, setModalVisible] = useState(false);
   const unreadCount = useNewsStore((state) => state.unreadCount);
 
@@ -33,10 +35,10 @@ export const SiliconNewsButton: React.FC<SiliconNewsButtonProps> = ({
         onPress={handlePress}
         style={[styles.button, compact && styles.buttonCompact]}
         accessibilityRole="button"
-        accessibilityLabel={`${label}, ${unreadCount} unread wire dispatches`}
+        accessibilityLabel={`${displayLabel}, ${unreadCount} unread wire dispatches`}
       >
         <Text style={[styles.icon, compact && styles.iconCompact]}>📰</Text>
-        {!compact && <Text style={styles.buttonText}>{label}</Text>}
+        {!compact && <Text style={styles.buttonText}>{displayLabel}</Text>}
 
         {/* Sophisticated Executive Amber Notification Badge */}
         {unreadCount > 0 && (

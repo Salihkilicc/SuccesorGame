@@ -3,6 +3,8 @@ import { useState, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
+import { casinoAlert } from '../../../data/i18n/casinoText';
+import { colourOf, spinRoulette } from '../../../core/casino/roulette';
 
 // --- TİPLER VE SABİTLER ---
 
@@ -25,50 +27,23 @@ export type PlacedBet = {
   amount: number;
 };
 
-const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+// ============================================================================
+//  THE RULE LIVES IN core/casino/roulette.ts NOW
+// ============================================================================
+//  The wheel, the colours, the payouts and the spin were all in this file,
+//  wrapped inside a `setTimeout(3000)` - so the number that decides who wins
+//  could not be tested without waiting three seconds for it, and changing how
+//  long the wheel spins meant editing the file that decides the result.
+//
+//  This hook keeps what a hook should keep: the money, the stores and the
+//  clock. Re-exported rather than re-declared, because two copies of a payout
+//  table is how the last four bugs in this codebase happened.
+// ============================================================================
 
-// Helper Fonksiyonlar
-const isRed = (value: number) => RED_NUMBERS.includes(value);
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-/** Get the color of a roulette number */
-export const getNumberColor = (n: number): 'red' | 'black' | 'green' => {
-  if (n === 0) return 'green';
-  return isRed(n) ? 'red' : 'black';
-};
-
-/** Evaluate if a single bet wins for a given result */
-const evaluateBet = (result: number, betType: BetType): { won: boolean; multiplier: number } => {
-  // Straight number bet
-  if (betType.startsWith('S')) {
-    const num = parseInt(betType.slice(1), 10);
-    return { won: result === num, multiplier: 35 };
-  }
-
-  // Area bets
-  switch (betType) {
-    case 'RED':
-      return { won: result !== 0 && isRed(result), multiplier: 2 };
-    case 'BLACK':
-      return { won: result !== 0 && !isRed(result), multiplier: 2 };
-    case 'EVEN':
-      return { won: result !== 0 && result % 2 === 0, multiplier: 2 };
-    case 'ODD':
-      return { won: result % 2 === 1, multiplier: 2 };
-    case 'LOW':
-      return { won: result >= 1 && result <= 18, multiplier: 2 };
-    case 'HIGH':
-      return { won: result >= 19 && result <= 36, multiplier: 2 };
-    case '1ST12':
-      return { won: result >= 1 && result <= 12, multiplier: 3 };
-    case '2ND12':
-      return { won: result >= 13 && result <= 24, multiplier: 3 };
-    case '3RD12':
-      return { won: result >= 25 && result <= 36, multiplier: 3 };
-    default:
-      return { won: false, multiplier: 0 };
-  }
-};
+/** Get the color of a roulette number. See core/casino/roulette.ts. */
+export const getNumberColor = colourOf;
 
 export const useRouletteLogic = (initialChip?: number) => {
   const { money, setField } = useStatsStore();
@@ -83,6 +58,16 @@ export const useRouletteLogic = (initialChip?: number) => {
   const [status, setStatus] = useState('Place your chips on the table.');
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState<number | null>(null);
+  /**
+   * THE NUMBER THE WHEEL IS AIMING AT.
+   *
+   * Set the instant the spin is decided rather than when it is revealed, so
+   * the animation has somewhere to arrive. `spinResult` stays what it was -
+   * the number the player has been SHOWN - and the two are different things
+   * for exactly as long as the ball is in the air.
+   * See core/casino/roulette.ts and components/RouletteWheel.tsx.
+   */
+  const [pendingResult, setPendingResult] = useState<number | null>(null);
   const [lastWinnings, setLastWinnings] = useState<number>(0);
   const [resultPopup, setResultPopup] = useState<{ type: 'win' | 'loss', amount: number } | null>(null);
   const lossStreak = useRef(0);
@@ -147,7 +132,7 @@ export const useRouletteLogic = (initialChip?: number) => {
     if (isSpinning) return;
     if (selectedChip <= 0) return;
     if (money < totalBetAmount + selectedChip) {
-      Alert.alert('Not enough cash', 'You don\'t have enough to place this bet.');
+      casinoAlert('Not enough cash', 'You don\'t have enough to place this bet.');
       return;
     }
 
@@ -176,11 +161,11 @@ export const useRouletteLogic = (initialChip?: number) => {
     setResultPopup(null);
 
     if (bets.length === 0) {
-      Alert.alert('Place Bet', 'Place your chips on the table first.');
+      casinoAlert('Place Bet', 'Place your chips on the table first.');
       return;
     }
     if (money < totalBetAmount) {
-      Alert.alert('Not enough cash', 'You don\'t have enough to cover your bets.');
+      casinoAlert('Not enough cash', 'You don\'t have enough to cover your bets.');
       return;
     }
 
@@ -188,24 +173,23 @@ export const useRouletteLogic = (initialChip?: number) => {
     const afterDeduct = money - totalBetAmount;
     setField('money', afterDeduct);
 
+    // DECIDED HERE, BEFORE ANYTHING TURNS. The three seconds below are the
+    // telling of it. This is the whole engine and show split.
+    const settlement = spinRoulette(bets);
+    setPendingResult(settlement.result);
+
     setIsSpinning(true);
     setSpinResult(null);
     setStatus('Spinning...');
 
     // 3 second spin delay
     setTimeout(() => {
-      // RNG
-      const result = Math.floor(Math.random() * 37); // 0-36
-      const color = getNumberColor(result);
-
-      // Evaluate all bets
-      let totalWinnings = 0;
-      for (const bet of bets) {
-        const { won, multiplier } = evaluateBet(result, bet.type);
-        if (won) {
-          totalWinnings += bet.amount * multiplier;
-        }
-      }
+      // ONE CALL, and it is synchronous. The three seconds above are the
+      // SHOW; this is the result, and it could have been produced before the
+      // wheel started turning. See core/casino/roulette.ts.
+      const result = settlement.result;
+      const color = settlement.colour;
+      const totalWinnings = settlement.returned;
 
       // Harcama bazlı reputation: minimum 1 + her $10K bahis = +1 rep
       const spendingRep = reputationForBet(totalBetAmount);
@@ -232,6 +216,7 @@ export const useRouletteLogic = (initialChip?: number) => {
       setSpinResult(result);
       setHistory(prev => [entry, ...prev].slice(0, 8));
       setIsSpinning(false);
+      setPendingResult(null);
 
       // Clear bets for next round
       setBets([]);
@@ -251,6 +236,7 @@ export const useRouletteLogic = (initialChip?: number) => {
       status,
       isSpinning,
       spinResult,
+      pendingResult,
       lastWinnings,
       resultPopup,
     },

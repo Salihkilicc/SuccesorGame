@@ -46,11 +46,12 @@ import { useMailStore, unreadMailCount } from '../../core/store/useMailStore';
 import { t, useLocale, useLocaleStore } from '../../core/i18n';
 import { START_EMPLOYEES } from '../../core/store/useStatsStore';
 import { getTier } from '../../core/market/capacity';
+import { brandDisplay, indexToPoints } from '../../core/market/brand';
 import { useNewsStore } from '../../core/store/useNewsStore';
 // SHELVED with the modal in the render - Silicon News is a route now.
 // import { SiliconNewsModal } from '../../features/news';
 import { useStoryStore } from '../../core/store/useStoryStore';
-import { readTitle } from '../../core/story/world';
+import { readTitle, currentQuarter } from '../../core/story/world';
 import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
 import EndingOverlay from '../../components/story/EndingOverlay';
 import SponsorDroughtWarningModal from '../../components/common/SponsorDroughtWarningModal';
@@ -346,7 +347,7 @@ const HomeScreen = () => {
         const qWithout = useSponsorshipStore.getState().quartersWithout;
         const isInDrought = !useSponsorshipStore.getState().active && qWithout > DROUGHT_GRACE_QUARTERS;
         if (isInDrought) {
-          const quarterIndex = result.data?.quarter ?? 0;
+          const quarterIndex = currentQuarter();
           const isFirst = lastDroughtWarningAt === 0;
           const isReminder = quarterIndex - lastDroughtWarningAt >= 4;
           if (isFirst || isReminder) {
@@ -414,25 +415,33 @@ const HomeScreen = () => {
         : `Critical (${Math.round(employeeMorale)}%)`;
 
   const rpBrief = `${formatNumber(Math.floor(totalRP || 0))} RP`;
-  const brandBrief = `${Math.round(brandValue || 0)}`;
-  const brandDelta = typeof brandChange === 'number' && Math.abs(brandChange) >= 0.05 ? brandChange : undefined;
+  // ----------------------------------------------------------------------
+  //  POINTS, LIKE EVERY OTHER SCREEN
+  // ----------------------------------------------------------------------
+  //  `stats.brandValue` is the 0-100 INDEX. This line printed it raw while
+  //  MyCompanyScreen, the market panel and the quarterly report all print
+  //  POINTS through `brandDisplay`. The same company therefore read 56 here
+  //  and 242 two taps away, and the category gate is quoted in points - so
+  //  the number on the home screen could not be compared to anything.
+  //
+  //  The delta moves to the same scale for the same reason; when it shows is
+  //  unchanged, only what it is measured in.
+  // ----------------------------------------------------------------------
+  const brandBrief = `${brandDisplay(brandValue ?? 0)}`;
+  const brandDelta = typeof brandChange === 'number' && Math.abs(brandChange) >= 0.05
+    ? indexToPoints(brandChange)
+    : undefined;
+
+  const moraleColor =
+    employeeMorale >= 70
+      ? theme.colors.highlight
+      : employeeMorale >= 40
+        ? theme.colors.textPrimary
+        : theme.colors.warning;
 
   // Status widget satırları: CEO ve Şirket Yönetim Paneli
-  const statusRows: { key: string; label: string; value: string; delta?: number }[] = [
-    { key: 'team', label: 'Team Morale', value: moraleBrief },
-    // ------------------------------------------------------------------
-    //  `|| 'R&D Points'` NEVER RAN, AND COULD NOT
-    // ------------------------------------------------------------------
-    //  `t()` returns THE KEY when a translation is missing, and a key is a
-    //  non-empty string, so the fallback after `||` is unreachable by
-    //  construction. `company.research` does not exist - the catalogue has
-    //  `company.researchDevelopment` and `company.researchPoints` - so this
-    //  row rendered the literal text "company.research" on the home screen.
-    //
-    //  The pattern is the problem rather than the missing key: every
-    //  `t('x') || 'fallback'` in the app is a fallback that can never fire
-    //  and a missing translation that can never be noticed.
-    // ------------------------------------------------------------------
+  const statusRows: { key: string; label: string; value: string; color?: string; delta?: number }[] = [
+    { key: 'team', label: 'Team Morale', value: moraleBrief, color: moraleColor },
     { key: 'research', label: t('company.researchPoints'), value: rpBrief },
     { key: 'brand', label: t('company.brandValue'), value: brandBrief, delta: brandDelta },
   ];
@@ -658,7 +667,7 @@ const HomeScreen = () => {
                 </View>
                 <View style={styles.widgetRowBetween}>
                   <Text style={styles.widgetLabel}>{t('home.income')}</Text>
-                  <Text style={[styles.widgetValue, { color: theme.colors.success }]} numberOfLines={1} adjustsFontSizeToFit>
+                  <Text style={[styles.widgetValue, { color: theme.colors.highlight }]} numberOfLines={1} adjustsFontSizeToFit>
                     {finances.totalIncome ? formatMoney(finances.totalIncome) : '$0'}
                   </Text>
                 </View>
@@ -711,7 +720,15 @@ const HomeScreen = () => {
                   >
                     <Text style={styles.statusLabel}>{row.label}</Text>
                     <View style={styles.statusValueContainer}>
-                      <Text style={styles.widgetStatusText} numberOfLines={1}>{row.value}</Text>
+                      <Text
+                        style={[
+                          styles.widgetStatusText,
+                          !!row.color && { color: row.color },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {row.value}
+                      </Text>
                       {row.delta !== undefined && (
                         <Text
                           style={[

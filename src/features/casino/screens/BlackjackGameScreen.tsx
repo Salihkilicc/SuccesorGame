@@ -1,7 +1,7 @@
 // src/features/casino/screens/BlackjackGameScreen.tsx
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import GameResultPopup from '../components/GameResultPopup';
@@ -10,7 +10,10 @@ import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 import AnimatedCard from '../components/AnimatedCard';
+import BlackjackFelt from '../components/BlackjackFelt';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
+import { translateCasinoStatus } from '../../../data/i18n/casinoText';
+import { chipsFor, maxBetFor } from '../data/casinoStakes';
 
 const BlackjackGameScreen = () => {
     useLocale();
@@ -23,7 +26,19 @@ const BlackjackGameScreen = () => {
 
   // Logic Hook
   const { state, actions } = useBlackjackLogic(initialBet);
-  const { playerCards, dealerCards, bet, roundState, status, resultPopup, playerTotal, dealerTotal, money } = state;
+  const { playerCards, dealerCards, bet, roundState, status, resultPopup, playerTotal, dealerTotal, dealerDrawn, money } = state;
+
+  // --------------------------------------------------------------------
+  //  WHERE THE DECK IS
+  // --------------------------------------------------------------------
+  //  Every card starts here and travels to its place. Offsets rather than
+  //  measured positions: the deck sits at the top right of the felt, so a
+  //  dealer card comes from a short way right and a player card from a long
+  //  way up and right. No layout pass, no re-render while it moves, one
+  //  transform on the UI thread. See components/AnimatedCard.tsx.
+  // --------------------------------------------------------------------
+  const DECK_FROM_DEALER = { x: 130, y: -34 };
+  const DECK_FROM_PLAYER = { x: 130, y: -190 };
 
   // Krupiyenin kapalı kartı sadece oyuncu oynarken gizli
   const hideDealerHole = roundState === 'player';
@@ -46,43 +61,71 @@ const BlackjackGameScreen = () => {
         {/* INFO BAR */}
         <View style={styles.topRow}>
           <Text style={[styles.statusText, { color: currentLocation.theme.primary }]}>
-            {status.toUpperCase()}
+            {translateCasinoStatus(status).toUpperCase()}
           </Text>
         </View>
 
-        {/* DEALER HAND */}
-        <View style={[styles.handCard, { borderColor: currentLocation.theme.secondary }]}>
-          <Text style={styles.handLabel}>DEALER ({!hideDealerHole ? dealerTotal : '?'})</Text>
-          <View style={styles.cardRow}>
-            {dealerCards.map((card, idx) => (
-              <AnimatedCard
-                key={`dealer-${card.rank}${card.suit}-${idx}`}
-                card={card}
-                index={idx}
-                hidden={idx === 1 && hideDealerHole}
-                baseDelay={100}
-              />
-            ))}
+        {/* ------------------------------------------------------------------
+            THE TABLE
+
+            Two bordered boxes stacked vertically, with a faint "BLACKJACK PAYS
+            3:2" between them, was what a blackjack table looked like here.
+            Cards faded up from forty pixels below wherever they happened to
+            sit; nothing came from anywhere.
+
+            It is a felt now, with a deck in the corner, and every card travels
+            from it. See components/BlackjackFelt.tsx.
+           ------------------------------------------------------------------ */}
+        <View style={styles.table}>
+          <BlackjackFelt
+            width={TABLE_W}
+            height={TABLE_H}
+            tint={currentLocation.theme.primary}
+            label={t('ui.blackjackPays32')}
+          />
+
+          {/* THE SHOE. A card that appears is a number; a card that comes
+              from here has been dealt. */}
+          <View style={[styles.shoe, { borderColor: currentLocation.theme.primary }]}>
+            <View style={styles.shoeCard} />
+            <View style={[styles.shoeCard, styles.shoeCard2]} />
           </View>
-        </View>
 
-        {/* LOGO / TABLE CENTER */}
-        <View style={styles.tableCenter}>
-          <Text style={[styles.tableLogo, { color: currentLocation.theme.primary, opacity: 0.2 }]}>{t('ui.blackjackPays32')}</Text>
-        </View>
+          {/* DEALER */}
+          <View style={styles.dealerZone}>
+            <Text style={styles.handLabel}>{t('casino.dealer')} ({!hideDealerHole ? dealerTotal : '?'})</Text>
+            <View style={styles.cardRow}>
+              {dealerCards.map((card, idx) => (
+                <AnimatedCard
+                  key={`dealer-${card.rank}${card.suit}-${idx}`}
+                  card={card}
+                  // The cards the dealer DRAWS arrive after the stand, so they
+                  // are staggered from zero rather than from the deal.
+                  index={idx < 2 ? idx : idx - 2}
+                  hidden={idx === 1 && hideDealerHole}
+                  baseDelay={idx < 2 ? 100 : 0}
+                  fromX={DECK_FROM_DEALER.x}
+                  fromY={DECK_FROM_DEALER.y}
+                />
+              ))}
+            </View>
+          </View>
 
-        {/* PLAYER HAND */}
-        <View style={[styles.handCard, { borderColor: currentLocation.theme.primary }]}>
-          <Text style={styles.handLabel}>YOU ({playerTotal})</Text>
-          <View style={styles.cardRow}>
-            {playerCards.map((card, idx) => (
-              <AnimatedCard
-                key={`player-${card.rank}${card.suit}-${idx}`}
-                card={card}
-                index={idx}
-                baseDelay={0}
-              />
-            ))}
+          {/* PLAYER */}
+          <View style={styles.playerZone}>
+            <View style={styles.cardRow}>
+              {playerCards.map((card, idx) => (
+                <AnimatedCard
+                  key={`player-${card.rank}${card.suit}-${idx}`}
+                  card={card}
+                  index={idx}
+                  baseDelay={0}
+                  fromX={DECK_FROM_PLAYER.x}
+                  fromY={DECK_FROM_PLAYER.y}
+                />
+              ))}
+            </View>
+            <Text style={styles.handLabel}>{t('casino.you')} ({playerTotal})</Text>
           </View>
         </View>
 
@@ -92,7 +135,7 @@ const BlackjackGameScreen = () => {
           {/* Only show chips if in betting phase */}
           <View style={{ opacity: roundState === 'player' ? 0.5 : 1 }}>
             <CustomChipSelector
-              chips={currentLocation.chips}
+              chips={chipsFor(currentLocation, money)}
               selectedChip={bet}
               onSelect={(val) => {
                 // If in idle/done, update bet
@@ -124,7 +167,7 @@ const BlackjackGameScreen = () => {
                     pressed && { opacity: 0.8 }
                   ]}
                 >
-                  <Text style={styles.primaryText}>{roundState === 'done' ? 'NEW DEAL' : 'DEAL'}</Text>
+                  <Text style={styles.primaryText}>{roundState === 'done' ? t('casino.newDeal') : t('casino.deal')}</Text>
                 </Pressable>
               )}
 
@@ -150,7 +193,40 @@ const BlackjackGameScreen = () => {
 
 export default BlackjackGameScreen;
 
+/** The felt's size. Wide enough for five cards, short enough to leave the
+ *  chips and the buttons on screen without scrolling. */
+const TABLE_W = Dimensions.get('window').width - 24;
+const TABLE_H = 320;
+
 const styles = StyleSheet.create({
+  table: {
+    width: TABLE_W,
+    height: TABLE_H,
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 26,
+  },
+  dealerZone: { alignItems: 'center', gap: 6 },
+  playerZone: { alignItems: 'center', gap: 6 },
+  /** The shoe, top right, which is where every card starts its journey. */
+  shoe: {
+    position: 'absolute',
+    right: TABLE_W * 0.10,
+    top: TABLE_H * 0.40,
+    width: 30,
+    height: 42,
+    borderRadius: 5,
+    borderWidth: 1,
+    opacity: 0.55,
+  },
+  shoeCard: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 4,
+    backgroundColor: '#2C3E50',
+    margin: 2,
+  },
+  shoeCard2: { margin: 4, backgroundColor: '#34495E' },
+
   container: { flex: 1, backgroundColor: '#1C242C' },
   content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
 

@@ -43,7 +43,12 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import ScreenHost from '../../../components/common/ScreenHost';
 import CrystalNavBar, { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { theme } from '../../../core/theme';
-import { t } from '../../../core/i18n';
+import { t, useLocale } from '../../../core/i18n';
+import {
+  translateNewsHeadline,
+  translateNewsCategory,
+  translateNewsReadTime,
+} from '../../../data/i18n/siliconNewsTranslations';
 
 export interface SiliconNewsModalProps {
   visible: boolean;
@@ -55,6 +60,9 @@ export interface SiliconNewsModalProps {
 /** News Article Card */
 const NewsCard = React.memo(({ item }: { item: NewsItem }) => {
   const visualTheme = NEWS_VISUAL_THEMES[item.type] || NEWS_VISUAL_THEMES.world;
+  const categoryText = translateNewsCategory(item.category, visualTheme.label);
+  const readTimeText = translateNewsReadTime(item.readTime);
+  const headlineText = translateNewsHeadline(item.text);
 
   return (
     <View style={[styles.card, { borderLeftColor: visualTheme.accentColor }]}>
@@ -63,21 +71,22 @@ const NewsCard = React.memo(({ item }: { item: NewsItem }) => {
         <View style={styles.cardMetaLeft}>
           <View style={[styles.badge, { backgroundColor: visualTheme.badgeBg }]}>
             <Text style={[styles.badgeText, { color: visualTheme.badgeText }]}>
-              {item.category || visualTheme.label}
+              {categoryText}
             </Text>
           </View>
           <Text style={styles.sourceText}>{item.source}</Text>
         </View>
-        <Text style={styles.readTimeText}>{item.readTime}</Text>
+        <Text style={styles.readTimeText}>{readTimeText}</Text>
       </View>
 
       {/* Article Body */}
-      <Text style={styles.headlineText}>{item.text}</Text>
+      <Text style={styles.headlineText}>{headlineText}</Text>
     </View>
   );
 });
 
 export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onClose, asScreen }) => {
+  useLocale();
   const { state, actions } = useSiliconNewsLogic(visible, onClose);
   const { newsHistory } = state;
 
@@ -95,7 +104,7 @@ export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onC
         {/* Header Container with downward nudge for comfortable spacing */}
         <View style={styles.headerWrapper}>
           <ScreenHeader
-            title="SILICON NEWS"
+            title={t('news.title')}
             subtitle={t('home.news') || 'NEWS'}
             onBack={actions.handleClose}
             inset={true}
@@ -112,7 +121,7 @@ export const SiliconNewsModal: React.FC<SiliconNewsModalProps> = ({ visible, onC
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No news recorded yet.</Text>
+              <Text style={styles.emptyText}>{t('news.noNews')}</Text>
             </View>
           }
         />

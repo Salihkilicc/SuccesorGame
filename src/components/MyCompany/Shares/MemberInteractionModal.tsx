@@ -434,6 +434,20 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                     { label: 'You offered', value: formatMoney(offerPrice) },
                     { label: 'They want', value: formatMoney(requiredPrice), strong: true },
                 ],
+                // ----------------------------------------------------------
+                //  WHY THE ASK IS ABOVE THE TICKER
+                // ----------------------------------------------------------
+                //  Without this line the ask simply looks wrong, and the
+                //  player concludes the price is broken rather than that the
+                //  board is refusing to sell control at the bottom of a hole.
+                //  See core/market/buyout.ts.
+                // ----------------------------------------------------------
+                note: buyoutResult.pricedOffReference
+                    ? t('mem.pricedOffReference', {
+                        v1: formatMoney(buyoutResult.referencePerShare),
+                        v2: formatMoney(buyoutResult.basePrice),
+                    })
+                    : undefined,
                 confirmLabel: 'OK',
                 tone: 'danger',
             });

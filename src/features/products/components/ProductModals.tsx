@@ -1777,7 +1777,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         textAlign: 'center',
     },
-    diceBtn: { padding: 4 },
     diceIcon: { fontSize: 20 },
     insightBox: { backgroundColor: theme.colors.cardSoft, padding: 12, borderRadius: 8, marginBottom: 20, borderLeftWidth: 4, borderLeftColor: theme.colors.accent },
     insightTitle: { color: theme.colors.textPrimary, fontWeight: '700', marginBottom: 4 },

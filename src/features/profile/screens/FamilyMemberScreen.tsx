@@ -38,8 +38,16 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import BabyNamingModal from '../../love/components/BabyNamingModal';
 import ProposalWizardView from '../../love/components/ProposalWizardView';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
+import { t, useLocale } from '../../../core/i18n';
+import {
+    translateSocialClass,
+    translateOccupation,
+    translateEducationLevel,
+    translateTrait,
+} from '../../../data/i18n/profileLoveShopText';
 
 export const FamilyMemberScreen: React.FC = () => {
+    useLocale();
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
     const { memberId, memberType, memberName: paramName } = route.params || {};
@@ -107,8 +115,8 @@ export const FamilyMemberScreen: React.FC = () => {
     const handleDesignateSuccessor = (targetChildId: string) => {
         family.designateSuccessor(targetChildId);
         Alert.alert(
-            'Succession Declared',
-            `${name} has been designated as the primary successor to the Hale dynasty.`,
+            t('profile.successionDeclared'),
+            t('profile.successionDeclaredDesc', { name }),
         );
     };
 
@@ -120,22 +128,22 @@ export const FamilyMemberScreen: React.FC = () => {
         // useStatsStore.money - see the note in useEquityStore, which had to
         // learn this once already when a dividend went into the wrong store.
         if ((useStatsStore.getState().money || 0) < cost) {
-            Alert.alert('Insufficient Funds', 'You need $2,500 for an exclusive date night.');
+            Alert.alert(t('shop.insufficientFunds'), t('profile.insufficientFundsDate'));
             return;
         }
         useStatsStore.getState().spendMoney(cost);
         family.updateLove(8);
         player.updateCore('happiness', Math.min(100, player.core.happiness + 6));
         player.updateCore('stress', Math.max(0, player.core.stress - 8));
-        Alert.alert('Exclusive Date', `Enjoyed a romantic evening with ${name} (+8 Love, -8 Stress).`);
+        Alert.alert(t('profile.exclusiveDate'), t('profile.exclusiveDateDesc', { name }));
     };
 
     const handleGiftPartner = () => {
         const res = handleGift(15000);
         if (!res.success) {
-            Alert.alert('Gift Failed', res.error || 'Could not send gift.');
+            Alert.alert(t('profile.giftFailed'), res.error || 'Could not send gift.');
         } else {
-            Alert.alert('Luxury Gift', `Luxury gift presented (+${res.loveDelta} Love).`);
+            Alert.alert(t('profile.luxuryGift'), t('profile.luxuryGiftDesc', { delta: String(res.loveDelta) }));
         }
     };
 
@@ -286,7 +294,7 @@ export const FamilyMemberScreen: React.FC = () => {
     if (!partner && !child) {
         return (
             <View style={styles.root}>
-                <ScreenHeader title="FAMILY MEMBER" category="company" />
+                <ScreenHeader title={t('family.familyMember')} category="company" />
                 <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>Member not found in family registry.</Text>
                 </View>
@@ -298,7 +306,7 @@ export const FamilyMemberScreen: React.FC = () => {
         <View style={styles.root}>
             {/* Screen Header with Back Arrow and dynamic child name subtitle */}
             <ScreenHeader
-                title={isPartner ? 'PARTNER' : 'FAMILY MEMBER'}
+                title={isPartner ? t('partner.dossier') : t('family.familyMember')}
                 subtitle={name.toUpperCase()}
                 category="company"
             />
@@ -316,8 +324,8 @@ export const FamilyMemberScreen: React.FC = () => {
                         <Text style={styles.memberName}>{name}</Text>
                         <Text style={styles.memberSub}>
                             {isPartner
-                                ? `${partner!.stats.occupation} • Age ${partner!.stats.age}`
-                                : `${child!.gender === 'Female' ? 'Daughter' : 'Son'} • Age ${child!.age} (${child!.educationLevel})`}
+                                ? `${translateOccupation(partner!.stats.occupation)} • ${t('family.age', { age: String(partner!.stats.age) })}`
+                                : `${child!.gender === 'Female' ? t('family.daughter') : t('family.son')} • ${t('family.age', { age: String(child!.age) })} (${translateEducationLevel(child!.educationLevel)})`}
                         </Text>
                     </View>
                     <View style={styles.badgesCol}>
@@ -325,7 +333,7 @@ export const FamilyMemberScreen: React.FC = () => {
                             <>
                                 <View style={styles.socialBadge}>
                                     <Text style={styles.socialBadgeText}>
-                                        {partner!.stats.socialClass.toUpperCase()}
+                                        {translateSocialClass(partner!.stats.socialClass).toUpperCase()}
                                     </Text>
                                 </View>
                                 <View
@@ -335,7 +343,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                     ]}
                                 >
                                     <Text style={styles.statusBadgeText}>
-                                        {partner!.isMarried ? 'SPOUSE' : 'PARTNER'}
+                                        {partner!.isMarried ? t('partner.married').toUpperCase() : t('partner.partner').toUpperCase()}
                                     </Text>
                                 </View>
                             </>
@@ -343,7 +351,7 @@ export const FamilyMemberScreen: React.FC = () => {
                             isDesignatedSuccessor && (
                                 <View style={styles.heirBadge}>
                                     <MaterialCommunityIcons name="crown" size={14} color="#FBBF24" />
-                                    <Text style={styles.heirBadgeText}>SUCCESSOR</Text>
+                                    <Text style={styles.heirBadgeText}>{t('family.successor')}</Text>
                                 </View>
                             )
                         )}
@@ -354,7 +362,7 @@ export const FamilyMemberScreen: React.FC = () => {
                 <View style={styles.sectionCard}>
                     <View style={styles.metricRow}>
                         <Text style={styles.metricLabel}>
-                            {isPartner ? 'ROMANTIC BOND' : 'FAMILY RELATIONSHIP'}
+                            {isPartner ? t('partner.affectionDevotion') : t('family.familyBond')}
                         </Text>
                         <Text style={styles.metricValue}>
                             {isPartner
@@ -381,16 +389,16 @@ export const FamilyMemberScreen: React.FC = () => {
                     <>
                         {/* Personality Matrix */}
                         <View style={styles.sectionCard}>
-                            <Text style={styles.sectionTitle}>PSYCHOMETRIC PROFILE</Text>
+                            <Text style={styles.sectionTitle}>{t('partner.psychometrics')}</Text>
                             <View style={styles.traitsWrap}>
                                 <View style={styles.traitChip}>
                                     <Text style={styles.traitText}>
-                                        {partner.stats.style.toUpperCase()} STYLE
+                                        {translateTrait(partner.stats.style).toUpperCase()}
                                     </Text>
                                 </View>
                                 <View style={styles.traitChip}>
                                     <Text style={styles.traitText}>
-                                        {partner.stats.socialClass.toUpperCase()} CLASS
+                                        {translateSocialClass(partner.stats.socialClass).toUpperCase()}
                                     </Text>
                                 </View>
                             </View>
@@ -398,7 +406,7 @@ export const FamilyMemberScreen: React.FC = () => {
 
                         {/* Partner Interactions */}
                         <View style={styles.actionsContainer}>
-                            <Text style={styles.sectionTitle}>INTERACTIONS</Text>
+                            <Text style={styles.sectionTitle}>{t('partner.interactions')}</Text>
                             <View style={styles.actionButtonsCol}>
                                 <Pressable
                                     style={({ pressed }) => [
@@ -414,7 +422,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                         color="#05A8F6"
                                     />
                                     <Text style={styles.btnSurfaceText}>
-                                        Exclusive Date Night ($2.5K)
+                                        {t('partner.exclusiveDateNight')}
                                     </Text>
                                 </Pressable>
 
@@ -432,7 +440,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                         color="#05A8F6"
                                     />
                                     <Text style={styles.btnSurfaceText}>
-                                        Send Luxury Gift ($15K)
+                                        {t('partner.sendLuxuryGift')}
                                     </Text>
                                 </Pressable>
 
@@ -450,7 +458,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                             size={18}
                                             color="#FBBF24"
                                         />
-                                        <Text style={styles.btnAmberText}>Propose Marriage</Text>
+                                        <Text style={styles.btnAmberText}>{t('partner.proposeMarriage')}</Text>
                                     </Pressable>
                                 )}
 
@@ -488,7 +496,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                         color={theme.colors.textSecondary}
                                     />
                                     <Text style={styles.btnDestructiveText}>
-                                        {partner.isMarried ? 'File for Divorce' : 'Break Up'}
+                                        {partner.isMarried ? t('partner.fileForDivorce') : t('partner.breakUp')}
                                     </Text>
                                 </Pressable>
                             </View>
@@ -503,36 +511,36 @@ export const FamilyMemberScreen: React.FC = () => {
                     <>
                         {/* Succession Suitability Stats Grid */}
                         <View style={styles.sectionCard}>
-                            <Text style={styles.sectionTitle}>SUCCESSION SUITABILITY</Text>
+                            <Text style={styles.sectionTitle}>{t('family.successionSuitability')}</Text>
                             <View style={styles.statsGrid}>
                                 <View style={styles.statTile}>
-                                    <Text style={styles.statTileLabel}>BUSINESS ACUMEN</Text>
+                                    <Text style={styles.statTileLabel}>{t('family.businessAcumen')}</Text>
                                     <Text style={[styles.statTileValue, { color: '#FFA94D' }]}>
                                         {child.stats.businessAcumen}
                                     </Text>
                                 </View>
                                 <View style={styles.statTile}>
-                                    <Text style={styles.statTileLabel}>INTELLECT</Text>
+                                    <Text style={styles.statTileLabel}>{t('family.intellect')}</Text>
                                     <Text style={[styles.statTileValue, { color: '#38BDF8' }]}>
                                         {child.stats.intellect}
                                     </Text>
                                 </View>
                                 <View style={styles.statTile}>
-                                    <Text style={styles.statTileLabel}>AMBITION</Text>
+                                    <Text style={styles.statTileLabel}>{t('family.ambition')}</Text>
                                     <Text style={[styles.statTileValue, { color: '#05A8F6' }]}>
                                         {child.stats.ambition}
                                     </Text>
                                 </View>
                                 <View style={styles.statTile}>
-                                    <Text style={styles.statTileLabel}>CHARM</Text>
+                                    <Text style={styles.statTileLabel}>{t('family.charm')}</Text>
                                     <Text style={styles.statTileValue}>{child.stats.charm}</Text>
                                 </View>
                                 <View style={styles.statTile}>
-                                    <Text style={styles.statTileLabel}>LOYALTY</Text>
+                                    <Text style={styles.statTileLabel}>{t('family.loyalty')}</Text>
                                     <Text style={styles.statTileValue}>{child.stats.loyalty}</Text>
                                 </View>
                                 <View style={styles.statTile}>
-                                    <Text style={styles.statTileLabel}>HEALTH</Text>
+                                    <Text style={styles.statTileLabel}>{t('family.health')}</Text>
                                     <Text style={styles.statTileValue}>{child.stats.health}</Text>
                                 </View>
                             </View>
@@ -541,11 +549,11 @@ export const FamilyMemberScreen: React.FC = () => {
                         {/* Traits List */}
                         {child.traits && child.traits.length > 0 && (
                             <View style={styles.sectionCard}>
-                                <Text style={styles.sectionTitle}>SPECIAL TRAITS</Text>
+                                <Text style={styles.sectionTitle}>{t('family.specialTraits')}</Text>
                                 <View style={styles.traitsWrap}>
                                     {child.traits.map((trait, index) => (
                                         <View key={index} style={styles.traitChip}>
-                                            <Text style={styles.traitText}>{trait}</Text>
+                                            <Text style={styles.traitText}>{translateTrait(trait)}</Text>
                                         </View>
                                     ))}
                                 </View>
@@ -554,7 +562,7 @@ export const FamilyMemberScreen: React.FC = () => {
 
                         {/* Child Succession Action */}
                         <View style={styles.actionsContainer}>
-                            <Text style={styles.sectionTitle}>DYNASTY ACTIONS</Text>
+                            <Text style={styles.sectionTitle}>{t('family.dynastyActions')}</Text>
                             <View style={styles.actionButtonsCol}>
                                 {!isDesignatedSuccessor ? (
                                     <Pressable
@@ -571,7 +579,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                             color="#FBBF24"
                                         />
                                         <Text style={styles.btnAmberText}>
-                                            Designate as Primary Successor
+                                            {t('family.designateSuccessor')}
                                         </Text>
                                     </Pressable>
                                 ) : (
@@ -582,7 +590,7 @@ export const FamilyMemberScreen: React.FC = () => {
                                             color="#FBBF24"
                                         />
                                         <Text style={styles.activeSuccessorText}>
-                                            Designated Primary Successor to the Hale Empire
+                                            {t('family.primarySuccessor')}
                                         </Text>
                                     </View>
                                 )}

@@ -3,6 +3,9 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { BetType, getNumberColor } from '../logic/useRouletteLogic';
 import { CasinoTheme } from '../data/casinoData';
+import { useLocale } from '../../../core/i18n';
+import { translateDozenBet, translateOutsideBet } from '../../../data/i18n/casinoText';
+import { feltColour } from '../../../core/casino/roulette';
 
 interface RouletteTableProps {
   onPlaceBet: (type: BetType) => void;
@@ -21,10 +24,11 @@ for (let row = 0; row < 12; row++) {
   ROULETTE_GRID.push([base + 1, base + 2, base + 3]);
 }
 
+// ONE SET OF FELT COLOURS. This table and the wheel beside it had two
+// different reds; see core/casino/roulette.ts -> FELT.
 const NUMBER_COLORS: Record<number, string> = {};
 for (let i = 0; i <= 36; i++) {
-  const c = getNumberColor(i);
-  NUMBER_COLORS[i] = c === 'red' ? '#B91C1C' : c === 'black' ? '#15191E' : '#166534';
+  NUMBER_COLORS[i] = feltColour(i);
 }
 
 const formatChipAmount = (val: number): string => {
@@ -108,6 +112,7 @@ const AreaBetButton = ({
 );
 
 const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: RouletteTableProps) => {
+  useLocale();
   return (
     <View style={styles.container}>
       {/* ZERO */}
@@ -143,21 +148,21 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
       {/* DOZEN BETS */}
       <View style={styles.dozenRow}>
         <AreaBetButton
-          label="1st 12"
+          label={translateDozenBet('1st 12')}
           betType="1ST12"
           betAmount={getBetOnPosition('1ST12')}
           onPress={() => onPlaceBet('1ST12')}
           disabled={disabled}
         />
         <AreaBetButton
-          label="2nd 12"
+          label={translateDozenBet('2nd 12')}
           betType="2ND12"
           betAmount={getBetOnPosition('2ND12')}
           onPress={() => onPlaceBet('2ND12')}
           disabled={disabled}
         />
         <AreaBetButton
-          label="3rd 12"
+          label={translateDozenBet('3rd 12')}
           betType="3RD12"
           betAmount={getBetOnPosition('3RD12')}
           onPress={() => onPlaceBet('3RD12')}
@@ -168,21 +173,21 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
       {/* AREA BETS (6-pack) */}
       <View style={styles.areaBetGrid}>
         <AreaBetButton
-          label="1-18"
+          label={translateOutsideBet('1-18')}
           betType="LOW"
           betAmount={getBetOnPosition('LOW')}
           onPress={() => onPlaceBet('LOW')}
           disabled={disabled}
         />
         <AreaBetButton
-          label="EVEN"
+          label={translateOutsideBet('EVEN')}
           betType="EVEN"
           betAmount={getBetOnPosition('EVEN')}
           onPress={() => onPlaceBet('EVEN')}
           disabled={disabled}
         />
         <AreaBetButton
-          label="◆ RED"
+          label={translateOutsideBet('◆ RED')}
           betType="RED"
           betAmount={getBetOnPosition('RED')}
           onPress={() => onPlaceBet('RED')}
@@ -191,7 +196,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           disabled={disabled}
         />
         <AreaBetButton
-          label="◆ BLACK"
+          label={translateOutsideBet('◆ BLACK')}
           betType="BLACK"
           betAmount={getBetOnPosition('BLACK')}
           onPress={() => onPlaceBet('BLACK')}
@@ -200,14 +205,14 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           disabled={disabled}
         />
         <AreaBetButton
-          label="ODD"
+          label={translateOutsideBet('ODD')}
           betType="ODD"
           betAmount={getBetOnPosition('ODD')}
           onPress={() => onPlaceBet('ODD')}
           disabled={disabled}
         />
         <AreaBetButton
-          label="19-36"
+          label={translateOutsideBet('19-36')}
           betType="HIGH"
           betAmount={getBetOnPosition('HIGH')}
           onPress={() => onPlaceBet('HIGH')}

@@ -70,12 +70,14 @@ const NewGameQuestion = () => {
                     label: t('newGame.play'),
                     description: t('newGame.playWhy'),
                     icon: 'book-open-page-variant-outline',
+                    tone: 'brand',
                     onPress: () => answer('play'),
                 },
                 {
                     label: t('newGame.skip'),
                     description: t('newGame.skipWhy'),
                     icon: 'fast-forward-outline',
+                    tone: 'primary',
                     onPress: () => answer('skip'),
                 },
             ]}

@@ -17,20 +17,30 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import ConversationRunner from '../../../components/story/ConversationRunner';
 import AnimatedBubble from '../../../components/story/AnimatedBubble';
 import { useMessageThreadLogic } from '../logic/useMessageThreadLogic';
+import { t, useLocale } from '../../../core/i18n';
+import {
+    translateRole,
+    translateSenderName,
+    translateMessageText,
+} from '../../../data/i18n/mailMessagesText';
 
 const formatMonth = (m: number) => `M${m}`;
 
 const MessageThreadScreen = () => {
+    useLocale();
     const { state, actions } = useMessageThreadLogic();
     const { thread, conversation, slideAnim, scrollViewRef } = state;
     const { handleBack, handleFinished } = actions;
 
     if (!thread) return null;
 
+    const displayName = translateSenderName(thread.name);
+    const displayRole = translateRole(thread.role);
+
     if (conversation) {
         return (
             <Animated.View style={[styles.root, { transform: [{ translateX: slideAnim }] }]}>
-                <ScreenHeader title={thread.name} subtitle={thread.role} onBack={handleBack} />
+                <ScreenHeader title={displayName} subtitle={displayRole} onBack={handleBack} />
                 <ConversationRunner
                     conversation={conversation}
                     variant="message"
@@ -45,7 +55,7 @@ const MessageThreadScreen = () => {
             <KeyboardAvoidingView
                 style={styles.root}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-                <ScreenHeader title={thread.name} subtitle={thread.role} onBack={handleBack} />
+                <ScreenHeader title={displayName} subtitle={displayRole} onBack={handleBack} />
 
                 <ScrollView 
                     ref={scrollViewRef}
@@ -70,7 +80,7 @@ const MessageThreadScreen = () => {
                                         isMine ? styles.tailRight : styles.tailLeft
                                     ]}>
                                         <Text style={[styles.bubbleText, isMine && styles.bubbleTextMine]}>
-                                            {m.text}
+                                            {translateMessageText(m.text)}
                                         </Text>
                                     </View>
                                 </AnimatedBubble>
@@ -86,7 +96,7 @@ const MessageThreadScreen = () => {
                         <TextInput
                             style={styles.composerInput}
                             editable={false}
-                            placeholder="Message..."
+                            placeholder={t('messages.composerPlaceholder')}
                             placeholderTextColor={theme.colors.textMuted}
                             multiline
                         />

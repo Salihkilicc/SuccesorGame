@@ -8,6 +8,12 @@ import { CasinoLocation } from '../data/casinoData';
 import { theme } from '../../../core/theme';
 import { formatCompact } from '../../../core/utils';
 import { CASINO_LADDER_TOP } from '../data/casinoData';
+import { useLocale } from '../../../core/i18n';
+import {
+  translateCasinoLocationName,
+  translateCasinoLocationSubtitle,
+  translateCasinoRank,
+} from '../../../data/i18n/casinoText';
 
 interface CasinoHeaderProps {
   location: CasinoLocation;
@@ -26,6 +32,7 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
   onLocationPress,
   hideLocationSelector = false,
 }) => {
+  useLocale();
   const insets = useSafeAreaInsets();
 
   const getReputationRank = (rep: number) => {
@@ -85,9 +92,9 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
             >
               <Text style={styles.locationPillFlag}>{location.theme.flag}</Text>
               <View style={styles.locationPillTextWrapper}>
-                <Text style={styles.locationPillCity}>{location.name.toUpperCase()}</Text>
+                <Text style={styles.locationPillCity}>{translateCasinoLocationName(location.name).toUpperCase()}</Text>
                 <Text style={[styles.locationPillSub, { color: location.theme.textColor }]}>
-                  {location.subTitle}
+                  {translateCasinoLocationSubtitle(location.subTitle)}
                 </Text>
               </View>
               <MaterialCommunityIcons
@@ -98,9 +105,9 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
             </TouchableOpacity>
           ) : (
             <View style={styles.titleWrapper}>
-              <Text style={styles.title}>{location.name.toUpperCase()}</Text>
+              <Text style={styles.title}>{translateCasinoLocationName(location.name).toUpperCase()}</Text>
               <Text style={[styles.subtitle, { color: location.theme.textColor }]}>
-                {location.subTitle}
+                {translateCasinoLocationSubtitle(location.subTitle)}
               </Text>
             </View>
           )}
@@ -118,7 +125,7 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
             <View style={styles.repLeftLabel}>
               <MaterialCommunityIcons name="star-circle-outline" size={12} color={location.theme.primary} />
               <Text style={styles.repLabelText}>
-                CASINO VIP: <Text style={{ color: location.theme.textColor, fontWeight: '800' }}>{rankName.toUpperCase()}</Text>
+                CASINO VIP: <Text style={{ color: location.theme.textColor, fontWeight: '800' }}>{translateCasinoRank(rankName).toUpperCase()}</Text>
               </Text>
             </View>
             <Text style={styles.repNumbersText}>

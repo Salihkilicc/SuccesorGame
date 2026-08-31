@@ -491,6 +491,7 @@ const FacilityPanel: React.FC = () => {
                         { value: employeeCount, label: 'Now', color: '#FFFFFF' },
                     ]}
                     steps={[1, 10, 100]}
+                    percents={[]}
                 />
 
                 <Text style={styles.costLine}>{t('company.wageBillAtThisSize', { v1: formatMoney(wageBill) })}</Text>

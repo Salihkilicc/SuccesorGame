@@ -43,12 +43,19 @@ interface ReelProps {
     isSpinning: boolean;
     delay: number;
     index: number;
+    /**
+     * How long this reel takes to settle.
+     *
+     * A prop rather than a constant because the LAST reel takes longer when
+     * the first two match. See logic/useSlotsLogic.ts -> HANG_MS.
+     */
+    settleMs?: number;
 }
 
 /** If a machine hands over nothing, show that rather than another game. */
 const MOCK_STRIP = ['help-circle-outline'];
 
-export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf, tint }: ReelProps) => {
+export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf, tint, settleMs = 260 }: ReelProps) => {
     // Fallback if symbols is empty
     const stripSymbols = symbols && symbols.length > 0 ? symbols : MOCK_STRIP;
 
@@ -65,7 +72,9 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf,
             Animated.loop(
                 Animated.timing(translateY, {
                     toValue: 0,
-                    duration: 500 + (stripSymbols.length * 20),
+                    // FASTER. At 500ms a revolution the symbols are readable, which is
+                    // why it looked like a list scrolling rather than a reel spinning.
+                    duration: 220 + (stripSymbols.length * 8),
                     easing: Easing.linear,
                     useNativeDriver: true,
                 })
@@ -84,7 +93,7 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf,
                     Animated.sequence([
                         Animated.timing(translateY, {
                             toValue: -targetIndex * SYMBOL_HEIGHT,
-                            duration: 400,
+                            duration: settleMs,
                             easing: Easing.out(Easing.poly(2)),
                             useNativeDriver: true
                         })
@@ -92,7 +101,7 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf,
                 });
             }, delay);
         }
-    }, [isSpinning, finalSymbol, delay, stripSymbols]);
+    }, [isSpinning, finalSymbol, delay, stripSymbols, settleMs]);
 
     return (
         <View style={styles.reelContainer}>
@@ -132,7 +141,19 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf,
 const styles = StyleSheet.create({
     reelContainer: {
         width: 72,
-        height: SYMBOL_HEIGHT * 3, // Show 3 symbols
+        // ------------------------------------------------------------------
+        //  ONE ROW, NOT THREE
+        // ------------------------------------------------------------------
+        //  Reported as "three came up side by side and it counted it as a
+        //  loss". They were right and so was the machine: this window showed
+        //  THREE rows and only the middle one is the payline, so the top row
+        //  landing three of a kind is a loss that looks exactly like a win.
+        //
+        //  A three row window belongs on a machine with three paylines. This
+        //  one has a single line, so it shows a single line, and now every
+        //  symbol on screen is a symbol that counts.
+        // ------------------------------------------------------------------
+        height: SYMBOL_HEIGHT,
         overflow: 'hidden',
         backgroundColor: '#434B50',
         borderWidth: 1,
@@ -150,7 +171,7 @@ const styles = StyleSheet.create({
     // `symbol` was a 40pt font size. The icon carries its own size now.
     payline: {
         position: 'absolute',
-        top: SYMBOL_HEIGHT,
+        top: 0,
         height: SYMBOL_HEIGHT,
         left: 0,
         right: 0,

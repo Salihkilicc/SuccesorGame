@@ -25,7 +25,12 @@ import {
     portfolioFriend, portfolioFriendEvent,
     PEAR_MULTIPLE, VULTURE_MULTIPLE, FRIEND_MULTIPLE, SQUEEZE_THRESHOLD,
 } from '../../data/events/portfolio';
-import { DIVESTITURE_DISCOUNT, quoteDivestiture, type AcquisitionDeal } from './mergers';
+import {
+    DIVESTITURE_DISCOUNT_MIN,
+    divestitureDiscount,
+    quoteDivestiture,
+    type AcquisitionDeal,
+} from './mergers';
 import { cashWarningEvent } from '../../data/events/cashWarning';
 import { CONVERSATIONS } from '../../data/story';
 import { EVENTS } from '../../data/events';
@@ -91,13 +96,32 @@ describe('all three are in the game', () => {
 //  THE PRICES
 // ============================================================================
 describe('none of the three prices is the market price', () => {
-    const market = 1 - DIVESTITURE_DISCOUNT;
+    // ------------------------------------------------------------------
+    //  WHAT AN OPEN SALE FETCHES, ON A HOLDING THAT HAS SETTLED
+    // ------------------------------------------------------------------
+    //  The exit commission is no longer one number. It starts at 35% on the
+    //  first quarter a sale is even allowed and falls to 12% over five years,
+    //  so "the market price" now depends on how long the thing has been held.
+    //
+    //  These three offers are pitched against a MATURE holding, which is the
+    //  situation all three scenes describe: a company that has been yours
+    //  long enough for somebody to have an opinion about it. So the anchor is
+    //  the floor. Measured against the 8 quarter fixture instead, the
+    //  commission is 28% and Marco's 0.80 becomes the best price in the game,
+    //  which inverts the whole design and makes his apology nonsense.
+    //  See mergers.divestitureDiscount.
+    // ------------------------------------------------------------------
+    const market = 1 - DIVESTITURE_DISCOUNT_MIN;
 
     it('and the market price is what selling normally gets you', () => {
         // Read from the engine rather than restated, so a rebalance of the
         // discount moves the thing these three are measured against.
+        // And the engine charges the SCHEDULE, not the floor: this fixture
+        // has been held eight quarters, so it pays more than a settled one.
         const q = quoteDivestiture(deal);
-        expect(q.proceeds).toBeCloseTo(q.currentFairValue * market, 6);
+        expect(q.proceeds).toBeCloseTo(
+            q.currentFairValue * (1 - divestitureDiscount(deal.quartersSinceClose)), 6);
+        expect(q.discount).toBeGreaterThan(DIVESTITURE_DISCOUNT_MIN);
     });
 
     it('Pear pays OVER, because he is not buying an asset', () => {

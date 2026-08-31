@@ -104,6 +104,75 @@ export const HOSTILE_TRUST_FLOOR = 15;
 export const holdingFraction = (holder: Holder, totalShares: number): number =>
     totalShares > 0 ? Math.max(0, holder.shareCount) / totalShares : 0;
 
+// ============================================================================
+//  AND WHAT THEY PRICE IT AGAINST
+// ============================================================================
+//
+//  Reported as: "I can wreck the company on purpose, take a billion dollar
+//  business down to a million, and then buy the shares out. It is an exploit
+//  and it works during the four year founder protection too."
+//
+//  It was, and the founder protection has nothing to do with it: that covers
+//  being REMOVED, and this is the player doing the buying. Measured on one
+//  company, healthy against deliberately wrecked - cash spent, debt loaded,
+//  earnings driven negative:
+//
+//      HEALTHY   valuation $7,029.2M   $702.92 a share   whole board $8,217.10M
+//      WRECKED   valuation     $1.5M     $0.15 a share   whole board     $1.75M
+//
+//  A four thousand seven hundred fold discount on control, and the ask fell by
+//  EXACTLY the ratio the price fell by, because `askPerShare` was
+//  `market * (1 + premium)` and the spot price was its only input. The board
+//  was pricing a control block off a number the player sets.
+//
+//  THE FIX IS THE UNAFFECTED PRICE. Real takeovers do not price off the screen
+//  on the day; they price off what the stock was worth before the thing that
+//  moved it. A director sitting on the board can read the books, knows a
+//  collapse was engineered, and will not hand over control at the bottom of a
+//  hole the buyer dug.
+//
+//  So the ask is measured against the HIGHER of the spot price and a reference
+//  that remembers. The reference follows the price up immediately and comes
+//  down only slowly, which gives exactly the asymmetry that is wanted:
+//
+//    a genuine decline    the reference walks down with it, a quarter of the
+//                         gap closing every year or so, and eventually the
+//                         board really is cheap, because the company really is
+//    an engineered crash  the reference barely moves, and control still costs
+//                         what the company was worth before you broke it
+//
+//  A company that is honestly worth less does get cheaper. It just takes the
+//  years that being honestly worth less takes.
+// ============================================================================
+
+/**
+ * How much of the gap between the reference and the spot price closes each
+ * quarter.
+ *
+ * MEASURED, not picked. At 0.12 a genuine tenfold decline takes about eighteen
+ * quarters for the reference to come within a tenth of the new price - four and
+ * a half years, which is roughly how long it takes a market to accept that a
+ * company is permanently smaller. The engineered four thousand fold crash above
+ * takes so long that it is not a strategy any more, which is the point: the
+ * same rule prices both, and only one of them is patient enough to survive it.
+ */
+export const UNAFFECTED_DECAY = 0.12;
+
+/**
+ * The reference price for next quarter.
+ *
+ * Up is instant: good news is priced immediately and nobody sells a rising
+ * company at last year's price. Down is slow, and that slowness is the whole
+ * defence.
+ */
+export const decayReference = (previousReference: number, spot: number): number => {
+    const s = Math.max(0, spot || 0);
+    const prev = Math.max(0, previousReference || 0);
+    if (!(prev > 0)) return s;
+    if (s >= prev) return s;
+    return prev - (prev - s) * UNAFFECTED_DECAY;
+};
+
 export type BuyoutAsk = {
     canSell: boolean;
     /** Why not, in words the screen can show. Null when they will sell. */
@@ -112,6 +181,13 @@ export type BuyoutAsk = {
     premium: number;
     /** The market price of one share, unchanged. */
     marketPerShare: number;
+    /** What the premium is actually applied to: the higher of spot and the reference. */
+    basePerShare: number;
+    /**
+     * True when the reference is doing the work, so the screen can say why the
+     * ask is above the ticker instead of looking broken.
+     */
+    pricedOffReference: boolean;
     /** What they want for ONE share. */
     askPerShare: number;
     /** What they want for THE WHOLE HOLDING. This is the number to compare. */
@@ -128,11 +204,21 @@ export const buyoutAsk = (
     holder: Holder,
     marketPerShare: number,
     name: string = 'They',
+    /**
+     * What the stock was worth before whatever moved it. Omit it and the ask
+     * is priced off spot exactly as before, which is what every test written
+     * against the old signature assumes.
+     */
+    unaffectedPerShare: number = 0,
 ): BuyoutAsk => {
     const trust = Number.isFinite(holder?.trust) ? holder.trust : 50;
     const trait = holder?.trait ?? '';
     const shares = Math.max(0, holder?.shareCount ?? 0);
     const market = Math.max(0, marketPerShare || 0);
+    const unaffected = Math.max(0, unaffectedPerShare || 0);
+    // They price a control block off the better of the two, never off the
+    // worse. See the note above UNAFFECTED_DECAY.
+    const base = Math.max(market, unaffected);
 
     if (trust < HOSTILE_TRUST_FLOOR && (trait === 'Shark' || trait === 'Snake')) {
         return {
@@ -140,6 +226,8 @@ export const buyoutAsk = (
             refusalReason: `${name} will not sell at any price. Trust is ${Math.round(trust)} of 100, and holding the shares is the point.`,
             premium: 0,
             marketPerShare: market,
+            basePerShare: base,
+            pricedOffReference: false,
             askPerShare: 0,
             askTotal: 0,
         };
@@ -150,12 +238,14 @@ export const buyoutAsk = (
     const traitPremium = trait in TRAIT_PREMIUM ? TRAIT_PREMIUM[trait] : DEFAULT_TRAIT_PREMIUM;
     const premium = reluctance + traitPremium;
 
-    const askPerShare = market * (1 + premium);
+    const askPerShare = base * (1 + premium);
     return {
         canSell: true,
         refusalReason: null,
         premium,
         marketPerShare: market,
+        basePerShare: base,
+        pricedOffReference: base > market,
         askPerShare,
         askTotal: askPerShare * shares,
     };

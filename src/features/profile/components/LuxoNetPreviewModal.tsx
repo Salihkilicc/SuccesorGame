@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, Modal, Pressable, ScrollView } from 'react-nati
 import LinearGradient from 'react-native-linear-gradient';
 import { useLuxoNetStore, LuxuryAsset } from '../../../core/store/useLuxoNetStore';
 import { handleBuyLuxury } from '../../../logic/personalEventsLogic';
+import { t, useLocale } from '../../../core/i18n';
+import { translateCategory, translateRarity } from '../../../data/i18n/profileLoveShopText';
 
 interface LuxoNetPreviewModalProps {
     visible: boolean;
@@ -14,6 +16,7 @@ export const LuxoNetPreviewModal: React.FC<LuxoNetPreviewModalProps> = ({
     visible,
     onClose,
 }) => {
+    useLocale();
     const { catalog, ownedAssets } = useLuxoNetStore();
 
     return (
@@ -36,11 +39,11 @@ export const LuxoNetPreviewModal: React.FC<LuxoNetPreviewModalProps> = ({
                             <View style={styles.titleRow}>
                                 <Text style={styles.modalTitle}>LUXONET</Text>
                                 <View style={styles.vaultBadge}>
-                                    <Text style={styles.vaultBadgeText}>SOVEREIGN VAULT</Text>
+                                    <Text style={styles.vaultBadgeText}>{t('shop.sovereignVault')}</Text>
                                 </View>
                             </View>
                             <Text style={styles.modalSub}>
-                                Exclusive Marketplace for Ultra-High-Net-Worth CEOs
+                                {t('shop.exclusiveMarketplace')}
                             </Text>
                         </View>
 
@@ -54,7 +57,9 @@ export const LuxoNetPreviewModal: React.FC<LuxoNetPreviewModalProps> = ({
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.scrollBody}
                     >
-                        <Text style={styles.sectionHeader}>CATALOG LISTINGS ({catalog.length})</Text>
+                        <Text style={styles.sectionHeader}>
+                            {t('shop.catalogListings', { count: String(catalog.length) })}
+                        </Text>
 
                         {catalog.map((item: LuxuryAsset) => (
                             <LinearGradient
@@ -66,12 +71,12 @@ export const LuxoNetPreviewModal: React.FC<LuxoNetPreviewModalProps> = ({
                                     <View style={styles.itemMeta}>
                                         <Text style={styles.itemName}>{item.name}</Text>
                                         <Text style={styles.itemBrand}>
-                                            {item.brand} • {item.category}
+                                            {item.brand} • {translateCategory(item.category)}
                                         </Text>
                                     </View>
                                     <View style={styles.rarityBadge}>
                                         <Text style={styles.rarityBadgeText}>
-                                            {item.rarity.toUpperCase()}
+                                            {translateRarity(item.rarity)}
                                         </Text>
                                     </View>
                                 </View>
@@ -80,20 +85,20 @@ export const LuxoNetPreviewModal: React.FC<LuxoNetPreviewModalProps> = ({
 
                                 <View style={styles.specsRow}>
                                     <View style={styles.specBox}>
-                                        <Text style={styles.specLabel}>PRESTIGE</Text>
+                                        <Text style={styles.specLabel}>{t('shop.prestige')}</Text>
                                         <Text style={styles.specValPurple}>+{item.prestigeScore}</Text>
                                     </View>
                                     <View style={styles.specBox}>
-                                        <Text style={styles.specLabel}>ANNUAL UPKEEP</Text>
+                                        <Text style={styles.specLabel}>{t('shop.annualUpkeep')}</Text>
                                         <Text style={styles.specValWhite}>
-                                            ${(item.annualMaintenanceCost / 1000).toFixed(0)}k/yr
+                                            ${(item.annualMaintenanceCost / 1000).toFixed(0)}k/{t('shop.yearUnit')}
                                         </Text>
                                     </View>
                                     <View style={styles.specBox}>
-                                        <Text style={styles.specLabel}>APPRECIATION</Text>
+                                        <Text style={styles.specLabel}>{t('shop.appreciation')}</Text>
                                         <Text style={styles.specValBlue}>
                                             {item.appreciationRatePerYear > 0 ? '+' : ''}
-                                            {(item.appreciationRatePerYear * 100).toFixed(0)}%/yr
+                                            {(item.appreciationRatePerYear * 100).toFixed(0)}%/{t('shop.yearUnit')}
                                         </Text>
                                     </View>
                                 </View>

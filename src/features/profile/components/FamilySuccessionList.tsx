@@ -14,6 +14,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { Child } from '../../../core/store/useFamilyStore';
+import { t, useLocale } from '../../../core/i18n';
+import { translateEducationLevel } from '../../../data/i18n/profileLoveShopText';
 
 interface FamilySuccessionListProps {
     children: Child[];
@@ -26,16 +28,19 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
     designatedSuccessorId,
     onSelectChild,
 }) => {
+    useLocale();
     return (
         <View style={styles.container}>
             <View style={styles.sectionHeaderRow}>
-                <Text style={styles.sectionTitle}>DYNASTY & SUCCESSION</Text>
-                <Text style={styles.countText}>{children.length} Successors</Text>
+                <Text style={styles.sectionTitle}>{t('family.dynastySuccession')}</Text>
+                <Text style={styles.countText}>
+                    {t('family.successorsCount', { count: String(children.length) })}
+                </Text>
             </View>
 
             {children.length === 0 ? (
                 <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>No descendants currently recorded.</Text>
+                    <Text style={styles.emptyText}>{t('family.noDescendants')}</Text>
                 </View>
             ) : (
                 children.map((child) => {
@@ -47,7 +52,8 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
                         .substring(0, 2)
                         .toUpperCase();
 
-                    const relationLabel = child.gender === 'Female' ? 'Daughter' : 'Son';
+                    const relationLabel = child.gender === 'Female' ? t('family.daughter') : t('family.son');
+                    const educationLabel = translateEducationLevel(child.educationLevel);
 
                     return (
                         <Pressable
@@ -72,12 +78,12 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
                                     </Text>
                                     {isSuccessor && (
                                         <View style={styles.heirTag}>
-                                            <Text style={styles.heirTagText}>SUCCESSOR</Text>
+                                            <Text style={styles.heirTagText}>{t('family.successor')}</Text>
                                         </View>
                                     )}
                                 </View>
                                 <Text style={styles.childSub}>
-                                    {relationLabel} • Age {child.age} • {child.educationLevel}
+                                    {relationLabel} • {t('family.age', { age: String(child.age) })} • {educationLabel}
                                 </Text>
                             </View>
 
@@ -85,7 +91,7 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
                             <View style={styles.rightBlock}>
                                 <View style={styles.bondPill}>
                                     <Text style={styles.bondText}>
-                                        {child.relationshipWithPlayer}% Bond
+                                        {t('family.bond', { pct: String(child.relationshipWithPlayer) })}
                                     </Text>
                                 </View>
                                 <MaterialCommunityIcons

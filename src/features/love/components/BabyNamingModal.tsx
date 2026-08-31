@@ -33,7 +33,9 @@ const BabyNamingModal: React.FC<Props> = ({
                     <Text style={styles.namingHeadEmoji}>👶</Text>
                     <Text style={styles.namingTitle}>{t('love.aNewLife')}</Text>
                     <Text style={styles.namingSubtitle}>
-                        {'Congratulations! You just had a ' + (pendingChildGender === 'Female' ? 'baby girl' : 'baby boy') + '.\nWhat will you name them?'}
+                        {t('love.babyBirthDesc', {
+                            gender: pendingChildGender === 'Female' ? t('love.babyGirl') : t('love.babyBoy'),
+                        })}
                     </Text>
 
                     {/* Input */}

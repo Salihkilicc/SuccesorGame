@@ -32,6 +32,14 @@ import {
     estimateTargetEbit,
     quoteAcquisition,
     quoteDivestiture,
+    DIVESTITURE_DISCOUNT_MAX,
+} from '../../../core/market/mergers';
+import {
+    strategyVerdict,
+    noteFor,
+    type SubsidiaryNote,
+} from '../../../core/market/subsidiaryStrategy';
+import {
     quoteFinancing,
 } from '../../../core/market/mergers';
 import { directorFromAcquisition } from '../../../core/market/governance';
@@ -111,6 +119,16 @@ export interface Subsidiary {
     strategy: SubsidiaryStrategy;
     lastChangePercent: number; // For UI display (e.g. +12.5%)
     history: number[];
+    /**
+     * WHY it moved the way it did, written by the quarterly evaluation and
+     * read by the quarterly report.
+     *
+     * A translation key plus its argument rather than a finished sentence,
+     * because the player can change language and a rendered string sitting in
+     * a save would not follow them.
+     * See core/market/subsidiaryStrategy.ts -> noteFor.
+     */
+    lastNote?: SubsidiaryNote;
 }
 
 export interface CorporateFinanceState {
@@ -1159,9 +1177,32 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
                 const quote = subsidiary.deal ? quoteDivestiture(subsidiary.deal) : undefined;
+
+                // ----------------------------------------------------------
+                //  IT CANNOT BE SOLD IN THE FIRST TWO QUARTERS
+                // ----------------------------------------------------------
+                //  Enforced HERE and not only on the screen, because the
+                //  screen is not the only caller: a story effect divests too
+                //  (see core/story/gameSink.ts), and a rule that lives in a
+                //  button is a rule with a way round it.
+                //
+                //  A STORY DIVESTITURE IS EXEMPT. When a scene has somebody
+                //  arrive with an offer, that offer is the fiction and the
+                //  player did not go looking for it. `priceMultiple` is what
+                //  says so: only the story passes one.
+                //  See core/market/mergers.ts -> divestitureLock.
+                // ----------------------------------------------------------
+                if (priceMultiple === undefined && quote?.locked) {
+                    console.warn(
+                        `[FinanceStore] ${subsidiary.name} cannot be sold for another `
+                        + `${quote.quartersLeft} quarter(s).`,
+                    );
+                    return;
+                }
+
                 const proceeds = priceMultiple !== undefined
                     ? (quote ? quote.currentFairValue : subsidiary.valuation) * priceMultiple
-                    : (quote ? quote.proceeds : subsidiary.valuation * 0.85);
+                    : (quote ? quote.proceeds : subsidiary.valuation * (1 - DIVESTITURE_DISCOUNT_MAX));
 
                 setCompanyCapital(companyCapital + proceeds);
 
@@ -1274,22 +1315,21 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 const { subsidiaries } = get();
 
                 const updatedSubsidiaries = subsidiaries.map(sub => {
+                    // ------------------------------------------------------
+                    //  ONE TABLE, NOT A CHAIN OF IFS
+                    // ------------------------------------------------------
+                    //  This was four hand-written sector conditions, and it
+                    //  recognised Technology, Industrial, Retail and Finance.
+                    //  The market data ships eight buyable HEALTH companies
+                    //  and no retailers at all, so a fifth of the portfolio
+                    //  fell through to the bad branch every single quarter,
+                    //  forever, whatever the player did - and an unrecognised
+                    //  sector defaulted to the same doom.
+                    //
+                    //  See core/market/subsidiaryStrategy.ts.
+                    // ------------------------------------------------------
                     const { strategy, sector } = sub;
-
-                    // 1. Determine Strategy Quality
-                    // Good Criteria
-                    const isTechGood = sector === 'Technology' && strategy.rnd >= 4;
-                    const isIndGood = sector === 'Industrial' && strategy.production >= 4;
-                    const isRetailGood = sector === 'Retail' && strategy.marketing >= 4;
-                    const isFinGood = sector === 'Finance' && strategy.marketing >= 3 && strategy.rnd >= 3;
-
-                    const meetsGoodCriteria = isTechGood || isIndGood || isRetailGood || isFinGood;
-
-                    // Bad Override
-                    const isWorkforceBad = strategy.workforce < 2;
-
-                    // Final Decision
-                    const isGoodStrategy = meetsGoodCriteria && !isWorkforceBad;
+                    const isGoodStrategy = strategyVerdict(sector, strategy as any).good;
 
                     // 2. Probability Logic
                     const roll = Math.random() * 100;
@@ -1329,7 +1369,11 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                         ...sub,
                         valuation: newValuation,
                         lastChangePercent: changePercent * 100, // Stored as percentage number (e.g. 12.5 for 12.5%)
-                        history: newHistory
+                        history: newHistory,
+                        // WHY it moved, for the report to read. A key rather
+                        // than a sentence: the player can change language and
+                        // a rendered string would not follow them.
+                        lastNote: noteFor(sector, strategy as any, changePercent),
                     };
                 });
 
@@ -1342,8 +1386,49 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 if (!company) return { success: false, msg: "Company not found." };
 
-                // 1. Calculate Markup
-                const markup = (askingPrice - company.valuation) / company.valuation;
+                // ----------------------------------------------------------
+                //  THE DOOR THAT DID NOT KNOW ABOUT THE COMMISSION
+                // ----------------------------------------------------------
+                //  Reported as "I buy a company and sell it straight away for
+                //  more, there is no commission in between". Four other routes
+                //  were measured first and every one of them LOSES money on an
+                //  immediate flip, from seven per cent to ninety three. This
+                //  was the fifth, and it is the one:
+                //
+                //    - it never called `quoteDivestiture`, so the fifteen per
+                //      cent exit discount did not exist here
+                //    - it credited the FULL asking price, and the asking price
+                //      defaults to `valuation`, which is set to what you PAID,
+                //      premium and all - so the premium that is supposed to
+                //      evaporate on day one came straight back
+                //    - and a refusal only cost five per cent of the valuation,
+                //      so it could simply be tried again
+                //
+                //  One question answered in two places again, and this was the
+                //  copy the player was actually using. It now asks the same
+                //  function every other exit asks.
+                //  See core/market/mergers.ts.
+                // ----------------------------------------------------------
+                const quote = company.deal ? quoteDivestiture(company.deal) : undefined;
+
+                if (quote?.locked) {
+                    return {
+                        success: false,
+                        msg: `A sale cannot be arranged for another ${quote.quartersLeft} `
+                            + `quarter${quote.quartersLeft === 1 ? '' : 's'}. Buyers want to see `
+                            + `a set of accounts under your ownership first.`,
+                    };
+                }
+
+                /** What a buyer thinks it is worth, rather than what you paid for it. */
+                const fairValue = quote ? quote.currentFairValue : company.valuation;
+                const commission = quote ? quote.discount : DIVESTITURE_DISCOUNT_MAX;
+
+                // 1. Calculate Markup, against the fair value rather than the
+                //    price you paid. Asking what you paid for a company you
+                //    overpaid for is already a markup, and it should read as
+                //    one.
+                const markup = fairValue > 0 ? (askingPrice - fairValue) / fairValue : 1;
 
                 // 2. Probability: Base 80%, -2% for every 1% markup
                 let successChance = 0.80 - (markup * 2.0);
@@ -1356,14 +1441,19 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
 
                 // 3. Roll Dice
                 if (Math.random() <= successChance) {
-                    // SUCCESS
+                    // SUCCESS, less the commission. Agreeing a price and
+                    // receiving that price are different things: bankers,
+                    // lawyers and the buyer's own diligence come out of it,
+                    // and how much they come out of depends on how long you
+                    // held it. See core/market/mergers.ts.
+                    const net = Math.max(0, askingPrice * (1 - commission));
                     const { companyCapital, setCompanyCapital } = useStatsStore.getState();
-                    setCompanyCapital(companyCapital + askingPrice);
+                    setCompanyCapital(companyCapital + net);
 
                     set((state) => ({
                         subsidiaries: state.subsidiaries.filter((s) => s.id !== id),
                     }));
-                    return { success: true, price: askingPrice, msg: "Sold!" };
+                    return { success: true, price: net, msg: "Sold!" };
                 } else {
                     // FAIL: -5% Valuation Penalty
                     const newVal = Math.floor(company.valuation * 0.95);

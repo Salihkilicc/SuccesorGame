@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, StyleSheet, ActivityIndicator, Animated } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import { t, useLocale } from '../../../core/i18n';
 
 interface PaymentProcessingModalProps {
     visible: boolean;
@@ -20,7 +21,8 @@ export const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({
     amount,
     onComplete,
 }) => {
-    const [statusText, setStatusText] = useState('Connecting to Swiss Private Vault Wire...');
+    useLocale();
+    const [statusText, setStatusText] = useState(t('shop.wireConnecting'));
     const [showSuccess, setShowSuccess] = useState(false);
     const [scaleAnim] = useState(new Animated.Value(0));
 
@@ -28,12 +30,12 @@ export const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({
         if (visible) {
             setShowSuccess(false);
             scaleAnim.setValue(0);
-            setStatusText('Connecting to Swiss Private Vault Wire...');
+            setStatusText(t('shop.wireConnecting'));
 
             const sequence = [
-                { time: 1000, text: 'Verifying Sovereign Biometric Signature...' },
-                { time: 2200, text: 'Authorizing Asset Title Transfer & Notarization...' },
-                { time: 3400, text: 'Acquisition Approved & Registered.' },
+                { time: 1000, text: t('shop.wireBiometric') },
+                { time: 2200, text: t('shop.wireNotarization') },
+                { time: 3400, text: t('shop.wireApproved') },
             ];
 
             const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -84,7 +86,7 @@ export const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({
 
                         <View style={styles.securityBadge}>
                             <MaterialCommunityIcons name="shield-lock" size={14} color="#7DD3FC" />
-                            <Text style={styles.securityText}>ENCRYPTED SWISS BANKING WIRE</Text>
+                            <Text style={styles.securityText}>{t('shop.wireEncrypted')}</Text>
                         </View>
                     </View>
                 ) : (

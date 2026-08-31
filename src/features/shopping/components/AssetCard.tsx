@@ -14,6 +14,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { OwnedAsset } from '../types';
+import { t, useLocale } from '../../../core/i18n';
+import { translateCategory } from '../../../data/i18n/profileLoveShopText';
 
 interface AssetCardProps {
     item: OwnedAsset;
@@ -57,9 +59,10 @@ export const AssetCard: React.FC<AssetCardProps> = ({
     onPropose,
     variant = 'grid',
 }) => {
+    useLocale();
     const isGrid = variant === 'grid';
     const catTheme = getCategoryTheme(item.category);
-    const categoryLabel = item.category.replace('_', ' ');
+    const categoryLabel = translateCategory(item.category);
 
     // Condition color
     const condition = Math.max(0, Math.min(100, item.condition || 100));
@@ -116,7 +119,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                             style={({ pressed }) => [styles.btnAction, pressed && styles.btnPressed]}
                             onPress={() => onSell(item)}
                         >
-                            <Text style={styles.btnActionText}>SELL</Text>
+                            <Text style={styles.btnActionText}>{t('shop.sell')}</Text>
                         </Pressable>
                     )}
 
@@ -126,14 +129,14 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                                 style={({ pressed }) => [styles.btnAction, styles.btnBlue, pressed && styles.btnPressed]}
                                 onPress={() => onRepair(item)}
                             >
-                                <Text style={styles.btnBlueText}>REPAIR</Text>
+                                <Text style={styles.btnBlueText}>{t('shop.repair')}</Text>
                             </Pressable>
                         ) : (
                             <Pressable
                                 style={({ pressed }) => [styles.btnAction, pressed && styles.btnPressed]}
                                 onPress={() => onSell(item)}
                             >
-                                <Text style={styles.btnActionText}>SELL</Text>
+                                <Text style={styles.btnActionText}>{t('shop.sell')}</Text>
                             </Pressable>
                         )
                     )}
@@ -143,7 +146,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                             style={({ pressed }) => [styles.btnAction, styles.btnAmber, pressed && styles.btnPressed]}
                             onPress={() => onPropose(item)}
                         >
-                            <Text style={styles.btnAmberText}>PROPOSE</Text>
+                            <Text style={styles.btnAmberText}>{t('shop.propose')}</Text>
                         </Pressable>
                     )}
                 </View>
@@ -175,7 +178,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                 style={({ pressed }) => [styles.btnAction, pressed && styles.btnPressed]}
                 onPress={() => onSell(item)}
             >
-                <Text style={styles.btnActionText}>SELL</Text>
+                <Text style={styles.btnActionText}>{t('shop.sell')}</Text>
             </Pressable>
         </View>
     );
