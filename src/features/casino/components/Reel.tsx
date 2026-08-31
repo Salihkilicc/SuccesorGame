@@ -21,7 +21,7 @@ import { theme } from '../../../core/theme';
 // 80 -> 64. Three of these is the height of the machine, so the twenty four
 // points saved here are twenty four the SPIN button gets back. See
 // screens/SlotsGameScreen.tsx, which no longer scrolls.
-const SYMBOL_HEIGHT = 64;
+export const SYMBOL_HEIGHT = 64;
 
 interface ReelProps {
     /** MaterialCommunityIcons names. */
@@ -118,8 +118,21 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf,
                 ))}
             </Animated.View>
 
-            <View style={styles.shadeTop} pointerEvents="none" />
-            <View style={styles.shadeBottom} pointerEvents="none" />
+            {/* ----------------------------------------------------------
+                THE SHADES ARE GONE
+
+                They were two 40 point scrims, top and bottom, dimming the
+                rows either side of the payline on a window that was 192
+                points tall. The window is 64 points now - one row - so the
+                two of them overlapped and covered the ENTIRE symbol in a
+                fifty per cent black wash. The one thing the player is meant
+                to look at was the darkest thing on the machine.
+
+                A one row window has nothing to fade out. What it needs
+                instead is the sense of being lit from the front, which is
+                the hairline below.
+               ---------------------------------------------------------- */}
+            <View style={styles.glassLip} pointerEvents="none" />
 
             {/* ----------------------------------------------------------
                 THE LINE THAT PAYS
@@ -127,8 +140,8 @@ export const Reel = ({ symbols, finalSymbol, isSpinning, delay, index, colourOf,
                 Three rows were drawn identically, so the row that decides
                 the money looked exactly like the two that decorate it. A
                 player could not tell where to look. This is a hairline
-                either side of the middle band, in the room's colour, so
-                the payline reads as the payline.
+                either side of the band, in the room's colour, so the
+                payline reads as the payline.
                ---------------------------------------------------------- */}
             <View
                 pointerEvents="none"
@@ -155,9 +168,23 @@ const styles = StyleSheet.create({
         // ------------------------------------------------------------------
         height: SYMBOL_HEIGHT,
         overflow: 'hidden',
-        backgroundColor: '#434B50',
+        // ------------------------------------------------------------------
+        //  DARKER THAN THE CARD GREY IT WAS
+        // ------------------------------------------------------------------
+        //  The reel sits inside a lit bezel now - see SlotCabinet.tsx - and a
+        //  window has to be darker than the frame around it or it does not
+        //  read as a window. `#434B50` is the same grey as every card in the
+        //  game, which is why the machine looked like a card.
+        //
+        //  THE GROUND, not an invented darker hex. I reached for `#141C24`
+        //  first and the palette audit was right to flag it: the ground is
+        //  already the darkest tone the theme has, and the cabinet body fades
+        //  down to it, so the window and the body meet at the same value and
+        //  the bezel stroke is what separates them. One less colour.
+        // ------------------------------------------------------------------
+        backgroundColor: theme.colors.background,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderColor: 'rgba(255,255,255,0.08)',
         borderRadius: 8,
     },
     strip: {
@@ -181,22 +208,44 @@ const styles = StyleSheet.create({
         // colour they are carrying. Two lines say the same thing.
         backgroundColor: 'transparent',
     },
-    shadeTop: {
+    /**
+     * A single highlight across the top third of the window.
+     *
+     * What the two shades were reaching for and getting backwards: it is not
+     * that the edges should be dark, it is that the glass should catch the
+     * light. Faint, and above the icon rather than over it.
+     */
+    glassLip: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        height: 40,
-        backgroundColor: 'rgba(28,36,44,0.5)',
+        height: 18,
+        backgroundColor: 'rgba(255,255,255,0.05)',
         zIndex: 10,
     },
-    shadeBottom: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 40,
-        backgroundColor: 'rgba(28,36,44,0.5)',
-        zIndex: 10,
-    }
+
+    // ----------------------------------------------------------------------
+    //  SHELVED with the three row window they were drawn for. Kept because
+    //  they record what the machine used to be, and because deleting is not
+    //  the move here.
+    // ----------------------------------------------------------------------
+    // shadeTop: {
+    //     position: 'absolute',
+    //     top: 0,
+    //     left: 0,
+    //     right: 0,
+    //     height: 40,
+    //     backgroundColor: 'rgba(28,36,44,0.5)',
+    //     zIndex: 10,
+    // },
+    // shadeBottom: {
+    //     position: 'absolute',
+    //     bottom: 0,
+    //     left: 0,
+    //     right: 0,
+    //     height: 40,
+    //     backgroundColor: 'rgba(28,36,44,0.5)',
+    //     zIndex: 10,
+    // }
 });

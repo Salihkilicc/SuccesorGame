@@ -5,7 +5,7 @@ import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import GameResultPopup from '../components/GameResultPopup';
-import { useBlackjackLogic, Card } from '../logic/useBlackjackLogic';
+import { useBlackjackLogic, SHOW_REVEAL_MS, Card } from '../logic/useBlackjackLogic';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
 import CasinoHeader from '../components/CasinoHeader';
 import { CustomChipSelector } from '../components/CustomChipSelector';
@@ -26,7 +26,7 @@ const BlackjackGameScreen = () => {
 
   // Logic Hook
   const { state, actions } = useBlackjackLogic(initialBet);
-  const { playerCards, dealerCards, bet, roundState, status, resultPopup, playerTotal, dealerTotal, dealerDrawn, money } = state;
+  const { playerCards, dealerCards, bet, roundState, status, resultPopup, playerTotal, dealerTotal, dealerDrawn, money, busy, hideHole } = state;
 
   // --------------------------------------------------------------------
   //  WHERE THE DECK IS
@@ -40,8 +40,26 @@ const BlackjackGameScreen = () => {
   const DECK_FROM_DEALER = { x: 130, y: -34 };
   const DECK_FROM_PLAYER = { x: 130, y: -190 };
 
-  // Krupiyenin kapalı kartı sadece oyuncu oynarken gizli
-  const hideDealerHole = roundState === 'player';
+  // ------------------------------------------------------------------
+  //  THE HOLE CARD
+  // ------------------------------------------------------------------
+  //  This used to be `roundState === 'player'`, which stopped working the
+  //  moment the settlement started waiting for the animation: the round now
+  //  stays open while the dealer draws, so the card would have stayed face
+  //  down until the very end and the one dramatic moment at the table would
+  //  have happened after the result was already on screen. The hook owns it.
+  // ------------------------------------------------------------------
+  const hideDealerHole = hideHole;
+
+  /**
+   * How long the drawn cards wait before they start arriving.
+   *
+   * The hole card turns over FIRST and alone. Without this offset the dealer's
+   * third card slides in over the top of the reveal and the two most
+   * interesting things at the table happen simultaneously, which means neither
+   * of them registers. Matches SHOW_REVEAL_MS in the hook.
+   */
+  const DRAW_AFTER_REVEAL = SHOW_REVEAL_MS;
 
   return (
     <View style={styles.container}>
@@ -103,7 +121,7 @@ const BlackjackGameScreen = () => {
                   // are staggered from zero rather than from the deal.
                   index={idx < 2 ? idx : idx - 2}
                   hidden={idx === 1 && hideDealerHole}
-                  baseDelay={idx < 2 ? 100 : 0}
+                  baseDelay={idx < 2 ? 100 : DRAW_AFTER_REVEAL}
                   fromX={DECK_FROM_DEALER.x}
                   fromY={DECK_FROM_DEALER.y}
                 />
@@ -118,7 +136,12 @@ const BlackjackGameScreen = () => {
                 <AnimatedCard
                   key={`player-${card.rank}${card.suit}-${idx}`}
                   card={card}
-                  index={idx}
+                  // ONLY THE OPENING TWO ARE STAGGERED. A card taken on a hit
+                  // is dealt on its own, so giving it index 4 made the player
+                  // wait 480ms of stagger for cards that were dealt minutes
+                  // ago. The dealer's row has always done this; the player's
+                  // row did not, and the longer your hand the worse it got.
+                  index={idx < 2 ? idx : 0}
                   baseDelay={0}
                   fromX={DECK_FROM_PLAYER.x}
                   fromY={DECK_FROM_PLAYER.y}
@@ -160,10 +183,10 @@ const BlackjackGameScreen = () => {
               {(roundState === 'idle' || roundState === 'done') && (
                 <Pressable
                   onPress={actions.deal}
-                  disabled={bet <= 0 && roundState === 'idle'}
+                  disabled={busy || (bet <= 0 && roundState === 'idle')}
                   style={({ pressed }) => [
                     styles.primaryButton,
-                    { backgroundColor: currentLocation.theme.primary, opacity: (bet <= 0 && roundState === 'idle') ? 0.5 : 1 },
+                    { backgroundColor: currentLocation.theme.primary, opacity: (busy || (bet <= 0 && roundState === 'idle')) ? 0.5 : 1 },
                     pressed && { opacity: 0.8 }
                   ]}
                 >
@@ -171,13 +194,29 @@ const BlackjackGameScreen = () => {
                 </Pressable>
               )}
 
-              {/* HIT / STAND */}
+              {/* ------------------------------------------------------------
+                  HIT / STAND
+
+                  DEAD WHILE THE TABLE IS BUSY. A player who can hit while the
+                  previous card is still in the air gets two cards landing on
+                  top of each other, and can bust before the card that busted
+                  them has finished turning over. `busy` is the whole reason
+                  the pacing holds.
+                 ------------------------------------------------------------ */}
               {roundState === 'player' && (
                 <>
-                  <Pressable onPress={actions.hit} style={({ pressed }) => [styles.gameBtn, styles.hitBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
+                  <Pressable
+                    onPress={actions.hit}
+                    disabled={busy}
+                    style={({ pressed }) => [styles.gameBtn, styles.hitBtn, busy && styles.btnBusy, pressed && { transform: [{ scale: 0.95 }] }]}
+                  >
                     <Text style={styles.gameBtnText}>{t('ui.hit')}</Text>
                   </Pressable>
-                  <Pressable onPress={actions.stand} style={({ pressed }) => [styles.gameBtn, styles.standBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
+                  <Pressable
+                    onPress={actions.stand}
+                    disabled={busy}
+                    style={({ pressed }) => [styles.gameBtn, styles.standBtn, busy && styles.btnBusy, pressed && { transform: [{ scale: 0.95 }] }]}
+                  >
                     <Text style={styles.gameBtnText}>{t('ui.stand')}</Text>
                   </Pressable>
                 </>
@@ -282,6 +321,7 @@ const styles = StyleSheet.create({
     minWidth: 90,
     alignItems: 'center'
   },
+  btnBusy: { opacity: 0.4 },
   hitBtn: { borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(207,208,210,0.1)' },
   standBtn: { borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(5,168,246,0.1)' },
   gameBtnText: { color: '#FFFFFF', fontWeight: '900' }

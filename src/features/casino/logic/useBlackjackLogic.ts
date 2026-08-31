@@ -1,9 +1,10 @@
 // src/features/casino/logic/useBlackjackLogic.ts
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 import { casinoAlert } from '../../../data/i18n/casinoText';
+import { CARD_SHOW_MS, DEAL_GAP, DEAL_MS, FLIP_MS } from '../components/AnimatedCard';
 import {
     dealerPlay,
     freshDeck,
@@ -41,6 +42,48 @@ type RoundState = 'idle' | 'player' | 'done';
 // Helper: Sayı Sınırlama
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
+// ============================================================================
+//  THE ENGINE KNOWS AT ONCE. THE TABLE TAKES ITS TIME TELLING YOU.
+// ============================================================================
+//
+//  Reported as "the card is still half open and it already says you won or you
+//  lost, and it is not satisfying".
+//
+//  That was exact. `resolveRound` was called on the same line that dealt the
+//  cards - synchronously, in the same React tick - so the popup mounted in the
+//  same frame in which the cards began travelling out of the shoe. The player
+//  was told the outcome of a hand they had not been shown yet, and then the
+//  animation played out underneath a banner that had already spoiled it.
+//
+//  Roulette got this right and blackjack never did: there the wheel turns for
+//  three seconds and the settlement waits behind it, even though `spinRoulette`
+//  decided the number before anything moved. Same idea here. The engine still
+//  settles the instant it can - that is what makes it testable - and these
+//  numbers are only how long the TELLING takes.
+//
+//  Every one of them is derived from what the cards actually do rather than
+//  picked, so changing the deal speed in AnimatedCard moves the pacing with it
+//  instead of quietly desynchronising it.
+// ============================================================================
+
+/** The opening deal: four cards staggered, the last one landing and turning. */
+export const SHOW_DEAL_MS = DEAL_GAP * 3 + DEAL_MS + CARD_SHOW_MS - DEAL_MS;
+
+/** One card on a hit. No stagger ahead of it, so just the card. */
+export const SHOW_HIT_MS = CARD_SHOW_MS + 90;
+
+/**
+ * The hole card turning over, plus a beat to look at it.
+ *
+ * THE MOST DRAMATIC MOMENT AT THE TABLE and it deserves its own pause. The
+ * dealer's draw waits behind this, which is why the screen offsets the drawn
+ * cards by the same amount.
+ */
+export const SHOW_REVEAL_MS = FLIP_MS + 200;
+
+/** And the last card the dealer draws still has to land and turn. */
+export const SHOW_SETTLE_MS = CARD_SHOW_MS + 120;
+
 export const useBlackjackLogic = (initialBet: number = 500000) => {
     // Global Store
     const { money, setField } = useStatsStore();
@@ -63,6 +106,45 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
      * dealer goes from two cards to five in a single frame.
      */
     const [dealerDrawn, setDealerDrawn] = useState(0);
+
+    /**
+     * True while the table is still showing you something.
+     *
+     * Cards in the air, a hole card turning, a dealer drawing. The buttons are
+     * dead for the duration, because a player who can hit while the previous
+     * card is still travelling gets two cards arriving on top of each other.
+     */
+    const [busy, setBusy] = useState(false);
+
+    /**
+     * Whether the dealer's second card has been turned face up.
+     *
+     * Separate from `roundState` on purpose. The hole card must turn the
+     * INSTANT the player stands, but the round is not over until the dealer
+     * has finished drawing and the settlement has been shown - and those are
+     * seconds apart now. Reading the reveal off `roundState === 'player'`
+     * would keep the card face down until the very end and throw away the one
+     * moment the hand is actually about.
+     */
+    const [holeRevealed, setHoleRevealed] = useState(false);
+
+    // ------------------------------------------------------------------
+    //  AND EVERY TIMER IS CANCELLABLE
+    // ------------------------------------------------------------------
+    //  A settlement that fires into a screen the player has already left
+    //  pays out into a dead component. Held here and cleared on unmount.
+    // ------------------------------------------------------------------
+    const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+    const clearTimers = useCallback(() => {
+        timers.current.forEach(clearTimeout);
+        timers.current = [];
+    }, []);
+    useEffect(() => clearTimers, [clearTimers]);
+
+    /** Do this once the table has finished showing what it is showing. */
+    const after = useCallback((ms: number, run: () => void) => {
+        timers.current.push(setTimeout(run, ms));
+    }, []);
 
     /** See core/casino/blackjack.ts. */
     const calculateHand = handValue;
@@ -154,7 +236,7 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
     const actions = {
         deal: () => {
             setResultPopup(null);
-            if (roundState === 'player') return;
+            if (roundState === 'player' || busy) return;
             if (bet <= 0) {
                 casinoAlert('Place Bet', 'Please place a bet on the table.');
                 return;
@@ -164,6 +246,7 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
                 return;
             }
 
+            clearTimers();
             const dealt = shuffle(freshDeck());
             const nextPlayer = [dealt.pop()!, dealt.pop()!];
             const nextDealer = [dealt.pop()!, dealt.pop()!];
@@ -171,21 +254,36 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
             setPlayerCards(nextPlayer);
             setDealerCards(nextDealer);
             setDeck(dealt);
+            setDealerDrawn(0);
+            setHoleRevealed(false);
             setRoundState('player');
-            setStatus('Your move: HIT or STAND.');
+            setStatus('Dealing...');
+            setBusy(true);
 
             const player = calculateHand(nextPlayer);
             const dealer = calculateHand(nextDealer);
 
-            if (player.isBlackjack || dealer.isBlackjack) {
-                const outcome = player.isBlackjack && dealer.isBlackjack ? 'push'
-                    : player.isBlackjack ? 'blackjack' : 'lose';
-                resolveRound(outcome);
-            }
+            // DECIDED HERE, BEFORE A CARD HAS LANDED. The wait below is the
+            // telling of it, not the deciding.
+            const natural = player.isBlackjack || dealer.isBlackjack;
+            const outcome = player.isBlackjack && dealer.isBlackjack ? 'push'
+                : player.isBlackjack ? 'blackjack' : 'lose';
+
+            after(SHOW_DEAL_MS, () => {
+                setBusy(false);
+                if (!natural) {
+                    setStatus('Your move: HIT or STAND.');
+                    return;
+                }
+                // A natural shows the dealer's hole card too. There is nothing
+                // left to play for, so there is nothing left to hide.
+                setHoleRevealed(true);
+                after(SHOW_REVEAL_MS, () => resolveRound(outcome));
+            });
         },
 
         hit: () => {
-            if (roundState !== 'player') return;
+            if (roundState !== 'player' || busy) return;
             const nextDeck = [...deck];
             const card = nextDeck.pop();
             if (!card) return;
@@ -193,15 +291,21 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
             const nextHand = [...playerCards, card];
             setPlayerCards(nextHand);
             setDeck(nextDeck);
+            setBusy(true);
 
             const { total } = calculateHand(nextHand);
-            if (total > 21) {
-                resolveRound('lose');
-            }
+
+            after(SHOW_HIT_MS, () => {
+                setBusy(false);
+                // THE CARD HAS TO BE FACE UP BEFORE IT CAN BUST YOU. This is
+                // the one that was reported: the bust banner used to arrive
+                // while the card that caused it was still turning over.
+                if (total > 21) resolveRound('lose');
+            });
         },
 
         stand: () => {
-            if (roundState !== 'player') return;
+            if (roundState !== 'player' || busy) return;
 
             // ONE CALL, and it hands back the cards IN ORDER so the table can
             // lay them down one at a time. See core/casino/blackjack.ts.
@@ -209,12 +313,31 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
             setDealerCards(play.cards);
             setDeck(play.deck);
             setDealerDrawn(play.drawn.length);
+            setBusy(true);
+            setStatus('Dealer plays.');
 
             // And one call for who won, rather than four branches here.
-            resolveRound(settle(playerCards, play.cards, bet).outcome);
+            const outcome = settle(playerCards, play.cards, bet).outcome;
+
+            // ---- and now the show, in three beats ----
+            //  The hole card turns FIRST and on its own, because it is the
+            //  moment the hand is about. The drawn cards are already in state
+            //  but the screen holds them back by SHOW_REVEAL_MS, so they
+            //  arrive after it rather than over the top of it. Only once the
+            //  last of them has landed and turned does anybody say who won.
+            //
+            //  Dumping all of it into one frame is what made this
+            //  unsatisfying: the drama and the answer arrived together, so
+            //  there was no drama.
+            setHoleRevealed(true);
+            const showing = play.drawn.length > 0
+                ? SHOW_REVEAL_MS + SHOW_SETTLE_MS + (play.drawn.length - 1) * DEAL_GAP
+                : SHOW_REVEAL_MS + 220;
+            after(showing, () => resolveRound(outcome));
         },
 
         adjustBet: (delta: number) => {
+            if (busy) return;
             setResultPopup(null);
             const next = clamp(bet + delta, 10, 100_000_000_000);
             setBet(next);
@@ -234,7 +357,16 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
             playerTotal,
             dealerTotal,
             dealerDrawn,
-            money
+            money,
+            busy,
+            /**
+             * Whether the hole card is still face down.
+             *
+             * Computed here rather than in the screen, which used to derive it
+             * from `roundState === 'player'` - and that no longer works now
+             * that the round stays open while the dealer draws.
+             */
+            hideHole: roundState === 'player' && !holeRevealed,
         },
         actions
     };

@@ -5,6 +5,18 @@ import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 import { casinoAlert } from '../../../data/i18n/casinoText';
 import { colourOf, spinRoulette } from '../../../core/casino/roulette';
+import { DROP_MS, SPIN_MS } from '../components/RouletteWheel';
+
+/**
+ * How long the table waits before saying who won.
+ *
+ * DERIVED, NOT PICKED. This was a flat 3000 beside a wheel that takes
+ * SPIN_MS + DROP_MS = 2620, so it was correct by coincidence: anybody
+ * lengthening the spin past 2780 would have had the result announced while the
+ * ball was still in the air, which is exactly the defect blackjack was
+ * reported for. Now the spin owns its own length and the settlement follows it.
+ */
+export const SETTLE_AFTER_MS = SPIN_MS + DROP_MS + 380;
 
 // --- TİPLER VE SABİTLER ---
 
@@ -182,7 +194,7 @@ export const useRouletteLogic = (initialChip?: number) => {
     setSpinResult(null);
     setStatus('Spinning...');
 
-    // 3 second spin delay
+    // The wheel turns, the ball drops, and only then is anybody told.
     setTimeout(() => {
       // ONE CALL, and it is synchronous. The three seconds above are the
       // SHOW; this is the result, and it could have been produced before the
@@ -220,7 +232,7 @@ export const useRouletteLogic = (initialChip?: number) => {
 
       // Clear bets for next round
       setBets([]);
-    }, 3000);
+    }, SETTLE_AFTER_MS);
   };
 
   const closePopup = () => setResultPopup(null);

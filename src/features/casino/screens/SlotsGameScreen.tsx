@@ -9,7 +9,8 @@ import { theme } from '../../../core/theme';
 import GameResultPopup from '../components/GameResultPopup';
 import { useSlotsLogic } from '../logic/useSlotsLogic';
 import type { SlotVariant } from '../logic/slotsData';
-import { Reel } from '../components/Reel';
+import { Reel, SYMBOL_HEIGHT } from '../components/Reel';
+import SlotCabinet from '../components/SlotCabinet';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 import { CASINO_LOCATIONS } from '../data/casinoData';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
@@ -21,6 +22,15 @@ import { chipsFor, maxBetFor } from '../data/casinoStakes';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 
 const { width } = Dimensions.get('window');
+
+/**
+ * How wide the cabinet is.
+ *
+ * The screen's padding either side, and then capped: on a large phone a
+ * cabinet that fills the width stops looking like an object in a room and
+ * starts looking like a background.
+ */
+const CABINET_W = Math.min(width - theme.spacing.lg * 2, 340);
 
 const SlotsGameScreen = () => {
     useLocale();
@@ -112,28 +122,51 @@ const SlotsGameScreen = () => {
           </Text>
         </View>
 
-        {/* SLOT MACHINE CONTAINER */}
-        <View style={[styles.machineContainer, { borderColor: currentLocation.theme.secondary }]}>
-          <View style={styles.reelsWrapper}>
-            {columns.map((colSymbols, colIdx) => (
-              <Reel
-                symbols={state.symbolIcons}
-                key={colIdx}
-                index={colIdx}
-                finalSymbol={colSymbols[1]}
-                colourOf={(icon) => colourOfIcon(state.symbols, icon)}
-                tint={currentLocation.theme.primary}
-                isSpinning={state.isSpinning}
-                // ONE SOURCE for the stagger. The last reel waits longer when the
-                // first two match: see logic/useSlotsLogic.ts -> HANG_MS.
-                delay={reelDelays[colIdx] ?? 0}
-                settleMs={settleMs}
-              />
-            ))}
-          </View>
+        {/* ------------------------------------------------------------------
+            THE MACHINE
 
-          {/* Payline Indicator */}
-          <View style={[styles.payline, { borderColor: currentLocation.theme.chipColor }]} pointerEvents="none" />
+            This was a grey rounded rectangle in the same colour as every other
+            card in the game, holding three reels, with a payline rule drawn
+            across the whole thing. Reported as "the slot needs a complete
+            makeover, it does not look good at all" - and separately, the flow
+            was liked, so none of the timing below is touched.
+
+            It has a body now: a lit marquee with the machine's NAME on it, two
+            pillars of lamps that chase while the reels turn, a glass bezel and
+            a coin tray. The name is the part that carries information rather
+            than decoration - the three machines pay differently and the screen
+            never once said which one you were standing at.
+
+            See components/SlotCabinet.tsx.
+           ------------------------------------------------------------------ */}
+        <View style={styles.machineRow}>
+          <SlotCabinet
+            width={CABINET_W}
+            glassHeight={SYMBOL_HEIGHT + 20}
+            title={config.title}
+            tint={currentLocation.theme.primary}
+            glow={currentLocation.theme.secondary}
+            spinning={isSpinning}
+            won={!!showResult && lastResult?.type === 'win'}
+          >
+            <View style={styles.reelsWrapper}>
+              {columns.map((colSymbols, colIdx) => (
+                <Reel
+                  symbols={state.symbolIcons}
+                  key={colIdx}
+                  index={colIdx}
+                  finalSymbol={colSymbols[1]}
+                  colourOf={(icon) => colourOfIcon(state.symbols, icon)}
+                  tint={currentLocation.theme.primary}
+                  isSpinning={state.isSpinning}
+                  // ONE SOURCE for the stagger. The last reel waits longer when the
+                  // first two match: see logic/useSlotsLogic.ts -> HANG_MS.
+                  delay={reelDelays[colIdx] ?? 0}
+                  settleMs={settleMs}
+                />
+              ))}
+            </View>
+          </SlotCabinet>
         </View>
 
         {/* CONTROLS */}
@@ -208,43 +241,52 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
 
-  machineContainer: {
-    backgroundColor: '#434B50',
-    borderRadius: 24,
-    // 20 -> 14, for the same reason the bet card shrank: the column has a
-    // fixed height now and every point here is a point the controls need.
-    padding: 14,
-    borderWidth: 1,
+  machineRow: {
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1C242C',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 10,
   },
   reelsWrapper: {
     flexDirection: 'row',
     gap: 6,
-    backgroundColor: '#434B50',
-    padding: 10,
-    borderRadius: 12,
-    overflow: 'hidden',
   },
-  payline: {
-    position: 'absolute',
-    top: '50%',
-    left: -10,
-    right: -10,
-    height: 84, // Slightly larger than symbol height
-    marginTop: -42,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    zIndex: 20,
-    borderRadius: 4,
-    opacity: 0.4,
-    pointerEvents: 'none',
-  },
+
+  // ----------------------------------------------------------------------
+  //  SHELVED with the grey box they dressed. See components/SlotCabinet.tsx
+  //  for what replaced them. Kept because they record what the screen used
+  //  to be, and because deleting is not the move here.
+  // ----------------------------------------------------------------------
+  // machineContainer: {
+  //   backgroundColor: card grey,
+  //   borderRadius: 24,
+  //   padding: 14,
+  //   borderWidth: 1,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   shadowColor: the ground,
+  //   shadowOffset: { width: 0, height: 10 },
+  //   shadowOpacity: 0.6,
+  //   shadowRadius: 20,
+  //   elevation: 10,
+  // },
+  //
+  //  AND THE PAYLINE RULE, which was drawn 84 points tall across the whole
+  //  machine at forty per cent opacity - a band bigger than the window it was
+  //  meant to be marking. Each reel draws its own now, inside its own glass.
+  //
+  // payline: {
+  //   position: 'absolute',
+  //   top: '50%',
+  //   left: -10,
+  //   right: -10,
+  //   height: 84,
+  //   marginTop: -42,
+  //   borderWidth: 1,
+  //   borderColor: 'rgba(255,255,255,0.08)',
+  //   zIndex: 20,
+  //   borderRadius: 4,
+  //   opacity: 0.4,
+  //   pointerEvents: 'none',
+  // },
 
   controlsSection: {
     // Tighter than the 24 it was: that gap plus the chip selector was what

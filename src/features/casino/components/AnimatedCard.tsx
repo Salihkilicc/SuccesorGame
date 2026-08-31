@@ -1,4 +1,50 @@
 // src/features/casino/components/AnimatedCard.tsx
+//
+// ============================================================================
+//  A CARD HAS TWO SIDES AND THIS ONE ONLY EVER HAD ONE
+// ============================================================================
+//
+//  Reported as "half the card looks completely faded and missing while it is
+//  opening, and there is no turning effect".
+//
+//  Both halves of that are the same defect. The component used to return EITHER
+//  a face-down card OR a face-up card depending on a prop, and animate a
+//  rotateY across the swap:
+//
+//      if (hidden) return <back rotateY 0deg -> 180deg />
+//      return          <face rotateY 180deg -> 360deg />
+//
+//  So the moment the hole card was revealed, React threw the back away and
+//  mounted the FACE at 180 degrees - which is the face seen from BEHIND. With
+//  no backface handling that renders as a mirrored, washed out ghost of itself,
+//  and it stays that way for the entire first half of the turn. Exactly what
+//  was reported: half the animation is a card that looks wrong and empty.
+//
+//  It is also why nothing else turned over. A card dealt face up mounted at
+//  flip = 1 and simply slid in, because the only thing that ever moved `flip`
+//  was the hole card being revealed. Every other card at the table arrived
+//  already open, which is not something a dealer can do.
+//
+//  ---------------------------------------------------------------------------
+//  SO THE CARD IS TWO SIDED NOW, THE WAY A CARD IS
+//  ---------------------------------------------------------------------------
+//  Both faces are mounted, all the time, stacked on the same square, each with
+//  `backfaceVisibility: 'hidden'`. They sit a half turn apart:
+//
+//      flip = 0        back at   0deg  (facing you)    face at 180deg (hidden)
+//      flip = 0.5      both edge on, and nothing is drawn
+//      flip = 1        back at 180deg  (hidden)        face at 360deg (facing you)
+//
+//  There is no swap and no moment where a face is drawn backwards, because the
+//  side pointing away from you is not drawn at all. That is what
+//  `backfaceVisibility` is for and it was the missing piece.
+//
+//  AND EVERY CARD NOW TURNS OVER AS IT LANDS. It leaves the shoe face down,
+//  travels, and begins its turn a little before it arrives - which is what a
+//  dealer's flick actually looks like, and is the whole of the difference
+//  between a card being dealt and a value appearing.
+// ============================================================================
+
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 
@@ -30,8 +76,20 @@ interface AnimatedCardProps {
 export const DEAL_MS = 260;
 /** And the gap between one card being dealt and the next. */
 export const DEAL_GAP = 120;
-/** How long the hole card takes to turn over. */
+/** How long a card takes to turn over. */
 export const FLIP_MS = 300;
+/**
+ * How far into its journey a card starts turning.
+ *
+ * Not at the end. A dealer flicks the card and it turns WHILE it travels, so
+ * it is face up by the time it stops moving. Waiting for it to land and then
+ * turning it reads as two separate events, which is slower and looks like a
+ * machine taking its turn.
+ */
+export const TURN_AT = 130;
+
+/** Everything the deal is waiting on: travel, then the turn that overlaps it. */
+export const CARD_SHOW_MS = TURN_AT + FLIP_MS;
 
 const AnimatedCard = ({
   card, index, hidden = false, baseDelay = 0, fromX = 0, fromY = 0,
@@ -39,12 +97,13 @@ const AnimatedCard = ({
   const travel = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.85)).current;
-  /** 0 face down, 1 face up. Only the hole card ever moves it. */
-  const flip = useRef(new Animated.Value(hidden ? 0 : 1)).current;
+  /** 0 face down, 1 face up. Every card starts face down, the way it is dealt. */
+  const flip = useRef(new Animated.Value(0)).current;
+
+  const cardKey = `${card.rank}${card.suit}`;
+  const dealDelay = baseDelay + index * DEAL_GAP;
 
   useEffect(() => {
-    const staggerDelay = baseDelay + index * DEAL_GAP;
-
     travel.setValue(1);
     opacity.setValue(0);
     scale.setValue(0.85);
@@ -53,7 +112,7 @@ const AnimatedCard = ({
       Animated.timing(travel, {
         toValue: 0,
         duration: DEAL_MS,
-        delay: staggerDelay,
+        delay: dealDelay,
         // Out of a shoe and onto the felt. `back` overshoots, which is what a
         // card sliding to a stop against the others actually does.
         easing: Easing.out(Easing.back(1.1)),
@@ -62,12 +121,12 @@ const AnimatedCard = ({
       Animated.timing(opacity, {
         toValue: 1,
         duration: 160,
-        delay: staggerDelay,
+        delay: dealDelay,
         useNativeDriver: true,
       }),
       Animated.spring(scale, {
         toValue: 1,
-        delay: staggerDelay,
+        delay: dealDelay,
         friction: 8,
         tension: 100,
         useNativeDriver: true,
@@ -77,46 +136,67 @@ const AnimatedCard = ({
     anim.start();
 
     return () => anim.stop();
-  }, [card.rank, card.suit, index, baseDelay, fromX, fromY]);
+  }, [cardKey, index, baseDelay, fromX, fromY]);
 
   // ----------------------------------------------------------------------
-  //  AND THE HOLE CARD TURNS OVER
+  //  AND THE TURN
   // ----------------------------------------------------------------------
-  //  Separate from the deal on purpose: it happens much later, when the
-  //  player stands, and it is the single most dramatic moment at the table.
-  //  It used to be a hard swap between two different components.
+  //  TWO DIFFERENT EVENTS SHARE THIS, and telling them apart is the only
+  //  fiddly part of the file:
+  //
+  //    A CARD BEING DEALT turns as it lands, so it waits out the stagger
+  //    ahead of it and starts partway through its own travel.
+  //
+  //    THE HOLE CARD BEING REVEALED happens minutes later, when the player
+  //    stands, and must turn IMMEDIATELY. Making it sit through the deal's
+  //    stagger a second time would be a dealer pausing before showing you
+  //    the card that decides the hand.
+  //
+  //  `flippedFor` is how they are told apart: a card it has not seen before
+  //  is being dealt, and a card it has seen whose `hidden` changed is being
+  //  turned over.
   // ----------------------------------------------------------------------
+  const flippedFor = useRef<string | null>(null);
+
   useEffect(() => {
-    Animated.timing(flip, {
+    const beingDealt = flippedFor.current !== cardKey;
+    flippedFor.current = cardKey;
+
+    const anim = Animated.timing(flip, {
       toValue: hidden ? 0 : 1,
       duration: FLIP_MS,
-      easing: Easing.inOut(Easing.quad),
+      delay: beingDealt ? dealDelay + TURN_AT : 0,
+      easing: Easing.inOut(Easing.cubic),
       useNativeDriver: true,
-    }).start();
-  }, [hidden]);
+    });
+    anim.start();
+    return () => anim.stop();
+  }, [hidden, cardKey, dealDelay]);
 
   const translateX = travel.interpolate({ inputRange: [0, 1], outputRange: [0, fromX] });
   const translateY = travel.interpolate({ inputRange: [0, 1], outputRange: [0, fromY] });
-  /** A quarter turn each way, so the two faces swap at the halfway point. */
+  /** A half turn apart, so exactly one side is ever pointing at you. */
   const faceUpSpin = flip.interpolate({ inputRange: [0, 1], outputRange: ['180deg', '360deg'] });
   const faceDownSpin = flip.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
 
   const isRed = ['♥', '♦'].includes(card.suit);
   const textColor = isRed ? '#C0392B' : '#1C242C';
 
-  if (hidden) {
-    return (
+  return (
+    <Animated.View
+      style={[
+        styles.slot,
+        {
+          opacity,
+          transform: [{ perspective: 800 }, { translateX }, { translateY }, { scale }],
+        },
+      ]}
+    >
+      {/* THE BACK. Drawn first, so it is underneath when both are edge on. */}
       <Animated.View
         style={[
-          styles.card,
-          styles.hiddenCard,
-          {
-            transform: [
-              { translateX }, { translateY }, { scale },
-              { perspective: 800 }, { rotateY: faceDownSpin },
-            ],
-            opacity,
-          },
+          styles.card, styles.hiddenCard,
+          { transform: [{ perspective: 800 }, { rotateY: faceDownSpin }] },
         ]}
       >
         <View style={styles.hiddenPattern}>
@@ -125,57 +205,66 @@ const AnimatedCard = ({
           </View>
         </View>
       </Animated.View>
-    );
-  }
 
-  return (
-    <Animated.View
-      style={[
-        styles.card,
-        {
-          transform: [
-            { translateX }, { translateY }, { scale },
-            { perspective: 800 }, { rotateY: faceUpSpin },
-          ],
-          opacity,
-        },
-      ]}
-    >
-      {/* Top-left rank + suit */}
-      <View style={styles.cornerTop}>
-        <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
-        <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
-      </View>
+      {/* THE FACE. */}
+      <Animated.View
+        style={[
+          styles.card,
+          { transform: [{ perspective: 800 }, { rotateY: faceUpSpin }] },
+        ]}
+      >
+        {/* Top-left rank + suit */}
+        <View style={styles.cornerTop}>
+          <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
+          <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
+        </View>
 
-      {/* Center suit (large) */}
-      <Text style={[styles.centerSuit, { color: textColor }]}>{card.suit}</Text>
+        {/* Center suit (large) */}
+        <Text style={[styles.centerSuit, { color: textColor }]}>{card.suit}</Text>
 
-      {/* Bottom-right rank + suit (inverted) */}
-      <View style={styles.cornerBottom}>
-        <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
-        <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
-      </View>
+        {/* Bottom-right rank + suit (inverted) */}
+        <View style={styles.cornerBottom}>
+          <Text style={[styles.cornerSuit, { color: textColor }]}>{card.suit}</Text>
+          <Text style={[styles.cornerRank, { color: textColor }]}>{card.rank}</Text>
+        </View>
+      </Animated.View>
     </Animated.View>
   );
 };
 
 export default AnimatedCard;
 
+const CARD_W = 62;
+const CARD_H = 88;
+
 const styles = StyleSheet.create({
-  card: {
-    width: 62,
-    height: 88,
-    borderRadius: 8,
-    backgroundColor: '#FAFAFA',
-    justifyContent: 'center',
-    alignItems: 'center',
+  /**
+   * The space the card occupies, and the only thing in the row's layout.
+   *
+   * The two faces are absolutely positioned inside it, so neither of them is
+   * measured and the card cannot change width halfway through its turn.
+   */
+  slot: {
+    width: CARD_W,
+    height: CARD_H,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+  },
+  card: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 8,
+    backgroundColor: '#FAFAFA',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
+    // THE MISSING PIECE. Without this the side pointing away from you is drawn
+    // anyway, mirrored, and you spend half of every turn looking at a card
+    // that is inside out.
+    backfaceVisibility: 'hidden',
   },
   hiddenCard: {
     backgroundColor: '#2C3E50',

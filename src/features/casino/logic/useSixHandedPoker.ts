@@ -56,12 +56,22 @@ export const STARTING_STACK_MULTIPLE = 20;
 //    THE STREET a longer beat when the board changes, because the flop landing
 //               is the moment of the hand and it should not arrive in the
 //               middle of somebody's call.
+//    SHOWDOWN   and the hand is over before anybody says who won.
 // ============================================================================
 
 /** The pause when a new street is about to be dealt. */
 export const STREET_BEAT_MS = 620;
 /** And between the three flop cards as they land. */
 export const BOARD_CARD_MS = 170;
+/**
+ * How long the finished hand sits there before the pot is awarded.
+ *
+ * Long enough for the last board card to land and turn over, plus a moment to
+ * look at it. Without it the river card and the result arrive together, which
+ * is the same complaint blackjack had: being told the answer while the thing
+ * that decided it is still moving.
+ */
+export const SHOWDOWN_MS = 900;
 
 export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
     const { money, setField } = useStatsStore();
@@ -114,7 +124,20 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
         roundRef.current = from;
         if (from.done || waitingForHuman(from)) {
             setRound(from);
-            if (from.done) settle(from);
+            // ------------------------------------------------------------
+            //  AND THE HAND IS OVER BEFORE ANYBODY SAYS SO
+            // ------------------------------------------------------------
+            //  `settle` used to run on this line, in the same tick as the
+            //  state that ends the hand - so on the river the pot was
+            //  awarded while the fifth board card was still turning over.
+            //  Same defect blackjack had, milder only because there is less
+            //  to look at. The engine has known the winner since the last
+            //  action; this is the pause where the table looks at the board.
+            // ------------------------------------------------------------
+            if (from.done) {
+                const id = setTimeout(() => settle(from), SHOWDOWN_MS);
+                timers.current.push(id);
+            }
             return;
         }
         const actor = from.players[from.turn];

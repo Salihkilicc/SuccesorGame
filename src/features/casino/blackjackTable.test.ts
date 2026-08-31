@@ -113,8 +113,13 @@ describe('and the hole card turns over', () => {
 
     it('and it is its own animation, because it happens much later', () => {
         // The deal and the reveal are minutes apart at a real table.
+        //
+        // This used to pin `}, [hidden]);` - a flip effect that watched only
+        // the reveal. It watches the card identity too now, because every
+        // card turns over as it lands rather than only the hole card. See
+        // cardFlip.test.ts for what tells the two events apart.
         const src = card();
-        expect(src).toMatch(/}, \[hidden\]\);/);
+        expect(src).toMatch(/}, \[hidden, cardKey, dealDelay\]\);/);
         expect(FLIP_MS).toBeGreaterThan(200);
     });
 });
@@ -129,7 +134,11 @@ describe('and the dealer draws one card at a time', () => {
         // The first two arrive at the deal; anything after that arrives when
         // the player stands, so it cannot share the deal's stagger.
         expect(screen()).toMatch(/index=\{idx < 2 \? idx : idx - 2\}/);
-        expect(screen()).toMatch(/baseDelay=\{idx < 2 \? 100 : 0\}/);
+        // The offset was 0 and is now the length of the hole card's turn: the
+        // drawn cards used to slide in ON TOP of the reveal, so the two most
+        // interesting things at the table happened at once. See
+        // cardPacing.test.ts.
+        expect(screen()).toMatch(/baseDelay=\{idx < 2 \? 100 : DRAW_AFTER_REVEAL\}/);
     });
 
     it('and the settlement is one call rather than four branches in a handler', () => {
