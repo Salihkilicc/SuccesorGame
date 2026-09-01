@@ -293,7 +293,9 @@ export const THINK_MAX_MS = 830;
  * has to be long enough to notice and short enough to sit through, and two
  * seconds is both.
  */
-export const THINK_CAP_MS = 2000;
+export const THINK_CAP_MS = 3200;
+// Raised from 2000 when the second tier landed: a deep tank the cap swallowed
+// would not be a deep tank, it would be the ordinary one again.
 
 /**
  * How often somebody stops and really thinks about it.
@@ -325,6 +327,26 @@ export const TANK_CHANCE = 1 / 7;
 export const TANK_MULTIPLE = 2.2;
 
 /**
+ * And once in a while, somebody REALLY stops.
+ *
+ * Asked for as "raise the waits a little more, it is good now but now and
+ * then one of them should make you wait a lot".
+ *
+ * Which is a better note than it looks. The ordinary tank made every long
+ * pause the same length, so after an evening it became its own rhythm - the
+ * exact problem the tank was introduced to fix, one level up. A second, rarer
+ * and longer tier restores the thing a real table has: most pauses short, some
+ * long, and every so often one that makes everybody look up.
+ *
+ * One in twenty five, so a five handed hand carries roughly a one in five
+ * chance of containing one. Rare enough to be an event.
+ */
+export const DEEP_TANK_CHANCE = 1 / 25;
+
+/** How much longer that one takes. */
+export const DEEP_TANK_MULTIPLE = 3.6;
+
+/**
  * How long this bot sits there before acting.
  *
  * A raise takes longer than a fold, because deciding to put money in is the
@@ -345,12 +367,16 @@ export const thinkTime = (action: Action, roll: () => number = Math.random): num
     // AND ONCE IN A WHILE, SOMEBODY STOPS DEAD.
     //  Never on a fold: nobody agonises over throwing a hand away, and a
     //  bot that did would be the most obvious tell at the table.
+    // AND ONCE IN A WHILE, SOMEBODY STOPS DEAD.
+    //  Two tiers, because one made every long pause the same length and became
+    //  a rhythm of its own - the problem the tank was added to fix, one level
+    //  up. Never on a fold: nobody agonises over throwing a hand away.
     const second = roll();
-    const tank = action !== 'fold'
-        && (Number.isFinite(second) ? second : 1) < TANK_CHANCE;
+    const die2 = Number.isFinite(second) ? second : 1;
+    const multiple = action === 'fold' ? 1
+        : die2 < DEEP_TANK_CHANCE ? DEEP_TANK_MULTIPLE
+            : die2 < TANK_CHANCE ? TANK_MULTIPLE
+                : 1;
 
-    return Math.min(
-        THINK_CAP_MS,
-        Math.round(tank ? byAction * TANK_MULTIPLE : byAction),
-    );
+    return Math.min(THINK_CAP_MS, Math.round(byAction * multiple));
 };

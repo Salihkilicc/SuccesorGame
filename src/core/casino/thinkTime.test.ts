@@ -41,6 +41,7 @@
 // ============================================================================
 
 import {
+    DEEP_TANK_CHANCE, DEEP_TANK_MULTIPLE,
     TANK_CHANCE, TANK_MULTIPLE, THINK_CAP_MS, THINK_MAX_MS, THINK_MIN_MS,
     thinkTime, type Action,
 } from './pokerBots';
@@ -71,8 +72,11 @@ describe('a pause has a shape, not just a range', () => {
         const tanks = calls.filter(x => x > ordinaryTop).length / N;
         // Four standard errors either side of the intended rate, computed
         // rather than picked: sqrt(p(1-p)/N) with p = 1/7.
+        // BOTH TIERS COUNT as "somebody stopped", so the rate to compare
+        // against is the two of them together.
         const se = Math.sqrt(TANK_CHANCE * (1 - TANK_CHANCE) / N);
         expect(Math.abs(tanks - TANK_CHANCE)).toBeLessThan(4 * se);
+        expect(DEEP_TANK_CHANCE).toBeLessThan(TANK_CHANCE);
     });
 
     it('and the tail is far longer than the body', () => {
@@ -107,10 +111,32 @@ describe('and the table has not got slower', () => {
     it('and nobody ever takes longer than the cap', () => {
         // MEASURED THE HARD WAY. The first version had no cap and a raise
         // that tanked came out at 3.9 seconds, because 1.35 and 2.2 compound.
+        //
+        // The cap went 2000 -> 3200 when the second tier landed, asked for as
+        // "now and then one of them should make you wait a lot". A cap that
+        // swallowed the deep tank would have turned it back into the ordinary
+        // one, which is the whole thing it exists to be different from.
         for (const action of ['call', 'raise', 'check'] as Action[]) {
             expect(Math.max(...draws(action))).toBeLessThanOrEqual(THINK_CAP_MS);
         }
-        expect(THINK_CAP_MS).toBeLessThanOrEqual(2000);
+        expect(THINK_CAP_MS).toBeLessThanOrEqual(3500);
+
+        // AND HIGH ENOUGH TO LET THE DEEP TIER THROUGH. A probe caught this:
+        // dropping the cap back to 2000 left every assertion passing while
+        // quietly clipping the long pause down to the ordinary one, which is
+        // the entire thing it exists to be different from. The raise
+        // multiplier compounds with the tank, so the cap has to clear both.
+        const deepestOrdinary = THINK_MAX_MS * 1.35 * TANK_MULTIPLE;
+        expect(THINK_CAP_MS).toBeGreaterThan(deepestOrdinary);
+    });
+
+    it('and the long pause is rare enough to stay an event', () => {
+        // One tier was becoming its own rhythm. Two tiers: most short, some
+        // long, and every so often one that makes everybody look up.
+        const calls = draws('call');
+        const deep = calls.filter(x => x > THINK_MAX_MS * TANK_MULTIPLE).length / calls.length;
+        expect(deep).toBeLessThan(0.08);
+        expect(deep).toBeGreaterThan(0.01);
     });
 
     it('and a whole betting round is still bearable', () => {
@@ -141,8 +167,10 @@ describe('and it is still pure', () => {
     it('the die is injected, so a test can pin an exact pause', () => {
         // Both draws come from the same source. A `Math.random` hiding inside
         // would make the function untestable and the hand unreproducible.
+        // A die of zero takes the DEEPEST tier, since zero is below every
+        // threshold. That is the pause this test pins.
         expect(thinkTime('call', () => 0)).toBe(
-            Math.round(THINK_MIN_MS * TANK_MULTIPLE));
+            Math.round(THINK_MIN_MS * DEEP_TANK_MULTIPLE));
         expect(thinkTime('call', () => 0.999)).toBeGreaterThan(THINK_MAX_MS * 0.9);
     });
 
