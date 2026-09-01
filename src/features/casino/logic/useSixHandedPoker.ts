@@ -19,7 +19,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
 import { casinoAlert } from '../../../data/i18n/casinoText';
-import { seatBots, thinkTime } from '../../../core/casino/pokerBots';
+import { thinkTime } from '../../../core/casino/pokerBots';
 import { seatTable, type Opponent } from '../../../core/casino/pokerTable';
 import {
     BOARD_AT,
@@ -31,11 +31,32 @@ import {
     waitingForHuman,
     type RoundState,
 } from '../../../core/casino/pokerRound';
+import {
+    BUY_IN_BLINDS,
+    applyHand,
+    buyInFor,
+    bustedCount,
+    canDeal,
+    cashOut,
+    openSession,
+    playerBusted,
+    replaceBusted,
+    sessionResult,
+    toPlayers,
+    type Session,
+} from '../../../core/casino/pokerSession';
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
-/** What every seat starts a session with, as a multiple of the stake. */
-export const STARTING_STACK_MULTIPLE = 20;
+/**
+ * What every seat starts a session with, as a multiple of the stake.
+ *
+ * SHELVED, and kept because the tuning notes refer to it. Twenty big blinds is
+ * a shove-fest rather than a cash game, and it was chosen when a "session" was
+ * one hand long so it never had to be deeper. The real number lives in
+ * core/casino/pokerSession.ts now.
+ */
+export const STARTING_STACK_MULTIPLE = BUY_IN_BLINDS;
 
 // ============================================================================
 //  THE BEATS BETWEEN THE ACTIONS
@@ -85,13 +106,29 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
     const casinoReputation = reputation.casino;
 
     const [ante, setAnte] = useState(initialBet);
-    /**
-     * Which seat is on the button.
-     *
-     * Rotates every hand so the blinds fall on everybody in turn. Without it
-     * the same two seats pay every time, which is a tax rather than a rota.
-     */
-    const button = useRef(0);
+
+    // ------------------------------------------------------------------
+    //  THE SESSION IS THE THING THAT PERSISTS NOW
+    // ------------------------------------------------------------------
+    //  Reported as "the table keeps changing, it should not - sit down with
+    //  one buy-in and play it until you leave; when somebody busts, somebody
+    //  else comes. And we do not win the pot, the mechanic is weak."
+    //
+    //  The old hook reseated five NEW people with FRESH stacks on every hand
+    //  and settled by moving your profit straight into your cash. So the pot
+    //  was never won, it was converted; no bot could ever bust; and the read
+    //  the bots were built for could never be used, because nobody was at the
+    //  table long enough to be read.
+    //
+    //  `session` holds the seats and their chips between hands. Cash moves
+    //  exactly twice: out when you sit down, back when you stand up. In
+    //  between it is chips, and chips stay where they land.
+    //  See core/casino/pokerSession.ts.
+    // ------------------------------------------------------------------
+    const [session, setSession] = useState<Session | null>(null);
+    /** The same session, readable from inside a callback without a stale copy. */
+    const sessionRef = useRef<Session | null>(null);
+
     const [round, setRound] = useState<RoundState | null>(null);
     /** The same hand, readable without going through a state updater. */
     const roundRef = useRef<RoundState | null>(null);
@@ -172,34 +209,81 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    /** Pay the hand out. The engine already moved chips between seats. */
+    /**
+     * Book the finished hand.
+     *
+     * NO CASH MOVES HERE ANY MORE. The engine already moved chips between the
+     * seats; this makes them stay there and works out what the hand did to
+     * your stack, which is a different question from what it did to your
+     * bank account. Your bank account changes twice a session: `sitDown` and
+     * `leave`.
+     *
+     * The old version compared your stack to one buy-in and paid the
+     * difference into your cash every hand - which is why winning three in a
+     * row looked exactly like winning one three times, and why nobody at the
+     * table could ever go broke.
+     */
     const settle = useCallback((s: RoundState) => {
         const you = s.players[HUMAN_SEAT];
-        if (!you) return;
-        const startingStack = ante * STARTING_STACK_MULTIPLE;
-        const delta = you.stack - startingStack;
+        const current = sessionRef.current;
+        if (!you || !current) return;
 
-        setField('money', Math.max(0, money + delta));
+        const before = current.seats[HUMAN_SEAT]?.stack ?? 0;
+        const delta = you.stack - before;
+
+        const banked = applyHand(current, s);
+
+        // ------------------------------------------------------------------
+        //  AND ANYBODY WHO RAN OUT LEAVES
+        // ------------------------------------------------------------------
+        //  Asked for as "let that person stay until they bust, and when one
+        //  busts someone else comes". The seat keeps its position so the
+        //  table does not shuffle under the player's eyes; only the person
+        //  in it changes. See replaceBusted.
+        // ------------------------------------------------------------------
+        const gone = bustedCount(banked);
+        const refilled = gone > 0
+            ? replaceBusted(banked, seatTable(vip, Math.random, gone), Math.random, vip)
+            : banked;
+
+        sessionRef.current = refilled;
+        setSession(refilled);
+        setOpponents(refilled.seats.slice(1).map((s2, i) => s2.who ?? opponents[i]).filter(Boolean) as Opponent[]);
+
         reputationUp(reputationForBet(ante));
 
         if (s.winners.includes(you.id) && delta > 0) {
             setStatus(`You take ${s.potWon.toLocaleString()}.`);
             setResultPopup({ type: 'win', amount: delta });
         } else if (delta === 0) {
-            setStatus('Split.');
+            setStatus(gone > 0 ? 'Seat filled.' : 'Split.');
             setResultPopup({ type: 'push', amount: 0 });
         } else {
             const best = s.reveal.find(r => r.id === s.winners[0]);
             setStatus(best ? `${best.rank.name} takes it.` : 'The pot goes elsewhere.');
             setResultPopup({ type: 'loss', amount: -delta });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ante, money, setField, reputationUp]);
 
-    const deal = useCallback(() => {
+        if (playerBusted(refilled)) {
+            setStatus('You are out of chips.');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ante, vip, reputationUp, opponents]);
+
+    // ------------------------------------------------------------------
+    //  SITTING DOWN, DEALING AND STANDING UP ARE THREE DIFFERENT THINGS
+    // ------------------------------------------------------------------
+    //  They used to be one function called `deal`, which is the whole bug in
+    //  miniature: if buying in and being dealt a hand are the same event, then
+    //  every hand is a new buy-in and there is no table.
+    // ------------------------------------------------------------------
+
+    /** Buy in and take a seat. Money leaves your cash exactly here. */
+    const sitDown = useCallback(() => {
         if (ante <= 0) return casinoAlert('Place Bet', 'Choose a stake first.');
-        const startingStack = ante * STARTING_STACK_MULTIPLE;
-        if (money < startingStack) {
+        const buyIn = buyInFor(ante);
+        if (money < buyIn) {
+            // Asked for as "if there is no money, do not let them sit down".
             return casinoAlert('Not enough cash', 'Lower the stake or build more bankroll.');
         }
 
@@ -207,19 +291,77 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
         setResultPopup(null);
 
         const table = seatTable(vip);
-        const bots = seatBots(table.map(o => o.name), vip);
+        const fresh = openSession(ante, table, Math.random, vip);
         setOpponents(table);
+        sessionRef.current = fresh;
+        setSession(fresh);
+        setField('money', Math.max(0, money - buyIn));
+        setRound(null);
+        roundRef.current = null;
+        setStatus('Take your seat.');
+    }, [ante, money, vip, setField]);
 
-        const fresh = startRound([
-            { id: 'you', name: 'You', bot: null, stack: startingStack },
-            ...bots.map((b, i) => ({ id: table[i].id, name: b.name, bot: b, stack: startingStack })),
-        ], ante, Math.random, button.current);
-        button.current = (button.current + 1) % (bots.length + 1);
+    /** Deal the next hand from the chips already on the table. */
+    const deal = useCallback(() => {
+        const current = sessionRef.current;
+        if (!current) return sitDown();
+        if (playerBusted(current)) {
+            return casinoAlert('Out of chips', 'Leave the table to cash out, or buy in again.');
+        }
+        if (!canDeal(current)) return;
 
+        clearTimers();
+        setResultPopup(null);
+
+        const fresh = startRound(
+            toPlayers(current), current.stake, Math.random, current.button,
+        );
         roundRef.current = fresh;
         setRound(fresh);
         setStatus('Your move.');
-    }, [ante, money, vip]);
+    }, [sitDown]);
+
+    /**
+     * Stand up, and take your chips with you.
+     *
+     * THE OTHER HALF OF THE BUY-IN, and the reason the pot means something: a
+     * stack is only a win once it is cash, so the decision of when to leave is
+     * a real one. Idempotent, because it is called both by the button and by
+     * the screen unmounting - a player who backs out mid-session must not lose
+     * their chips to a navigation event.
+     */
+    const leave = useCallback(() => {
+        const current = sessionRef.current;
+        if (!current) return 0;
+        clearTimers();
+        const back = cashOut(current);
+        const result = sessionResult(current);
+        sessionRef.current = null;
+        setSession(null);
+        setRound(null);
+        roundRef.current = null;
+        setField('money', Math.max(0, useStatsStore.getState().money + back));
+        setStatus(result >= 0 ? 'You leave ahead.' : 'You leave light.');
+        return back;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setField]);
+
+    /**
+     * And leaving the screen cashes you out.
+     *
+     * Chips that only exist inside a hook are chips that vanish when the
+     * player presses back. A ref, not the state, because the cleanup runs
+     * after the last render and the state it closed over would be stale.
+     */
+    useEffect(() => () => {
+        const current = sessionRef.current;
+        if (!current) return;
+        const back = cashOut(current);
+        sessionRef.current = null;
+        if (back > 0) {
+            useStatsStore.setState({ money: Math.max(0, useStatsStore.getState().money + back) });
+        }
+    }, []);
 
     const act = useCallback((action: 'fold' | 'call' | 'check' | 'raise', amount = 0) => {
         // ------------------------------------------------------------------
@@ -259,9 +401,29 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
             owed,
             yourTurn: !!round && waitingForHuman(round),
             handOver: !!round?.done,
+
+            // ---- the session ----
+            /** Null until you buy in. The screen shows the lobby when it is. */
+            session,
+            /** True once you are sitting at a table with chips. */
+            seated: !!session,
+            /** Your chips. Not your money: your money is in the header. */
+            stack: session?.seats?.[HUMAN_SEAT]?.stack ?? 0,
+            /** What one buy-in costs at the chosen stake. */
+            buyIn: buyInFor(ante),
+            /** Hands played since you sat down. */
+            hands: session?.hands ?? 0,
+            /** Up or down against everything you have bought in for. */
+            sessionUp: session ? sessionResult(session) : 0,
+            /** You have run out and cannot be dealt in. */
+            broke: !!session && playerBusted(session),
+            /** Every seat's chips, so the table can show them. */
+            seats: session?.seats ?? [],
         },
         actions: {
+            sitDown,
             deal,
+            leave,
             act,
             setAnte,
             closePopup: () => setResultPopup(null),

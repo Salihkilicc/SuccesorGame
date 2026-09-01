@@ -230,11 +230,45 @@ export interface SpinAngles {
  * `fromWheel` lets a second spin carry on from where the first one stopped
  * instead of snapping back to zero.
  */
-export const spinAngles = (result: number, fromWheel: number = 0): SpinAngles => {
+export const spinAngles = (
+    result: number,
+    fromWheel: number = 0,
+    fromBall: number = 0,
+): SpinAngles => {
     const pocket = pocketAngle(result);
     // The wheel goes clockwise, so it always ADDS. Landing angle is chosen so
     // the ball's resting place lines up with the pocket once both have stopped.
     const wheelTo = fromWheel + WHEEL_TURNS * 360 + (360 - (fromWheel % 360));
-    const ballTo = -(BALL_TURNS * 360) - pocket;
+
+    // ------------------------------------------------------------------
+    //  THE BALL HAS TO CARRY ON FROM WHERE IT STOPPED, TOO
+    // ------------------------------------------------------------------
+    //  Reported as "sometimes it is not the ball that spins, the wheel
+    //  disc does".
+    //
+    //  THE DEFECT, and it only showed from the SECOND spin onwards, which
+    //  is why it read as intermittent. `ballTo` used to be an absolute
+    //  angle - always -(6 x 360) - pocket - while the wheel accumulated
+    //  through `fromWheel`. So on the first spin the ball travelled six
+    //  turns from zero and looked right, and on every spin after that it
+    //  was ALREADY at roughly that angle: the new target differed only by
+    //  the gap between the old pocket and the new one. A few degrees.
+    //  Sometimes backwards.
+    //
+    //  Meanwhile the wheel kept doing its full three turns. A wheel
+    //  turning under a ball that twitches is exactly "the disc spins, not
+    //  the ball".
+    //
+    //  So the ball is given a target relative to where it IS, then walked
+    //  further anticlockwise until it lands on the pocket exactly. The
+    //  residue is unchanged - it still finishes at -pocket, so the landing
+    //  is identical - only the distance travelled is fixed.
+    // ------------------------------------------------------------------
+    const wanted = -pocket;
+    const atLeast = fromBall - BALL_TURNS * 360;
+    // How far past the target that overshoots, as a positive angle.
+    const drift = (((atLeast - wanted) % 360) + 360) % 360;
+    const ballTo = atLeast - drift;
+
     return { wheelTo, ballTo };
 };

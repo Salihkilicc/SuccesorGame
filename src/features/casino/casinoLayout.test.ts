@@ -75,7 +75,11 @@ describe('nothing you have to press can scroll away', () => {
         // matches the import line at the top of the file, which is before
         // every scroller and would have made this pass on nothing.
         expect(src.indexOf('<CustomChipSelector')).toBeGreaterThan(scrollEnd);
-        expect(src.indexOf('actions.handleSpin')).toBeGreaterThan(scrollEnd);
+        // THE SPIN BUTTON, by its own style, rather than by the handler.
+        // `actions.handleSpin` now appears twice - the wheel itself is
+        // pressable, and the wheel is pinned ABOVE the scroller - so matching
+        // the handler found the wheel and said the button had moved.
+        expect(src.indexOf('styles.spinButton')).toBeGreaterThan(scrollEnd);
     });
 
     it('and the slot still does not scroll, which it never should have', () => {

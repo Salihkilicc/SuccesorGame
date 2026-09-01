@@ -101,7 +101,11 @@ describe('the wheel is built out of the engine', () => {
     });
 
     it('and the target angles come from spinAngles', () => {
-        expect(wheel()).toMatch(/spinAngles\(result, wheelAt\.current\)/);
+        // The ball's own angle joined the call when "sometimes it is not the
+        // ball that spins, the disc does" was fixed - the ball was the one
+        // thing on screen whose position was not carried forward between
+        // spins. See rouletteBall.test.ts.
+        expect(wheel()).toMatch(/spinAngles\(result, wheelAt\.current, ballAt\.current\)/);
     });
 });
 

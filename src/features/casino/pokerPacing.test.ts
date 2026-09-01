@@ -175,7 +175,13 @@ describe('and the buy in is honest about itself', () => {
     });
 
     it('and the screen says what it will cost before you sit down', () => {
-        expect(read('screens', 'PokerGameScreen.tsx'))
-            .toMatch(/money\(ante \* STARTING_STACK_MULTIPLE\)/);
+        // The multiplication moved into the engine when the table became a
+        // real session: a buy-in is a hundred blinds and the screen should
+        // not be the place that knows that. `buyIn` comes from the hook now,
+        // which is also what the MAX button is solved against.
+        // See core/casino/pokerSession.ts -> buyInFor.
+        const src = read('screens', 'PokerGameScreen.tsx');
+        expect(src).toMatch(/money\(buyIn\)/);
+        expect(src).not.toMatch(/ante \* STARTING_STACK_MULTIPLE/);
     });
 });

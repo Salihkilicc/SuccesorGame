@@ -27,6 +27,7 @@ import GameResultPopup from '../components/GameResultPopup';
 import AnimatedCard from '../components/AnimatedCard';
 import PokerTable, { seatPosition } from '../components/PokerTable';
 import { HUMAN_SEAT } from '../../../core/casino/pokerRound';
+import { maxStakeFor } from '../../../core/casino/pokerSession';
 import PokerSeat from '../components/PokerSeat';
 import { CustomChipSelector } from '../components/CustomChipSelector';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
@@ -63,7 +64,19 @@ const PokerGameScreen = () => {
     const {
         money: cash, ante, round, opponents, status, resultPopup,
         board, hole, pot, owed, yourTurn, handOver,
+        seated, stack, buyIn, broke, seats, sessionUp, hands,
     } = state;
+
+    /**
+     * The biggest stake this bankroll can sit down at.
+     *
+     * Asked for as "you should be able to enter with max bet, and if there is
+     * no money you should not enter". Both halves come from the same number:
+     * when it is zero, nothing on the chip rack is affordable and the button
+     * says so instead of throwing an alert after the tap.
+     */
+    const topStake = maxStakeFor(cash, chipsFor(currentLocation, cash));
+    const canAfford = cash >= buyIn && ante > 0;
 
     const tint = currentLocation.theme.primary;
     const seatCount = opponents.length;
@@ -160,7 +173,12 @@ const PokerGameScreen = () => {
                                     name={o.name}
                                     kind={o.kind}
                                     company={o.company}
-                                    stack={p?.stack ?? 0}
+                                    // FROM THE SESSION, falling back to the
+                                    // hand. Between hands there is no round at
+                                    // all, and a table showing five stacks of
+                                    // zero while everybody sits there with
+                                    // chips is the old model showing through.
+                                    stack={p?.stack ?? seats[i + 1]?.stack ?? 0}
                                     lastAction={p?.lastAction ?? null}
                                     lastAmount={p?.lastAmount ?? 0}
                                     active={!!round && !round.done && round.turn === i + 1}
@@ -194,7 +212,12 @@ const PokerGameScreen = () => {
                         ))}
                     </View>
                     <Text style={styles.yourStack}>
-                        {t('casino.you')} · {money(round?.players?.[0]?.stack ?? 0)}
+                        {t('casino.you')} · {money(round?.players?.[0]?.stack ?? stack)}
+                        {seated && hands > 0 && (
+                            <Text style={styles.sessionUp}>
+                                {'   '}{sessionUp >= 0 ? '+' : '-'}{money(Math.abs(sessionUp))}
+                            </Text>
+                        )}
                     </Text>
 
                     {/* ----------------------------------------------------
@@ -223,7 +246,21 @@ const PokerGameScreen = () => {
                --------------------------------------------------------- */}
             <View style={styles.controlsDock}>
                 <View style={styles.controls}>
-                    {(!round || handOver) && (
+                    {/* ------------------------------------------------------
+                        BEFORE YOU SIT DOWN
+
+                        The chips choose the STAKE, and the buy-in is a
+                        hundred of them. This used to be the same control that
+                        dealt a hand, which is how every hand became a new
+                        buy-in and the table stopped being a table.
+
+                        MAX picks the biggest stake the bankroll can cover.
+                        Asked for by name, and it is also the honest answer to
+                        "how much can I play for" - a question the player
+                        should not have to solve by tapping chips until the
+                        alert stops appearing.
+                       ------------------------------------------------------ */}
+                    {!seated && (
                         <>
                             <CustomChipSelector
                                 chips={chipsFor(currentLocation, cash)}
@@ -231,18 +268,74 @@ const PokerGameScreen = () => {
                                 onSelect={actions.setAnte}
                                 gameTheme={currentLocation.theme}
                             />
-                            <Text style={styles.buyIn}>
-                                {t('casino.buyIn', { v1: money(ante * STARTING_STACK_MULTIPLE) })}
-                            </Text>
+                            <View style={styles.buyInRow}>
+                                <Text style={styles.buyIn}>
+                                    {t('casino.buyIn', { v1: money(buyIn) })}
+                                </Text>
+                                <Pressable
+                                    onPress={() => actions.setAnte(topStake)}
+                                    disabled={topStake <= 0}
+                                    style={({ pressed }) => [
+                                        styles.maxBtn,
+                                        { borderColor: tint },
+                                        (pressed || topStake <= 0) && { opacity: 0.55 },
+                                    ]}
+                                >
+                                    <Text style={[styles.maxText, { color: tint }]}>MAX</Text>
+                                </Pressable>
+                            </View>
                             <Pressable
-                                onPress={actions.deal}
-                                style={[styles.primary, { backgroundColor: tint }]}
+                                onPress={actions.sitDown}
+                                disabled={!canAfford}
+                                style={[
+                                    styles.primary,
+                                    { backgroundColor: tint },
+                                    !canAfford && { opacity: 0.45 },
+                                ]}
                             >
                                 <Text style={styles.primaryText}>
-                                    {handOver ? t('casino.newDeal') : t('casino.deal')}
+                                    {canAfford ? t('casino.sitDown') : t('casino.notEnough')}
                                 </Text>
                             </Pressable>
                         </>
+                    )}
+
+                    {/* ------------------------------------------------------
+                        AT THE TABLE
+
+                        Deal the next hand from the chips already in front of
+                        you, or stand up and take them with you. Leaving is
+                        the only thing that turns a stack into money, which is
+                        what makes staying a decision.
+                       ------------------------------------------------------ */}
+                    {seated && (!round || handOver) && (
+                        <View style={styles.tableRow}>
+                            <Pressable
+                                onPress={actions.leave}
+                                style={({ pressed }) => [
+                                    styles.leaveBtn,
+                                    pressed && { opacity: 0.7 },
+                                ]}
+                            >
+                                <Text style={styles.leaveText}>
+                                    {t('casino.cashOut', { v1: money(stack) })}
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={actions.deal}
+                                disabled={broke}
+                                style={[
+                                    styles.primary, styles.primaryFlex,
+                                    { backgroundColor: tint },
+                                    broke && { opacity: 0.45 },
+                                ]}
+                            >
+                                <Text style={styles.primaryText}>
+                                    {broke ? t('casino.outOfChips')
+                                        : round ? t('casino.newDeal') : t('casino.deal')}
+                                </Text>
+                            </Pressable>
+                        </View>
                     )}
 
                     {yourTurn && (
@@ -318,6 +411,46 @@ const styles = StyleSheet.create({
     boardCard: {},
     you: { alignItems: 'center', marginTop: 6, gap: 4 },
     holeRow: { flexDirection: 'row', gap: 6 },
+    /**
+     * Up or down since you sat down.
+     *
+     * MUTED, not green or red. The house rule keeps those for profit and loss
+     * in the company, and a poker session running warm is not that. It sits
+     * beside your stack because the two answer different questions: how many
+     * chips you have, and whether any of them are yours.
+     */
+    sessionUp: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        fontWeight: '700',
+    },
+    buyInRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+    },
+    maxBtn: {
+        paddingHorizontal: 10,
+        paddingVertical: 3,
+        borderRadius: 8,
+        borderWidth: 1,
+    },
+    maxText: { fontSize: 10, fontWeight: '900', letterSpacing: 1 },
+    tableRow: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+    primaryFlex: { flex: 1 },
+    leaveBtn: {
+        paddingHorizontal: 14,
+        paddingVertical: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.16)',
+    },
+    leaveText: {
+        color: theme.colors.textSecondary,
+        fontSize: 12,
+        fontWeight: '800',
+    },
     /** What your cards made. Muted when you lost, the room's colour when you won. */
     yourHand: {
         marginTop: 2,

@@ -99,6 +99,16 @@ const RouletteWheel = ({ size = 240, result, spinning, onSettled, tint }: Props)
 
     /** Where the wheel was left last time, so a second spin carries on. */
     const wheelAt = useRef(0);
+    /**
+     * And where the BALL was left, which nothing tracked.
+     *
+     * THE DEFECT behind "sometimes it is not the ball that spins, the disc
+     * does". The wheel carried its angle forward and the ball did not, so
+     * from the second spin onwards the ball's target was a few degrees from
+     * where it already sat while the wheel did three full turns underneath
+     * it. See core/casino/roulette.ts -> spinAngles.
+     */
+    const ballAt = useRef(0);
 
     const r = size / 2;
     const pocketR = r * 0.86;
@@ -108,7 +118,8 @@ const RouletteWheel = ({ size = 240, result, spinning, onSettled, tint }: Props)
     useEffect(() => {
         if (!spinning || result === null) return;
 
-        const { wheelTo, ballTo } = spinAngles(result, wheelAt.current);
+        const { wheelTo, ballTo } = spinAngles(result, wheelAt.current, ballAt.current);
+        ballAt.current = ballTo;
         wheelAt.current = wheelTo;
 
         ballRadius.setValue(0);

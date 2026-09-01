@@ -134,14 +134,39 @@ const RouletteGameScreen = () => {
           there can afford to be modest, and it leaves the table room.
          ------------------------------------------------------------------ */}
       <View style={styles.wheelStage}>
-        <RouletteWheel
-          size={168}
-          result={pendingResult ?? spinResult}
-          spinning={isSpinning}
-          tint={currentLocation.theme.primary}
-        />
-        {isSpinning && (
+        {/* ----------------------------------------------------------------
+            AND THE WHEEL ITSELF SPINS IT
+
+            Asked for as "in roulette, pressing the wheel should spin it".
+            Which is how it works at a table: the croupier's hand is on the
+            wheel, not on a button somewhere else. The button below stays -
+            it says what it costs and it is the reachable one for a thumb -
+            but the wheel is now the obvious thing to press, and it is
+            already pinned in view.
+
+            Same guard as the button, not a second copy of the rules: the
+            handler refuses on its own when there are no bets or a spin is
+            already running. See logic/useRouletteLogic.ts.
+           ---------------------------------------------------------------- */}
+        <Pressable
+          onPress={actions.handleSpin}
+          disabled={isSpinning || bets.length === 0}
+          hitSlop={6}
+          style={({ pressed }) => pressed && !isSpinning && styles.wheelPressed}
+        >
+          <RouletteWheel
+            size={168}
+            result={pendingResult ?? spinResult}
+            spinning={isSpinning}
+            tint={currentLocation.theme.primary}
+          />
+        </Pressable>
+        {isSpinning ? (
           <Text style={styles.spinningText}>{t('casino.spinning')}</Text>
+        ) : (
+          <Text style={styles.wheelHint}>
+            {bets.length === 0 ? t('casino.placeChipsFirst') : t('casino.tapWheel')}
+          </Text>
         )}
       </View>
 
@@ -289,6 +314,15 @@ const styles = StyleSheet.create({
 
   /** Everything below the header, and what the result number measures from. */
   stage: { flex: 1 },
+
+  /** The wheel dips a little under a finger, so the tap is acknowledged. */
+  wheelPressed: { transform: [{ scale: 0.97 }], opacity: 0.9 },
+  wheelHint: {
+    color: theme.colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
 
   /** The grid scrolls. Its bottom padding is now only the dock's business. */
   content: { padding: theme.spacing.md, gap: 12, paddingBottom: 12 },

@@ -229,6 +229,22 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
         const nextMoney = money - bet + winnings;
         setField('money', nextMoney);
         setRoundState('done');
+
+        // ------------------------------------------------------------------
+        //  AND THE TABLE IS FREE AGAIN
+        // ------------------------------------------------------------------
+        //  Reported as "in blackjack I cannot play any more after I lose".
+        //  That was mine, and it was a bad one: `busy` is set when the show
+        //  starts and every path cleared it EXCEPT this one. Standing is the
+        //  path, and standing is how most hands end - so the table locked
+        //  solid after nearly every hand and DEAL stayed dead forever.
+        //
+        //  It belongs here rather than in the three callers, because "the
+        //  hand is over" and "the table has stopped showing you things" are
+        //  the same moment, and three callers is three chances to forget.
+        //  Which is exactly what happened.
+        // ------------------------------------------------------------------
+        setBusy(false);
     };
 
     // --- ACTIONS (UI'ın kullanacağı fonksiyonlar) ---
