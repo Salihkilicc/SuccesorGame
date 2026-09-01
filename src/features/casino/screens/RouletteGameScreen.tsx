@@ -246,11 +246,14 @@ const RouletteGameScreen = () => {
       <View style={styles.controlsDock}>
         <View style={styles.controlsSection}>
           {/* CHIP SELECTOR */}
+          {/* Compact, because the grid below wants the height more than the
+              rail does. See components/CustomChipSelector.tsx. */}
           <CustomChipSelector
             chips={chipsFor(currentLocation, money)}
             selectedChip={selectedChip}
             onSelect={actions.selectChip}
             gameTheme={currentLocation.theme}
+            compact
           />
 
           <View style={styles.bottomControls}>
@@ -305,8 +308,10 @@ const styles = StyleSheet.create({
   wheelStage: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    gap: 4,
+    // 8 -> 4. The wheel is pinned, so every point of padding around it is a
+    // point the grid underneath never gets back.
+    paddingVertical: 4,
+    gap: 2,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'rgba(255,255,255,0.08)',
   },
@@ -325,12 +330,20 @@ const styles = StyleSheet.create({
   },
 
   /** The grid scrolls. Its bottom padding is now only the dock's business. */
-  content: { padding: theme.spacing.md, gap: 12, paddingBottom: 12 },
+  content: { padding: theme.spacing.md, gap: 8, paddingBottom: 8 },
 
   /** The chips and the SPIN button, pinned above the nav bar. */
+  /**
+   * The dock, on a diet.
+   *
+   * Asked for as "make the bet size part smaller, and stretch the roulette
+   * further down". Those are one request from both ends: the dock and the
+   * betting grid share a screen, and the grid is the thing being played on.
+   * Every point taken out here is a point the table gets.
+   */
   controlsDock: {
     paddingHorizontal: theme.spacing.md,
-    paddingTop: 8,
+    paddingTop: 4,
     paddingBottom: NAV_BAR_CLEARANCE,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: 'rgba(255,255,255,0.08)',
@@ -443,14 +456,16 @@ const styles = StyleSheet.create({
   },
 
   // Controls
-  controlsSection: { gap: 10 },
+  controlsSection: { gap: 4 },
   bottomControls: {
     backgroundColor: '#384147',
-    padding: 12,
-    borderRadius: 16,
+    // 12 -> 8, and the inner gap is gone: with the SPIN button moved to the
+    // wheel there is only one row left in here to space out.
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    gap: 10,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -459,7 +474,7 @@ const styles = StyleSheet.create({
   },
   betDisplay: { gap: 1 },
   betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
-  betValueText: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
+  betValueText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
   betCount: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600' },
 
   clearBtn: {

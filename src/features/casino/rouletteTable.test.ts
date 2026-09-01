@@ -130,3 +130,65 @@ describe('and the chip is a chip', () => {
         expect(txt.slice(0, txt.indexOf('},'))).toMatch(/color: '#000000'/);
     });
 });
+
+// ============================================================================
+//  AND THE DOCK GAVE ITS HEIGHT TO THE TABLE
+// ============================================================================
+//
+//  Asked for as "make the bet size part smaller in size, and stretch the
+//  roulette further down". Those are one request from both ends: the chip rail
+//  and the betting grid are competing for the same screen, and only one of
+//  them is the thing being played on.
+//
+//  Worked out rather than eyeballed, in points of dock height:
+//
+//      chip rail       64 chip + 24 margin   ->  44 + 8      saves 36
+//      dock padding    8 top                 ->  4           saves  4
+//      bet card        12 padding + 10 gap   ->  8, no gap   saves 14
+//      wheel stage     8 padding + 4 gap     ->  4 + 2       saves  6
+//                                                            ----------
+//                                                                    60
+//
+//  Which is a row and a half of numbers, and where it went: the cells are 42
+//  points instead of 38, and twelve rows of that is 48 points of the 60.
+// ============================================================================
+
+describe('and the rail is smaller so the table can be taller', () => {
+    it('roulette asks for the compact rail', () => {
+        // A prop rather than shrinking it everywhere: blackjack and the slot
+        // have room, and their chips are the only control they have.
+        expect(screen()).toMatch(/compact\s*\n\s*\/>/);
+    });
+
+    it('and the compact rail really is smaller', () => {
+        const rail = read('components', 'CustomChipSelector.tsx');
+        const small = rail.slice(rail.indexOf('chipContainerSmall: {'));
+        const w = Number((small.match(/width: (\d+)/) || [])[1]);
+        expect(w).toBeGreaterThan(0);
+        expect(w).toBeLessThan(64);
+        expect(rail).toMatch(/containerSmall: \{/);
+    });
+
+    it('and the full size rail is untouched, for the screens with room', () => {
+        const rail = read('components', 'CustomChipSelector.tsx');
+        const full = rail.slice(rail.indexOf('chipContainer: {'));
+        expect(full.slice(0, full.indexOf('},'))).toMatch(/width: 64/);
+        for (const s of ['BlackjackGameScreen.tsx', 'SlotsGameScreen.tsx']) {
+            const src = fs.readFileSync(path.join(__dirname, 'screens', s), 'utf8');
+            expect([s, /compact/.test(src)]).toEqual([s, false]);
+        }
+    });
+
+    it('and the cells took the room that was freed', () => {
+        const t = table();
+        const cell = t.slice(t.indexOf('numberCell: {'));
+        expect(Number((cell.match(/height: (\d+)/) || [])[1])).toBeGreaterThan(38);
+    });
+
+    it('and the dock is tighter than it was', () => {
+        const src = screen();
+        expect(src).toMatch(/controlsSection: \{ gap: 4 \}/);
+        expect(src).toMatch(/paddingVertical: 8,\n\s*borderRadius: 14/);
+        expect(src).not.toMatch(/controlsDock: \{[\s\S]{0,120}paddingTop: 8,/);
+    });
+});

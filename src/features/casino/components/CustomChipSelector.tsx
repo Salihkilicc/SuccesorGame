@@ -9,18 +9,33 @@ interface CustomChipSelectorProps {
     selectedChip: number;
     onSelect: (val: number) => void;
     gameTheme: CasinoTheme;
+    /**
+     * A smaller rail, for a screen that needs the height elsewhere.
+     *
+     * Asked for on roulette: "make the bet size part smaller, and stretch the
+     * roulette further down". Those are the same request from both ends - the
+     * dock and the betting grid are competing for the same screen, and the
+     * grid is the thing being played on.
+     *
+     * A prop rather than a second component, and rather than shrinking the
+     * rail everywhere: blackjack and the slot have room and their chips are
+     * the only control they have.
+     */
+    compact?: boolean;
 }
 
 const ChipItem = ({
     value,
     isSelected,
     onSelect,
-    color
+    color,
+    compact,
 }: {
     value: number;
     isSelected: boolean;
     onSelect: (val: number) => void;
     color: string;
+    compact?: boolean;
 }) => {
     const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -54,11 +69,12 @@ const ChipItem = ({
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             onPress={() => onSelect(value)}
-            style={{ alignItems: 'center', marginHorizontal: 6 }}
+            style={{ alignItems: 'center', marginHorizontal: compact ? 4 : 6 }}
         >
             <Animated.View
                 style={[
                     styles.chipContainer,
+                    compact && styles.chipContainerSmall,
                     {
                         borderColor: color,
                         backgroundColor: isSelected ? color : 'transparent',
@@ -71,10 +87,15 @@ const ChipItem = ({
                     },
                 ]}
             >
-                <View style={[styles.chipInner, { borderColor: isSelected ? '#FFFFFF' : color }]}>
+                <View style={[
+                    styles.chipInner,
+                    compact && styles.chipInnerSmall,
+                    { borderColor: isSelected ? '#FFFFFF' : color },
+                ]}>
                     <Text
                         style={[
                             styles.chipText,
+                            compact && styles.chipTextSmall,
                             { color: isSelected ? '#FFFFFF' : color, fontWeight: '800' },
                         ]}
                         adjustsFontSizeToFit
@@ -88,10 +109,10 @@ const ChipItem = ({
     );
 };
 
-export const CustomChipSelector = ({ chips, selectedChip, onSelect, gameTheme }: CustomChipSelectorProps) => {
+export const CustomChipSelector = ({ chips, selectedChip, onSelect, gameTheme, compact }: CustomChipSelectorProps) => {
     useLocale();
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, compact && styles.containerSmall]}>
             <Text style={styles.label}>{t('ui.betSize')}</Text>
             <View style={styles.row}>
                 {chips.map((chipVal) => (
@@ -101,6 +122,7 @@ export const CustomChipSelector = ({ chips, selectedChip, onSelect, gameTheme }:
                         isSelected={selectedChip === chipVal}
                         onSelect={onSelect}
                         color={gameTheme.chipColor}
+                        compact={compact}
                     />
                 ))}
             </View>
@@ -113,6 +135,11 @@ const styles = StyleSheet.create({
         marginVertical: 12,
         alignItems: 'center',
         gap: 8,
+    },
+    /** The same rail with the air taken out of it. */
+    containerSmall: {
+        marginVertical: 4,
+        gap: 4,
     },
     label: {
         color: theme.colors.textSecondary,
@@ -147,5 +174,27 @@ const styles = StyleSheet.create({
     },
     chipText: {
         fontSize: 12,
+    },
+
+    // ----------------------------------------------------------------------
+    //  THE COMPACT RAIL
+    // ----------------------------------------------------------------------
+    //  64 points of chip plus 24 of margin is 88 points of dock, on a screen
+    //  whose whole job is a betting grid that does not fit. Forty four still
+    //  reads as a chip and still takes a thumb, and it hands about forty
+    //  points back to the table. See screens/RouletteGameScreen.tsx.
+    // ----------------------------------------------------------------------
+    chipContainerSmall: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+    },
+    chipInnerSmall: {
+        width: 37,
+        height: 37,
+        borderRadius: 18.5,
+    },
+    chipTextSmall: {
+        fontSize: 10,
     },
 });

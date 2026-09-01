@@ -298,9 +298,11 @@ const styles = StyleSheet.create({
   },
   numberCell: {
     flex: 1,
-    // 32 -> 38. The nested scroller that made 32 necessary is gone, so the
-    // numbers can be the size a thumb actually wants.
-    height: 38,
+    // 32 -> 38 when the nested scroller went, and 38 -> 42 when the dock was
+    // put on a diet. Asked for as "stretch the roulette further down": the
+    // table is the thing being played on, so it takes the room the chip rail
+    // and the spin button gave up.
+    height: 42,
     borderRadius: 3,
     justifyContent: 'center',
     alignItems: 'center',
@@ -309,7 +311,7 @@ const styles = StyleSheet.create({
     borderColor: RULE,
   },
   zeroCell: {
-    height: 34,
+    height: 38,
     borderRadius: 3,
   },
   numberText: {
@@ -367,7 +369,7 @@ const styles = StyleSheet.create({
   areaBetBtn: {
     flexBasis: '32%',
     flexGrow: 1,
-    height: 36,
+    height: 38,
     borderRadius: 4,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: RULE,
