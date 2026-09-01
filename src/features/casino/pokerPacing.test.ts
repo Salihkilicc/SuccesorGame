@@ -115,8 +115,23 @@ describe('the table is five, and the reason is measurable', () => {
         expect(six.waitMs - three.waitMs).toBeGreaterThan(1200);
     });
 
-    it('and five is under eleven seconds of other people', () => {
-        expect(average(TABLE_SEATS).waitMs).toBeLessThan(11_000);
+    it('and five is under thirteen seconds of other people', () => {
+        // ------------------------------------------------------------------
+        //  THE BOUND WENT UP, AND THE OLD NUMBER WAS MEASURING A BROKEN TABLE
+        // ------------------------------------------------------------------
+        //  Eleven seconds was measured when an all in seat was being asked to
+        //  act, had no chips, and folded itself out of the pot - so 99.9% of
+        //  hands ended with everybody folding, usually before the flop. Very
+        //  little watching, because very little poker.
+        //
+        //  Hands are played to a showdown 94.5% of the time now, so there are
+        //  more actions to sit through and the honest figure is about twelve
+        //  seconds. That is not the pacing getting worse; it is the pacing of
+        //  a hand that happens.
+        //
+        //  The deeper think tank added a little too, which was asked for.
+        // ------------------------------------------------------------------
+        expect(average(TABLE_SEATS).waitMs).toBeLessThan(13_000);
     });
 
     it('and it is quicker than six was', () => {

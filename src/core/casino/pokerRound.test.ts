@@ -279,7 +279,8 @@ describe('the showdown', () => {
     it('and an empty table does not crash the settlement', () => {
         const empty = finish({
             players: [], board: [], deck: [], street: 'showdown', pot: 100,
-            toMatch: 0, turn: 0, actedSinceRaise: 0, done: false, potWon: 0, winners: [], reveal: [],
+            toMatch: 0, turn: 0, actedSinceRaise: 0, minRaise: 1,
+            done: false, potWon: 0, winners: [], reveal: [],
         });
         expect(empty.done).toBe(true);
         expect(empty.winners).toEqual([]);

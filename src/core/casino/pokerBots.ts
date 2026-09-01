@@ -67,6 +67,25 @@ export const PROFILES: Readonly<Record<Personality, Profile>> = {
     maniac: { playAt: 0.12, raiseAt: 0.34, aggression: 0.85, raiseSize: 0.9 },
 };
 
+/**
+ * How much better than the pot odds each of them wants before calling.
+ *
+ * Above one declines marginal spots; below one calls when the arithmetic says
+ * no. The same axis `playAt` describes, but applied where it belongs - to a
+ * price, which a fixed bar can never respond to.
+ */
+export const PATIENCE: Readonly<Record<Personality, number>> = {
+    rock: 1.30,
+    surgeon: 1.25,
+    crowd: 0.70,
+    maniac: 0.48,
+};
+
+/** How strongly chips already in the middle pull a seat into calling. */
+export const COMMITMENT_PULL = 0.9;
+/** And the most it can ever discount the price. */
+export const COMMITMENT_MAX = 0.6;
+
 export const PERSONALITY_NAMES: Readonly<Record<Personality, string>> = {
     rock: 'Rock',
     surgeon: 'Surgeon',
@@ -125,6 +144,15 @@ export interface Situation {
      * table of maniacs loosens against them too.
      */
     aggressorRate?: number;
+    /**
+     * What this seat has already put in THIS HAND.
+     *
+     * Chips in the middle are not yours any more, and a seat that folds after
+     * committing half its stack has bought nothing with all of it. Without
+     * this the bots built pots and abandoned them, which is how a player who
+     * raised every decision reached a showdown once in a thousand hands.
+     */
+    committed?: number;
 }
 
 /** How wrong a bot's read can be at judgement 0. */
@@ -217,10 +245,49 @@ export const decide = (
     //  somebody is playing against a computer.
     const price = toCall / Math.max(1, pot + toCall);
 
-    //  The call stays PRICE SENSITIVE even against an aggressor. Paying to see
-    //  a bluff is how you lose to one slowly; the punishment happens above, in
-    //  the raise.
-    if (seen >= p.playAt + price * 0.5 && stack > 0) {
+    // ------------------------------------------------------------------
+    //  POT ODDS, AND POT COMMITMENT
+    // ------------------------------------------------------------------
+    //  It was `seen >= playAt + price * 0.5`, which adds a fixed personality
+    //  bar to a price and produces a number that means nothing in particular.
+    //  Instrumented against a player who raises every single decision:
+    //
+    //      hands ending with everybody folding      99.9%
+    //      hands reaching a showdown                 0.1%
+    //
+    //  The bully never had to show a hand. Not once in four thousand. The
+    //  bots called the early streets, built the pot, and abandoned it to the
+    //  last bet - which is not "respecting a raise", it is donating.
+    //
+    //  Two things replace it, and both are the arithmetic a person actually
+    //  does:
+    //
+    //  POT ODDS. `seen` is the share of hands this one beats, so it can be
+    //  compared to the price directly: you need to be right more often than
+    //  the price you are paying. `patience` is where the personality lives -
+    //  a rock wants better than the odds, a maniac calls below them - and it
+    //  means the same thing on every street.
+    //
+    //  POT COMMITMENT. Chips already in the middle are not yours any more.
+    //  A player who has put half their stack in and folds to the last bet has
+    //  bought nothing with all of it, and this is the exact behaviour that let
+    //  the bully win every hand. The more committed a seat is, the less it
+    //  needs to continue.
+    //
+    //  An earlier attempt at loosening the call made things WORSE and the note
+    //  above used to say so. It was measured under the old strength scale,
+    //  where `seen` was noise - loosening a call on a meaningless read just
+    //  pays somebody off faster. On an honest read, calling down with a good
+    //  hand is how a bluffer gets caught.
+    // ------------------------------------------------------------------
+    const patience = PATIENCE[bot?.personality] ?? 1.2;
+    const committed = Math.max(0, Number.isFinite(s?.committed) ? (s.committed as number) : 0);
+    const invested = committed / Math.max(1, committed + stack);
+    const commitment = 1 - Math.min(COMMITMENT_MAX, invested * COMMITMENT_PULL);
+
+    const needed = price * patience * commitment * (1 - aggro * 0.20);
+
+    if (seen >= needed && stack > 0) {
         return { action: 'call', amount: Math.min(stack, toCall) };
     }
 

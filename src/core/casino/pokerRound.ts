@@ -20,7 +20,7 @@
 // ============================================================================
 
 import { freshDeck, shuffle, type Card } from './blackjack';
-import { bestHand, compareHands, handStrength, type HandRank } from './pokerHand';
+import { bestHand, compareHands, handStrength, holeStrength, type HandRank } from './pokerHand';
 import { decide, type Action, type Bot } from './pokerBots';
 
 export type Street = 'preflop' | 'flop' | 'turn' | 'river' | 'showdown';
@@ -61,6 +61,25 @@ export interface RoundState {
     turn: number;
     /** How many have acted since the last raise. The street ends at everyone. */
     actedSinceRaise: number;
+    /**
+     * How big the last raise was, which is the smallest the next one may be.
+     *
+     * THE MISSING RULE, and it made the machine spin. `applyAction` forced a
+     * raise to be at least `toMatch + 1`, so once the bet was large a bot
+     * whose pot sized raise came out below it raised by ONE CHIP - and four
+     * bots doing that in turn reset `actedSinceRaise` forever. Found with the
+     * board on the river, four seats each committed 903,010-odd against a
+     * toMatch of 903,013, none of them able to close the street.
+     *
+     * It could not happen before, because hands never got that deep: everyone
+     * folded preflop. Fixing the all in bug made deep hands normal and this
+     * surfaced within two thousand of them.
+     *
+     * Real poker has had this rule forever, for exactly this reason: a raise
+     * must be at least as big as the one before it, or a table can raise each
+     * other a chip at a time until the sun goes out.
+     */
+    minRaise: number;
     done: boolean;
     /**
      * What the pot WAS, once it has been paid out.
@@ -143,6 +162,9 @@ export const startRound = (
         // button: the player is never left waiting to find out it is their go.
         turn: HUMAN_SEAT,
         actedSinceRaise: 0,
+        // The big blind is the opening minimum. Every raise after it has to
+        // be at least as big as the last one.
+        minRaise: Math.max(1, stake),
         done: false,
         potWon: 0,
         winners: [],
@@ -155,16 +177,53 @@ export const visibleBoard = (s: RoundState): Card[] =>
     (s.board || []).slice(0, BOARD_AT[s.street] ?? 0);
 
 /** How strong a player's hand is right now, 0 to 1. */
-export const strengthOf = (s: RoundState, p: Player): number =>
-    handStrength(bestHand(p.hole, visibleBoard(s)));
+export const strengthOf = (s: RoundState, p: Player): number => {
+    const board = visibleBoard(s);
+    // PREFLOP IS A DIFFERENT QUESTION. There is no five card hand to rank yet.
+    return board.length === 0
+        ? holeStrength(p.hole)
+        : handStrength(bestHand(p.hole, board));
+};
 
+/**
+ * Whose turn it is next.
+ *
+ * ALL IN IS NOT A DECISION, and skipping it here is the fix for the worst bug
+ * this table has had.
+ *
+ * A seat with no chips left has already paid for the hand and is entitled to
+ * see it through to a showdown. It was still being ASKED to act, and `decide`
+ * ends `if (seen >= needed && stack > 0) call` - so with a stack of zero it
+ * fell through to a fold, every single time, and folded itself out of a pot it
+ * had already bought.
+ *
+ * Instrumented against a player who raised every decision, over four thousand
+ * hands:
+ *
+ *      hands ending with everybody folding      99.9%
+ *      hands reaching a showdown                 0.1%
+ *
+ *  The bully was not being respected, and the bots were not being cowardly.
+ *  Anybody who called them all in was quietly removed from the hand on the
+ *  next street, so the pot came back uncontested no matter what anybody held.
+ */
 const nextLiveSeat = (s: RoundState, from: number): number => {
+    for (let step = 1; step <= s.players.length; step++) {
+        const i = (from + step) % s.players.length;
+        const p = s.players[i];
+        if (!p.folded && p.stack > 0) return i;
+    }
+    // Everybody left is all in. Nobody has a decision, so the hand runs out.
     for (let step = 1; step <= s.players.length; step++) {
         const i = (from + step) % s.players.length;
         if (!s.players[i].folded) return i;
     }
     return from;
 };
+
+/** Seats that can still put chips in. Everybody else is along for the ride. */
+const canAct = (s: RoundState): Player[] =>
+    s.players.filter(p => !p.folded && p.stack > 0);
 
 /** Apply one action from whoever is on the button. */
 export const applyAction = (
@@ -186,16 +245,41 @@ export const applyAction = (
         p.lastAction = 'fold';
         p.lastAmount = 0;
     } else if (action === 'raise') {
-        // A raise has to actually be a raise, or the street never closes.
-        const target = Math.max(s.toMatch + 1, Math.min(p.committed + p.stack, amount));
-        const put = target - p.committed;
-        p.stack -= put;
-        p.committed = target;
-        s.pot += put;
-        s.toMatch = target;
-        p.lastAction = 'raise';
-        p.lastAmount = target;
-        s.actedSinceRaise = 0;
+        // ------------------------------------------------------------------
+        //  A RAISE HAS TO BE A REAL RAISE
+        // ------------------------------------------------------------------
+        //  It was `Math.max(s.toMatch + 1, ...)` - a minimum raise of one
+        //  chip. See `minRaise` on the state for the hand that hung on it.
+        //
+        //  The smallest legal raise is the size of the last one. A player who
+        //  cannot cover that is not raising: they call, and go all in if that
+        //  is everything they have, which is the real rule and also the only
+        //  way the street can ever close.
+        // ------------------------------------------------------------------
+        const ceiling = p.committed + p.stack;
+        const legal = s.toMatch + Math.max(1, s.minRaise);
+
+        if (ceiling < legal) {
+            // Cannot make a legal raise. This is a call, all in if need be.
+            const put = Math.min(Math.max(0, s.toMatch - p.committed), p.stack);
+            p.stack -= put;
+            p.committed += put;
+            s.pot += put;
+            p.lastAction = put > 0 ? 'call' : 'check';
+            p.lastAmount = put;
+        } else {
+            const target = Math.max(legal, Math.min(ceiling, amount));
+            const put = target - p.committed;
+            p.stack -= put;
+            p.committed = target;
+            s.pot += put;
+            // The next raise has to clear at least this much again.
+            s.minRaise = Math.max(s.minRaise, target - s.toMatch);
+            s.toMatch = target;
+            p.lastAction = 'raise';
+            p.lastAmount = target;
+            s.actedSinceRaise = 0;
+        }
     } else {
         // call or check
         const put = Math.min(owed, p.stack);
@@ -219,7 +303,12 @@ export const applyAction = (
     if (live.length <= 1) return finish(s);
 
     const everyoneMatched = live.every(x => x.committed >= s.toMatch || x.stack === 0);
-    if (everyoneMatched && s.actedSinceRaise >= live.length) return nextStreet(s);
+    // COUNTED OVER THE SEATS THAT CAN ACT, not over everybody still in. An
+    // all in seat cannot act, so waiting for it to is waiting forever - and
+    // the old count made the street close a turn early or a turn late
+    // depending on how many were all in.
+    const actors = canAct(s).length;
+    if (everyoneMatched && (actors === 0 || s.actedSinceRaise >= actors)) return nextStreet(s);
 
     s.turn = nextLiveSeat(s, s.turn);
     return s;
@@ -239,7 +328,14 @@ const nextStreet = (state: RoundState): RoundState => {
         players: state.players.map(p => ({ ...p, committed: 0, lastAction: null, lastAmount: 0 })),
         toMatch: 0,
         actedSinceRaise: 0,
-        turn: state.players.findIndex(p => !p.folded),
+        // A new street opens the betting again, and the blind is the floor.
+        minRaise: state.minRaise,
+        // The first seat that can actually DO something. An all in player
+        // opening a street is a player being asked a question with no answer.
+        turn: (() => {
+            const i = state.players.findIndex(p => !p.folded && p.stack > 0);
+            return i >= 0 ? i : state.players.findIndex(p => !p.folded);
+        })(),
     };
 };
 
@@ -305,7 +401,24 @@ export const finish = (state: RoundState): RoundState => {
 export const advance = (state: RoundState, roll: () => number = Math.random): RoundState => {
     if (state.done) return state;
     const p = state.players[state.turn];
-    if (!p || !p.bot) return state;
+    if (!p) return state;
+    // ------------------------------------------------------------------
+    //  NOBODY ASKS AN ALL IN PLAYER ANYTHING, INCLUDING THE HUMAN
+    // ------------------------------------------------------------------
+    //  BEFORE the bot check, and the ordering is the whole of a second bug I
+    //  made putting this in. With it below, an all in HUMAN was never
+    //  advanced: `waitingForHuman` had just been taught that they have no
+    //  decision, and `advance` returns unchanged for anybody without a bot,
+    //  so the hand could not move and the machine spun. 3,782 hands out of
+    //  4,000 hit the guard.
+    //
+    //  An all in seat of any kind is checked through. They have paid; they
+    //  are entitled to the river.
+    // ------------------------------------------------------------------
+    if (p.stack <= 0 && !p.folded) {
+        return applyAction(state, 'call', 0);
+    }
+    if (!p.bot) return state;
 
     const d = decide(
         { ...p.bot, stack: p.stack },
@@ -316,6 +429,8 @@ export const advance = (state: RoundState, roll: () => number = Math.random): Ro
             stack: p.stack,
             street: Math.min(3, STREET_ORDER.indexOf(state.street)) as 0 | 1 | 2 | 3,
             aggressorRate: aggressorRate(state),
+            // What this seat already has in the middle. See pokerBots -> commitment.
+            committed: p.committed,
         },
         roll,
     );
@@ -338,7 +453,12 @@ export const aggressorRate = (s: RoundState): number => {
 
 /** True when the table is waiting on the person holding the phone. */
 export const waitingForHuman = (s: RoundState): boolean =>
-    !s.done && s.turn === HUMAN_SEAT && !s.players[HUMAN_SEAT]?.folded;
+    !s.done
+    && s.turn === HUMAN_SEAT
+    && !s.players[HUMAN_SEAT]?.folded
+    // An all in player has nothing to decide either, and asking them puts a
+    // FOLD button in front of somebody who has already paid to see the river.
+    && (s.players[HUMAN_SEAT]?.stack ?? 0) > 0;
 
 /** Run every bot until it is the human's turn again or the hand ends. */
 export const advanceToHuman = (

@@ -223,10 +223,78 @@ export const bestHand = (hole: Card[], board: Card[]): HandRank =>
 //  flush from a nine high flush would be playing better than a person.
 // ============================================================================
 
+/** Where each category starts, as the share of hands it beats. */
+export const CATEGORY_FLOOR: Readonly<Record<HandCategory, number>> = {
+    [HandCategory.HighCard]: 0.00,
+    [HandCategory.Pair]: 0.17,
+    [HandCategory.TwoPair]: 0.61,
+    [HandCategory.Trips]: 0.85,
+    [HandCategory.Straight]: 0.90,
+    [HandCategory.Flush]: 0.94,
+    [HandCategory.FullHouse]: 0.97,
+    [HandCategory.Quads]: 0.998,
+    [HandCategory.StraightFlush]: 0.9997,
+};
+const CATEGORY_CEIL: Readonly<Record<HandCategory, number>> = {
+    [HandCategory.HighCard]: 0.17,
+    [HandCategory.Pair]: 0.61,
+    [HandCategory.TwoPair]: 0.85,
+    [HandCategory.Trips]: 0.90,
+    [HandCategory.Straight]: 0.94,
+    [HandCategory.Flush]: 0.97,
+    [HandCategory.FullHouse]: 0.998,
+    [HandCategory.Quads]: 0.9997,
+    [HandCategory.StraightFlush]: 1,
+};
+
+/**
+ * How strong a hand is, as THE SHARE OF HANDS IT BEATS.
+ *
+ * It was `(category + within) / 9`, which spreads nine categories evenly and
+ * is therefore wrong, because hands are not evenly distributed. Measured over
+ * forty thousand flops: p50 0.111, and only 1.6% of hands reached 0.40 - the
+ * bar the tight bots call at. So "waits for a hand, then takes your stack"
+ * meant, in practice, "folds".
+ */
 export const handStrength = (rank: HandRank): number => {
-    const cat = rank?.category ?? 0;
+    const cat = (rank?.category ?? 0) as HandCategory;
+    const floor = CATEGORY_FLOOR[cat] ?? 0;
+    const ceil = CATEGORY_CEIL[cat] ?? 1;
     const top = rank?.score?.[1] ?? 0;
-    // Each category is a band; the top card moves you within it.
     const within = Math.max(0, Math.min(1, (top - 2) / 12));
-    return Math.max(0, Math.min(1, (cat + within) / 9));
+    return Math.max(0, Math.min(1, floor + (ceil - floor) * within));
+};
+
+// ============================================================================
+//  BEFORE THE FLOP, EVERY HAND LOOKED IDENTICAL
+// ============================================================================
+//
+//  `rankHand` needs five cards. Preflop there are two, so it returned
+//  `Incomplete` and `handStrength` turned that into 0 - for pocket aces and for
+//  seven-deuce alike. On the street where most of the folding happens the bots
+//  could not tell one from the other, and their decision came from misread
+//  noise. Measured: A A 0.0000, 7 2 0.0000.
+// ============================================================================
+
+export const PAIR_BASE = 0.42;
+export const PAIR_RANK_WEIGHT = 0.5;
+export const SUITED_BONUS = 0.07;
+export const CONNECTED_BONUS = 0.05;
+
+/** What two cards are worth, on the same 0 to 1 scale as `handStrength`. */
+export const holeStrength = (cards: Card[]): number => {
+    const hand = (cards || []).filter(Boolean);
+    if (hand.length < 2) return 0;
+    const a = RANK_ORDER[hand[0].rank] ?? 0;
+    const b = RANK_ORDER[hand[1].rank] ?? 0;
+    if (!a || !b) return 0;
+    const high = Math.max(a, b);
+    const low = Math.min(a, b);
+    const norm = (r: number) => Math.max(0, Math.min(1, (r - 2) / 12));
+    if (a === b) return Math.min(1, PAIR_BASE + PAIR_RANK_WEIGHT * norm(high));
+    const base = norm(high) * 0.34 + norm(low) * 0.20;
+    const suited = hand[0].suit === hand[1].suit ? SUITED_BONUS : 0;
+    const gap = high - low;
+    const connected = gap <= 4 ? CONNECTED_BONUS * (1 - (gap - 1) / 4) : 0;
+    return Math.max(0, Math.min(1, base + suited + connected));
 };

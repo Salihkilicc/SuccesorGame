@@ -190,7 +190,15 @@ const pokerReturn = (style: PokerStyle, vip = false, hands = 4000): number => {
                 } else if (style === 'folding') {
                     act = owed > 0 ? 'fold' : 'check';
                 } else if (style === 'reckless') {
-                    act = strength > 0.1 ? 'raise' : owed > 0 ? 'call' : 'check';
+                    // 0.1 -> 0.35 WHEN THE STRENGTH SCALE WAS REBUILT. This
+                    // number is part of the simulated PLAYER, not the game,
+                    // and it was chosen to mean "aggressive but not insane" on
+                    // the old scale, where it selected about half of hands.
+                    // On a scale that measures the share of hands you beat,
+                    // 0.1 selects about eighty five per cent, which made
+                    // `reckless` and `always` the same player - and left this
+                    // file with two tests measuring one thing.
+                    act = strength > 0.35 ? 'raise' : owed > 0 ? 'call' : 'check';
                 } else {
                     act = 'raise';
                 }
@@ -325,10 +333,35 @@ describe('and raising every hand is no longer a strategy', () => {
         expect(pokerReturn('always')).toBeLessThan(1.15);
     });
 
-    it('and it is still slightly better than folding everything, as it should be', () => {
-        // Aggression is supposed to be worth something. It is supposed not to
-        // be worth thirty per cent.
-        expect(pokerReturn('reckless')).toBeGreaterThan(pokerReturn('folding'));
+    it('and the three styles finish in the right order', () => {
+        // ------------------------------------------------------------------
+        //  THIS USED TO ASSERT THAT RECKLESS BEATS FOLDING
+        // ------------------------------------------------------------------
+        //  "Aggression is supposed to be worth something." It was written when
+        //  aggression was worth everything: the bots folded 99.9% of hands
+        //  because anybody who called an all in was quietly folded out of the
+        //  pot on the next street, so betting was free money and folding was
+        //  the only thing that could lose.
+        //
+        //  With that fixed the table pays out the way a poker table does, and
+        //  indiscriminate aggression is punished rather than rewarded. So the
+        //  property worth pinning is the ORDER, which is a stronger claim than
+        //  the one it replaces:
+        //
+        //      playing well   beats   folding everything
+        //      folding        beats   raising at anything
+        //
+        //  A game where the middle of that is wrong is a game where thinking
+        //  does not pay.
+        // ------------------------------------------------------------------
+        const good = pokerReturn('good');
+        const folding = pokerReturn('folding');
+        const reckless = pokerReturn('reckless');
+
+        expect(good).toBeGreaterThan(reckless);
+        expect(folding).toBeGreaterThan(reckless);
+        // And folding is not a living either: it bleeds the blinds.
+        expect(folding).toBeLessThan(1);
     });
 
     it('and the Noir table is no easier to bully than a city one', () => {
