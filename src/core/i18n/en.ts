@@ -2307,6 +2307,7 @@ export const en: Record<string, string> = {
     'casino.buyInLabel': 'BUY IN',
     'casino.blindsAre': 'Blinds {v1} / {v2}',
     'casino.allIn': 'ALL IN',
+    'casino.pickChip': 'CHOOSE YOUR STAKE',
     'casino.tapHub': 'TAP THE CENTRE TO SPIN',
     'casino.spinShort': 'SPIN',
     'casino.tapWheel': 'TAP THE WHEEL TO SPIN',

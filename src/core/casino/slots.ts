@@ -107,30 +107,39 @@ export interface SlotSpin {
     payline: [number, number, number];
     /** Total returned per unit staked. Zero on a loss. */
     multiplier: number;
-    /**
-     * The first two reels match and the third does not.
-     *
-     * A LOSS THAT LOOKS LIKE IT ALMOST WAS NOT ONE, and the only reason the
-     * engine reports it is so the screen can hang the third reel. It does not
-     * change the odds by a hair: the outcome above is already decided, and
-     * this only describes what the losing grid happens to look like.
-     */
-    nearMiss: boolean;
 }
 
-/**
- * How often a LOSING spin is dressed as a near miss.
- *
- * Real machines stack their reels so this happens more than chance would
- * give, and it is the single most effective thing in the business. Here it is
- * done honestly: the spin has already lost, and this decides nothing except
- * which of two losing pictures is drawn. A player who counts will find the
- * return is exactly what it says.
- *
- * A quarter. High enough to be the reason the third reel is worth watching,
- * low enough that it does not become the normal shape of a loss.
- */
-export const NEAR_MISS_SHARE = 0.25;
+// ============================================================================
+//  THE NEAR MISS IS GONE, AND IT IS WORTH SAYING WHY
+// ============================================================================
+//
+//  SHELVED:
+//
+//      /** The first two reels match and the third does not. */
+//      nearMiss: boolean;
+//
+//      /** How often a LOSING spin is dressed as a near miss. */
+//      export const NEAR_MISS_SHARE = 0.25;
+//
+//  The idea was that a quarter of losses would be drawn as `[face, face,
+//  other]` so the third reel was worth watching, and the note beside it
+//  argued this was honest because the outcome was already decided and only
+//  the picture changed.
+//
+//  That argument was wrong, and the player found the hole in it: the picture
+//  IS the game. `[face, face, other]` is also exactly what the second prize
+//  looks like, so the machine was drawing the same three symbols in the same
+//  three positions for a win and for a loss. Measured over 200,000 spins on
+//  the Ticker, it came up as a LOSS twice as often as a win.
+//
+//  Reported twice, the second time as "two come up side by side and it is
+//  still a loss, the slots are not right". Correct both times.
+//
+//  A near miss is also the one mechanic in slot design whose entire purpose
+//  is to mislead the person playing. Removing it costs the machine nothing:
+//  the last reel still hangs when the first two match, and that now means a
+//  prize has already landed and the only question is how big.
+// ============================================================================
 
 const pick = (roll: () => number, n: number): number => {
     const raw = roll();
@@ -147,7 +156,7 @@ const pick = (roll: () => number, n: number): number => {
 export const spinSlot = (m: SlotMachine, roll: () => number = Math.random): SlotSpin => {
     const faces = m.payouts.length;
     if (faces < 3) {
-        return { outcome: 'nothing', payline: [0, 1, 2], multiplier: 0, nearMiss: false };
+        return { outcome: 'nothing', payline: [0, 1, 2], multiplier: 0 };
     }
 
     const rawDie = roll();
@@ -162,43 +171,66 @@ export const spinSlot = (m: SlotMachine, roll: () => number = Math.random): Slot
             outcome: 'jackpot',
             payline: [face, face, face],
             multiplier: m.payouts[face] ?? 0,
-            nearMiss: false,
         };
     }
 
-    // ---- two of a kind ----
+    // ------------------------------------------------------------------
+    //  TWO OF A KIND, ALWAYS SHOWN IN FRONT
+    // ------------------------------------------------------------------
+    //  It used to put the odd symbol in the middle half the time, for
+    //  variety. Variety lost to legibility: `[face, face, other]` every time
+    //  means TWO IN FRONT IS ALWAYS A WIN, and the third reel only decides
+    //  how much. A machine you can read at a glance beats one with a prettier
+    //  spread of losing shapes.
+    // ------------------------------------------------------------------
     if (die < jackpot + second) {
         const face = pick(roll, faces);
         let other = pick(roll, faces);
         if (other === face) other = (other + 1) % faces;
-        // Which two match is cosmetic; putting the odd one in the middle
-        // sometimes stops every second prize looking identical.
-        const middleOut = roll() < 0.5;
-        const payline: [number, number, number] = middleOut
-            ? [face, other, face]
-            : [face, face, other];
-        return { outcome: 'second', payline, multiplier: m.twoKindMultiplier, nearMiss: false };
+        return {
+            outcome: 'second',
+            payline: [face, face, other],
+            multiplier: m.twoKindMultiplier,
+        };
     }
 
-    // ---- nothing ----
-    // Three different faces. A quarter of the time the first two match, which
-    // is a near miss and is worth watching the third reel for.
-    const nearMiss = roll() < NEAR_MISS_SHARE;
-    if (nearMiss) {
-        const face = pick(roll, faces);
-        let third = pick(roll, faces);
-        if (third === face) third = (third + 1) % faces;
-        return { outcome: 'nothing', payline: [face, face, third], multiplier: 0, nearMiss: true };
-    }
-
+    // ------------------------------------------------------------------
+    //  NOTHING, AND IT HAS TO LOOK LIKE NOTHING
+    // ------------------------------------------------------------------
+    //  THE DEFECT, reported twice: "two come up side by side and it is still
+    //  a loss". Measured before touching it, over 200,000 spins on the
+    //  Ticker:
+    //
+    //      two side by side, PAID    17,281
+    //      two side by side, LOST    35,900
+    //
+    //  So the shape that pays the second prize appeared, pixel for pixel,
+    //  twice as often as a LOSS than as a win. There was no way to tell them
+    //  apart, because there was nothing to tell apart: the same three symbols
+    //  in the same three positions, one paying and one not.
+    //
+    //  That came from a "near miss" branch which built `[face, face, third]`
+    //  on a quarter of losses, deliberately, to make the third reel worth
+    //  watching. The comment two lines below it even claimed the opposite -
+    //  that a loss "cannot be mistaken for a second prize that did not pay" -
+    //  while the branch above it manufactured exactly that mistake.
+    //
+    //  A near miss is also the one mechanic in slot design that exists to
+    //  mislead, and the player found it by being misled. It is gone. Losses
+    //  are three different faces, and the anticipation is carried by the
+    //  reels instead: the last one hangs when the first two match, which now
+    //  always means a prize has already landed and the only question is its
+    //  size. See features/casino/logic/useSlotsLogic.ts -> HANG_MS.
+    //
+    //  NO ODDS MOVED. `spinSlot` decides the outcome from the die before it
+    //  picks a single face, so this changes only what the machine SHOWS.
+    // ------------------------------------------------------------------
     const a = pick(roll, faces);
     let b = pick(roll, faces);
     if (b === a) b = (b + 1) % faces;
     let c = pick(roll, faces);
-    // Three DIFFERENT faces, so an ordinary loss cannot be mistaken for a
-    // second prize that did not pay.
     while (c === a || c === b) c = (c + 1) % faces;
-    return { outcome: 'nothing', payline: [a, b, c], multiplier: 0, nearMiss: false };
+    return { outcome: 'nothing', payline: [a, b, c], multiplier: 0 };
 };
 
 /**

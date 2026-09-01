@@ -51,7 +51,6 @@
 // ============================================================================
 
 import {
-    NEAR_MISS_SHARE,
     TARGET_RTP,
     expectedReturn,
     isBalanced,
@@ -231,7 +230,7 @@ describe('the spin, run for real', () => {
         const m = SLOT_CONFIG.dynasty;
         for (let i = 0; i < 5000; i++) {
             const s = spinSlot(m);
-            if (s.outcome !== 'nothing' || s.nearMiss) continue;
+            if (s.outcome !== 'nothing') continue;
             const [a, b, c] = s.payline;
             expect(`${a},${b},${c}`).toBe(`${a},${b},${c}`);
             expect(new Set([a, b, c]).size).toBe(3);
@@ -255,26 +254,62 @@ describe('the spin, run for real', () => {
     });
 });
 
-describe('the near miss is honest', () => {
-    it('it only ever describes a spin that has ALREADY lost', () => {
-        // THE LINE THIS DOES NOT CROSS. Real machines stack their reels so
-        // near misses happen more than chance would give, which changes what
-        // a player believes about their odds. This changes nothing except
-        // which of two losing pictures gets drawn.
-        for (let i = 0; i < 20_000; i++) {
-            const s = spinSlot(SLOT_CONFIG.ticker);
-            if (s.nearMiss) {
-                expect(s.outcome).toBe('nothing');
-                expect(s.multiplier).toBe(0);
+// ============================================================================
+//  THE NEAR MISS WAS NOT HONEST, AND THIS BLOCK PROVED THE WRONG THING
+// ============================================================================
+//
+//  What was here: four tests arguing that dressing a quarter of losses as
+//  `[face, face, other]` was fine because the OUTCOME was already decided and
+//  only the picture changed. One of them even measured the return to prove
+//  the money was untouched.
+//
+//  Every one of them passed, and the mechanic was still broken, because they
+//  all asked "does this change the odds" and none asked the question the
+//  player asked: CAN YOU TELL IT APART FROM A WIN. You could not. The second
+//  prize is drawn as two matching in front, and so was this - the same three
+//  symbols in the same three positions, paying in one case and not the other.
+//
+//  A test suite can be complete about the thing it decided to measure and
+//  still miss the defect entirely. That is what happened here, twice, because
+//  the player reported it twice before it was believed.
+//
+//  Replaced with the property that actually matters.
+// ============================================================================
+
+describe('you can tell a win from a loss by looking at it', () => {
+    it('two matching side by side ALWAYS pays', () => {
+        // THE DEFECT, as one assertion. Measured before the fix, over 200,000
+        // spins on the Ticker: this shape paid 17,281 times and lost 35,900.
+        for (const m of [SLOT_CONFIG.ticker, SLOT_CONFIG.boardroom, SLOT_CONFIG.dynasty]) {
+            for (let i = 0; i < 30_000; i++) {
+                const s = spinSlot(m);
+                const [a, b, c] = s.payline;
+                if (a === b) expect(s.multiplier).toBeGreaterThan(0);
+                expect(typeof c).toBe('number');
             }
         }
     });
 
-    it('and it really is a miss: two the same, then not', () => {
+    it('and a loss never shows two of anything', () => {
+        // Not adjacent, not split. Any repeated face on a losing line is a
+        // player being shown a prize they did not get.
+        for (const m of [SLOT_CONFIG.ticker, SLOT_CONFIG.boardroom, SLOT_CONFIG.dynasty]) {
+            for (let i = 0; i < 30_000; i++) {
+                const s = spinSlot(m);
+                if (s.outcome !== 'nothing') continue;
+                expect(new Set(s.payline).size).toBe(3);
+            }
+        }
+    });
+
+    it('and the second prize is always two in front, so the reel can hang', () => {
+        // The odd symbol used to go in the middle half the time, for variety.
+        // Legibility beat variety: two in front means a prize has landed and
+        // the last reel only decides its size.
         let seen = 0;
-        for (let i = 0; i < 20_000 && seen < 200; i++) {
+        for (let i = 0; i < 40_000 && seen < 500; i++) {
             const s = spinSlot(SLOT_CONFIG.ticker);
-            if (!s.nearMiss) continue;
+            if (s.outcome !== 'second') continue;
             seen++;
             expect(s.payline[0]).toBe(s.payline[1]);
             expect(s.payline[2]).not.toBe(s.payline[1]);
@@ -282,31 +317,28 @@ describe('the near miss is honest', () => {
         expect(seen).toBeGreaterThan(0);
     });
 
-    it('and it happens to about a quarter of losses, not to most of them', () => {
-        let losses = 0;
-        let near = 0;
+    it('and the hang now always precedes a prize rather than usually a loss', () => {
+        // The screen hangs the last reel on `payline[0] === payline[1]`.
+        // Before this it was a loss two times in three.
+        let hangs = 0;
+        let paid = 0;
         for (let i = 0; i < 50_000; i++) {
             const s = spinSlot(SLOT_CONFIG.ticker);
-            if (s.outcome !== 'nothing') continue;
-            losses++;
-            if (s.nearMiss) near++;
+            if (s.payline[0] !== s.payline[1]) continue;
+            hangs++;
+            if (s.multiplier > 0) paid++;
         }
-        const share = near / losses;
-        expect(Math.abs(share - NEAR_MISS_SHARE)).toBeLessThan(0.03);
-        expect(NEAR_MISS_SHARE).toBe(0.25);
+        expect(hangs).toBeGreaterThan(1000);
+        expect(paid).toBe(hangs);
     });
 
-    it('and the return is untouched by it, which is the proof', () => {
-        // If dressing a loss changed the money, this would be rigging.
+    it('and none of it moved the return, which is the point', () => {
+        // The outcome is decided from the die BEFORE a single face is picked,
+        // so rearranging the symbols cannot touch the money. If this drifts,
+        // the change was not cosmetic after all.
         const m = SLOT_CONFIG.boardroom;
         let returned = 0;
-        let near = 0;
-        for (let i = 0; i < 200_000; i++) {
-            const s = spinSlot(m);
-            returned += s.multiplier;
-            if (s.nearMiss) near++;
-        }
-        expect(near).toBeGreaterThan(1000);
+        for (let i = 0; i < 200_000; i++) returned += spinSlot(m).multiplier;
         expect(Math.abs(returned / 200_000 - TARGET_RTP)).toBeLessThan(0.02);
     });
 });

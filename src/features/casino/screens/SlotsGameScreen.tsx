@@ -205,7 +205,11 @@ const SlotsGameScreen = () => {
                 pressed && styles.spinButtonPressed,
                 (isSpinning || bet <= 0) && styles.disabledButton
               ]}>
-              <Text style={styles.spinText}>{isSpinning ? '...' : t('casino.spin')}</Text>
+              {/* The button says what is missing rather than firing an alert
+                  after the tap. A stake of zero means unchosen. */}
+              <Text style={styles.spinText}>
+                {isSpinning ? '...' : bet <= 0 ? t('casino.pickChip') : t('casino.spin')}
+              </Text>
             </Pressable>
           </View>
         </View>

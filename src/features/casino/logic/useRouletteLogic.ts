@@ -63,7 +63,10 @@ export const useRouletteLogic = (initialChip?: number) => {
   const casinoReputation = reputation.casino;
 
   // State
-  const [selectedChip, setSelectedChip] = useState<number>(initialChip ?? 1000);
+  // NOTHING IS STAKED UNTIL THE PLAYER STAKES IT. This defaulted to 1000, so
+  // the first tap on the table laid a chip whose size nobody had chosen.
+  // `placeBet` already refuses a zero chip; now that refusal can happen.
+  const [selectedChip, setSelectedChip] = useState<number>(initialChip ?? 0);
   const [bets, setBets] = useState<PlacedBet[]>([]);
   const [lastResult, setLastResult] = useState<ResultEntry | null>(null);
   const [history, setHistory] = useState<ResultEntry[]>([]);

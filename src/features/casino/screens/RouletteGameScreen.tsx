@@ -165,7 +165,9 @@ const RouletteGameScreen = () => {
           <Text style={styles.spinningText}>{t('casino.spinning')}</Text>
         ) : (
           <Text style={styles.wheelHint}>
-            {bets.length === 0 ? t('casino.placeChipsFirst') : t('casino.tapHub')}
+            {selectedChip <= 0 ? t('casino.pickChip')
+              : bets.length === 0 ? t('casino.placeChipsFirst')
+                : t('casino.tapHub')}
           </Text>
         )}
       </View>

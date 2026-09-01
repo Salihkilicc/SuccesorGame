@@ -99,7 +99,21 @@ export const useSlotsLogic = (
   const casinoReputation = reputation.casino;
 
   const [grid, setGrid] = useState<Grid>(() => generateRandomGrid(iconStrip(symbols)));
-  const [bet, setBet] = useState<number>(() => clamp(initialBet ?? config.minBet, config.minBet, maxBetLimit));
+  // ------------------------------------------------------------------
+  //  NOTHING IS STAKED UNTIL THE PLAYER STAKES IT
+  // ------------------------------------------------------------------
+  //  Asked for as "it should not be playable without choosing a bet, in any
+  //  game". This defaulted to `config.minBet`, so the machine arrived with a
+  //  chip already on it and SPIN was live before the player had decided
+  //  anything - which is how somebody plays a stake they never chose and
+  //  then reasonably wonders where the money went.
+  //
+  //  Zero means unchosen. It is not a legal stake, so every guard that
+  //  already refused a zero bet now does the work, and the button says what
+  //  is missing instead of firing.
+  // ------------------------------------------------------------------
+  const [bet, setBet] = useState<number>(() =>
+    initialBet ? clamp(initialBet, config.minBet, maxBetLimit) : 0);
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [message, setMessage] = useState('Ready to spin');
@@ -119,7 +133,7 @@ export const useSlotsLogic = (
   }, [variant]);
 
   useEffect(() => {
-    if (bet > maxBetLimit) setBet(maxBetLimit);
+    if (bet > 0 && bet > maxBetLimit) setBet(maxBetLimit);
   }, [maxBetLimit]);
 
   const reputationUp = (delta: number) => {

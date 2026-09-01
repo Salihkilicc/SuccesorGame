@@ -19,7 +19,10 @@ const BlackjackGameScreen = () => {
     useLocale();
   const navigation = useNavigation();
   const route = useRoute<any>();
-  const initialBet = route.params?.betAmount ?? 500;
+  // NOTHING IS STAKED UNTIL THE PLAYER STAKES IT. This was 500, so the table
+  // arrived with a bet on it and DEAL was live before any decision had been
+  // made. Zero is not a legal stake and the button says so.
+  const initialBet = route.params?.betAmount ?? 0;
 
   // Global Casino System for Theme & Rep
   const { currentLocation, casinoReputation } = useCasinoSystem();
@@ -208,7 +211,10 @@ const BlackjackGameScreen = () => {
                     pressed && { opacity: 0.8 }
                   ]}
                 >
-                  <Text style={styles.primaryText}>{roundState === 'done' ? t('casino.newDeal') : t('casino.deal')}</Text>
+                  <Text style={styles.primaryText}>
+                    {bet <= 0 ? t('casino.pickChip')
+                      : roundState === 'done' ? t('casino.newDeal') : t('casino.deal')}
+                  </Text>
                 </Pressable>
               )}
 

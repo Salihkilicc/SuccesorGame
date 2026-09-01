@@ -2287,6 +2287,7 @@ export const tr: Record<string, string> = {
     'casino.buyInLabel': 'MASAYA GİRİŞ',
     'casino.blindsAre': 'Körler {v1} / {v2}',
     'casino.allIn': 'HEPSİ',
+    'casino.pickChip': 'BAHSİNİ SEÇ',
     'casino.tapHub': 'ÇEVİRMEK İÇİN ORTAYA DOKUN',
     'casino.spinShort': 'ÇEVİR',
     'casino.tapWheel': 'ÇEVİRMEK İÇİN ÇARKA DOKUN',
