@@ -238,14 +238,26 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             return;
         }
 
+        // ------------------------------------------------------------------
+        //  SHORTER, BECAUSE IT IS A FIFTY THOUSAND DOLLAR DECISION
+        // ------------------------------------------------------------------
+        //  Reported as "these dinner and gift panels are much too long,
+        //  needlessly". They were: a paragraph of summary, two ledger rows,
+        //  and then a second paragraph explaining the mechanic - for a button
+        //  the player presses every quarter once they know what it does.
+        //
+        //  A confirmation should carry what changes and what it costs. The
+        //  cost is one line, the effect is one line, and the lesson about
+        //  money versus legacy belongs on the button that offers the choice,
+        //  not in front of the player who already made it.
+        // ------------------------------------------------------------------
         setPanel({
             title: t('mem.sendGiftTitle'),
             summary: t('mem.sendGiftBody2', { v1: formatMoney(GIFT_COST), v2: member.name }),
             lines: [
-                { label: 'Cost', value: formatMoney(GIFT_COST) },
-                { label: 'Your cash after', value: formatMoney(money - GIFT_COST), strong: true },
+                { label: t('mem.cashAfter'), value: formatMoney(money - GIFT_COST), strong: true },
             ],
-            note: 'A gift is a MONEY gesture. It pleases a member who cares about money and insults one thinking about their legacy.',
+            note: t('mem.giftLikes'),
             confirmLabel: t('equity.sendGift'),
             onConfirm: () => {
                         updateStats({ money: money - GIFT_COST });
@@ -279,7 +291,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         setPanel({
             title: t('mem.dinnerTitle'),
             summary: t('mem.dinnerBody2', { v1: member.name, v2: String(ENERGY_COST) }),
-            note: 'Dinner is a RECOGNITION gesture. A member who wants their name remembered needs attention, not money.',
+            note: t('mem.dinnerLikes'),
             confirmLabel: t('equity.arrangeDinner'),
             onConfirm: () => {
                 const r = offerGesture(member.id, 'legacy', 1);
@@ -294,11 +306,28 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         });
     };
 
+    // ----------------------------------------------------------------------
+    //  THE LOCKED DOOR SHOULD STILL BE A DOOR
+    // ----------------------------------------------------------------------
+    //  It said "This feature is locked. Unlock by completing the Corporate
+    //  Espionage storyline", under a spy emoji. Two problems with that beyond
+    //  the emoji, which this game has removed from every other surface.
+    //
+    //  It broke the fiction. Nothing else in the boardroom speaks in features
+    //  and unlocks; the board speaks about people. And it explained a
+    //  storyline the player may not have met, which tells them a name and
+    //  nothing they can act on.
+    //
+    //  What it says now is the in-world reason - you have nothing on them -
+    //  with the storyline as a quiet note underneath. Same information, and
+    //  it belongs to the same world as the rest of the panel.
+    // ----------------------------------------------------------------------
     const handleBlackmail = () => {
         setPanel({
-            title: '🕵️ Blackmail',
-            summary: t('alert.thisFeatureIsLockedN'),
-            confirmLabel: 'OK',
+            title: t('mem.blackmailTitle'),
+            summary: t('mem.blackmailBody'),
+            note: t('mem.blackmailNote'),
+            confirmLabel: t('common.ok'),
         });
     };
 
@@ -698,8 +727,26 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                 onPress={handleSendGift}
                                 disabled={money < 50000}
                             >
-                                <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(251, 191, 36, 0.15)', borderColor: 'rgba(251, 191, 36, 0.3)' }]}>
-                                    <MaterialCommunityIcons name="gift-outline" size={24} color="#FBBF24" />
+                                {/* ------------------------------------------
+                                    THE GAME'S OWN COLOURS
+
+                                    Reported as "renovate their symbols to suit
+                                    the game's theme". These three badges were
+                                    amber, cornflower and slate - three hex
+                                    literals belonging to no palette in this
+                                    codebase, from whichever component they
+                                    were copied out of. Next to a boardroom
+                                    built entirely from the theme they read as
+                                    stickers.
+
+                                    One family now, and they carry MEANING
+                                    rather than decoration: the two gestures
+                                    that work share the accent, and the one
+                                    you cannot use is the disabled grey every
+                                    other dead control in the game uses.
+                                   ------------------------------------------ */}
+                                <View style={[styles.actionIconBadge, styles.badgeLive]}>
+                                    <MaterialCommunityIcons name="gift-outline" size={24} color={theme.colors.highlight} />
                                 </View>
                                 <Text style={styles.actionTitle}>{t('equity.sendGift')}</Text>
                                 <Text style={styles.actionCost}>$50K</Text>
@@ -716,8 +763,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                 ]}
                                 onPress={handlePrivateDinner}
                             >
-                                <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(96, 165, 250, 0.15)', borderColor: 'rgba(96, 165, 250, 0.3)' }]}>
-                                    <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="#60A5FA" />
+                                <View style={[styles.actionIconBadge, styles.badgeLive]}>
+                                    <MaterialCommunityIcons name="silverware-fork-knife" size={24} color={theme.colors.highlight} />
                                 </View>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
                                 <Text style={styles.actionCost}>20 Energy</Text>
@@ -735,11 +782,13 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                 ]}
                                 onPress={handleBlackmail}
                             >
-                                <View style={[styles.actionIconBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)', borderColor: 'rgba(148, 163, 184, 0.3)' }]}>
-                                    <MaterialCommunityIcons name="incognito" size={24} color="#94A3B8" />
+                                <View style={[styles.actionIconBadge, styles.badgeDead]}>
+                                    <MaterialCommunityIcons name="incognito" size={24} color={theme.colors.textMuted} />
                                 </View>
                                 <Text style={styles.actionTitle}>{t('equity.blackmail')}</Text>
-                                <Text style={styles.actionCost}>🔒 Locked</Text>
+                                {/* The padlock emoji went with the rest of them. An
+                                    icon says locked; a word beside it says it twice. */}
+                                <Text style={styles.actionCost}>{t('mem.locked')}</Text>
                                 <Text style={styles.actionEffect}>{t('equity.forceVote')}</Text>
                             </Pressable>
                         </View>
@@ -846,9 +895,39 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                     />
                                     <View style={{ flex: 1 }}>
                                         <Text style={styles.routeName}>{BUYOUT_ROUTE_LABELS[r]}</Text>
+                                        {/* ----------------------------------------------
+                                            WHERE THE SHARES GO, ON THE ROW THAT CHOOSES IT
+
+                                            Reported as "when I buy a board member out,
+                                            does it make sense that I buy it with the
+                                            COMPANY'S money? Because I am buying it for
+                                            myself, that felt absurd."
+
+                                            It would be absurd, and it is not what
+                                            happens. The treasury route retires the
+                                            shares: the player gains none, the total
+                                            shrinks, and everybody's percentage rises
+                                            because the denominator did. It also goes to
+                                            a board vote, because it is their money.
+                                            See useShareholderStore -> negotiateSharePurchase.
+
+                                            So this was never a mechanic problem. It was
+                                            that the ONLY sentence saying so sat in an
+                                            info box BELOW the Make Offer button - after
+                                            the decision, which is not information. All
+                                            the row said was "your stake 33% becomes
+                                            41%", and a player reading that while paying
+                                            with company money draws exactly the
+                                            conclusion that was drawn.
+
+                                            One line, on the row, before the button.
+                                           ---------------------------------------------- */}
                                         <Text style={styles.routeMeta} numberOfLines={2}>
                                             {q.feasible
-                                                ? `Your stake ${q.ownershipBefore.toFixed(1)}% becomes ${q.ownershipAfter.toFixed(1)}%`
+                                                ? `${q.proposalKind ? t('mem.tornUp') : t('mem.youKeepThem')} ${t('mem.stakeMove', {
+                                                    v1: q.ownershipBefore.toFixed(1),
+                                                    v2: q.ownershipAfter.toFixed(1),
+                                                })}`
                                                 : q.reason}
                                         </Text>
                                     </View>
@@ -862,6 +941,21 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                 </Pressable>
                             );
                         })}
+
+                        {/* ------------------------------------------------
+                            AND THE FULL EXPLANATION, ABOVE THE BUTTON
+
+                            It was below it. A paragraph explaining that the
+                            company tears the shares up, placed after the
+                            control that commits to buying them, is not an
+                            explanation - it is a receipt. Nobody scrolls past
+                            a button they have already pressed.
+                           ------------------------------------------------ */}
+                        <View style={styles.infoBox}>
+                            <Text style={styles.infoText}>
+                                {BUYOUT_ROUTE_EXPLANATIONS[route]}
+                            </Text>
+                        </View>
 
                         {/* Make Offer Button */}
                         <Pressable
@@ -877,13 +971,6 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                 {routeQuotes[route].feasible ? t('mem.makeOffer') : t('mem.insufficientFunds')}
                             </Text>
                         </Pressable>
-
-                        {/* Info Box */}
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoText}>
-                                {BUYOUT_ROUTE_EXPLANATIONS[route]}
-                            </Text>
-                        </View>
                     </View>
                 )}
             </View>
@@ -1078,6 +1165,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 1,
         marginBottom: 2,
+    },
+    /**
+     * A gesture you can make.
+     *
+     * The theme's own accent, not one of the three unrelated hex literals
+     * these badges carried. `highlightSoft` is the fill that exists for
+     * exactly this and it keeps the boardroom in one palette.
+     */
+    badgeLive: {
+        backgroundColor: theme.colors.highlightSoft,
+        borderColor: theme.colors.border,
+    },
+    /** And one you cannot. The same grey every dead control in the game uses. */
+    badgeDead: {
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderColor: theme.colors.border,
     },
     actionIcon: {
         fontSize: 32,
