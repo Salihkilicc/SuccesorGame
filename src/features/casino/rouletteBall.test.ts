@@ -136,30 +136,67 @@ describe('and the component remembers where it left the ball', () => {
     });
 });
 
-describe('and the wheel can be pressed to spin it', () => {
+describe('and the hub is the only thing that spins it', () => {
     const screen = () => read('screens', 'RouletteGameScreen.tsx');
+    const wheel = () => read('components', 'RouletteWheel.tsx');
 
-    it('the wheel is the obvious thing to press', () => {
-        // Asked for as "pressing the wheel in roulette should spin it", which
-        // is how a real table works: the croupier's hand is on the wheel.
+    // ------------------------------------------------------------------
+    //  THIS BLOCK USED TO PIN THE WHOLE WHEEL AS THE BUTTON
+    // ------------------------------------------------------------------
+    //  That was the first pass at "pressing the wheel should spin it", and
+    //  it was wrong in a way worth recording: a wheel is a betting SURFACE
+    //  in a real room, so a tap anywhere on it means nothing in particular.
+    //  Asked for again, precisely: "make the round thing in the middle the
+    //  button". The hub is the one part of a wheel nobody ever bets on.
+    //
+    //  And the bottom button is gone entirely now, so the assertions about
+    //  it went with it rather than being loosened.
+    // ------------------------------------------------------------------
+
+    it('the hub cap is a control, not a decoration', () => {
+        const src = wheel();
+        expect(src).toMatch(/onPress=\{onSpin\}/);
+        expect(src).toMatch(/disabled=\{!canSpin \|\| !onSpin\}/);
+        expect(src).toMatch(/hub: \{/);
+    });
+
+    it('and it sits outside both turning layers, so the label can be read', () => {
+        // A label on a spinning disc is not a label. The hub cap is drawn
+        // after the wheel and after the ball.
+        const src = wheel();
+        const wheelLayer = src.indexOf('{/* ---- THE WHEEL ---- */}');
+        const ballLayer = src.indexOf('{/* ---- THE BALL ----');
+        const hub = src.indexOf('THE HUB CAP, WHICH IS THE BUTTON');
+        expect(hub).toBeGreaterThan(ballLayer);
+        expect(ballLayer).toBeGreaterThan(wheelLayer);
+    });
+
+    it('and the screen hands it the spin, on the same terms as before', () => {
+        // Not a second copy of the rules: `handleSpin` already refuses when
+        // there is nothing down or a spin is running.
         const src = screen();
-        expect(src).toMatch(/<Pressable\s*\n\s*onPress=\{actions\.handleSpin\}[\s\S]{0,240}<RouletteWheel/);
+        expect(src).toMatch(/onSpin=\{actions\.handleSpin\}/);
+        expect(src).toMatch(/canSpin=\{!isSpinning && bets\.length > 0\}/);
     });
 
-    it('and it refuses on the same terms the button does', () => {
-        // Not a second copy of the rules. The handler already declines when
-        // there are no chips down or a spin is running; this only mirrors it
-        // for the disabled state.
-        expect(screen()).toMatch(/disabled=\{isSpinning \|\| bets\.length === 0\}/);
-    });
-
-    it('and the button is still there, because a thumb reaches it', () => {
-        expect(screen()).toMatch(/styles\.spinButton/);
-    });
-
-    it('and it says which of the two things to do', () => {
+    it('and there is no separate play button left anywhere', () => {
+        // THE ASK. It was a full width button at the bottom of a tall screen,
+        // acting on a wheel pinned at the top.
         const src = screen();
-        expect(src).toMatch(/casino\.tapWheel/);
+        expect(src).not.toMatch(/<Pressable\s*\n\s*onPress=\{actions\.handleSpin\}/);
+        expect(src).not.toMatch(/^\s{2}spinButton: \{/m);
+        expect(src).toMatch(/\/\/ spinButton: \{/);
+    });
+
+    it('and it still says what to do', () => {
+        const src = screen();
+        expect(src).toMatch(/casino\.tapHub/);
         expect(src).toMatch(/casino\.placeChipsFirst/);
+    });
+
+    it('and the label is dark, because the hub takes the room colour', () => {
+        const src = wheel();
+        const style = src.slice(src.indexOf('hubText: {'));
+        expect(style.slice(0, style.indexOf('}'))).toMatch(/color: '#000000'/);
     });
 });

@@ -14,6 +14,7 @@ import RouletteWheel from '../components/RouletteWheel';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { translateCasinoStatus } from '../../../data/i18n/casinoText';
 import { chipsFor, maxBetFor } from '../data/casinoStakes';
+import { FELT } from '../../../core/casino/roulette';
 
 const RouletteGameScreen = () => {
     useLocale();
@@ -135,37 +136,36 @@ const RouletteGameScreen = () => {
          ------------------------------------------------------------------ */}
       <View style={styles.wheelStage}>
         {/* ----------------------------------------------------------------
-            AND THE WHEEL ITSELF SPINS IT
+            THE HUB IS THE BUTTON, AND THE ONLY ONE
 
-            Asked for as "in roulette, pressing the wheel should spin it".
-            Which is how it works at a table: the croupier's hand is on the
-            wheel, not on a button somewhere else. The button below stays -
-            it says what it costs and it is the reachable one for a thumb -
-            but the wheel is now the obvious thing to press, and it is
-            already pinned in view.
+            Asked for as "there should not be a play button; make the round
+            thing in the middle of the wheel the button and pressing it
+            spins". The bottom button is gone.
 
-            Same guard as the button, not a second copy of the rules: the
-            handler refuses on its own when there are no bets or a spin is
-            already running. See logic/useRouletteLogic.ts.
+            The first pass made the WHOLE wheel pressable, which was worse
+            than it sounds: a wheel is a betting surface in a real room, so
+            a tap anywhere on it means nothing in particular. The hub is the
+            one part nobody ever bets on, and it is where a croupier's hand
+            actually goes.
+
+            No second copy of the rules here: `handleSpin` already refuses
+            when there are no chips down or a spin is running, and `canSpin`
+            only mirrors that for the dead state.
            ---------------------------------------------------------------- */}
-        <Pressable
-          onPress={actions.handleSpin}
-          disabled={isSpinning || bets.length === 0}
-          hitSlop={6}
-          style={({ pressed }) => pressed && !isSpinning && styles.wheelPressed}
-        >
-          <RouletteWheel
-            size={168}
-            result={pendingResult ?? spinResult}
-            spinning={isSpinning}
-            tint={currentLocation.theme.primary}
-          />
-        </Pressable>
+        <RouletteWheel
+          size={176}
+          result={pendingResult ?? spinResult}
+          spinning={isSpinning}
+          tint={currentLocation.theme.primary}
+          onSpin={actions.handleSpin}
+          canSpin={!isSpinning && bets.length > 0}
+          spinLabel={isSpinning ? '' : t('casino.spinShort')}
+        />
         {isSpinning ? (
           <Text style={styles.spinningText}>{t('casino.spinning')}</Text>
         ) : (
           <Text style={styles.wheelHint}>
-            {bets.length === 0 ? t('casino.placeChipsFirst') : t('casino.tapWheel')}
+            {bets.length === 0 ? t('casino.placeChipsFirst') : t('casino.tapHub')}
           </Text>
         )}
       </View>
@@ -272,24 +272,23 @@ const RouletteGameScreen = () => {
               )}
             </View>
 
-            {/* Full-Width SPIN BTN */}
-            <Pressable
-              onPress={actions.handleSpin}
-              disabled={isSpinning || bets.length === 0}
-              style={({ pressed }) => [
-                styles.spinButton,
-                {
-                  backgroundColor: isSpinning || bets.length === 0
-                    ? '#3A4248'
-                    : currentLocation.theme.primary,
-                },
-                pressed && styles.spinButtonPressed,
-              ]}
-            >
-              <Text style={styles.spinText}>
-                {isSpinning ? '...' : t('ui.spinWheel')}
-              </Text>
-            </Pressable>
+            {/* --------------------------------------------------------
+                THE SPIN BUTTON IS GONE FROM HERE
+
+                Asked for as "there should not be a play button; make the
+                round thing in the middle of the wheel the button". It is
+                the hub now. See components/RouletteWheel.tsx.
+
+                What it cost while it lived here was not just the space:
+                the action was at the bottom of a tall screen and the
+                thing it acted on was pinned at the top, so playing a
+                round meant looking in two places and pressing in a
+                third. The hub is inside the wheel that is already in
+                view, which is one place.
+
+                The dock keeps what it should keep: what you are betting,
+                and how to take it back.
+               -------------------------------------------------------- */}
           </View>
         </View>
       </View>
@@ -316,7 +315,6 @@ const styles = StyleSheet.create({
   stage: { flex: 1 },
 
   /** The wheel dips a little under a finger, so the tap is acknowledged. */
-  wheelPressed: { transform: [{ scale: 0.97 }], opacity: 0.9 },
   wheelHint: {
     color: theme.colors.textMuted,
     fontSize: 10,
@@ -419,11 +417,27 @@ const styles = StyleSheet.create({
   },
 
   // Table
+  /**
+   * The cloth, and the rail around it.
+   *
+   * It was a flat dark rectangle with a one point border and six points of
+   * padding, which read as a container rather than a table. A real layout is
+   * a green cloth inside a raised wooden rail, and the two together are most
+   * of what makes it look like somewhere you stand rather than a list of
+   * buttons. `FELT.rim` is the same tone the wheel is built from, so the two
+   * halves of the screen are one object.
+   */
   tableContainer: {
-    backgroundColor: '#1E2C22',
-    borderRadius: 14,
-    padding: 6,
-    borderWidth: 1,
+    backgroundColor: FELT.cloth,
+    borderRadius: 16,
+    padding: 10,
+    borderWidth: 3,
+    borderColor: FELT.rim,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
 
   // Controls
@@ -460,18 +474,28 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  spinButton: {
-    width: '100%',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.35,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  spinButtonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
-  spinText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900', letterSpacing: 1.2 },
+  // ----------------------------------------------------------------------
+  //  SHELVED with the button they dressed. The hub in the middle of the
+  //  wheel is the spin control now; see components/RouletteWheel.tsx.
+  //  Kept because they record what the screen used to be.
+  // ----------------------------------------------------------------------
+  // spinButton: {
+  //   width: '100%',
+  //   paddingVertical: 14,
+  //   borderRadius: 12,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   shadowColor: '#000',
+  //   shadowOffset: { width: 0, height: 3 },
+  //   shadowOpacity: 0.35,
+  //   shadowRadius: 5,
+  //   elevation: 5,
+  // },
+  // spinButtonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
+  // spinText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900', letterSpacing: 1.2 },
+  //
+  //  AND `wheelPressed`, from the brief moment the whole wheel was the
+  //  button. Pressing anywhere on a betting surface is ambiguous; the hub
+  //  is the one part of a wheel nobody bets on.
+  // wheelPressed: { transform: [{ scale: 0.97 }], opacity: 0.9 },
 });

@@ -47,7 +47,7 @@
 // ============================================================================
 
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 import {
     FELT,
@@ -73,6 +73,29 @@ type Props = {
     onSettled?: () => void;
     /** The room's accent, for the rim. */
     tint: string;
+    // ----------------------------------------------------------------------
+    //  THE HUB IS THE BUTTON
+    // ----------------------------------------------------------------------
+    //  Asked for as "there should be no play button; make the round thing in
+    //  the middle of the wheel the button, and pressing it spins".
+    //
+    //  Which is the right instinct and it is not only tidiness. The button was
+    //  at the very bottom of a tall screen, so the sequence was: put chips
+    //  down at the top, travel to the bottom, press, travel back up to watch.
+    //  Three places for one action. Putting it in the middle of the thing that
+    //  turns collapses all three into one, and the wheel is already pinned in
+    //  view.
+    //
+    //  A `Pressable` over the hub rather than the whole wheel: the wheel is a
+    //  betting SURFACE in a real room, and a tap anywhere on it is ambiguous.
+    //  The hub is the one part of a wheel nobody ever bets on.
+    // ----------------------------------------------------------------------
+    /** Press the hub. Absent means the hub is inert. */
+    onSpin?: () => void;
+    /** Whether the hub will do anything. Greyed and dead when false. */
+    canSpin?: boolean;
+    /** What the hub says. */
+    spinLabel?: string;
 };
 
 
@@ -91,7 +114,9 @@ const wedgePath = (cx: number, cy: number, r: number, from: number, to: number):
     return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
 };
 
-const RouletteWheel = ({ size = 240, result, spinning, onSettled, tint }: Props) => {
+const RouletteWheel = ({
+    size = 240, result, spinning, onSettled, tint, onSpin, canSpin = false, spinLabel = 'SPIN',
+}: Props) => {
     const wheel = useRef(new Animated.Value(0)).current;
     const ball = useRef(new Animated.Value(0)).current;
     /** The ball's distance from the centre. It falls inward at the end. */
@@ -213,9 +238,10 @@ const RouletteWheel = ({ size = 240, result, spinning, onSettled, tint }: Props)
                             );
                         })}
                     </G>
-                    {/* The hub, so the wedges do not meet in an ugly point. */}
+                    {/* The turret the wedges meet at. The hub CAP that sits on
+                        top of it is drawn outside this layer, because a label
+                        on a spinning disc cannot be read. */}
                     <Circle cx={r} cy={r} r={r * 0.30} fill={FELT.rim} stroke={tint} strokeWidth={1.5} />
-                    <Circle cx={r} cy={r} r={r * 0.10} fill={tint} opacity={0.9} />
                 </Svg>
             </Animated.View>
 
@@ -229,6 +255,41 @@ const RouletteWheel = ({ size = 240, result, spinning, onSettled, tint }: Props)
             >
                 <Animated.View style={[styles.ball, { transform: [{ translateY: ballDrop }] }]} />
             </Animated.View>
+
+            {/* ---- THE HUB CAP, WHICH IS THE BUTTON ----
+                Outside both turning layers, so the label stays still while
+                everything under it moves. A light fill takes dark text, which
+                is the house rule and is also what makes it read as a control
+                rather than as another part of the wheel. */}
+            <View style={[StyleSheet.absoluteFill, styles.centre]} pointerEvents="box-none">
+                <Pressable
+                    onPress={onSpin}
+                    disabled={!canSpin || !onSpin}
+                    hitSlop={8}
+                    style={({ pressed }) => [
+                        styles.hub,
+                        {
+                            width: r * 0.56,
+                            height: r * 0.56,
+                            borderRadius: r * 0.28,
+                            backgroundColor: canSpin ? tint : FELT.rim,
+                            borderColor: canSpin ? tint : 'rgba(255,255,255,0.14)',
+                        },
+                        pressed && canSpin && styles.hubPressed,
+                    ]}
+                >
+                    <Text
+                        numberOfLines={1}
+                        style={[
+                            styles.hubText,
+                            { fontSize: Math.max(8, r * 0.10) },
+                            !canSpin && styles.hubTextOff,
+                        ]}
+                    >
+                        {spinLabel}
+                    </Text>
+                </Pressable>
+            </View>
         </View>
     );
 };
@@ -236,6 +297,31 @@ const RouletteWheel = ({ size = 240, result, spinning, onSettled, tint }: Props)
 const styles = StyleSheet.create({
     wrap: { alignItems: 'center', justifyContent: 'center' },
     centre: { alignItems: 'center', justifyContent: 'center' },
+    /**
+     * The hub cap, and the only control on this screen now.
+     *
+     * Sized off the wheel's radius so it stays in proportion when the wheel
+     * is resized, which it has been twice already.
+     */
+    hub: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.35,
+        shadowRadius: 4,
+        elevation: 6,
+    },
+    hubPressed: { transform: [{ scale: 0.92 }] },
+    hubText: {
+        // DARK ON A LIT FILL. Every room primary is a light colour; measured
+        // in slotCabinet.test.ts, and this is the same rule.
+        color: '#000000',
+        fontWeight: '900',
+        letterSpacing: 0.5,
+    },
+    hubTextOff: { color: 'rgba(255,255,255,0.45)' },
     ball: {
         width: 11,
         height: 11,

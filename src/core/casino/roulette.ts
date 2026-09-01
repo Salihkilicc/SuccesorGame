@@ -75,6 +75,17 @@ export const FELT = {
     rim: '#2A2E35',
     /** The ball. */
     ivory: '#F4F4F6',
+    /**
+     * The cloth the betting layout is printed on.
+     *
+     * DELIBERATELY NOT `green` ABOVE. That one is the zero pocket and it is
+     * saturated enough to read as a signal colour; a whole table of it would
+     * be the brightest thing on the screen and would fight the rule that
+     * reserves green for profit and loss. This is the dark table green a
+     * layout is actually printed on, and it sits behind numbers rather than
+     * competing with them.
+     */
+    cloth: '#16281F',
 } as const;
 
 export const feltColour = (n: number): string => FELT[colourOf(n)];

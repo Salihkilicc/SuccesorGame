@@ -1,6 +1,6 @@
 // src/features/casino/components/RouletteTable.tsx
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { BetType, getNumberColor } from '../logic/useRouletteLogic';
 import { CasinoTheme } from '../data/casinoData';
 import { useLocale } from '../../../core/i18n';
@@ -43,11 +43,14 @@ const NumberCell = ({
   betAmount,
   onPress,
   disabled,
+  chipColor,
 }: {
   number: number;
   betAmount: number;
   onPress: () => void;
   disabled?: boolean;
+  /** The room's chip colour. It was one hardcoded gold for every city. */
+  chipColor: string;
 }) => {
   const bgColor = NUMBER_COLORS[number];
   const isZero = number === 0;
@@ -66,7 +69,7 @@ const NumberCell = ({
     >
       <Text style={styles.numberText}>{number}</Text>
       {betAmount > 0 && (
-        <View style={styles.chipIndicator}>
+        <View style={[styles.chipIndicator, { backgroundColor: chipColor, borderColor: 'rgba(0,0,0,0.35)' }]}>
           <Text style={styles.chipIndicatorText}>{formatChipAmount(betAmount)}</Text>
         </View>
       )}
@@ -82,6 +85,7 @@ const AreaBetButton = ({
   color,
   customBg,
   disabled,
+  chipColor,
 }: {
   label: string;
   betType: BetType;
@@ -90,6 +94,7 @@ const AreaBetButton = ({
   color?: string;
   customBg?: string;
   disabled?: boolean;
+  chipColor: string;
 }) => (
   <Pressable
     onPress={onPress}
@@ -104,7 +109,10 @@ const AreaBetButton = ({
   >
     <Text style={[styles.areaBetText, color ? { color } : {}]}>{label}</Text>
     {betAmount > 0 && (
-      <View style={[styles.chipIndicator, styles.areaChipIndicator]}>
+      <View style={[
+        styles.chipIndicator, styles.areaChipIndicator,
+        { backgroundColor: chipColor, borderColor: 'rgba(0,0,0,0.35)' },
+      ]}>
         <Text style={styles.chipIndicatorText}>{formatChipAmount(betAmount)}</Text>
       </View>
     )}
@@ -113,6 +121,9 @@ const AreaBetButton = ({
 
 const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: RouletteTableProps) => {
   useLocale();
+  // ONE GOLD FOR EVERY CITY was what the chip markers used. The room already
+  // has a chip colour and every other surface in the casino uses it.
+  const chip = gameTheme?.chipColor || gameTheme?.primary || '#FFFFFF';
   return (
     <View style={styles.container}>
       {/* ZERO */}
@@ -121,15 +132,23 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
         betAmount={getBetOnPosition('S0')}
         onPress={() => onPlaceBet('S0')}
         disabled={disabled}
+        chipColor={chip}
       />
 
-      {/* NUMBER GRID */}
-      <ScrollView
-        style={styles.gridScroll}
-        contentContainerStyle={styles.gridContainer}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-      >
+      {/* ------------------------------------------------------------------
+          THE NUMBER GRID, ALL TWELVE ROWS OF IT
+
+          THE DEFECT, reported as "the table has ended up small in the
+          middle". This was a ScrollView capped at a fixed height - a scroller
+          INSIDE the screen's scroller - holding twelve rows that need about
+          four hundred points. So two thirds of the table was hidden behind a
+          nested scroll gesture that fought the outer one, in the middle of a
+          screen that already scrolls.
+
+          A nested scroller is almost always a layout giving up. The outer one
+          scrolls; this just lays the numbers out.
+         ------------------------------------------------------------------ */}
+      <View style={styles.gridContainer}>
         {ROULETTE_GRID.map((row, rowIdx) => (
           <View key={rowIdx} style={styles.gridRow}>
             {row.map((num) => (
@@ -139,11 +158,12 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
                 betAmount={getBetOnPosition(`S${num}` as BetType)}
                 onPress={() => onPlaceBet(`S${num}` as BetType)}
                 disabled={disabled}
+                chipColor={chip}
               />
             ))}
           </View>
         ))}
-      </ScrollView>
+      </View>
 
       {/* DOZEN BETS */}
       <View style={styles.dozenRow}>
@@ -153,6 +173,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('1ST12')}
           onPress={() => onPlaceBet('1ST12')}
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateDozenBet('2nd 12')}
@@ -160,6 +181,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('2ND12')}
           onPress={() => onPlaceBet('2ND12')}
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateDozenBet('3rd 12')}
@@ -167,6 +189,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('3RD12')}
           onPress={() => onPlaceBet('3RD12')}
           disabled={disabled}
+          chipColor={chip}
         />
       </View>
 
@@ -178,6 +201,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('LOW')}
           onPress={() => onPlaceBet('LOW')}
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateOutsideBet('EVEN')}
@@ -185,6 +209,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('EVEN')}
           onPress={() => onPlaceBet('EVEN')}
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateOutsideBet('◆ RED')}
@@ -194,6 +219,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           color="#FF6B6B"
           customBg="#881337"
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateOutsideBet('◆ BLACK')}
@@ -203,6 +229,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           color="#E2E8F0"
           customBg="#0F172A"
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateOutsideBet('ODD')}
@@ -210,6 +237,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('ODD')}
           onPress={() => onPlaceBet('ODD')}
           disabled={disabled}
+          chipColor={chip}
         />
         <AreaBetButton
           label={translateOutsideBet('19-36')}
@@ -217,6 +245,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betAmount={getBetOnPosition('HIGH')}
           onPress={() => onPlaceBet('HIGH')}
           disabled={disabled}
+          chipColor={chip}
         />
       </View>
     </View>
@@ -225,39 +254,67 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
 
 export default RouletteTable;
 
+// ============================================================================
+//  IT WAS A GRID OF BUTTONS, NOT A LAYOUT
+// ============================================================================
+//
+//  Reported as "make the roulette table more attractive, it is bad right now".
+//
+//  Three things were wrong and none of them was the colours of the numbers.
+//
+//    THE CELLS WERE TINY AND FAR APART. 32 points tall with 2 point gaps, so
+//    every cell floated on its own with a hairline outline. A roulette layout
+//    is a PAINTED CLOTH: the numbers sit in a continuous grid divided by thin
+//    white lines, not a scatter of rounded rectangles. Bigger cells, tighter
+//    gaps, and the gap colour IS the line.
+//
+//    THERE WAS NO CLOTH. Nothing behind the numbers, so the whole thing read
+//    as controls on a dark screen rather than a table you are standing at. It
+//    has a felt and a rail now, and the felt is the same green the wheel uses.
+//
+//    THE CHIP MARKER WAS A GOLD BOX, with a black outline, cornered outside
+//    the cell it belonged to, in the one gold literal in the codebase. Chips
+//    are round, they sit ON the number, and the colour that means "your money
+//    is here" is the room's own chip colour.
+// ============================================================================
+
+/** The line between two numbers, which is what the gap actually is. */
+const RULE = 'rgba(255,255,255,0.22)';
+
 const styles = StyleSheet.create({
   container: {
-    gap: 4,
+    gap: 5,
   },
 
   // Grid
-  gridScroll: {
-    maxHeight: 250,
-  },
   gridContainer: {
-    gap: 2,
+    // The gap is the painted line, so it takes the line's colour and a
+    // background behind it rather than being empty space.
+    gap: 1.5,
   },
   gridRow: {
     flexDirection: 'row',
-    gap: 2,
+    gap: 1.5,
   },
   numberCell: {
     flex: 1,
-    height: 32,
-    borderRadius: 5,
+    // 32 -> 38. The nested scroller that made 32 necessary is gone, so the
+    // numbers can be the size a thumb actually wants.
+    height: 38,
+    borderRadius: 3,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: RULE,
   },
   zeroCell: {
-    height: 32,
-    borderRadius: 5,
+    height: 34,
+    borderRadius: 3,
   },
   numberText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '800',
   },
   cellPressed: {
@@ -265,57 +322,62 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.96 }],
   },
 
-  // Chip indicators
+  // ----------------------------------------------------------------------
+  //  THE CHIP
+  // ----------------------------------------------------------------------
+  //  A round marker sitting ON the number, the way a chip does, rather than
+  //  a gold tag pinned to the corner and hanging outside the cell.
+  // ----------------------------------------------------------------------
   chipIndicator: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: '#FFD700',
-    borderRadius: 8,
+    bottom: 2,
+    right: 2,
+    borderRadius: 9,
     paddingHorizontal: 4,
     paddingVertical: 1,
     minWidth: 18,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.3)',
   },
   areaChipIndicator: {
-    top: -5,
-    right: -5,
+    bottom: 3,
+    right: 3,
   },
   chipIndicatorText: {
-    fontSize: 8,
+    fontSize: 8.5,
     fontWeight: '900',
-    color: '#1C242C',
+    // DARK ON A LIGHT CHIP. The chip takes the room's colour, and every room
+    // colour is a light fill; measured in slotCabinet.test.ts.
+    color: '#000000',
   },
 
   // Dozen row
   dozenRow: {
     flexDirection: 'row',
-    gap: 3,
-    marginTop: 2,
+    gap: 4,
+    marginTop: 3,
   },
 
   // Area bets
   areaBetGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 3,
+    gap: 4,
   },
   areaBetBtn: {
     flexBasis: '32%',
     flexGrow: 1,
-    height: 32,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    height: 36,
+    borderRadius: 4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: RULE,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     position: 'relative',
   },
   areaBetText: {
-    color: 'rgba(255,255,255,0.9)',
+    color: 'rgba(255,255,255,0.92)',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.5,

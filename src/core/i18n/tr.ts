@@ -2284,6 +2284,8 @@ export const tr: Record<string, string> = {
     'casino.checkCall': 'GÖR / PAS',
     'casino.spin': 'ÇEVİR',
     'casino.spinning': 'Dönüyor...',
+    'casino.tapHub': 'ÇEVİRMEK İÇİN ORTAYA DOKUN',
+    'casino.spinShort': 'ÇEVİR',
     'casino.tapWheel': 'ÇEVİRMEK İÇİN ÇARKA DOKUN',
     'casino.placeChipsFirst': 'FİŞLERİNİ KOY',
     'casino.clear': 'TEMİZLE',

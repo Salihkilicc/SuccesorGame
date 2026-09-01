@@ -128,8 +128,13 @@ describe('and the wheel stays where it can be seen', () => {
     });
 
     it('and it is smaller, because a wheel that is always there can be', () => {
-        expect(screen()).toMatch(/size=\{168\}/);
-        expect(screen()).not.toMatch(/size=\{230\}/);
+        // 230 -> 168 when it was pinned, then 168 -> 176 when the hub became
+        // the spin button and needed to be a comfortable target. What this
+        // pins is the point: a wheel that never leaves the screen does not
+        // have to dominate it.
+        const size = Number((screen().match(/size=\{(\d+)\}/) || [])[1]);
+        expect(size).toBeGreaterThan(0);
+        expect(size).toBeLessThan(200);
     });
 });
 
