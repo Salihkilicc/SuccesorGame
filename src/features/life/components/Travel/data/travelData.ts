@@ -262,7 +262,7 @@ export const VACATION_SPOTS: VacationSpot[] = [
         emoji: '🇷🇺',
         color: '#05A8F6',
         transportIcon: '🚂',
-        souvenir: { id: 'ru_egg', name: 'Fabergé Egg', emoji: '🥚', description: 'Jeweled egg of royalty.', rarity: 'LEGENDARY' },
+        souvenir: { id: 'ru_egg', name: 'Imperial Jewelled Egg', emoji: '🥚', description: 'Jeweled egg of royalty.', rarity: 'LEGENDARY' },
         narratives: {
             low: ['It was incredibly cold.', 'Visas were a hassle.', 'Traffic in the city center.'],
             mid: ['Red Square was impressive.', 'Saw the beautiful metro stations.', 'Ballet at the Bolshoi.'],

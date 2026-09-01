@@ -177,7 +177,7 @@ export const PRODUCT_MARKETS: ProductMarket[] = [
         competitors: [
             { stockId: 'tech_gpt', name: 'OpenAI-ish', symbol: 'AI', share: 29.0, strength: 90 },
             { stockId: 'tech_chip', name: 'Novidia', symbol: 'CHIP', share: 26.0, strength: 94 },
-            { stockId: 'ind_lmt', name: 'Lockheed Marvin', symbol: 'LMT', share: 16.0, strength: 71 },
+            { stockId: 'ind_lmt', name: 'Lockhead Marvin', symbol: 'LMT', share: 16.0, strength: 71 },
             { stockId: 'tech_chat', name: 'ChatAI Corp', symbol: 'CHAT', share: 11.0, strength: 63 },
             { stockId: 'ind_spce', name: 'SpaceZ', symbol: 'SPCE', share: 4.0, strength: 35 },
         ],

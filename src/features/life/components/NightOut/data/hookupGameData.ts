@@ -249,17 +249,17 @@ const MONEY_SCENARIOS: HookupScenario[] = [
     },
     {
         id: 'money_003',
-        clue: "She's complaining to her friend that her Birkin is last season's.",
+        clue: "She's complaining to her friend that her handbag is last season's.",
         correctStrategy: 'MONEY',
         options: {
             charisma: "Fashion is temporary. Your personality is what matters.",
             money: "Paris Fashion Week is next month. I have front row seats.",
-            fame: "Hermès sent me three this year. I can't keep up."
+            fame: "The atelier sent me three this year. I can't keep up."
         }
     },
     {
         id: 'money_004',
-        clue: "She's checking her Patek Philippe watch every five minutes.",
+        clue: "She's checking her Beaulieu & Fils watch every five minutes.",
         correctStrategy: 'MONEY',
         options: {
             charisma: "Waiting for someone or just bored?",
@@ -279,11 +279,11 @@ const MONEY_SCENARIOS: HookupScenario[] = [
     },
     {
         id: 'money_006',
-        clue: "She's showing off her new Cartier bracelet to everyone nearby.",
+        clue: "She's showing off her new Corbeau bracelet to everyone nearby.",
         correctStrategy: 'MONEY',
         options: {
             charisma: "It's beautiful, but I bet your smile is worth more.",
-            money: "Cartier is classic. I just picked up a piece from their new collection.",
+            money: "Corbeau is classic. I just picked up a piece from their new collection.",
             fame: "They loaned me jewelry for the red carpet last week."
         }
     },
@@ -339,11 +339,11 @@ const MONEY_SCENARIOS: HookupScenario[] = [
     },
     {
         id: 'money_012',
-        clue: "She's showing her friend photos of her new Lamborghini.",
+        clue: "She's showing her friend photos of her new Taurino.",
         correctStrategy: 'MONEY',
         options: {
             charisma: "Nice car. But can you actually drive it?",
-            money: "Beautiful choice. I went with the Bugatti myself.",
+            money: "Beautiful choice. I went with the Vaurien myself.",
             fame: "They let me test drive one for a commercial. Incredible machine."
         }
     },
@@ -389,10 +389,10 @@ const MONEY_SCENARIOS: HookupScenario[] = [
     },
     {
         id: 'money_017',
-        clue: "She's annoyed that the club doesn't validate valet for Ferraris.",
+        clue: "She's annoyed that the club doesn't validate valet for Corsaltas.",
         correctStrategy: 'MONEY',
         options: {
-            charisma: "Ferrari problems. Life must be hard.",
+            charisma: "Corsalta problems. Life must be hard.",
             money: "I'll cover it. What's a few hundred between friends?",
             fame: "They gave me one for a campaign. Beautiful car."
         }
@@ -413,7 +413,7 @@ const MONEY_SCENARIOS: HookupScenario[] = [
         correctStrategy: 'MONEY',
         options: {
             charisma: "Art collector? That's impressive.",
-            money: "I was at that auction. Picked up a Basquiat.",
+            money: "I was at that auction. Picked up a Duvernay.",
             fame: "I'm friends with several artists. Want an introduction?"
         }
     },
@@ -423,7 +423,7 @@ const MONEY_SCENARIOS: HookupScenario[] = [
         correctStrategy: 'MONEY',
         options: {
             charisma: "That's stunning. You wear it well.",
-            money: "Harry Winston? I have a piece from their vault collection.",
+            money: "Winterbourne? I have a piece from their vault collection.",
             fame: "They loaned me the Hope Diamond once. Security was intense."
         }
     }

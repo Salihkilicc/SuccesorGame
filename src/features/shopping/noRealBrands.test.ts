@@ -44,23 +44,51 @@
 //  every shop rather than a list somebody remembers to update.
 //
 //  ---------------------------------------------------------------------------
-//  AND IT COVERS THE SHOP ONLY, WHICH IS NOT THE WHOLE GAME
+//  AND THEN THE SAME SWEEP OVER THE REST OF THE GAME
 //  ---------------------------------------------------------------------------
-//  Written down so nobody reads a green suite as an all clear. A sweep of the
-//  rest of src turned up four more files with the same problem and they are
-//  NOT checked here, because widening this file would have meant renaming
-//  forty pieces of art in a commit that was asked to fix the shop:
+//  The shop was where it was worst and it was not where it stopped. Five more
+//  files carried real names, and the last section of this file walks all of
+//  src rather than a list, because the point of a net is that nobody has to
+//  remember to widen it:
 //
-//      features/life/NightOut/data/hookupGameData.ts       9 names
-//      features/life/BlackMarket/blackMarketData.ts        7 names
-//      features/love/data/encounterData.ts                 1 name
-//      features/life/Travel/data/travelData.ts             1 name
+//      life/NightOut/hookupGameData.ts   Bugatti, Ferrari, Lamborghini,
+//                                        Patek, Cartier, Hermès, Birkin,
+//                                        Basquiat, Harry Winston
+//      life/BlackMarket/blackMarketData.ts   24 modern paintings, 13 gems
+//                                        named after houses or people, and
+//                                        three weapons with live trademarks
+//      love/data/encounterData.ts        a Gulfstream cabin
+//      life/Travel/travelData.ts         a Fabergé egg
+//      assets/data/marketData.ts         "Airbus-ish", "Lockheed Marvin"
 //
-//  (`features/love/data/nameData.ts` also matches, on "Ferrari" and "Chanel".
-//  Those are a common Italian surname and a common given name, and a person
-//  called Ferrari is not a car. It is left alone on purpose.)
+//  The nightclub dialogue now names the game's OWN marques - a Corbeau
+//  bracelet, a Beaulieu & Fils watch, "I went with the Vaurien myself" -
+//  which is better than it was: the shop and the conversation about the shop
+//  are one world now instead of two.
+//
+//  ---------------------------------------------------------------------------
+//  WHERE THE LINE IS DRAWN, AND WHY IT IS NOT "SCRUB EVERY PROPER NOUN"
+//  ---------------------------------------------------------------------------
+//  A COMPANY, a MODERN ARTIST'S ESTATE or a LIVING PERSON goes. Those are the
+//  ones with somebody to be wronged and somebody to complain: Picasso, Warhol,
+//  Rothko, Hockney, De Beers, Tiffany, Graff.
+//
+//  A PUBLIC DOMAIN ARTWORK or a HISTORICAL OBJECT stays. The Mona Lisa, the
+//  Rosetta Stone, the Koh-i-Noor, Van Gogh's irises. Nobody owns those names,
+//  a black market that cannot sell the Mona Lisa is a worse black market, and
+//  renaming them would have bought nothing at all.
+//
+//  A PLACE stays, including a landmark you VISIT: the travel screen offers an
+//  after-hours tour of Versailles and that is what tourists do. The shop
+//  SELLING Versailles was the problem, and that one went.
+//
+//  (`love/data/nameData.ts` matches on "Ferrari" and "Chanel" and is left
+//  alone. They are a common Italian surname and a common given name, and a
+//  person called Ferrari is not a car.)
 // ============================================================================
 
+import fs from 'fs';
+import path from 'path';
 import { ITEMS, SHOPS } from './data/shoppingRegistry';
 import { initialLuxuryCatalog } from '../../core/store/useLuxoNetStore';
 
@@ -255,5 +283,102 @@ describe('but the world is still the real world', () => {
         for (const p of places) {
             expect([p, all.includes(p)]).toEqual([p, true]);
         }
+    });
+
+    it('and the black market can still sell you a stolen Mona Lisa', () => {
+        // The overreaction this guards against. Public domain artworks and
+        // historical objects are nobody's to lose, and a fence with nothing
+        // recognisable on the table is not a fence.
+        const src = read(BLACK_MARKET);
+        for (const keep of ['Mona Lisa', 'Rosetta Stone', 'Koh-i-Noor', 'Van Gogh']) {
+            expect([keep, src.includes(keep)]).toEqual([keep, true]);
+        }
+    });
+});
+
+// ============================================================================
+//  AND THE SAME SWEEP OVER EVERYTHING ELSE
+// ============================================================================
+//
+//  Walks src rather than a list of files. A named list is a thing somebody has
+//  to remember to add to, and the whole failure being fixed here is that the
+//  shop was written by somebody who reached for the real names because it was
+//  quicker - which is exactly what the next person will do in the next file.
+// ============================================================================
+
+const SRC_ROOT = path.join(__dirname, '..', '..');
+const BLACK_MARKET = path.join(
+    'features', 'life', 'components', 'BlackMarket', 'blackMarketData.ts',
+);
+
+/** A source file's live text: comments stripped, so a note is not an offence. */
+const liveText = (abs: string) =>
+    fs.readFileSync(abs, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .split('\n')
+        .filter(l => !/^\s*(\/\/|\*)/.test(l))
+        .map(l => l.replace(/\s\/\/.*$/, ''))
+        .join('\n');
+
+const read = (rel: string) => liveText(path.join(SRC_ROOT, rel));
+
+const walk = (dir: string, out: string[] = []): string[] => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, e.name);
+        if (e.isDirectory()) { walk(full, out); continue; }
+        if (!/\.tsx?$/.test(e.name) || /\.test\./.test(e.name)) continue;
+        out.push(full);
+    }
+    return out;
+};
+
+/**
+ * Words that are somebody's product, and that no source file may carry.
+ *
+ * A narrower list than BANNED on purpose. That one is aimed at the shop's own
+ * fields, where a model number is a claim; this one is aimed at ninety
+ * thousand lines of prose, where `GTO` and `AMG` and `F1` turn up inside
+ * unrelated identifiers and the false positives would drown the signal.
+ * Makers and estates only.
+ */
+//
+//  PLACES_THAT_BELONG_TO_SOMEBODY is left out entirely. That group exists for
+//  the shop, where the offence is SELLING somebody's building. Everywhere else
+//  a landmark is a landmark: the travel screen offers an after-hours tour of
+//  Versailles, a look at Buckingham Palace and a walk round the Kremlin, which
+//  is what a tourist does and what a travel screen is for.
+//
+//  `Carnival` comes out of AIR_AND_SEA here for the same kind of reason. It is
+//  a cruise line and it is also a street party in Rio, and the travel screen
+//  means the second one.
+const BANNED_EVERYWHERE = [
+    ...CAR_MAKERS, ...WATCH_MAKERS,
+    ...AIR_AND_SEA.filter(b => b !== 'Carnival'),
+    'Basquiat', 'Warhol', 'Rothko', 'Pollock', 'Lichtenstein', 'Hockney',
+    'Lucian Freud', 'de Grisogono', 'De Beers', 'Moussaieff', 'Rockefeller',
+    'Birkin', 'Hermes', 'Hermès', 'Louis Vuitton', 'Gucci', 'Prada',
+    'Dom Perignon', 'Dom Pérignon', 'Macallan', 'Stradivarius',
+    'AK-47', 'Desert Eagle', 'RPG-7', 'Elvis', 'Liz Taylor',
+];
+
+describe('and no file anywhere in the game carries a maker"s name', () => {
+    it('not one, and the ones that are allowed to are named here', () => {
+        // `nameData.ts` is a pool of first names and surnames. Ferrari is a
+        // common Italian surname and Chanel is a common given name; a person
+        // called Ferrari is not a car, and renaming people to avoid a car
+        // would be the wrong fix to the wrong problem.
+        const ALLOWED = [path.join('features', 'love', 'data', 'nameData.ts')];
+
+        const offenders = walk(SRC_ROOT)
+            .filter(f => !ALLOWED.some(a => f.endsWith(a)))
+            .filter(f => !f.endsWith('noRealBrands.test.ts'))
+            .map(f => ({
+                file: path.relative(SRC_ROOT, f),
+                hits: BANNED_EVERYWHERE.filter(b =>
+                    new RegExp(`(^|[^a-z0-9])${escape(b)}([^a-z0-9]|$)`, 'i').test(liveText(f))),
+            }))
+            .filter(o => o.hits.length > 0);
+
+        expect(offenders).toEqual([]);
     });
 });

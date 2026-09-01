@@ -350,7 +350,7 @@ export const INITIAL_STOCKS: StockItem[] = [
   {
     id: 'ind_air',
     symbol: 'FLY',
-    name: 'Airbus-ish',
+    name: 'Aerobus-ish',
     price: 25.0,
     change: 1.2,
     category: 'Industrial',
@@ -596,7 +596,7 @@ export const INITIAL_STOCKS: StockItem[] = [
   {
     id: 'ind_lmt',
     symbol: 'LMT',
-    name: 'Lockheed Marvin',
+    name: 'Lockhead Marvin',
     price: 77.0,
     change: 0.8,
     category: 'Industrial',

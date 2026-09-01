@@ -23,7 +23,7 @@ export const ENCOUNTER_DATA: Record<string, EncounterScenario[]> = {
         },
         {
             id: 'vip_private_hangar',
-            text: 'During a tarmac delay at Teterboro private airport, a striking aerospace executive invites you to wait out the storm inside their Gulfstream G700 cabin.',
+            text: 'During a tarmac delay at Teterboro private airport, a striking aerospace executive invites you to wait out the storm inside their Silverstream S700 cabin.',
             flirt: 'Accept with a smile and toast to spontaneous first-class detours and instant chemistry.',
         },
         {
