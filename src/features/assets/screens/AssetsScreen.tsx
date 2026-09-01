@@ -92,7 +92,7 @@ import {
 import { trailingTotal } from '../../../core/market/equity';
 import { currentQuarter } from '../../../core/story/world';
 import { useShareholderStore } from '../../shareholders/stores/useShareholderStore';
-import { useLuxoNetStore } from '../../../core/store/useLuxoNetStore';
+import { useAssetStore } from '../../shopping/store/useAssetStore';
 import CeoPayPanel from '../../../components/MyCompany/Shares/CeoPayPanel';
 import { formatNumber } from '../../../core/utils';
 
@@ -104,25 +104,41 @@ const AssetsScreen = () => {
     const { playerShareCount } = useShareholderStore();
 
     // ------------------------------------------------------------------
-    //  LUXONET, READ FOR THE FIRST TIME
+    //  THE LUXURY ROW, NOW READING THE LIST THE SHOP ACTUALLY WRITES
     // ------------------------------------------------------------------
-    //  `getTotalPortfolioValue`, `getTotalAnnualMaintenance`, `quarterlyTick`
-    //  and `getTotalPrestige` all had ZERO callers. Four query helpers, a
-    //  quarterly tick that returns maintenance and value change, and an owned
-    //  assets array - and nothing anywhere consulted any of it. A player could
-    //  buy a hypercar and their wealth would not move by a dollar.
+    //  This row was added to fix "correct data that nothing reads": LuxoNet's
+    //  four query helpers had no callers, so a player could buy a hypercar and
+    //  their wealth would not move by a dollar. It read `useLuxoNetStore`.
     //
-    //  Read here, and INFORMATION ONLY on purpose: it is not added to the net
-    //  worth above and the row does not lead into LuxoNet. Adding it to the
-    //  total would change the balance of the game in a commit that was asked
-    //  to display a number; that is a decision on its own and it has not been
-    //  made yet. What this fixes is that the number was invisible.
+    //  That is the wrong store. There are two luxury systems here and every
+    //  button the player can press is wired to the other one - the cart, the
+    //  checkout, belongings, the profile, the partner gifts all write to
+    //  `useAssetStore`. `useLuxoNetStore.ownedAssets` is written by one
+    //  function, reached from one component, and that component is not
+    //  mounted. It is empty for the whole of every run, so this row has never
+    //  appeared on screen once: it renders behind `luxuryCount > 0`.
+    //
+    //  The same failure at one remove, and worth saying plainly: it is not
+    //  enough that something reads the field. It has to read the field the
+    //  game WRITES. See oneOwnershipList.test.ts.
+    //
+    //  Still INFORMATION ONLY, which is a separate and unchanged decision:
+    //  it is not added to the net worth above and the row does not lead into
+    //  the shop. Folding it in moves a title gate and an achievement, and that
+    //  is its own piece of work.
+    //
+    //  The annual upkeep is not shown, because it is not charged. LuxoNet
+    //  carries `annualMaintenanceCost` per item and nothing ever bills it;
+    //  `OwnedAsset` does not carry it at all. Printing a number here would be
+    //  inventing a cost the player never pays. It comes back with the
+    //  maintenance work, which is the next thing after this.
+    //
+    //      const luxuryUpkeep = ownedLuxury
+    //          .reduce((sum, a) => sum + (a.annualMaintenanceCost || 0), 0);
     // ------------------------------------------------------------------
-    const luxuryValue = useLuxoNetStore((s) => s.ownedAssets)
-        .reduce((sum, a) => sum + (a.currentMarketValue || 0), 0);
-    const luxuryCount = useLuxoNetStore((s) => s.ownedAssets).length;
-    const luxuryUpkeep = useLuxoNetStore((s) => s.ownedAssets)
-        .reduce((sum, a) => sum + (a.annualMaintenanceCost || 0), 0);
+    const ownedLuxury = useAssetStore((s) => s.ownedItems);
+    const luxuryValue = ownedLuxury.reduce((sum, a) => sum + (a.marketValue || 0), 0);
+    const luxuryCount = ownedLuxury.length;
 
     const [payOpen, setPayOpen] = React.useState(false);
 
@@ -396,10 +412,7 @@ const AssetsScreen = () => {
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.holdingLabel}>{t('personal.luxury')}</Text>
                                     <Text style={styles.holdingSub} numberOfLines={1}>
-                                        {t('personal.luxuryCount', {
-                                            n: String(luxuryCount),
-                                            cost: formatMoney(luxuryUpkeep),
-                                        })}
+                                        {t('personal.luxuryCount', { n: String(luxuryCount) })}
                                     </Text>
                                 </View>
                                 <Text style={styles.holdingValue} numberOfLines={1} adjustsFontSizeToFit>

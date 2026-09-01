@@ -2075,7 +2075,9 @@ export const en: Record<string, string> = {
     'personal.stakeDetail': '{shares} shares in {company}',
     'personal.stakeNoName': '{shares} shares',
     'personal.luxury': 'Luxury holdings',
-    'personal.luxuryCount': '{n} owned · upkeep {cost} a year',
+    // The upkeep half is shelved rather than deleted. See the note in tr.ts.
+    //  'personal.luxuryCount': '{n} owned · upkeep {cost} a year',
+    'personal.luxuryCount': '{n} owned',
     'personal.luxuryNote': 'Bought through LuxoNet. Not counted in the total above.',
     // ------------------------------------------------------------------
     //  THE PAY PANEL, SHORTENED

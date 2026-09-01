@@ -2065,7 +2065,12 @@ export const tr: Record<string, string> = {
     'personal.stakeDetail': '{company} içinde {shares} hisse',
     'personal.stakeNoName': '{shares} hisse',
     'personal.luxury': 'Lüks varlıklar',
-    'personal.luxuryCount': '{n} adet · yılda {cost} bakım',
+    // The upkeep half is shelved rather than deleted: LuxoNet carries an
+    // annualMaintenanceCost per item and nothing has ever billed it, so the
+    // line was quoting a cost the player never pays. It returns with the
+    // maintenance work.
+    //  'personal.luxuryCount': '{n} adet · yılda {cost} bakım',
+    'personal.luxuryCount': '{n} adet',
     'personal.luxuryNote': 'LuxoNet üzerinden alındı. Yukarıdaki toplama dahil değil.',
     'pay.summary': 'Çeyrekte {current} alıyorsun. Şirketin taşıyabileceği {ceiling}.',
     'pay.note': 'Zam yılda bir kez ve güvene mal olur. Kesinti bedava ve anında.',

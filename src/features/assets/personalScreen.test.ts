@@ -400,12 +400,38 @@ describe('the stake row', () => {
 //  The signature failure of this codebase for the sixth time this session.
 // ============================================================================
 
+//  ---------------------------------------------------------------------------
+//  AND THEN IT READ THE WRONG STORE FOR MONTHS
+//  ---------------------------------------------------------------------------
+//  The version this file first pinned took `useLuxoNetStore.ownedAssets`, and
+//  nothing has ever put anything in that array: the shop writes to
+//  `useAssetStore`, and LuxoNet's own `buyAsset` is reached from one component
+//  that is not mounted. So the row rendered behind `luxuryCount > 0` and never
+//  appeared once.
+//
+//  The signature failure at one remove. Checking that something READS the
+//  field is not enough; it has to read the field the game WRITES, and these
+//  assertions were satisfied by the store name alone. Now pinned to the store
+//  that is actually written. See oneOwnershipList.test.ts.
+// ============================================================================
+
 describe('the luxury row', () => {
-    it('reads what the store has been recording all along', () => {
+    it('reads the list the shop actually writes to', () => {
         const src = code('screens/AssetsScreen.tsx');
-        expect(src).toMatch(/useLuxoNetStore/);
-        expect(src).toMatch(/currentMarketValue/);
-        expect(src).toMatch(/annualMaintenanceCost/);
+        expect(src).toMatch(/useAssetStore/);
+        expect(src).toMatch(/ownedItems/);
+        expect(src).toMatch(/marketValue/);
+    });
+
+    it('and not the one nothing fills', () => {
+        expect(code('screens/AssetsScreen.tsx')).not.toMatch(/useLuxoNetStore/);
+    });
+
+    it('and quotes no upkeep, because no upkeep is charged', () => {
+        // It carried "upkeep $X a year" read off LuxoNet's
+        // annualMaintenanceCost, which nothing bills. A cost the player never
+        // pays is worse than no cost. It returns with the maintenance work.
+        expect(code('screens/AssetsScreen.tsx')).not.toMatch(/luxuryUpkeep/);
     });
 
     it('and is information only, with no door into LuxoNet', () => {
