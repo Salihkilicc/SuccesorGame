@@ -81,13 +81,99 @@ const getCurrentQuarter = (): number => {
 // ============================================================================
 //  1. HANDLE BUY LUXURY
 // ============================================================================
+//
+//  THIS USED TO BE ONE FUNCTION AND IT CHARGED THE PLAYER TWICE.
+//
+//  It does three separable things: it takes the money, it registers the asset,
+//  and it tells the world. The shop's checkout has already done the first two
+//  by the time it gets here - `spendMoney(orderTotal)` and `purchaseCart()` -
+//  and only ever wanted the third. But calling it for the third got the first
+//  as well, so every purchase in the shop came out of the wallet twice: once
+//  at the quoted total and again at the sticker price.
+//
+//  What made it invisible is that the second charge is a fallback. The lookup
+//  `luxoStore.buyAsset(asset.id)` returns "Item not found in LuxoNet catalog",
+//  and the not-found branch pays for the item itself - which is correct in the
+//  case it was written for and wrong in the case that actually happens. There
+//  are two luxury catalogues in this project and the shop sells from the other
+//  one, so it is ALWAYS the not-found branch. See checkoutCharge.test.ts.
+//
+//  So the announcing is now its own exported function. Not a boolean argument
+//  saying "do not charge me this time": a flag like that is one wrong call
+//  site away from the same bug, and it would leave the function still claiming
+//  to be a single operation when it is two.
+// ============================================================================
 
 /**
- * Executes a luxury asset purchase from LuxoNet:
+ * The part of a purchase that the world sees. NO MONEY MOVES HERE.
+ *
+ * Raises brand value and publishes the headline. Called on its own by the
+ * shop's checkout, which has already paid, and by `handleBuyLuxury` after it
+ * has paid.
+ */
+export const announceLuxuryPurchase = (
+    asset: LuxuryAsset | { id: string; name: string; price: number; prestigeScore?: number; category?: string; brand?: string },
+): { brandValueDelta: number; newBrandValue: number; newsHeadline: string } => {
+    const price = asset.price;
+    const currentQ = getCurrentQuarter();
+
+    // Brand Value Surge. Luxury items exhibit immense signaling power, scaled
+    // with price tier and prestige score.
+    const prestige = 'prestigeScore' in asset && asset.prestigeScore ? asset.prestigeScore : 100;
+    const baseBoost = Math.max(6, Math.min(25, Math.round(prestige / 25)));
+
+    const currentBrand = useStatsStore.getState().brandValue ?? 18;
+    const newBrand = Math.min(100, currentBrand + baseBoost);
+    const brandDelta = newBrand - currentBrand;
+
+    useStatsStore.setState((s) => ({
+        ...s,
+        brandValue: newBrand,
+    }));
+
+    // Generate & push the news headline.
+    const ceo = getCeoName();
+    const company = getCompanyName();
+
+    const headlines: string[] = [
+        `${company} CEO acquires ${asset.name} in massive power display!`,
+        `High Society Buzz: ${ceo} spotted with ultra-exclusive ${asset.name}.`,
+        `Executive Dominance: ${company} leadership splurges $${(price / 1_000_000).toFixed(1)}M on ${asset.name}.`,
+        `${company} brand surges as CEO's luxury lifestyle captivates global media.`,
+    ];
+
+    const chosenHeadline = headlines[Math.floor(Math.random() * headlines.length)];
+    const newsStoryText = `In a lavish show of wealth and executive influence, ${ceo}, head of ${company}, has officially purchased the ${asset.name} valued at $${price.toLocaleString()}. Industry analysts note that this bold acquisition elevates ${company}'s global prestige and cultural footprint.`;
+
+    const newsPayload: NewsPayload = {
+        type: 'player',
+        category: 'Exclusive',
+        source: 'Silicon Chronicle',
+        headline: chosenHeadline,
+        text: newsStoryText,
+        quarter: currentQ,
+        readTime: '2 min read',
+        isHero: true,
+    };
+
+    useNewsStore.getState().addNewsBatch([newsPayload]);
+
+    return {
+        brandValueDelta: brandDelta,
+        newBrandValue: newBrand,
+        newsHeadline: chosenHeadline,
+    };
+};
+
+/**
+ * Buys a luxury asset AND announces it. The whole transaction.
+ *
  * 1. Validates & deducts personal cash from player's wallet.
  * 2. Adds asset to LuxoNet ownedAssets portfolio.
- * 3. Heavily INCREASES corporate brandValue (luxury flaunting signals market dominance & supreme prestige).
- * 4. Pushes an Exclusive / Breaking news article to useNewsStore.
+ * 3. Raises brandValue and publishes the news, via `announceLuxuryPurchase`.
+ *
+ * A caller that has already taken the money wants `announceLuxuryPurchase`,
+ * not this.
  *
  * @param asset The luxury asset object (or catalog ID) being purchased.
  */
@@ -140,54 +226,15 @@ export const handleBuyLuxury = (
         };
     }
 
-    // 3. Calculate Brand Value Surge
-    // Luxury items exhibit immense signaling power. Scaled with price tier and prestige score.
-    const prestige = 'prestigeScore' in asset && asset.prestigeScore ? asset.prestigeScore : 100;
-    const baseBoost = Math.max(6, Math.min(25, Math.round(prestige / 25)));
-
-    const currentBrand = useStatsStore.getState().brandValue ?? 18;
-    const newBrand = Math.min(100, currentBrand + baseBoost);
-    const brandDelta = newBrand - currentBrand;
-
-    // Apply Brand Surge to StatsStore
-    useStatsStore.setState((s) => ({
-        ...s,
-        brandValue: newBrand,
-    }));
-
-    // 4. Generate & Push News Headline
-    const ceo = getCeoName();
-    const company = getCompanyName();
-
-    const headlines: string[] = [
-        `${company} CEO acquires ${asset.name} in massive power display!`,
-        `High Society Buzz: ${ceo} spotted with ultra-exclusive ${asset.name}.`,
-        `Executive Dominance: ${company} leadership splurges $${(price / 1_000_000).toFixed(1)}M on ${asset.name}.`,
-        `${company} brand surges as CEO's luxury lifestyle captivates global media.`,
-    ];
-
-    const chosenHeadline = headlines[Math.floor(Math.random() * headlines.length)];
-    const newsStoryText = `In a lavish show of wealth and executive influence, ${ceo}, head of ${company}, has officially purchased the ${asset.name} valued at $${price.toLocaleString()}. Industry analysts note that this bold acquisition elevates ${company}'s global prestige and cultural footprint.`;
-
-    const newsPayload: NewsPayload = {
-        type: 'player',
-        category: 'Exclusive',
-        source: 'Silicon Chronicle',
-        headline: chosenHeadline,
-        text: newsStoryText,
-        quarter: currentQ,
-        readTime: '2 min read',
-        isHero: true,
-    };
-
-    useNewsStore.getState().addNewsBatch([newsPayload]);
+    // 3. The money has moved and the asset is registered. Tell the world.
+    const announcement = announceLuxuryPurchase(asset);
 
     return {
         success: true,
         cost: price,
-        brandValueDelta: brandDelta,
-        newBrandValue: newBrand,
-        newsHeadline: chosenHeadline,
+        brandValueDelta: announcement.brandValueDelta,
+        newBrandValue: announcement.newBrandValue,
+        newsHeadline: announcement.newsHeadline,
         ownedAsset: purchaseOutcome.asset,
     };
 };

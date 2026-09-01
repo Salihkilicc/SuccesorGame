@@ -23,7 +23,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { theme } from '../../../core/theme';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
-import { handleBuyLuxury } from '../../../logic/personalEventsLogic';
+import { announceLuxuryPurchase } from '../../../logic/personalEventsLogic';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
@@ -77,6 +77,19 @@ export const CartScreen = () => {
         setIsProcessing(true);
     };
 
+    // ------------------------------------------------------------------
+    //  THE CHECKOUT PAYS ONCE, HERE, AND NOWHERE ELSE
+    // ------------------------------------------------------------------
+    //  This called `handleBuyLuxury` for the brand surge and the headline,
+    //  and got a second cashier with them: that function looks the item up in
+    //  the LuxoNet catalogue, never finds a LuxeNet item there, and its
+    //  not-found branch pays for the item out of the wallet again. So every
+    //  order in this shop was charged the quoted total AND the sticker price,
+    //  roughly 2.08 times what the screen said. See checkoutCharge.test.ts.
+    //
+    //  `announceLuxuryPurchase` is the same brand surge and the same headline
+    //  with no till attached.
+    // ------------------------------------------------------------------
     const handlePaymentComplete = () => {
         const purchasedCartItems = [...cart];
         spendMoney(orderTotal);
@@ -86,7 +99,7 @@ export const CartScreen = () => {
         let lastHeadline = '';
 
         purchasedCartItems.forEach((cartItem) => {
-            const result = handleBuyLuxury({
+            const result = announceLuxuryPurchase({
                 id: cartItem.id,
                 name: cartItem.name,
                 price: cartItem.price,
@@ -94,10 +107,8 @@ export const CartScreen = () => {
                 category: cartItem.category,
                 brand: cartItem.name.split(' ')[0] || 'Luxury',
             });
-            if (result.success) {
-                totalBrandSurge += result.brandValueDelta;
-                lastHeadline = result.newsHeadline;
-            }
+            totalBrandSurge += result.brandValueDelta;
+            lastHeadline = result.newsHeadline;
         });
 
         setIsProcessing(false);
