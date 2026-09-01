@@ -88,12 +88,122 @@ export const CEO_NAMES: Readonly<Record<string, string>> = {
  * supposed to feel like public rooms, and a table of six memorable characters
  * would make the rare CEO stop being an event.
  */
-export const STRANGERS: readonly string[] = [
-    'Tomas Berg', 'Rosa Iglesias', 'Bill Hartley', 'Mei Chen', 'Omar Farouk',
-    'Ana Petrescu', 'Gerald Boone', 'Priya Nair', 'Stefan Weiss', 'Leila Haddad',
-    'Duncan Reid', 'Sofia Marchetti', 'Kwame Boateng', 'Hanna Virtanen',
-    'Enzo Ricci', 'Claire Dubois', 'Yusuf Demir', 'Grace Okonkwo',
-];
+// ============================================================================
+//  AND THEY COME FROM EVERYWHERE, WHICH USED TO BE A CLAIM
+// ============================================================================
+//
+//  Asked for as "increase these, put in names from around the world too, from
+//  people who are not real, vary them ethnically".
+//
+//  The old list was eighteen names with a comment saying they were
+//  "deliberately from everywhere", and it was not true enough to hold up. Ten
+//  of the eighteen were European, and there was nobody from Japan, Korea,
+//  Vietnam, Thailand, Indonesia, the Philippines, Iran, Central Asia, East or
+//  Southern Africa, the Caribbean, Latin America outside Iberia, or the
+//  Pacific. A comment asserting a property nobody can check is how a list
+//  stays narrow for a year.
+//
+//  So it is GROUPED BY REGION rather than being one flat array. Two reasons,
+//  and the second is the one that matters:
+//
+//    1. The spread is legible. You can see a thin region by looking.
+//    2. The spread is TESTABLE. `STRANGER_REGIONS` is exported, so a test can
+//       assert that every region carries its share and that no region has
+//       quietly become half the pool. See pokerTable.test.ts.
+//
+//  ---------------------------------------------------------------------------
+//  EVERY ONE OF THEM IS INVENTED
+//  ---------------------------------------------------------------------------
+//  Ordinary given names paired with ordinary surnames from the same place.
+//  Nobody here is a real person, and that is deliberate: the game already
+//  refuses to put words in the mouths of real people, and a casino full of
+//  recognisable names would break the fiction in the other direction too - the
+//  rare rival chief executive is supposed to be the memorable face at the
+//  table, and strangers who are also famous would drown them out.
+//
+//  They stay deliberately unremarkable for the same reason. Three surnames
+//  were changed on a second pass because they are strongly attached to real
+//  people even though the full names were invented: a stranger in a casino
+//  should not make anybody think of somebody in particular.
+// ============================================================================
+
+/**
+ * The stranger pool, by region.
+ *
+ * Fifteen regions. The keys are not shown anywhere - they exist so the
+ * balance can be seen and checked.
+ */
+export const STRANGER_REGIONS: Readonly<Record<string, readonly string[]>> = {
+    nordic: [
+        'Tomas Berg', 'Hanna Virtanen', 'Sigrid Dahl', 'Mikkel Sorensen',
+        'Elin Bjornsson', 'Aleksi Rantanen',
+    ],
+    britishIsles: [
+        'Bill Hartley', 'Gerald Boone', 'Duncan Reid', 'Niamh Gallagher',
+        'Owen Pritchard', 'Fiona Blackwood',
+    ],
+    westernEurope: [
+        'Claire Dubois', 'Stefan Weiss', 'Sofia Marchetti', 'Enzo Ricci',
+        'Rosa Iglesias', 'Bram de Vries', 'Mathieu Lefevre', 'Greta Hoffmann',
+    ],
+    easternEurope: [
+        'Ana Petrescu', 'Jakub Nowak', 'Milena Horvat', 'Vasil Ivanov',
+        'Katarzyna Zielinska', 'Andrei Popescu',
+    ],
+    mediterranean: [
+        'Yusuf Demir', 'Eleni Stavrou', 'Nuno Carvalho', 'Zeynep Aksoy',
+        'Dimitris Fotiadis', 'Beatriz Alves',
+    ],
+    middleEast: [
+        'Omar Farouk', 'Leila Haddad', 'Rami Nasser', 'Dalia Mansour',
+        'Karim Sabbagh', 'Nadia Khoury',
+    ],
+    persianCentralAsia: [
+        'Darius Ashrafi', 'Roya Tabrizi', 'Timur Nazarov', 'Aigerim Sultanova',
+        'Behnam Kordi', 'Ruslan Karimov',
+    ],
+    southAsia: [
+        'Priya Nair', 'Arjun Mehta', 'Fatima Siddiqui', 'Ravi Chandran',
+        'Ishaan Kapoor', 'Nilanthi Perera', 'Bilal Ahsan',
+    ],
+    eastAsia: [
+        'Mei Chen', 'Haruto Sasaki', 'Ji-woo Han', 'Yuki Morimoto',
+        'Liang Zhao', 'Seo-yeon Baek', 'Wen Xiaoling',
+    ],
+    southeastAsia: [
+        'Nguyen Thi Lan', 'Somchai Prasert', 'Dewi Kusuma', 'Ramon Mendoza',
+        'Chan Sophea', 'Aina Rahim', 'Bayu Santoso',
+    ],
+    westAfrica: [
+        'Kwame Boateng', 'Grace Okonkwo', 'Aminata Diallo', 'Chidi Eze',
+        'Ousmane Traore', 'Yaa Mensah',
+    ],
+    eastAfrica: [
+        'Abebe Tesfaye', 'Zawadi Mwangi', 'Hodan Warsame', 'Solomon Girma',
+        'Neema Kimani', 'Yonas Bekele',
+    ],
+    southernAfrica: [
+        'Thabo Ndlovu', 'Lerato Khumalo', 'Sipho Dlamini', 'Anneke Botha',
+        'Naledi Moyo', 'Tendai Chirwa',
+    ],
+    latinAmerica: [
+        'Camila Ferreira', 'Mateo Rojas', 'Valentina Cruz', 'Joaquin Silva',
+        'Luana Barbosa', 'Diego Alcantara', 'Paola Quispe',
+    ],
+    northAmericaPacific: [
+        'Marcus Whitfield', 'Dana Kealoha', 'Colton Reyes', 'Aroha Waitoa',
+        'Jesse Lamontagne', 'Tiare Moala',
+    ],
+};
+
+/**
+ * All of them, flattened.
+ *
+ * Built from the regions rather than typed a second time, so the two can
+ * never disagree - which is the failure this codebase produces most often.
+ */
+export const STRANGERS: readonly string[] =
+    Object.values(STRANGER_REGIONS).flat();
 
 /** Every listed rival with a named chief executive, if the markets are loaded. */
 export const rivalCeos = (): Opponent[] => {
