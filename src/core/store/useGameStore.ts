@@ -1333,10 +1333,44 @@ export const useGameStore = create<GameStore>()(
           useStatsStore.getState()
         );
 
+        // ------------------------------------------------------------------
+        //  AND YOU CANNOT PAY A BILL YOU CANNOT AFFORD
+        // ------------------------------------------------------------------
+        //  The luxury upkeep is by far the largest personal expense once the
+        //  player owns anything - the median item in the shop costs nearly
+        //  four times the founder's whole salary per quarter to keep - so a
+        //  collection bought on a good year can outrun the income that bought
+        //  it. Charged unconditionally, that is a silent slide into negative
+        //  cash with no decision anywhere in it.
+        //
+        //  So the bill is attempted, and if the quarter cannot carry it the
+        //  exact figure is backed out and the collection is left to rot at
+        //  four times the normal rate instead. Not paying is not free; it is
+        //  the expensive option, paid slowly and in the asset rather than in
+        //  cash. See core/luxury/upkeep.ts.
+        //
+        //  Backed out rather than never added because `personalQuarter` is the
+        //  single source for the quarter's arithmetic and a second version of
+        //  it that omits one line is how the salary ended up with three
+        //  values. It carries `luxuryUpkeep` out separately for exactly this.
+        // ------------------------------------------------------------------
+        const cashIfPaid = (stats.money || 0) + quarterlyReport.netFlow + bonus.paid;
+        const upkeepPaid = quarterlyReport.luxuryUpkeep <= 0 || cashIfPaid >= 0;
+
         // Apply Net Flow to Cash. The bonus rides in here rather than being
         // written separately, so cash is settled in ONE place - two writes
         // to `money` in the same tick is how the last one silently wins.
-        const newPlayerCash = (stats.money || 0) + quarterlyReport.netFlow + bonus.paid;
+        const newPlayerCash = upkeepPaid
+          ? cashIfPaid
+          : cashIfPaid + quarterlyReport.luxuryUpkeep;
+
+        try {
+          require('../../features/shopping/store/useAssetStore')
+            .useAssetStore.getState()
+            .quarterlyTick(Math.max(1, quarters), upkeepPaid);
+        } catch (e) {
+          console.warn('[luxury] collection could not be aged', e);
+        }
 
         mark('acquisitions');
         // ------------------------------------------------------------------

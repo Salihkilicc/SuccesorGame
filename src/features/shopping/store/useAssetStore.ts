@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
 import { ShoppingItem, OwnedAsset } from '../types';
+import { decayed, portfolioUpkeepQuarterly, valueAt } from '../../../core/luxury/upkeep';
 
 // Simple UUID generator (JS only, no native dependencies)
 const generateId = () => {
@@ -37,6 +38,22 @@ type AssetActions = {
     isOwned: (catalogId: string) => boolean;
     removeOwnedItem: (instanceId: string) => void;
     repairOwnedItem: (instanceId: string, condition?: number) => void;
+
+    // ------------------------------------------------------------------
+    //  TIME PASSING
+    // ------------------------------------------------------------------
+    //  What the collection costs to keep for one quarter, and what happens
+    //  to it when a quarter goes by. `paid` is whether the player could
+    //  cover the bill: an unpaid quarter costs nothing and rots four times
+    //  faster, which is what makes the upkeep line worth reading.
+    //
+    //  See core/luxury/upkeep.ts. The store owns WHAT IS OWNED; the rates
+    //  and the curves are pure and live there.
+    // ------------------------------------------------------------------
+    /** The whole collection's bill for one quarter. */
+    upkeepQuarterly: () => number;
+    /** Age the collection. Returns nothing; read `ownedItems` after. */
+    quarterlyTick: (quarters: number, paid: boolean) => void;
 
     // Luxury System
     setAppliedLuxuryBuff: (amount: number) => void;
@@ -132,8 +149,40 @@ export const useAssetStore = create<AssetStore>()(
                     if (index === -1) return state;
 
                     const newOwned = [...state.ownedItems];
-                    newOwned[index] = { ...newOwned[index], condition };
+                    const fixed = { ...newOwned[index], condition };
+                    // The value follows the condition, here as well as in the
+                    // tick. It did not before: `marketValue` was written once
+                    // at purchase and never again, and the portfolio hook
+                    // recomputed its own copy on the way to the screen. Two
+                    // answers to one question, which is this project's oldest
+                    // habit. See core/luxury/upkeep.valueAt.
+                    fixed.marketValue = Math.floor(valueAt(fixed.price, condition));
+                    newOwned[index] = fixed;
                     return { ...state, ownedItems: newOwned };
+                }),
+
+            // ========================================================================
+            // TIME PASSING
+            // ========================================================================
+
+            upkeepQuarterly: () => portfolioUpkeepQuarterly(get().ownedItems),
+
+            quarterlyTick: (quarters, paid) =>
+                set((state) => {
+                    const q = Number.isFinite(quarters) ? Math.max(0, quarters) : 0;
+                    if (q === 0 || state.ownedItems.length === 0) return state;
+
+                    return {
+                        ...state,
+                        ownedItems: state.ownedItems.map((asset) => {
+                            const condition = decayed(asset.condition, asset.category, q, paid);
+                            return {
+                                ...asset,
+                                condition,
+                                marketValue: Math.floor(valueAt(asset.price, condition)),
+                            };
+                        }),
+                    };
                 }),
 
             // ========================================================================

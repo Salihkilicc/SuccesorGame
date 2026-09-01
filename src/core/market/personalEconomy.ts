@@ -120,6 +120,19 @@ export type PersonalExpenseInput = {
     educationCostQuarterly: number;
     /** What a partner costs, per QUARTER. */
     partnerCostQuarterly: number;
+    /**
+     * What the luxury collection costs to keep, per QUARTER.
+     *
+     * Passed in for the same reason the tuition is: it belongs to the shop,
+     * which this file has no business knowing about. See core/luxury/upkeep.ts
+     * for the rates and for the exploit that turning them on uncovered.
+     *
+     * Optional, and zero when absent, because this is by far the largest of
+     * the personal expenses once the player owns anything - the median item in
+     * the catalogue costs nearly four times the founder's whole salary to keep
+     * - and every existing caller and test predates it.
+     */
+    luxuryUpkeepQuarterly?: number;
 };
 
 export type PersonalQuarter = {
@@ -132,6 +145,16 @@ export type PersonalQuarter = {
     lifestyle: number;
     education: number;
     partner: number;
+    /**
+     * The luxury upkeep, kept as its own line rather than folded into the
+     * total.
+     *
+     * The quarter tick needs it separately: a player who cannot cover the bill
+     * does not pay it, and the store backs this exact figure out of the cash
+     * movement and lets the collection rot instead. Folded in, that would be
+     * a subtraction nobody could undo.
+     */
+    luxuryUpkeep: number;
     totalExpenses: number;
 
     netFlow: number;
@@ -169,11 +192,13 @@ export const personalQuarter = (
     const tax = totalIncome * PERSONAL_TAX_RATE;
     const education = Math.max(0, expenses?.educationCostQuarterly || 0);
     const partner = Math.max(0, expenses?.partnerCostQuarterly || 0);
+    const luxuryUpkeep = Math.max(0, expenses?.luxuryUpkeepQuarterly || 0);
 
     const totalExpenses = HOUSING_COST_QUARTERLY
         + LIFESTYLE_COST_QUARTERLY
         + partner
         + education
+        + luxuryUpkeep
         + tax;
 
     return {
@@ -185,6 +210,7 @@ export const personalQuarter = (
         lifestyle: LIFESTYLE_COST_QUARTERLY,
         education,
         partner,
+        luxuryUpkeep,
         totalExpenses,
         netFlow: totalIncome - totalExpenses,
     };

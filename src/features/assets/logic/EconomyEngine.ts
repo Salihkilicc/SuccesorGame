@@ -84,7 +84,26 @@ export const calculateQuarterlyFinances = (
             ceoPayQuarterly: statsState?.ceoPayQuarterly,
             payCeilingQuarterly: payCeiling(trailingTotal(statsState?.revenueHistory ?? [])),
         },
-        { educationCostQuarterly: educationCost, partnerCostQuarterly: partnerQuarterlyCost },
+        {
+            educationCostQuarterly: educationCost,
+            partnerCostQuarterly: partnerQuarterlyCost,
+            // ------------------------------------------------------------------
+            //  WHAT THE COLLECTION COSTS TO KEEP
+            // ------------------------------------------------------------------
+            //  Read from the store rather than passed in, like the education
+            //  bill above it and for the same reason: this function is the one
+            //  place the quarter's money is assembled, and a second assembler
+            //  is how the salary ended up with three values.
+            //
+            //  Usually the largest personal expense in the game once anything
+            //  is owned - the median item in the shop costs nearly four times
+            //  the founder's whole salary per quarter to keep. That is the
+            //  point of it. See core/luxury/upkeep.ts.
+            // ------------------------------------------------------------------
+            luxuryUpkeepQuarterly:
+                require('../../shopping/store/useAssetStore')
+                    .useAssetStore.getState().upkeepQuarterly(),
+        },
     );
 
     const salaryQuarterly = q.salary;
@@ -153,9 +172,16 @@ export const calculateQuarterlyFinances = (
                 label: 'Partner Upkeep',
                 amount: partnerQuarterlyCost,
                 type: 'expense' as const
+            }] : []),
+            ...(q.luxuryUpkeep > 0 ? [{
+                id: 'luxuryUpkeep',
+                label: 'Estate & Collection Upkeep',
+                amount: q.luxuryUpkeep,
+                type: 'expense' as const
             }] : [])
         ],
         assetsBreakdown,
+        luxuryUpkeep: q.luxuryUpkeep,
         educationMultiplier,
         educationBonus: educationMultiplier > 1.0 ? `+${Math.round((educationMultiplier - 1) * 100)}%` : undefined
     };

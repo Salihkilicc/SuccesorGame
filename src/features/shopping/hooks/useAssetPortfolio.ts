@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { OwnedAsset, ProductCategory } from '../types';
+import { repairCost, valueAt } from '../../../core/luxury/upkeep';
 
 export type PortfolioFilter = 'ALL' | 'REAL_ESTATE' | 'VEHICLE' | 'COLLECTION';
 
@@ -16,19 +17,26 @@ export const useAssetPortfolio = () => {
     /**
      * Data Enrichment
      * Calculates current market value based on condition
+     *
+     * ----------------------------------------------------------------------
+     *  THE CURVE MOVED OUT, AND THAT IS THE WHOLE FIX
+     * ----------------------------------------------------------------------
+     *  This was `0.5 + 0.5 * (condition / 100)` written here, and the repair
+     *  bill forty lines below was `price * damage / 1000` written there, and
+     *  the two were never compared to each other. Restoring an asset from 50
+     *  condition cost 5% of its price and put back 25% of its price - a five
+     *  to one return on any item in the catalogue, repeatable.
+     *
+     *  Both now come from core/luxury/upkeep, where the repair is PRICED OFF
+     *  the value it restores and cannot be profitable by construction.
+     * ----------------------------------------------------------------------
      */
     const portfolioItems = useMemo(() => {
         // Since ownedItems are now full objects, we just need to calculate dynamic value
-        const enriched = ownedItems.map(asset => {
-            // Current Value Calculation: Base Price * Condition Factor
-            const conditionFactor = 0.5 + (0.5 * (asset.condition / 100));
-            const currentMarketValue = Math.floor(asset.price * conditionFactor);
-
-            return {
-                ...asset,
-                marketValue: currentMarketValue,
-            };
-        });
+        const enriched = ownedItems.map(asset => ({
+            ...asset,
+            marketValue: Math.floor(valueAt(asset.price, asset.condition)),
+        }));
 
         // Sort by Market Value (High to Low)
         return enriched.sort((a, b) => b.marketValue - a.marketValue);
@@ -95,19 +103,34 @@ export const useAssetPortfolio = () => {
             return;
         }
 
-        // Repair cost: 1% of value per 10% condition missing
-        const damagePercent = 100 - asset.condition;
-        const repairCost = Math.floor(asset.price * (damagePercent / 1000));
+        // ------------------------------------------------------------------
+        //  AND THE PLAYER IS TOLD IT IS A LOSS, BECAUSE IT IS ONE
+        // ------------------------------------------------------------------
+        //  A restoration costs more than the value it puts back, always, by
+        //  construction. That is not a trap to spring on somebody after they
+        //  press the button: the panel says what it costs, what it restores,
+        //  and what the difference is.
+        //
+        //  The reason to do it anyway is that neglect is worse and compounds
+        //  - an unpaid quarter takes four times the condition - so this is a
+        //  decision about how fast you are losing, not about whether.
+        // ------------------------------------------------------------------
+        const cost = Math.floor(repairCost(asset.price, asset.condition, 100));
+        const restored = Math.floor(valueAt(asset.price, 100) - valueAt(asset.price, asset.condition));
+        const loss = cost - restored;
 
         Alert.alert(
             'Restoration Service',
-            `Restore condition to 100% for $${repairCost.toLocaleString()}?`,
+            `Restore to mint condition for $${cost.toLocaleString()}.\n\n`
+            + `This puts back $${restored.toLocaleString()} of value, so the restoration `
+            + `costs you $${loss.toLocaleString()} net. Left alone it will keep falling, `
+            + `and four times faster in any quarter you do not pay the upkeep.`,
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
                     text: 'Restore',
                     onPress: () => {
-                        const success = spendMoney(repairCost);
+                        const success = spendMoney(cost);
                         if (success) {
                             repairOwnedItem(asset.instanceId, 100);
                             Alert.alert('Restored', 'Asset is now in mint condition.');
