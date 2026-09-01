@@ -32,6 +32,7 @@ import { avatarHue, initialsOf, type SeatKind } from '../../../core/casino/poker
 import type { Action } from '../../../core/casino/pokerBots';
 import type { Card } from '../../../core/casino/blackjack';
 import AnimatedCard from './AnimatedCard';
+import { type RoomFelt } from '../../../core/casino/roomPalette';
 
 /**
  * How wide a card is at the showdown.
@@ -75,6 +76,8 @@ type Props = {
     handName?: string;
     /** They won or shared the pot. */
     winner?: boolean;
+    /** The room's card back. These flip as they land, so it is seen. */
+    back?: RoomFelt;
 };
 
 const money = (n: number): string => {
@@ -99,7 +102,7 @@ const KIND_LABEL: Record<SeatKind, string> = {
 
 const PokerSeat = ({
     id, name, kind, company, stack, lastAction, lastAmount, active, folded, tint,
-    hole, handName, winner,
+    hole, handName, winner, back,
 }: Props) => {
     const showing = !!hole && hole.length > 0;
     const hue = avatarHue(id);
@@ -143,6 +146,7 @@ const PokerSeat = ({
                                 index={i}
                                 width={SHOWN_CARD_W}
                                 fromY={-24}
+                                back={back}
                             />
                         ))}
                     </View>

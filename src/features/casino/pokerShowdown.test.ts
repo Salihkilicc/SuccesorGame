@@ -129,7 +129,9 @@ describe('and the seat draws the hand it was given', () => {
 
     it('and the cards replace the action bubble rather than crowd it', () => {
         // "CALL 8M" is history once the cards are up.
-        expect(seat()).toMatch(/\{showing \? \([\s\S]{0,900}\) : !!lastAction && \(/);
+        // The block grew when the room's card back was threaded through, so
+        // this counts the structure rather than a character budget.
+        expect(seat()).toMatch(/\{showing \? \([\s\S]*?\) : !!lastAction && \(/);
     });
 
     it('and the winner is marked without green', () => {

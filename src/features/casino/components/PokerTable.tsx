@@ -21,19 +21,24 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, Ellipse, LinearGradient, Stop, Text as SvgText } from 'react-native-svg';
+import { type RoomFelt } from '../../../core/casino/roomPalette';
 
 type Props = {
     width: number;
     height: number;
     tint: string;
+    /** This room's cloth and rail. See core/casino/roomPalette.ts. */
+    felt: RoomFelt;
     /** The pot, written on the felt where a dealer would push it. */
     potLabel?: string;
     children?: React.ReactNode;
 };
 
-const FELT_DARK = '#0A3327';
-const FELT_LIGHT = '#10513A';
-const RAIL = '#241811';
+// SHELVED with blackjack's, and for the same reason: the room brings its own
+// cloth now. See core/casino/roomPalette.ts.
+//   const felt.cloth = '#0A3327';
+//   const felt.clothLight = '#10513A';
+//   const felt.rail = '#241811';
 
 /**
  * Where seat `i` of `n` sits, as a fraction of the table.
@@ -62,7 +67,7 @@ export const seatPosition = (index: number, count: number): { x: number; y: numb
     };
 };
 
-const PokerTable = ({ width, height, tint, potLabel, children }: Props) => {
+const PokerTable = ({ width, height, tint, potLabel, children, felt }: Props) => {
     const cx = width / 2;
     const cy = height * 0.46;
     const rx = width * 0.46;
@@ -73,12 +78,12 @@ const PokerTable = ({ width, height, tint, potLabel, children }: Props) => {
             <Svg width={width} height={height} style={StyleSheet.absoluteFill} pointerEvents="none">
                 <Defs>
                     <LinearGradient id="pokerFelt" x1="0" y1="0" x2="0" y2="1">
-                        <Stop offset="0" stopColor={FELT_LIGHT} />
-                        <Stop offset="1" stopColor={FELT_DARK} />
+                        <Stop offset="0" stopColor={felt.clothLight} />
+                        <Stop offset="1" stopColor={felt.cloth} />
                     </LinearGradient>
                 </Defs>
 
-                <Ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={RAIL} />
+                <Ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={felt.rail} />
                 <Ellipse cx={cx} cy={cy} rx={rx - 8} ry={ry - 8} fill="url(#pokerFelt)" />
                 <Ellipse
                     cx={cx} cy={cy} rx={rx - 8} ry={ry - 8}

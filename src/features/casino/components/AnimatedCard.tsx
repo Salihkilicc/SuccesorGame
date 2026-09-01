@@ -47,6 +47,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { type RoomFelt } from '../../../core/casino/roomPalette';
 
 export type CardData = {
   rank: string;
@@ -70,6 +71,16 @@ interface AnimatedCardProps {
    */
   fromX?: number;
   fromY?: number;
+  /**
+   * The back of this room's cards.
+   *
+   * Asked for as "change the back of the cards for every room". It was one
+   * blue for all six: you climbed a ladder of five cities and a private room
+   * and were dealt the same deck every time. Undefined keeps the old blue, so
+   * anywhere that has not been told which room it is still draws a card.
+   * See core/casino/roomPalette.ts.
+   */
+  back?: RoomFelt;
   /**
    * How wide the card is, in points.
    *
@@ -106,7 +117,7 @@ export const TURN_AT = 130;
 export const CARD_SHOW_MS = TURN_AT + FLIP_MS;
 
 const AnimatedCard = ({
-  card, index, hidden = false, baseDelay = 0, fromX = 0, fromY = 0, width = CARD_W,
+  card, index, hidden = false, baseDelay = 0, fromX = 0, fromY = 0, width = CARD_W, back,
 }: AnimatedCardProps) => {
   /** Everything on the card in proportion, so a mini card is not a squashed one. */
   const k = width / CARD_W;
@@ -215,11 +226,19 @@ const AnimatedCard = ({
         style={[
           styles.card, styles.hiddenCard,
           { borderRadius: 8 * k },
+          back && { backgroundColor: back.back, borderColor: back.backEdge },
           { transform: [{ perspective: 800 }, { rotateY: faceDownSpin }] },
         ]}
       >
-        <View style={[styles.hiddenPattern, { borderRadius: 6 * k, margin: 3 * k }]}>
-          <View style={[styles.hiddenInner, { width: 36 * k, height: 36 * k, borderRadius: 18 * k }]}>
+        <View style={[
+          styles.hiddenPattern,
+          { borderRadius: 6 * k, margin: 3 * k },
+          back && { backgroundColor: back.backPattern },
+        ]}>
+          <View style={[
+            styles.hiddenInner,
+            { width: 36 * k, height: 36 * k, borderRadius: 18 * k },
+          ]}>
             <Text style={[styles.hiddenIcon, { fontSize: 22 * k }]}>🂠</Text>
           </View>
         </View>

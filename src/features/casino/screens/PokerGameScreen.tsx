@@ -35,6 +35,7 @@ import { pokerBuyInFor } from '../data/casinoStakes';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { translateCasinoStatus } from '../../../data/i18n/casinoText';
 import { VIP_LOCATION_ID } from '../data/vipRoom';
+import { feltFor } from '../../../core/casino/roomPalette';
 
 const TABLE_W = Dimensions.get('window').width - 16;
 const TABLE_H = 300;
@@ -92,6 +93,12 @@ const PokerGameScreen = () => {
      * alerting after it.
      */
     const canAfford = cash >= buyIn && buyIn > 0;
+
+    /**
+     * This room's cloth, rail and card back. Derived from the room's accent
+     * rather than typed out six times. See core/casino/roomPalette.ts.
+     */
+    const felt = feltFor(currentLocation.theme.primary, currentLocationId === VIP_LOCATION_ID);
 
     const tint = currentLocation.theme.primary;
     const seatCount = opponents.length;
@@ -154,6 +161,7 @@ const PokerGameScreen = () => {
                     width={TABLE_W}
                     height={TABLE_H}
                     tint={tint}
+                    felt={felt}
                     potLabel={pot > 0 ? `POT ${money(pot)}` : undefined}
                 >
                     {/* The five of them, on the arc. */}
@@ -202,6 +210,7 @@ const PokerGameScreen = () => {
                                     hole={shown ? p?.hole : undefined}
                                     handName={shown?.rank.name}
                                     winner={!!round?.winners?.includes(o.id)}
+                                    back={felt}
                                 />
                             </View>
                         );
@@ -211,7 +220,8 @@ const PokerGameScreen = () => {
                     <View style={styles.boardRow} pointerEvents="none">
                         {board.map((c, i) => (
                             <View key={`${c.rank}${c.suit}`} style={styles.boardCard}>
-                                <AnimatedCard card={c} index={i} baseDelay={0} fromY={-60} />
+                                <AnimatedCard card={c} index={i} baseDelay={0} fromY={-60}
+                  back={felt} />
                             </View>
                         ))}
                     </View>
@@ -223,7 +233,8 @@ const PokerGameScreen = () => {
                 <View style={styles.you}>
                     <View style={styles.holeRow}>
                         {hole.map((c, i) => (
-                            <AnimatedCard key={`${c.rank}${c.suit}`} card={c} index={i} fromY={-140} fromX={60} />
+                            <AnimatedCard key={`${c.rank}${c.suit}`} card={c} index={i} fromY={-140} fromX={60}
+                  back={felt} />
                         ))}
                     </View>
                     <Text style={styles.yourStack}>

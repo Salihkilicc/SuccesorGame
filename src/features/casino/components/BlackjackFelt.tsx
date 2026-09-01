@@ -24,21 +24,27 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, Ellipse, LinearGradient, Path, Stop, Text as SvgText } from 'react-native-svg';
+import { type RoomFelt } from '../../../core/casino/roomPalette';
 
 type Props = {
     width: number;
     height: number;
     /** The room's accent, for the rail. */
     tint: string;
+    /** This room's cloth and rail. See core/casino/roomPalette.ts. */
+    felt: RoomFelt;
     /** The house rules, written on the felt as they are in every casino. */
     label: string;
 };
 
-const FELT_DARK = '#0B3B2A';
-const FELT_LIGHT = '#12563C';
-const RAIL = '#2A1D14';
+// SHELVED. One cloth for six rooms: you climbed a ladder of five cities and a
+// private room and sat down at the same green table every time.
+//   const felt.cloth = '#0B3B2A';
+//   const felt.clothLight = '#12563C';
+//   const felt.rail = '#2A1D14';
+// The room brings its own now. See core/casino/roomPalette.ts.
 
-const BlackjackFelt = ({ width, height, tint, label }: Props) => {
+const BlackjackFelt = ({ width, height, tint, label, felt }: Props) => {
     const cx = width / 2;
     const cy = height * 0.52;
     const rx = width * 0.52;
@@ -49,13 +55,13 @@ const BlackjackFelt = ({ width, height, tint, label }: Props) => {
             <Svg width={width} height={height}>
                 <Defs>
                     <LinearGradient id="feltGrad" x1="0" y1="0" x2="0" y2="1">
-                        <Stop offset="0" stopColor={FELT_LIGHT} />
-                        <Stop offset="1" stopColor={FELT_DARK} />
+                        <Stop offset="0" stopColor={felt.clothLight} />
+                        <Stop offset="1" stopColor={felt.cloth} />
                     </LinearGradient>
                 </Defs>
 
                 {/* The rail, then the felt inside it. */}
-                <Ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={RAIL} />
+                <Ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={felt.rail} />
                 <Ellipse cx={cx} cy={cy} rx={rx - 7} ry={ry - 7} fill="url(#feltGrad)" />
                 <Ellipse
                     cx={cx} cy={cy} rx={rx - 7} ry={ry - 7}

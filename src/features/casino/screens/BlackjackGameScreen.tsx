@@ -14,6 +14,8 @@ import BlackjackFelt from '../components/BlackjackFelt';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { translateCasinoStatus } from '../../../data/i18n/casinoText';
 import { chipsFor, maxBetFor } from '../data/casinoStakes';
+import { feltFor } from '../../../core/casino/roomPalette';
+import { VIP_LOCATION_ID } from '../data/vipRoom';
 
 const BlackjackGameScreen = () => {
     useLocale();
@@ -40,6 +42,15 @@ const BlackjackGameScreen = () => {
   //  way up and right. No layout pass, no re-render while it moves, one
   //  transform on the UI thread. See components/AnimatedCard.tsx.
   // --------------------------------------------------------------------
+
+  /**
+   * This room's cloth, rail and card back.
+   *
+   * Derived from the room's own accent rather than typed out six times. See
+   * core/casino/roomPalette.ts.
+   */
+  const felt = feltFor(currentLocation.theme.primary, currentLocation.id === VIP_LOCATION_ID);
+
   const DECK_FROM_DEALER = { x: 130, y: -34 };
   const DECK_FROM_PLAYER = { x: 130, y: -190 };
 
@@ -120,6 +131,7 @@ const BlackjackGameScreen = () => {
             width={TABLE_W}
             height={TABLE_H}
             tint={currentLocation.theme.primary}
+            felt={felt}
             label={t('ui.blackjackPays32')}
           />
 
@@ -145,6 +157,7 @@ const BlackjackGameScreen = () => {
                   baseDelay={idx < 2 ? 100 : DRAW_AFTER_REVEAL}
                   fromX={DECK_FROM_DEALER.x}
                   fromY={DECK_FROM_DEALER.y}
+                  back={felt}
                 />
               ))}
             </View>
@@ -166,6 +179,7 @@ const BlackjackGameScreen = () => {
                   baseDelay={0}
                   fromX={DECK_FROM_PLAYER.x}
                   fromY={DECK_FROM_PLAYER.y}
+                  back={felt}
                 />
               ))}
             </View>
