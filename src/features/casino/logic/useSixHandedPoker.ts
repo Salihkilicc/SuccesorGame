@@ -32,6 +32,14 @@ import {
     type RoundState,
 } from '../../../core/casino/pokerRound';
 import {
+    BLINDS_PER_BUY_IN,
+    RAISE_MIN_PCT,
+    RAISE_STEPS,
+    blindFor,
+    nudgeRaise,
+    raiseAmount,
+} from '../../../core/casino/pokerStakes';
+import {
     BUY_IN_BLINDS,
     applyHand,
     buyInFor,
@@ -100,12 +108,28 @@ export const BOARD_CARD_MS = 170;
  */
 export const SHOWDOWN_MS = 1700;
 
-export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
+export const useSixHandedPoker = (initialBet: number, vip: boolean, roomBuyIn?: number) => {
     const { money, setField } = useStatsStore();
     const { reputation, updateReputation } = usePlayerStore();
     const casinoReputation = reputation.casino;
 
-    const [ante, setAnte] = useState(initialBet);
+    // ------------------------------------------------------------------
+    //  THE ROOM SETS THE STAKE NOW, NOT A CHIP RACK
+    // ------------------------------------------------------------------
+    //  Asked for as "in poker remove the bets, set a buy-in for each country
+    //  and for the VIP room, and you enter by paying it".
+    //
+    //  The rail was borrowed from the other three games and never fitted: they
+    //  are one-shot, so choosing a stake is the whole decision. Poker is a
+    //  session and the betting happens INSIDE the hand, so a rack of four
+    //  chips outside the table asked a question a poker door does not have.
+    //
+    //  `roomBuyIn` is the number on the wall. The big blind falls out of it at
+    //  a hundred blinds a stack, so there is one figure to reason about rather
+    //  than two that can disagree. See core/casino/pokerStakes.ts.
+    // ------------------------------------------------------------------
+    const buyIn = Math.max(0, roomBuyIn ?? initialBet * BLINDS_PER_BUY_IN);
+    const ante = blindFor(buyIn);
 
     // ------------------------------------------------------------------
     //  THE SESSION IS THE THING THAT PERSISTS NOW
@@ -125,6 +149,23 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
     //  between it is chips, and chips stay where they land.
     //  See core/casino/pokerSession.ts.
     // ------------------------------------------------------------------
+    // ------------------------------------------------------------------
+    //  HOW BIG YOUR RAISE IS
+    // ------------------------------------------------------------------
+    //  Asked for as "the bets should show as percentages, 5 10 20 25 with
+    //  plus and minus, like normal poker".
+    //
+    //  It was one button reading `Math.max(pot, ante * 2)` - a single pot
+    //  sized raise, take it or leave it. Which removes the one decision poker
+    //  is actually about: not whether to put money in, but how much.
+    //
+    //  A percentage of your own STACK rather than of the pot. Pot fractions
+    //  are the language players use, but five per cent of a pot is almost
+    //  always below the minimum raise, so two of the four buttons would give
+    //  the same number and look broken. See core/casino/pokerStakes.ts.
+    // ------------------------------------------------------------------
+    const [raisePct, setRaisePct] = useState<number>(RAISE_STEPS[1] ?? RAISE_MIN_PCT);
+
     const [session, setSession] = useState<Session | null>(null);
     /** The same session, readable from inside a callback without a stale copy. */
     const sessionRef = useRef<Session | null>(null);
@@ -280,8 +321,7 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
 
     /** Buy in and take a seat. Money leaves your cash exactly here. */
     const sitDown = useCallback(() => {
-        if (ante <= 0) return casinoAlert('Place Bet', 'Choose a stake first.');
-        const buyIn = buyInFor(ante);
+        if (buyIn <= 0) return casinoAlert('Closed', 'This room is not dealing.');
         if (money < buyIn) {
             // Asked for as "if there is no money, do not let them sit down".
             return casinoAlert('Not enough cash', 'Lower the stake or build more bankroll.');
@@ -410,7 +450,8 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
             /** Your chips. Not your money: your money is in the header. */
             stack: session?.seats?.[HUMAN_SEAT]?.stack ?? 0,
             /** What one buy-in costs at the chosen stake. */
-            buyIn: buyInFor(ante),
+            /** The number on the wall. What it costs to sit down here. */
+            buyIn,
             /** Hands played since you sat down. */
             hands: session?.hands ?? 0,
             /** Up or down against everything you have bought in for. */
@@ -419,13 +460,33 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean) => {
             broke: !!session && playerBusted(session),
             /** Every seat's chips, so the table can show them. */
             seats: session?.seats ?? [],
+
+            // ---- the raise ladder ----
+            /** The four quick sizes, as percentages of your stack. */
+            raiseSteps: RAISE_STEPS,
+            /** Which one is chosen. */
+            raisePct,
+            /**
+             * What that percentage actually puts in, in chips.
+             *
+             * Computed here rather than in the screen so the button's LABEL
+             * and the amount the engine receives are the same number. Two
+             * places computing it is how a button ends up lying about what it
+             * will do.
+             */
+            raiseChips: round
+                ? raiseAmount(raisePct, you?.stack ?? 0, you?.committed ?? 0, round.toMatch)
+                : 0,
         },
         actions: {
             sitDown,
             deal,
             leave,
             act,
-            setAnte,
+            /** Pick one of the quick sizes. */
+            setRaisePct,
+            /** Nudge it by five either way, staying inside the ladder. */
+            nudgeRaisePct: (by: number) => setRaisePct(p => nudgeRaise(p, by)),
             closePopup: () => setResultPopup(null),
         },
     };

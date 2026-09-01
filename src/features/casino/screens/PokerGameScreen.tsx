@@ -27,12 +27,11 @@ import GameResultPopup from '../components/GameResultPopup';
 import AnimatedCard from '../components/AnimatedCard';
 import PokerTable, { seatPosition } from '../components/PokerTable';
 import { HUMAN_SEAT } from '../../../core/casino/pokerRound';
-import { maxStakeFor } from '../../../core/casino/pokerSession';
 import PokerSeat from '../components/PokerSeat';
-import { CustomChipSelector } from '../components/CustomChipSelector';
 import { useCasinoSystem } from '../hooks/useCasinoSystem';
+import { useStatsStore } from '../../../core/store';
 import { useSixHandedPoker, STARTING_STACK_MULTIPLE } from '../logic/useSixHandedPoker';
-import { chipsFor } from '../data/casinoStakes';
+import { pokerBuyInFor } from '../data/casinoStakes';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { translateCasinoStatus } from '../../../data/i18n/casinoText';
 import { VIP_LOCATION_ID } from '../data/vipRoom';
@@ -57,26 +56,42 @@ const PokerGameScreen = () => {
     const route = useRoute<any>();
     const { currentLocation, casinoReputation, currentLocationId } = useCasinoSystem();
 
+    // ------------------------------------------------------------------
+    //  THE DOOR PRICE, READ REACTIVELY
+    // ------------------------------------------------------------------
+    //  A selector rather than `getState()`: the buy-in is a share of the
+    //  player's fortune, so it has to move when the fortune does. Reading it
+    //  once at render would freeze the door at whatever the wallet held the
+    //  first time the screen mounted.
+    // ------------------------------------------------------------------
+    const wallet = useStatsStore(st => st.money);
+    const doorPrice = pokerBuyInFor(currentLocation, wallet);
+
     const { state, actions } = useSixHandedPoker(
         route.params?.betAmount ?? 1_000_000,
         currentLocationId === VIP_LOCATION_ID,
+        doorPrice,
     );
     const {
         money: cash, ante, round, opponents, status, resultPopup,
         board, hole, pot, owed, yourTurn, handOver,
         seated, stack, buyIn, broke, seats, sessionUp, hands,
+        raiseSteps, raisePct, raiseChips,
     } = state;
 
+    /** True when the chosen size puts everything in. The label should say so. */
+    const allIn = seated && raiseChips >= (round?.players?.[HUMAN_SEAT]?.committed ?? 0)
+        + (round?.players?.[HUMAN_SEAT]?.stack ?? 0);
+
     /**
-     * The biggest stake this bankroll can sit down at.
+     * Whether the door will open.
      *
-     * Asked for as "you should be able to enter with max bet, and if there is
-     * no money you should not enter". Both halves come from the same number:
-     * when it is zero, nothing on the chip rack is affordable and the button
-     * says so instead of throwing an alert after the tap.
+     * One number now instead of a rack to hunt through. The MAX button that
+     * used to solve "how much can I play for" is gone with the rack: the room
+     * answers that itself, and the button says so before the tap rather than
+     * alerting after it.
      */
-    const topStake = maxStakeFor(cash, chipsFor(currentLocation, cash));
-    const canAfford = cash >= buyIn && ante > 0;
+    const canAfford = cash >= buyIn && buyIn > 0;
 
     const tint = currentLocation.theme.primary;
     const seatCount = opponents.length;
@@ -260,29 +275,35 @@ const PokerGameScreen = () => {
                         should not have to solve by tapping chips until the
                         alert stops appearing.
                        ------------------------------------------------------ */}
+                    {/* ------------------------------------------------------
+                        THE DOOR PRICE
+
+                        Asked for as "remove the bets in poker, set a buy-in
+                        for each country and the VIP room, and enter by paying
+                        it". The chip rack is gone.
+
+                        It was borrowed from the other three games and never
+                        fitted here. They are one-shot, so picking a stake is
+                        the whole decision; poker is a session and the betting
+                        happens inside the hand, so four chips outside the
+                        table asked a question a poker door does not have. A
+                        real room posts one number on the wall.
+
+                        The number is the room's OWN share of your fortune, so
+                        Athens costs half a per cent and the VIP room ten,
+                        which is the figure that was asked for. No second
+                        ladder to fall out of step. See data/casinoStakes.ts.
+                       ------------------------------------------------------ */}
                     {!seated && (
                         <>
-                            <CustomChipSelector
-                                chips={chipsFor(currentLocation, cash)}
-                                selectedChip={ante}
-                                onSelect={actions.setAnte}
-                                gameTheme={currentLocation.theme}
-                            />
-                            <View style={styles.buyInRow}>
-                                <Text style={styles.buyIn}>
-                                    {t('casino.buyIn', { v1: money(buyIn) })}
+                            <View style={styles.doorCard}>
+                                <Text style={styles.doorLabel}>{t('casino.buyInLabel')}</Text>
+                                <Text style={[styles.doorPrice, { color: tint }]}>
+                                    {money(buyIn)}
                                 </Text>
-                                <Pressable
-                                    onPress={() => actions.setAnte(topStake)}
-                                    disabled={topStake <= 0}
-                                    style={({ pressed }) => [
-                                        styles.maxBtn,
-                                        { borderColor: tint },
-                                        (pressed || topStake <= 0) && { opacity: 0.55 },
-                                    ]}
-                                >
-                                    <Text style={[styles.maxText, { color: tint }]}>MAX</Text>
-                                </Pressable>
+                                <Text style={styles.doorMeta}>
+                                    {t('casino.blindsAre', { v1: money(ante), v2: money(ante * 2) })}
+                                </Text>
                             </View>
                             <Pressable
                                 onPress={actions.sitDown}
@@ -339,30 +360,89 @@ const PokerGameScreen = () => {
                     )}
 
                     {yourTurn && (
-                        <View style={styles.actionRow}>
-                            <Pressable
-                                onPress={() => actions.act('fold')}
-                                style={[styles.action, styles.actionQuiet]}
-                            >
-                                <Text style={styles.actionText}>{t('casino.fold')}</Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => actions.act(owed > 0 ? 'call' : 'check')}
-                                style={[styles.action, { borderColor: tint }]}
-                            >
-                                <Text style={styles.actionText}>
-                                    {owed > 0 ? `${t('casino.call')} ${money(owed)}` : t('casino.check')}
-                                </Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => actions.act('raise', Math.max(pot, ante * 2))}
-                                style={[styles.action, { backgroundColor: tint, borderColor: tint }]}
-                            >
-                                <Text style={[styles.actionText, styles.actionTextStrong]}>
-                                    {t('casino.raise')} {money(Math.max(pot, ante * 2))}
-                                </Text>
-                            </Pressable>
-                        </View>
+                        <>
+                            {/* ----------------------------------------------
+                                HOW MUCH, WHICH IS THE ACTUAL DECISION
+
+                                Asked for as "the bets should show as
+                                percentages, 5 10 20 25 with plus and minus,
+                                like normal poker".
+
+                                It was one button reading `Math.max(pot, ante
+                                * 2)`: a single pot sized raise, take it or
+                                leave it. Which removes the one thing poker is
+                                about. Not whether to put money in, but how
+                                much - a small raise and a shove are different
+                                sentences and this could only say one of them.
+
+                                A share of YOUR STACK rather than of the pot.
+                                See core/casino/pokerStakes.ts for why: five
+                                per cent of a pot is almost always under the
+                                minimum raise, so two of the four buttons
+                                would produce the same number.
+                               ---------------------------------------------- */}
+                            <View style={styles.sizeRow}>
+                                <Pressable
+                                    onPress={() => actions.nudgeRaisePct(-5)}
+                                    style={({ pressed }) => [styles.nudge, pressed && { opacity: 0.6 }]}
+                                >
+                                    <Text style={styles.nudgeText}>-</Text>
+                                </Pressable>
+
+                                {raiseSteps.map(step => (
+                                    <Pressable
+                                        key={step}
+                                        onPress={() => actions.setRaisePct(step)}
+                                        style={[
+                                            styles.sizeChip,
+                                            raisePct === step && { borderColor: tint, backgroundColor: `${tint}22` },
+                                        ]}
+                                    >
+                                        <Text style={[
+                                            styles.sizeChipText,
+                                            raisePct === step && { color: tint },
+                                        ]}>
+                                            {step}%
+                                        </Text>
+                                    </Pressable>
+                                ))}
+
+                                <Pressable
+                                    onPress={() => actions.nudgeRaisePct(5)}
+                                    style={({ pressed }) => [styles.nudge, pressed && { opacity: 0.6 }]}
+                                >
+                                    <Text style={styles.nudgeText}>+</Text>
+                                </Pressable>
+                            </View>
+
+                            <View style={styles.actionRow}>
+                                <Pressable
+                                    onPress={() => actions.act('fold')}
+                                    style={[styles.action, styles.actionQuiet]}
+                                >
+                                    <Text style={styles.actionText}>{t('casino.fold')}</Text>
+                                </Pressable>
+                                <Pressable
+                                    onPress={() => actions.act(owed > 0 ? 'call' : 'check')}
+                                    style={[styles.action, { borderColor: tint }]}
+                                >
+                                    <Text style={styles.actionText}>
+                                        {owed > 0 ? `${t('casino.call')} ${money(owed)}` : t('casino.check')}
+                                    </Text>
+                                </Pressable>
+                                <Pressable
+                                    onPress={() => actions.act('raise', raiseChips)}
+                                    style={[styles.action, { backgroundColor: tint, borderColor: tint }]}
+                                >
+                                    {/* The SAME number the hook hands the engine.
+                                        Computing it twice is how a button ends up
+                                        lying about what it will do. */}
+                                    <Text style={[styles.actionText, styles.actionTextStrong]}>
+                                        {allIn ? t('casino.allIn') : `${t('casino.raise')} ${money(raiseChips)}`}
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </>
                     )}
                 </View>
             </View>
@@ -424,6 +504,82 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '700',
     },
+    /**
+     * The number on the wall.
+     *
+     * One figure with the blinds it implies underneath, rather than a rack of
+     * four chips. A poker room does not ask what you would like the stakes to
+     * be; it tells you, and you decide whether to walk in.
+     */
+    doorCard: {
+        alignItems: 'center',
+        paddingVertical: 14,
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.10)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        gap: 2,
+    },
+    doorLabel: {
+        color: theme.colors.textMuted,
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 1.2,
+    },
+    doorPrice: {
+        fontSize: 26,
+        fontWeight: '900',
+        letterSpacing: 0.4,
+    },
+    doorMeta: {
+        color: theme.colors.textMuted,
+        fontSize: 10,
+        fontWeight: '700',
+    },
+
+    // ----------------------------------------------------------------------
+    //  THE RAISE LADDER
+    // ----------------------------------------------------------------------
+    //  Four quick sizes and a nudge either side. Percentages of your own
+    //  stack, which is what makes them always legal and always meaningful.
+    // ----------------------------------------------------------------------
+    sizeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5,
+        marginBottom: 8,
+    },
+    sizeChip: {
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 9,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.14)',
+        minWidth: 46,
+        alignItems: 'center',
+    },
+    sizeChipText: {
+        color: theme.colors.textSecondary,
+        fontSize: 12,
+        fontWeight: '800',
+    },
+    nudge: {
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.14)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    nudgeText: {
+        color: theme.colors.textPrimary,
+        fontSize: 16,
+        fontWeight: '900',
+        lineHeight: 18,
+    },
+
     buyInRow: {
         flexDirection: 'row',
         alignItems: 'center',

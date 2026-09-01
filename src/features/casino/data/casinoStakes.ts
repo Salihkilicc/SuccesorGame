@@ -47,6 +47,7 @@
 
 import type { CasinoLocation } from './casinoData';
 import { VIP_LOCATION_ID, vipChipsFor, vipMaxBet } from './vipRoom';
+import { pokerBuyIn } from '../../../core/casino/pokerStakes';
 
 /**
  * A number a casino would actually print on a chip.
@@ -134,3 +135,34 @@ export const chipsFor = (location: CasinoLocation, money: number): number[] => {
 
 /** The share of a fortune the last room can take in one hand. Asked for by name. */
 export const TOP_ROOM_BET_SHARE = 0.05;
+
+// ============================================================================
+//  AND POKER USES THE SAME LADDER FOR A DIFFERENT THING
+// ============================================================================
+//
+//  Asked for as "in poker remove the bets, set a buy-in for each country and
+//  for the VIP room, and enter by paying it... in the VIP room let it be ten
+//  per cent of your money."
+//
+//  A poker room posts one number on the wall. The chip rack above answers
+//  "how much is this hand worth", which is the right question for roulette
+//  and the wrong one at a poker door, where the only question is what it
+//  costs to sit down.
+//
+//  IT IS THE ROOM'S OWN SHARE, not a second ladder. Athens plays for half a
+//  per cent of your fortune and its poker door costs half a per cent; Macau
+//  five and five. Which lands the VIP room on ten, the number that was asked
+//  for, without anybody typing a table of six figures that goes stale the
+//  first time a share moves.
+// ============================================================================
+
+/** The VIP room's poker door, as a share of everything. Asked for by name. */
+export const VIP_POKER_SHARE = 0.10;
+
+/** What it costs to sit down at this room's poker table. */
+export const pokerBuyInFor = (location: CasinoLocation, money: number): number => {
+    if (location.id === VIP_LOCATION_ID) {
+        return pokerBuyIn(money, VIP_POKER_SHARE, 0);
+    }
+    return pokerBuyIn(money, location.maxBetPercent ?? 0, location.minMaxBet ?? 0);
+};

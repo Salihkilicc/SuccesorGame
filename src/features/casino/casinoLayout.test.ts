@@ -62,7 +62,11 @@ describe('nothing you have to press can scroll away', () => {
         const scrollEnd = src.indexOf('</ScrollView>');
         expect(scrollEnd).toBeGreaterThan(-1);
         expect(src.indexOf("actions.act('fold')")).toBeGreaterThan(scrollEnd);
-        expect(src.indexOf('<CustomChipSelector')).toBeGreaterThan(scrollEnd);
+        // The chip rack went when the room started posting one buy-in. What
+        // has to stay below the scroller is the DOOR and the raise ladder,
+        // which are the two things you press.
+        expect(src.indexOf('casino.buyInLabel')).toBeGreaterThan(scrollEnd);
+        expect(src.indexOf('actions.setRaisePct')).toBeGreaterThan(scrollEnd);
         expect(src).toMatch(/controlsDock: \{/);
     });
 

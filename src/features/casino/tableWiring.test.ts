@@ -117,18 +117,25 @@ describe('and the screen shows a lobby, then a table', () => {
         expect(src).toMatch(/money\(buyIn\)/);
     });
 
-    it('and MAX picks the biggest stake the bankroll covers', () => {
-        // Asked for by name.
+    it('and the room posts one price instead of a rack to hunt through', () => {
+        // MAX AND THE RACK ARE BOTH GONE, and the reason MAX existed went
+        // with them: it solved "how much can I play for", which the room now
+        // answers itself. A poker door does not ask what you would like the
+        // stakes to be. See core/casino/pokerStakes.ts and pokerStakes.test.ts.
         const src = screen();
-        expect(src).toMatch(/const topStake = maxStakeFor\(cash, chipsFor\(currentLocation, cash\)\)/);
-        expect(src).toMatch(/onPress=\{\(\) => actions\.setAnte\(topStake\)\}/);
+        expect(src).not.toMatch(/<CustomChipSelector/);
+        expect(src).not.toMatch(/maxStakeFor/);
+        expect(src).toMatch(/const doorPrice = pokerBuyInFor\(currentLocation, wallet\)/);
+        expect(src).toMatch(/casino\.buyInLabel/);
     });
 
     it('and you cannot sit down with money you do not have', () => {
         // Asked for as "if there is no money, do not sit down". The button
         // says so rather than throwing an alert after the tap.
         const src = screen();
-        expect(src).toMatch(/const canAfford = cash >= buyIn && ante > 0/);
+        // `ante` is derived from the buy-in now rather than chosen, so the
+        // only question left at the door is whether the price is covered.
+        expect(src).toMatch(/const canAfford = cash >= buyIn && buyIn > 0/);
         expect(src).toMatch(/disabled=\{!canAfford\}/);
         expect(src).toMatch(/casino\.notEnough/);
     });
