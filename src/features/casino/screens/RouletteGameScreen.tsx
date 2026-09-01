@@ -108,7 +108,18 @@ const RouletteGameScreen = () => {
         cash={money}
       />
 
+      {/* ------------------------------------------------------------------
+          EVERYTHING BELOW THE HEADER
+
+          A box of its own, because the result number positions itself from
+          the top of whatever contains it and needs something that starts
+          under the cash pill. Anchoring it at container level would mean
+          knowing the header's height, which depends on the safe area inset -
+          a number this screen has no business knowing.
+         ------------------------------------------------------------------ */}
+      <View style={styles.stage}>
       <GameResultPopup result={resultPopup} onHide={actions.closePopup} />
+
 
       {/* ------------------------------------------------------------------
           THE WHEEL IS PINNED, NOT SCROLLED
@@ -190,7 +201,22 @@ const RouletteGameScreen = () => {
           />
         </View>
 
-        {/* CONTROLS */}
+      </ScrollView>
+
+      {/* ------------------------------------------------------------------
+          THE CONTROLS ARE PINNED, LIKE THE WHEEL
+
+          Reported as "the bet area and the play button are so far down that
+          we have to move around in the game". The betting grid genuinely IS
+          tall - three columns of twelve plus the outside bets - so unlike the
+          other three screens this one has to keep a scroller. What it does
+          not have to do is put the chips and the SPIN button INSIDE it.
+
+          So the rule is the one the wheel already follows: the thing you
+          LOOK at may scroll, the thing you ACT with may not. The grid scrolls
+          between a fixed wheel above and fixed controls below.
+         ------------------------------------------------------------------ */}
+      <View style={styles.controlsDock}>
         <View style={styles.controlsSection}>
           {/* CHIP SELECTOR */}
           <CustomChipSelector
@@ -241,8 +267,8 @@ const RouletteGameScreen = () => {
             </Pressable>
           </View>
         </View>
-
-      </ScrollView>
+      </View>
+      </View>
     </View>
   );
 };
@@ -260,7 +286,22 @@ const styles = StyleSheet.create({
   },
 
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.md, gap: 12, paddingBottom: NAV_BAR_CLEARANCE },
+
+  /** Everything below the header, and what the result number measures from. */
+  stage: { flex: 1 },
+
+  /** The grid scrolls. Its bottom padding is now only the dock's business. */
+  content: { padding: theme.spacing.md, gap: 12, paddingBottom: 12 },
+
+  /** The chips and the SPIN button, pinned above the nav bar. */
+  controlsDock: {
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: 8,
+    paddingBottom: NAV_BAR_CLEARANCE,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#1C242C',
+  },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   statusText: { fontSize: 14, fontWeight: '700', letterSpacing: 1 },

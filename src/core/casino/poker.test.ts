@@ -54,6 +54,7 @@ import {
     MAX_MISREAD,
     PERSONALITIES,
     PROFILES,
+    THINK_CAP_MS,
     THINK_MAX_MS,
     THINK_MIN_MS,
     decide,
@@ -431,10 +432,17 @@ describe('and they do not all act at once', () => {
     });
 
     it('and nobody sits there forever', () => {
+        // THE CEILING MOVED, ON PURPOSE. This was `THINK_MAX_MS * 2`, which
+        // was the true bound back when every pause was a single uniform draw.
+        // One in seven is a TANK now - somebody stopping dead, which is what
+        // makes the table read as people rather than a loop - so the real
+        // guarantee is the explicit cap. See thinkTime.test.ts for the
+        // measurement, and for why the cap had to exist at all: without it a
+        // tanked raise compounded to 3.9 seconds.
         for (let i = 0; i < 500; i++) {
             const t = thinkTime('raise');
             expect(t).toBeGreaterThan(THINK_MIN_MS * 0.5);
-            expect(t).toBeLessThan(THINK_MAX_MS * 2);
+            expect(t).toBeLessThanOrEqual(THINK_CAP_MS);
         }
     });
 });

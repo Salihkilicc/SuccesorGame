@@ -93,11 +93,6 @@ const SlotsGameScreen = () => {
         cash={money}
       />
 
-      {/* The amount, rising and fading, taking no taps. */}
-      <GameResultPopup
-        result={showResult && lastResult ? lastResult : null}
-        onHide={actions.hideResult}
-      />
 
       {/* ------------------------------------------------------------------
           A SLOT MACHINE DOES NOT SCROLL
@@ -114,6 +109,21 @@ const SlotsGameScreen = () => {
           out of reach.
          ------------------------------------------------------------------ */}
       <View style={styles.content}>
+
+        {/* ----------------------------------------------------------------
+            THE AMOUNT, rising into the cash pill it just changed.
+
+            INSIDE the content box rather than beside the header, because the
+            popup positions itself from the top of whatever contains it and
+            this is the first thing that starts below the header. Anchoring it
+            at container level would need the header's height, which depends
+            on the safe area inset - a number this screen has no business
+            knowing.
+           ---------------------------------------------------------------- */}
+        <GameResultPopup
+          result={showResult && lastResult ? lastResult : null}
+          onHide={actions.hideResult}
+        />
 
         {/* INFO ROW */}
         <View style={styles.infoRow}>
@@ -210,6 +220,7 @@ export default SlotsGameScreen;
 // STYLES
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1C242C' },
+
   content: {
     flex: 1,
     padding: theme.spacing.lg,

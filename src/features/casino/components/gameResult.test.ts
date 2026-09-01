@@ -68,8 +68,17 @@ describe('the result', () => {
 
     it('and it does not sit on top of the table', () => {
         // A card in the middle of the screen covered the thing the player was
-        // watching. This floats above the controls instead.
-        expect(code(...POPUP)).toMatch(/bottom: '\d+%'/);
+        // watching.
+        //
+        // THIS USED TO PIN `bottom: '32%'` and that was the wrong thing to
+        // pin. A percentage from the bottom is a different place on each of
+        // the four screens that use this - on both card games it was the
+        // cards - so the test was enforcing the very number that caused the
+        // complaint "it lands on the cards". It is anchored to the cash pill
+        // now; see resultPlacement.test.ts for the whole argument.
+        const src = code(...POPUP);
+        expect(src).toMatch(/top: 6,/);
+        expect(src).not.toMatch(/bottom: '\d+%'/);
     });
 });
 

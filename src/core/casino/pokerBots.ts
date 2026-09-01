@@ -281,8 +281,48 @@ export const seatBots = (
 //  Asked for as "it should feel online but be offline".
 // ============================================================================
 
-export const THINK_MIN_MS = 400;
-export const THINK_MAX_MS = 900;
+export const THINK_MIN_MS = 380;
+export const THINK_MAX_MS = 830;
+
+/**
+ * The longest anybody ever takes.
+ *
+ * MEASURED, and the first attempt needed it. Multiplying a raise by 1.35 and
+ * then tanking it compounds, and the tail came out at 3.9 seconds - which,
+ * with five bots and four streets, is a hand that takes half a minute. A tank
+ * has to be long enough to notice and short enough to sit through, and two
+ * seconds is both.
+ */
+export const THINK_CAP_MS = 2000;
+
+/**
+ * How often somebody stops and really thinks about it.
+ *
+ * ---------------------------------------------------------------------------
+ *  A UNIFORM RANDOM PAUSE IS STILL A MACHINE
+ * ---------------------------------------------------------------------------
+ *  Asked for as "make the waiting random, like they are thinking - it already
+ *  is, but raise it a little".
+ *
+ *  It WAS already random: a flat draw between 400 and 900ms. And it still read
+ *  as mechanical, which is the interesting part. A uniform distribution means
+ *  every pause is a middling pause - you never get the snap-fold and you never
+ *  get the long tank, so after four hands the rhythm is as recognisable as a
+ *  fixed delay would be. Randomness is not the same thing as variety.
+ *
+ *  What a real table sounds like is mostly fast, with the occasional person
+ *  who stops dead. Nobody deliberates over folding seven-two; everybody
+ *  deliberates over calling a big river bet. So one in six or so takes a
+ *  TANK - two and a half times as long - and the rest are quick.
+ *
+ *  The mean is only a little above where it was. What changed is the SHAPE,
+ *  and the shape is the thing that reads as a person.
+ * ---------------------------------------------------------------------------
+ */
+export const TANK_CHANCE = 1 / 7;
+
+/** How much longer a tank takes than an ordinary pause. */
+export const TANK_MULTIPLE = 2.2;
 
 /**
  * How long this bot sits there before acting.
@@ -291,9 +331,26 @@ export const THINK_MAX_MS = 900;
  * decision a person actually stops to make.
  */
 export const thinkTime = (action: Action, roll: () => number = Math.random): number => {
+    // CLAMPED, not just checked for NaN. `Number.isFinite` passes -1 happily,
+    // and -1 here produced a NEGATIVE pause - which JavaScript then treats as
+    // zero, so the bot acts instantly and nothing looks broken enough to
+    // investigate. Found by a test feeding the function a hostile die.
     const raw = roll();
-    const die = Number.isFinite(raw) ? raw : 0.5;
+    const die = Math.max(0, Math.min(1, Number.isFinite(raw) ? raw : 0.5));
     const span = THINK_MAX_MS - THINK_MIN_MS;
     const base = THINK_MIN_MS + die * span;
-    return Math.round(action === 'raise' ? base * 1.35 : action === 'fold' ? base * 0.7 : base);
+
+    const byAction = action === 'raise' ? base * 1.35 : action === 'fold' ? base * 0.7 : base;
+
+    // AND ONCE IN A WHILE, SOMEBODY STOPS DEAD.
+    //  Never on a fold: nobody agonises over throwing a hand away, and a
+    //  bot that did would be the most obvious tell at the table.
+    const second = roll();
+    const tank = action !== 'fold'
+        && (Number.isFinite(second) ? second : 1) < TANK_CHANCE;
+
+    return Math.min(
+        THINK_CAP_MS,
+        Math.round(tank ? byAction * TANK_MULTIPLE : byAction),
+    );
 };

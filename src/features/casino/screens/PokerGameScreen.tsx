@@ -87,9 +87,34 @@ const PokerGameScreen = () => {
                 cash={cash}
             />
 
+            {/* --------------------------------------------------------------
+                EVERYTHING BELOW THE HEADER
+
+                A box of its own, because the result number positions itself
+                from the top of whatever contains it and needs something that
+                starts under the cash pill. Anchoring it at container level
+                would mean knowing the header's height, which depends on the
+                safe area inset - a number this screen has no business
+                knowing.
+               -------------------------------------------------------------- */}
+            <View style={styles.stage}>
             <GameResultPopup result={resultPopup} onHide={actions.closePopup} />
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            {/* --------------------------------------------------------------
+                THE FELT SCROLLS. THE CONTROLS DO NOT.
+
+                Reported as "the bet area and the play button are so far down
+                that we have to move around in the game". FOLD, CALL and RAISE
+                were at the bottom of a ScrollView below a table and your own
+                hand, so on most phones the three buttons the hand depends on
+                started below the fold - and a poker action you have to scroll
+                to find is one you will not make in time.
+               -------------------------------------------------------------- */}
+            <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={styles.content}
+                showsVerticalScrollIndicator={false}
+            >
                 <Text style={[styles.status, { color: tint }]} numberOfLines={1}>
                     {translateCasinoStatus(status).toUpperCase()}
                 </Text>
@@ -191,9 +216,12 @@ const PokerGameScreen = () => {
                     )}
                 </View>
 
-                {/* ---------------------------------------------------------
-                    CONTROLS
-                   --------------------------------------------------------- */}
+            </ScrollView>
+
+            {/* ---------------------------------------------------------
+                CONTROLS, pinned above the nav bar.
+               --------------------------------------------------------- */}
+            <View style={styles.controlsDock}>
                 <View style={styles.controls}>
                     {(!round || handOver) && (
                         <>
@@ -244,7 +272,8 @@ const PokerGameScreen = () => {
                         </View>
                     )}
                 </View>
-            </ScrollView>
+            </View>
+            </View>
         </View>
     );
 };
@@ -253,7 +282,21 @@ export default PokerGameScreen;
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#1C242C' },
-    content: { paddingBottom: NAV_BAR_CLEARANCE + 20, paddingHorizontal: 8 },
+
+    /** Everything below the header, and what the result number measures from. */
+    stage: { flex: 1 },
+    scroll: { flex: 1 },
+    /** The table scrolls; its bottom padding is the dock's business now. */
+    content: { paddingBottom: 8, paddingHorizontal: 8 },
+    /** FOLD, CALL and RAISE, where they cannot scroll away mid hand. */
+    controlsDock: {
+        paddingHorizontal: 8,
+        paddingTop: 8,
+        paddingBottom: NAV_BAR_CLEARANCE,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: '#1C242C',
+    },
     status: {
         textAlign: 'center',
         fontSize: 11,

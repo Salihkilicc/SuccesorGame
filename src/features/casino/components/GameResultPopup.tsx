@@ -142,18 +142,41 @@ const GameResultPopup = ({ result, onHide }: Props) => {
 export default GameResultPopup;
 
 const styles = StyleSheet.create({
+    // ----------------------------------------------------------------------
+    //  IT RISES INTO THE CASH PILL
+    // ----------------------------------------------------------------------
+    //  Reported as "you cannot tell how much you won, it lands on the cards".
+    //
+    //  It was `bottom: '32%'`, centred, with a comment claiming that put it
+    //  "above the controls and below the table". That was true on ONE screen.
+    //  Four screens use this component and their layouts have nothing in
+    //  common - blackjack has a felt with the player's hand along the bottom,
+    //  poker has your hole cards there, roulette has a betting grid, the slot
+    //  has a cabinet - so a single hardcoded percentage lands somewhere
+    //  different on each, and on the two card games it landed on the cards.
+    //
+    //  THE ONLY STRIP THAT IS FREE ON ALL FOUR is the top right, directly
+    //  under the cash pill: every screen's status line is either left aligned
+    //  or centred and short, and no screen puts anything else up there.
+    //
+    //  Which turns out to be the right place for a different reason too. This
+    //  number is a CHANGE IN YOUR BALANCE, and the balance is in that pill. It
+    //  now rises INTO the total it just changed, instead of floating over the
+    //  felt with nothing to connect it to. Same animation, and it finally
+    //  means something.
+    // ----------------------------------------------------------------------
     wrap: {
         position: 'absolute',
         left: 0,
-        right: 0,
-        // Above the controls and below the table, so it never sits on top of
-        // the thing the player is watching.
-        bottom: '32%',
-        alignItems: 'center',
+        right: 16,
+        top: 6,
+        alignItems: 'flex-end',
         zIndex: 20,
     },
     amount: {
-        fontSize: 30,
+        // 30 -> 26. It is beside the header now rather than alone in the
+        // middle of the screen, so it does not have to shout to be found.
+        fontSize: 26,
         fontWeight: '900',
         letterSpacing: 0.5,
         // No background. The rule for the signal colours in this codebase is

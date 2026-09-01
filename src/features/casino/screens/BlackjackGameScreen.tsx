@@ -1,7 +1,7 @@
 // src/features/casino/screens/BlackjackGameScreen.tsx
 import React from 'react';
 import { t, useLocale } from '../../../core/i18n';
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import GameResultPopup from '../components/GameResultPopup';
@@ -72,9 +72,27 @@ const BlackjackGameScreen = () => {
         cash={money}
       />
 
-      <GameResultPopup result={resultPopup} onHide={actions.closePopup} />
+      {/* ------------------------------------------------------------------
+          A TABLE DOES NOT SCROLL EITHER
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          Reported as "the bet area and the play button are so far down that
+          we have to move around in the game". This was a ScrollView holding
+          the felt, the chips and the buttons, so on anything but the tallest
+          phone the two controls the screen exists for started BELOW the fold
+          and had to be scrolled up to before every hand.
+
+          The slot was fixed for exactly this a while ago and the other three
+          screens were left as they were. A fixed column instead: the felt
+          takes the middle and gives up height when there is not enough, and
+          the controls are pinned above the nav bar where they cannot move.
+
+          `stage` is also what the result number is positioned against, so it
+          lands under the cash pill rather than over the header.
+         ------------------------------------------------------------------ */}
+      <View style={styles.stage}>
+        {/* The amount, under the cash pill it just changed, rather than over
+            the player's hand. See components/GameResultPopup.tsx. */}
+        <GameResultPopup result={resultPopup} onHide={actions.closePopup} />
 
         {/* INFO BAR */}
         <View style={styles.topRow}>
@@ -225,19 +243,62 @@ const BlackjackGameScreen = () => {
           </View>
         </View>
 
-      </ScrollView>
+      </View>
     </View>
   );
 };
 
 export default BlackjackGameScreen;
 
-/** The felt's size. Wide enough for five cards, short enough to leave the
- *  chips and the buttons on screen without scrolling. */
 const TABLE_W = Dimensions.get('window').width - 24;
-const TABLE_H = 320;
+
+/**
+ * Everything on this screen that is NOT the felt, in points.
+ *
+ * header 143 + stage padding 32 + status 34 + chips 70 + controls 80
+ * + the gaps between them 32, and then the nav bar's own clearance.
+ *
+ * Measured off the components rather than guessed, and it is an estimate on
+ * purpose: it only has to be close, because the felt is clamped between a
+ * floor and a ceiling either side of it.
+ */
+const CHROME_H = 143 + 32 + 34 + 70 + 80 + 32 + NAV_BAR_CLEARANCE;
+
+/**
+ * The felt's height.
+ *
+ * DERIVED FROM THE DEVICE, not fixed at 320.
+ *
+ * 320 was a number that fitted the phone it was written on. The comment
+ * beside it said "short enough to leave the chips and the buttons on screen
+ * without scrolling", and the ScrollView wrapped around it made that untrue
+ * without anybody noticing - on a shorter phone the felt simply pushed the
+ * controls below the fold and the scroller absorbed the mistake. Reported as
+ * "the bet area and the play button are so far down we have to move around".
+ *
+ * The floor matters as much as the ceiling: below about 190 the dealer's row
+ * and the player's row start to touch, and a cramped table is worse than a
+ * short one.
+ */
+const TABLE_H = Math.max(
+    190,
+    Math.min(320, Dimensions.get('window').height - CHROME_H),
+);
 
 const styles = StyleSheet.create({
+  /**
+   * Everything below the header.
+   *
+   * A fixed column, not a scroller. It is also the box the result number is
+   * positioned against, so `top: 6` on that lands just under the cash pill
+   * rather than behind the header.
+   */
+  stage: {
+    flex: 1,
+    padding: theme.spacing.lg,
+    paddingBottom: NAV_BAR_CLEARANCE,
+    justifyContent: 'space-between',
+  },
   table: {
     width: TABLE_W,
     height: TABLE_H,
@@ -267,7 +328,9 @@ const styles = StyleSheet.create({
   shoeCard2: { margin: 4, backgroundColor: '#34495E' },
 
   container: { flex: 1, backgroundColor: '#1C242C' },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
+  // SHELVED with the ScrollView it styled. `stage` above replaced it: the
+  // same padding, but on a fixed column that cannot move.
+  // content: { padding: theme.spacing.lg, gap: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE },
 
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   statusText: { fontSize: 14, fontWeight: '700', letterSpacing: 1 },
