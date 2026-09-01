@@ -117,7 +117,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
         {
             id: 're_sky_001',
             shopId: 'shop_skyline_architects',
-            name: 'Burj Khalifa Owner Floor',
+            name: 'Zenith Tower Crown Floor',
             price: 6500000000,
             type: 'skyscraper_floor',
             brand: 'Skyline Architects',
@@ -181,7 +181,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             type: 'mansion',
             brand: 'Dynasty 8 Elite',
             category: 'REAL_ESTATE',
-            specs: ['90210', 'IMAX Theater', 'Bowling Alley', 'Car Gallery'],
+            specs: ['90210', 'Giant Screen Theater', 'Bowling Alley', 'Car Gallery'],
             description: 'The ultimate Hollywood estate. Space for your entire ego.',
         },
         {
@@ -192,8 +192,8 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
             type: 'penthouse',
             brand: 'Dynasty 8 Elite',
             category: 'REAL_ESTATE',
-            specs: ['Monte Carlo', 'F1 Track View', 'Private Casino', 'Rooftop Pool'],
-            description: 'Watch the Grand Prix from your jacuzzi. The epitome of Monaco life.',
+            specs: ['Monte Carlo', 'Street Circuit View', 'Private Casino', 'Rooftop Pool'],
+            description: 'Watch the street race from your jacuzzi. The epitome of Monaco life.',
         },
 
         // ========================================================================
@@ -228,7 +228,7 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
         {
             id: 're_her_001',
             shopId: 'shop_heritage_estates',
-            name: 'Château de Versailles Annex',
+            name: 'Château Beaumont Annex',
             price: 350000000,
             type: 'castle',
             brand: 'Heritage Estates',
@@ -239,13 +239,13 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
         {
             id: 're_her_002',
             shopId: 'shop_heritage_estates',
-            name: 'Tuscan Medici Villa',
+            name: 'Tuscan Dynasty Villa',
             price: 150000000,
             type: 'villa',
             brand: 'Heritage Estates',
             category: 'REAL_ESTATE',
             specs: ['Italy', 'Vineyard', 'Renaissance Art', 'Chapel'],
-            description: 'Live like the Medici family. Includes a priceless art collection.',
+            description: 'Live like a Renaissance banking dynasty. Includes a priceless art collection.',
         },
 
         // ========================================================================

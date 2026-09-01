@@ -151,9 +151,9 @@ const generateInstanceId = (): string =>
 
 export const initialLuxuryCatalog: LuxuryAsset[] = [
     {
-        id: 'lux_car_chiron_300',
-        name: 'Bugatti Chiron Super Sport 300+',
-        brand: 'Bugatti',
+        id: 'lux_car_meridian_300',
+        name: 'Vaurien Meridian Super Sport 300+',
+        brand: 'Vaurien',
         category: 'Hypercar',
         rarity: 'Legendary',
         price: 3900000, // $3.9M
@@ -195,8 +195,8 @@ export const initialLuxuryCatalog: LuxuryAsset[] = [
     },
     {
         id: 'lux_jet_g700_flagship',
-        name: 'Gulfstream G700 Flagship Jet',
-        brand: 'Gulfstream Aerospace',
+        name: 'Silverstream S700 Flagship Jet',
+        brand: 'Silverstream Aerospace',
         category: 'PrivateJet',
         rarity: 'Legendary',
         price: 78000000, // $78M
@@ -217,13 +217,13 @@ export const initialLuxuryCatalog: LuxuryAsset[] = [
     },
     {
         id: 'lux_watch_grandmaster_chime',
-        name: 'Patek Philippe Grandmaster Chime 6300G',
-        brand: 'Patek Philippe',
+        name: 'Beaulieu & Fils Grand Sonnerie 6300G',
+        brand: 'Beaulieu & Fils',
         category: 'HauteHorlogerie',
         rarity: 'OneOfAKind',
         price: 4200000, // $4.2M
         description:
-            'The most complicated wristwatch ever crafted by Patek Philippe. Reversible double-face white gold case with 20 complications, 5 chiming modes, and hand-guilloched hobnail pattern.',
+            'The most complicated wristwatch ever crafted by Beaulieu & Fils. Reversible double-face white gold case with 20 complications, 5 chiming modes, and hand-guilloched hobnail pattern.',
         prestigeScore: 220,
         annualMaintenanceCost: 12000,
         appreciationRatePerYear: 0.08, // Rare collector timepiece appreciates +8% annually
