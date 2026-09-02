@@ -1451,6 +1451,7 @@ export const en: Record<string, string> = {
     'obs.insolvencyCountdown': 'Company capital is below zero. The creditors are at the door and you have {v1} quarters. Get capital back above zero in that time and the clock resets.',
     'obs.insolvencyLastCall': 'Company capital is still below zero and this is your last quarter. If it does not turn positive, the company passes to its creditors.',
     'obs.reachLost': 'The demand you could not serve has left a lasting mark: you have lost {v1} of the market you could otherwise reach, and those customers are with a competitor. Serving demand wins it back slowly, but losing it is faster than earning it.',
+    'obs.reachWayBack': 'The way back is one thing and it is slow: serve at least {v1} of the demand every quarter and reach climbs again. From where you are now that is about {v2} quarters of never running short. Anything less and it keeps falling.',
     'obs.marketingUnderUpkeep': 'Your marketing budget is {v1}, and holding the brand where it is costs {v2}. That line grows with your revenue, so the budget that was comfortable last year stops being enough. You were under it this quarter; the brand starts eroding from the next one.',
     'obs.brandAtFacilityCeiling': 'Brand Value has reached your facility ceiling ({v1}). More marketing will not move this number; raising the tier is what lifts the ceiling.',
     'obs.brandValueRoseV': 'Brand Value rose {v1} points to {v2}. This lifts your share in every category.',
@@ -1896,6 +1897,7 @@ export const en: Record<string, string> = {
     // ---- urun uyarilari ----
     'product.demandTick': 'demand {v1}',
     'product.maxUnits': 'max {v1}',
+    'product.reachDamaged': 'Past stockouts still cost you: {v1} of the market you could reach is with a competitor, and it is taken off every quarter until you earn it back. Serve at least {v2} of demand and it climbs again, which from here is about {v3} quarters.',
     'product.underSupplying': 'Under-supplying by {v1} units. Those customers go to a rival and your brand takes a hit.',
     'product.overBuilding': 'Over-building by {v1} units. They become inventory and cost $5 each per quarter to store.',
     'product.maxEfficiency': 'MAX EFFICIENCY',

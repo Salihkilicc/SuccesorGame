@@ -1447,6 +1447,7 @@ export const tr: Record<string, string> = {
     'obs.insolvencyCountdown': 'Şirket sermayesi eksiye düştü. Alacaklılar kapıda ve {v1} çeyreğin var. Bu süre içinde sermayeyi artıya çıkarırsan sayaç sıfırlanır.',
     'obs.insolvencyLastCall': 'Şirket sermayesi hâlâ ekside ve bu son çeyreğin. Sermaye bu çeyrek artıya dönmezse şirket alacaklılara geçer.',
     'obs.reachLost': 'Karşılayamadığın talep kalıcı bir iz bıraktı: artık ulaşabileceğin pazarın {v1} kadarını kaybettin ve o müşteriler rakipteler. Talebi karşılamaya devam edersen yavaşça geri gelir, ama kaybetmesi kazanmasından hızlıdır.',
+    'obs.reachWayBack': 'Geri dönüşün tek yolu var ve yavaş: her çeyrek talebin en az {v1} kadarını karşılarsan erişimin yeniden tırmanır. Bulunduğun yerden bu, hiç stoksuz kalmadan yaklaşık {v2} çeyrek demek. Altında kalırsan düşmeye devam eder.',
     'obs.marketingUnderUpkeep': 'Pazarlama bütçen {v1}, markayı yerinde tutmak ise {v2} istiyor. Bu eşik cironla birlikte büyür, yani sen büyüdükçe dünkü bütçe yetmez olur. Bu çeyrek altında kaldın; marka önümüzdeki çeyrekten itibaren erimeye başlar.',
     'obs.brandAtFacilityCeiling': 'Marka Değeri tesisinin tavanına dayandı ({v1}). Daha fazla pazarlama bu sayıyı yukarı taşımaz; tavanı kaldıran şey kademe yükseltmek.',
     'obs.brandValueRoseV': 'Marka Değeri {v1} puan artarak {v2} oldu. Bu, her kategorideki payını yükseltir.',
@@ -1893,6 +1894,7 @@ export const tr: Record<string, string> = {
     // ---- urun uyarilari ----
     'product.demandTick': 'talep {v1}',
     'product.maxUnits': 'en fazla {v1}',
+    'product.reachDamaged': 'Geçmiş stok tükenmelerinin bedelini hâlâ ödüyorsun: ulaşabileceğin pazarın {v1} kadarı rakipte ve geri kazanana dek her çeyrek bu kadarı düşülüyor. Talebin en az {v2} kadarını karşılarsan yeniden tırmanır; buradan bu, yaklaşık {v3} çeyrek demek.',
     'product.underSupplying': '{v1} adet eksik üretiyorsun. O müşteriler rakibe gidiyor ve markan zarar görüyor.',
     'product.overBuilding': '{v1} adet fazla üretiyorsun. Stoğa kalır ve her çeyrek adet başına 5$ depolama maliyeti çıkarır.',
     'product.maxEfficiency': 'Azami verim',

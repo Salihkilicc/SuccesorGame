@@ -23,6 +23,8 @@ import {
     demandUnits,
     marketingBenchmark,
     shareOfVoice,
+    REACH_SERVE_TARGET,
+    quartersToRecover,
 } from '../../../core/market/attraction';
 import { HOLD_TICK_MS, holdNudge, matchDemandPlan, maxUnitsPerQuarter, nudgeUnits, productUpgradeRP, resolveTargetUnits } from '../../../core/market/production';
 import { ProductIconBadge } from './ProductIcon';
@@ -618,6 +620,29 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
     //  will anyone hear about it.
     // ======================================================================
     const alerts: string[] = [];
+    // ----------------------------------------------------------------------
+    //  THE STANDING BILL, BEFORE THIS QUARTER'S PROBLEMS
+    // ----------------------------------------------------------------------
+    //  First in the list because it is not a thing that might go wrong: it
+    //  is a multiplier that is ALREADY on, taken off every unit of demand
+    //  this product will ever be offered, until it is earned back.
+    //
+    //  It belongs on this screen and not only in the report because the two
+    //  controls that cause it - the production target and the marketing
+    //  budget - are here. Measured over sixty quarters of understaffed but
+    //  otherwise good play, reach fell 0.97 to 0.35 while attraction climbed
+    //  2.91 to 5.47: the company improved and shrank at once, and the only
+    //  place that said so was a line in a report the player had already
+    //  closed by the time they set next quarter's target.
+    // ----------------------------------------------------------------------
+    const reachNow = product.reachIndex ?? 1;
+    if (reachNow < 0.95) {
+        alerts.push(t('product.reachDamaged', {
+            v1: formatPercent(Math.round((1 - reachNow) * 100)),
+            v2: formatPercent(Math.round(REACH_SERVE_TARGET * 100)),
+            v3: String(quartersToRecover(reachNow)),
+        }));
+    }
     if (supplyGap < 0) {
         alerts.push(t('product.underSupplying', { v1: formatNumber(Math.abs(supplyGap)) }));
     } else if (supplyGap > expectedDemand * 0.2 && expectedDemand > 0) {

@@ -428,6 +428,68 @@ export const updateReachIndex = (
     return clamp01(p - REACH_DECAY * (1 - served) * p);
 };
 
+// ============================================================================
+//  HOW LONG IT TAKES BACK, AND WHAT IT TAKES
+// ============================================================================
+//
+//  Measured on the live engine over sixty quarters. A player who upgrades the
+//  plant, hires researchers and buys every quality level they can afford, but
+//  never staffs the factory to its tier, runs out of stock EVERY quarter from
+//  the first one. Reach falls 0.97 to 0.35 and takes the whole run with it:
+//
+//      attraction   2.91 -> 5.47   the quality ladder is working
+//      reach        0.97 -> 0.35   and this is eating all of it
+//      share        0.44 -> 0.30   so the company shrinks while it improves
+//
+//  With the crew hired and nothing else changed: reach holds at 1.00, revenue
+//  goes 2.3M to 10.6M and profit 273K to 999K over the same sixty quarters.
+//
+//  So the mechanic is not too harsh. It is UNREADABLE. The report already
+//  named the loss - "you have lost 65% of the market you could reach" - but
+//  not the two things a player needs in order to act on it: what ends the
+//  bleeding, and how long the way back is. Without those, a permanent
+//  multiplier reads as bad luck.
+//
+//  This is deliberately derived from REACH_RECOVERY and REACH_FULL_THRESHOLD
+//  rather than written out, so the sentence on the screen cannot drift away
+//  from the arithmetic in updateReachIndex above.
+// ============================================================================
+
+/**
+ * The share of demand that has to be served before any of it comes back.
+ *
+ * Below this the index falls; at or above it the index climbs. Named for the
+ * screens, which have to state the condition rather than imply it.
+ */
+export const REACH_SERVE_TARGET = REACH_FULL_THRESHOLD;
+
+/**
+ * Quarters of full service needed to climb from `reach` back to `target`.
+ *
+ * Recovery is geometric - each quarter closes REACH_RECOVERY of the REMAINING
+ * gap - so the last few points take much longer than the first few. That is
+ * why this is solved rather than counted: at 0.35 the honest answer is
+ * thirteen quarters - over three years - and a player who is told "it
+ * recovers slowly" will guess three.
+ *
+ * Returns 0 when already at or above the target.
+ *
+ * The target is held below 1 because the climb is asymptotic: it approaches
+ * whole and never arrives, so asking for exactly 1.00 has no finite answer.
+ * A caller passing 1 wants "as good as recovered", which is what 0.99 is.
+ */
+export const quartersToRecover = (
+    reach: number | undefined,
+    target: number = 0.95,
+): number => {
+    const p = clamp01(reach ?? 1);
+    const t = Math.min(0.99, clamp01(target));
+    if (p >= t) return 0;
+    // p_n = 1 - (1 - p) * (1 - RECOVERY)^n  ->  solve for n at p_n = t.
+    const n = Math.log((1 - t) / (1 - p)) / Math.log(1 - REACH_RECOVERY);
+    return Math.max(1, Math.ceil(n));
+};
+
 /**
  * Pazarin bu urunden talep ettigi adet.
  * Uretimden BAGIMSIZ — modelin butun mesele bu.

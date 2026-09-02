@@ -2,6 +2,7 @@ import React from 'react';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { t, useLocale } from '../../../core/i18n';
 import { brandDisplay } from '../../../core/market/brand';
+import { REACH_SERVE_TARGET, quartersToRecover } from '../../../core/market/attraction';
 import {
   Modal,
   Pressable,
@@ -176,12 +177,38 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   //  AFTER the stockout note: that one is what happened this quarter, this
   //  one is the bill for it, and the bill only makes sense next to the
   //  purchase.
+  //
+  //  ------------------------------------------------------------------
+  //  AND THE LOSS ALONE WAS NOT ENOUGH TO ACT ON
+  //  ------------------------------------------------------------------
+  //  Reported as "I played it and it felt flat", then measured over sixty
+  //  quarters of otherwise good play with the factory left understaffed:
+  //  attraction climbed 2.91 to 5.47 while reach fell 0.97 to 0.35, so the
+  //  company improved and shrank at the same time. Hiring the crew and
+  //  changing nothing else took the same run from 3.0M to 10.6M of revenue.
+  //
+  //  The mechanic was not too harsh. It was unreadable. This note already
+  //  said WHAT was lost and nothing about the two things a player has to
+  //  know in order to do anything about it:
+  //
+  //      the condition   serve 90% of demand, or it keeps falling
+  //      the price       thirteen quarters of that, from 0.35
+  //
+  //  Both come from core/market/attraction so the sentence cannot drift
+  //  away from the arithmetic that produced it.
   // ------------------------------------------------------------------
   const reach = r.reachIndex;
   if (reach !== undefined && reach < 0.95) {
     notes.push({
       tone: 'bad',
       text: t('obs.reachLost', { v1: formatPercent(Math.round((1 - reach) * 100)) }),
+    });
+    notes.push({
+      tone: 'bad',
+      text: t('obs.reachWayBack', {
+        v1: formatPercent(Math.round(REACH_SERVE_TARGET * 100)),
+        v2: String(quartersToRecover(reach)),
+      }),
     });
   }
 
