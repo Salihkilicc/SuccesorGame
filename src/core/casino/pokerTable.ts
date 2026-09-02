@@ -29,7 +29,7 @@
 //  works in a test with no stores running.
 // ============================================================================
 
-export type SeatKind = 'ceo' | 'board' | 'stranger';
+export type SeatKind = 'ceo' | 'board' | 'stranger' | 'magnate';
 
 export interface Opponent {
     id: string;
@@ -137,64 +137,177 @@ export const STRANGER_REGIONS: Readonly<Record<string, readonly string[]>> = {
     nordic: [
         'Tomas Berg', 'Hanna Virtanen', 'Sigrid Dahl', 'Mikkel Sorensen',
         'Elin Bjornsson', 'Aleksi Rantanen',
+        'Petter Lund', 'Ingrid Halvorsen', 'Joonas Makela',
     ],
     britishIsles: [
         'Bill Hartley', 'Gerald Boone', 'Duncan Reid', 'Niamh Gallagher',
         'Owen Pritchard', 'Fiona Blackwood',
+        'Rhys Morgan', 'Sinead Doherty', 'Callum Fraser',
     ],
     westernEurope: [
         'Claire Dubois', 'Stefan Weiss', 'Sofia Marchetti', 'Enzo Ricci',
         'Rosa Iglesias', 'Bram de Vries', 'Mathieu Lefevre', 'Greta Hoffmann',
+        'Lena Brandt', 'Pau Serrano', 'Anouk Visser',
     ],
     easternEurope: [
         'Ana Petrescu', 'Jakub Nowak', 'Milena Horvat', 'Vasil Ivanov',
         'Katarzyna Zielinska', 'Andrei Popescu',
+        'Tomas Novak', 'Iryna Kovalenko', 'Zsofia Balogh', 'Marek Dvorak',
     ],
     mediterranean: [
         'Yusuf Demir', 'Eleni Stavrou', 'Nuno Carvalho', 'Zeynep Aksoy',
         'Dimitris Fotiadis', 'Beatriz Alves',
+        'Selin Korkmaz', 'Nikos Vlachos', 'Ines Cardoso', 'Emre Yildiz',
     ],
     middleEast: [
         'Omar Farouk', 'Leila Haddad', 'Rami Nasser', 'Dalia Mansour',
         'Karim Sabbagh', 'Nadia Khoury',
+        'Samir Barakat', 'Yara Kassab', 'Tarek Halabi', 'Mona Sleiman',
     ],
     persianCentralAsia: [
         'Darius Ashrafi', 'Roya Tabrizi', 'Timur Nazarov', 'Aigerim Sultanova',
         'Behnam Kordi', 'Ruslan Karimov',
+        'Parisa Golzar', 'Alisher Yusupov', 'Nargiz Aliyeva', 'Farhad Rostami',
     ],
     southAsia: [
         'Priya Nair', 'Arjun Mehta', 'Fatima Siddiqui', 'Ravi Chandran',
         'Ishaan Kapoor', 'Nilanthi Perera', 'Bilal Ahsan',
+        'Ananya Bose', 'Imran Qureshi', 'Kavya Rajan', 'Dilshan Fernando',
     ],
     eastAsia: [
         'Mei Chen', 'Haruto Sasaki', 'Ji-woo Han', 'Yuki Morimoto',
         'Liang Zhao', 'Seo-yeon Baek', 'Wen Xiaoling',
+        'Sora Nakagawa', 'Min-jun Oh', 'Fang Yuwen', 'Kenji Arakawa',
     ],
     southeastAsia: [
         'Nguyen Thi Lan', 'Somchai Prasert', 'Dewi Kusuma', 'Ramon Mendoza',
         'Chan Sophea', 'Aina Rahim', 'Bayu Santoso',
+        'Tran Van Minh', 'Siti Nurhaliza', 'Pornthip Chaiya', 'Iman Hakim',
     ],
     westAfrica: [
         'Kwame Boateng', 'Grace Okonkwo', 'Aminata Diallo', 'Chidi Eze',
         'Ousmane Traore', 'Yaa Mensah',
+        'Adaeze Nwosu', 'Kofi Asante', 'Mariam Cisse', 'Emeka Obi',
     ],
     eastAfrica: [
         'Abebe Tesfaye', 'Zawadi Mwangi', 'Hodan Warsame', 'Solomon Girma',
         'Neema Kimani', 'Yonas Bekele',
+        'Amani Juma', 'Selamawit Haile', 'Faisal Warsame', 'Rehema Otieno',
     ],
     southernAfrica: [
         'Thabo Ndlovu', 'Lerato Khumalo', 'Sipho Dlamini', 'Anneke Botha',
         'Naledi Moyo', 'Tendai Chirwa',
+        'Bongani Nkosi', 'Refilwe Mokoena', 'Tapiwa Muroyi', 'Karabo Sithole',
     ],
     latinAmerica: [
         'Camila Ferreira', 'Mateo Rojas', 'Valentina Cruz', 'Joaquin Silva',
         'Luana Barbosa', 'Diego Alcantara', 'Paola Quispe',
+        'Renata Aguilar', 'Nicolas Vergara', 'Yamila Duarte', 'Emilio Pacheco',
     ],
     northAmericaPacific: [
         'Marcus Whitfield', 'Dana Kealoha', 'Colton Reyes', 'Aroha Waitoa',
         'Jesse Lamontagne', 'Tiare Moala',
+        'Harper Vandermeer', 'Kaimana Puana', 'Elodie Tremblay', 'Wiremu Ngata',
     ],
 };
+
+// ============================================================================
+//  AND THE PEOPLE IN THE PRIVATE ROOM
+// ============================================================================
+//
+//  Asked for as "should we increase the number of people in the casino, for
+//  the low profile rooms and the high profile one, having a lot of people
+//  could work in our favour".
+//
+//  MEASURED FIRST, and the answer was not symmetric. Over a hundred sittings:
+//
+//                  BEFORE                      AFTER
+//      CITY ROOM   113 faces, 72% repeat       156 faces, 61% repeat
+//      VIP ROOM     21 faces, 95% repeat        61 faces, 85% repeat
+//
+//  The city pool went 96 to 153 strangers, which is the easy half and was
+//  asked for. The room that needed it was the other one.
+//
+//  The city pool is fine. Seeing the same face twice in a public room is not a
+//  fault, it is a regular. The VIP room is the one that was starved, and it is
+//  starved by CONSTRUCTION rather than by a short list: it fills every seat
+//  from `rivalCeos()`, and that returns exactly one person per listed rival
+//  company. Twenty one, and it is exhausted inside thirty sittings.
+//
+//  Adding names to CEO_NAMES cannot fix it. The roster is keyed on stock ids
+//  and only yields a person when a company with that id exists, so the ceiling
+//  is the number of rival companies in the market. Raising it means inventing
+//  companies, which is a market change, not a casino one.
+//
+//  ---------------------------------------------------------------------------
+//  SO THE ROOM GETS A SECOND KIND OF SOMEBODY
+//  ---------------------------------------------------------------------------
+//  A private room in Monte Carlo is not four technology chief executives. It
+//  is old money, a shipping family, somebody who inherited a bank. These are
+//  people the player has heard of and does not do business with, which is
+//  exactly the gap: they fill the room without diluting the rule that makes a
+//  rival CEO worth noticing, because they are a DIFFERENT kind of face.
+//
+//  The line the file already holds is kept: THERE ARE NO STRANGERS IN THERE.
+//  A magnate is not a stranger. The city rooms never see one.
+//
+//  All invented, for the same reason the strangers are, and each carries the
+//  line that shows under their name where a chief executive's company goes.
+// ============================================================================
+
+export interface Magnate {
+    id: string;
+    name: string;
+    /** Shown under the name, where a CEO's company sits. */
+    of: string;
+}
+
+export const MAGNATES: readonly Magnate[] = [
+    { id: 'mg_ashworth', name: 'Cornelius Ashworth', of: 'Shipping, fourth generation' },
+    { id: 'mg_valmorel', name: 'Sylvie Valmorel', of: 'Private bank, Geneva' },
+    { id: 'mg_okonjo', name: 'Adaora Okonjo', of: 'Ports and rail' },
+    { id: 'mg_sandoval', name: 'Rafael Sandoval', of: 'Copper and lithium' },
+    { id: 'mg_lindqvist', name: 'Britta Lindqvist', of: 'Timber and paper' },
+    { id: 'mg_al_najjar', name: 'Hisham al Najjar', of: 'Refining' },
+    { id: 'mg_takahara', name: 'Reiko Takahara', of: 'Department stores' },
+    { id: 'mg_beaumont', name: 'Hugo Beaumont', of: 'Vineyards and hotels' },
+    { id: 'mg_deshmukh', name: 'Vikram Deshmukh', of: 'Cement, half a continent' },
+    { id: 'mg_moretti', name: 'Giulia Moretti', of: 'Couture, sold it twice' },
+    { id: 'mg_castellan', name: 'Auguste Castellan', of: 'Insurance, inherited' },
+    { id: 'mg_park', name: 'Park Seung ho', of: 'Shipbuilding' },
+    { id: 'mg_ferreyra', name: 'Marisol Ferreyra', of: 'Cattle and grain' },
+    { id: 'mg_vandervelde', name: 'Joost Vandervelde', of: 'Diamonds, wholesale' },
+    { id: 'mg_okoye', name: 'Chinedu Okoye', of: 'Telecoms, private' },
+    { id: 'mg_st_clair', name: 'Rosalind St Clair', of: 'Racehorses and land' },
+    { id: 'mg_haddadi', name: 'Nasrin Haddadi', of: 'Pistachios and pipelines' },
+    { id: 'mg_wren', name: 'Marcus Wren', of: 'Hedge fund, closed to new money' },
+    { id: 'mg_bergqvist', name: 'Astrid Bergqvist', of: 'Iron ore' },
+    { id: 'mg_montoya', name: 'Ignacio Montoya', of: 'Airports' },
+    { id: 'mg_kirilenko', name: 'Yelena Kirilenko', of: 'Fertiliser' },
+    { id: 'mg_amadou', name: 'Ibrahim Amadou', of: 'Gold concessions' },
+    { id: 'mg_whitcombe', name: 'Eleanor Whitcombe', of: 'Publishing, what is left of it' },
+    { id: 'mg_serrano', name: 'Tomas Serrano', of: 'Olive oil, absurdly' },
+    { id: 'mg_nakamura', name: 'Hideo Nakamura', of: 'Machine tools' },
+    { id: 'mg_dubois', name: 'Camille Dubois', of: 'Auction house' },
+    { id: 'mg_pillay', name: 'Anand Pillay', of: 'Sugar and logistics' },
+    { id: 'mg_thornbury', name: 'Gerald Thornbury', of: 'Never worked a day' },
+    { id: 'mg_farsi', name: 'Layla Farsi', of: 'Desalination' },
+    { id: 'mg_bjornstad', name: 'Even Bjornstad', of: 'Salmon' },
+    { id: 'mg_calderon', name: 'Beatriz Calderon', of: 'Toll roads' },
+    { id: 'mg_ruangsri', name: 'Kittipong Ruangsri', of: 'Rubber' },
+    { id: 'mg_kowalczyk', name: 'Zofia Kowalczyk', of: 'Cold storage' },
+    { id: 'mg_hennessey', name: 'Declan Hennessey', of: 'Distilling' },
+    { id: 'mg_oyelaran', name: 'Folake Oyelaran', of: 'Cocoa' },
+    { id: 'mg_stavros', name: 'Nikolas Stavros', of: 'Tankers' },
+    { id: 'mg_wexley', name: 'Priscilla Wexley', of: 'Trusts, three of them' },
+    { id: 'mg_barut', name: 'Cem Barut', of: 'Construction' },
+    { id: 'mg_delacroix', name: 'Odile Delacroix', of: 'Perfume houses' },
+    { id: 'mg_arriaga', name: 'Salvador Arriaga', of: 'Silver, since 1890' },
+];
+
+/** The magnates as seatable opponents. */
+export const magnateOpponents = (): Opponent[] =>
+    MAGNATES.map(m => ({ id: m.id, name: m.name, kind: 'magnate' as const, company: m.of }));
 
 /**
  * All of them, flattened.
@@ -283,6 +396,16 @@ export const CITY_CEO_CHANCE = 1 / 6;
  */
 export const CITY_BOARD_CHANCE = 1 / 12;
 
+/**
+ * How much of the private room is rival chief executives.
+ *
+ * Two seats in five, so a four handed table usually has one or two. They are
+ * the faces the player has a history with and the room would lose its point if
+ * they were rare; it would lose a different point if every seat were one,
+ * which is what it was.
+ */
+export const VIP_RIVAL_CHANCE = 0.4;
+
 const pick = <T,>(list: readonly T[], roll: () => number): T | undefined => {
     if (!list || list.length === 0) return undefined;
     const raw = roll();
@@ -293,8 +416,13 @@ const pick = <T,>(list: readonly T[], roll: () => number): T | undefined => {
 /**
  * Who is at this table tonight.
  *
- * `vip` fills every seat with a rival chief executive, which is the whole
- * character of the Noir room: there are no strangers in there.
+ * `vip` fills every seat with SOMEBODY - a rival chief executive or a
+ * magnate - which is the whole character of the Noir room: there are no
+ * strangers in there.
+ *
+ * It used to draw rivals only, and there are twenty one of those, so the room
+ * was exhausted inside thirty sittings and showed the same faces for the rest
+ * of the run. See the note above MAGNATES for the measurement.
  */
 export const seatTable = (
     vip: boolean,
@@ -303,9 +431,14 @@ export const seatTable = (
 ): Opponent[] => {
     const ceos = rivalCeos();
     const board = boardOpponents();
+    const magnates = magnateOpponents();
     const out: Opponent[] = [];
     const taken = new Set<string>();
     const usedNames = new Set<string>();
+
+    /** Everyone from a pool who is not already at this table. */
+    const notSeated = (pool: readonly Opponent[]) =>
+        pool.filter(o => !taken.has(o.id) && !usedNames.has(o.name));
 
     const addUnique = (o: Opponent | undefined): boolean => {
         if (!o || taken.has(o.id)) return false;
@@ -317,11 +450,28 @@ export const seatTable = (
 
     for (let i = 0; i < Math.max(0, seats); i++) {
         if (vip) {
-            // Every seat a rival. Fall through to a stranger only if the game
-            // has fewer rivals than seats, which would otherwise leave a hole.
-            let placed = false;
-            for (let tries = 0; tries < 12 && !placed; tries++) placed = addUnique(pick(ceos, roll));
+            // ----------------------------------------------------------
+            //  EVERY SEAT IS SOMEBODY, AND A RIVAL STILL COMES FIRST
+            // ----------------------------------------------------------
+            //  Weighted rather than uniform: a rival chief executive is the
+            //  face the player has a history with, and the room would lose
+            //  its point if they were one in three. So a rival is tried
+            //  first at VIP_RIVAL_CHANCE and a magnate fills the rest.
+            //
+            //  Both are drawn from `notSeated` so a face already at this
+            //  table cannot be drawn again, which is what the old retry
+            //  loop was for and did badly - twelve tries against a pool of
+            //  twenty one still collides.
+            // ----------------------------------------------------------
+            const wantRival = roll() < VIP_RIVAL_CHANCE;
+            const first = wantRival ? ceos : magnates;
+            const second = wantRival ? magnates : ceos;
+
+            let placed = addUnique(pick(notSeated(first), roll));
+            if (!placed) placed = addUnique(pick(notSeated(second), roll));
             if (!placed) {
+                // Only if the game somehow has neither. A hole in the table
+                // would be worse than a stranger in the private room.
                 const spare = STRANGERS.find(n => !usedNames.has(n)) || 'Guest';
                 addUnique({ id: `x${i}`, name: spare, kind: 'stranger' });
             }

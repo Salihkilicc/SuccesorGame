@@ -41,6 +41,8 @@
 import {
     CITY_CEO_CHANCE, STRANGERS, STRANGER_REGIONS, TABLE_SEATS,
     avatarHue, initialsOf, seatTable,
+    MAGNATES,
+    CEO_NAMES,
 } from './pokerTable';
 
 /** A fixed die, so a seating is the same every run. */
@@ -132,11 +134,49 @@ describe('and a table never seats the same person twice', () => {
         expect(seatTable(false, die(3))).toHaveLength(TABLE_SEATS - 1);
     });
 
-    it('and the VIP room is still all rivals', () => {
-        // The room's whole point. A stranger in there would be a stranger in
-        // a room you had to be somebody to enter.
-        const vip = seatTable(true, die(5));
-        for (const o of vip) expect(o.kind).toBe('ceo');
+    it('and the VIP room still has no strangers in it', () => {
+        // THE ROOM'S WHOLE POINT, and it is the line that survived the room
+        // being widened. A stranger in there would be a stranger in a room
+        // you had to be somebody to enter.
+        //
+        // This used to assert every seat was a `ceo`, which was the same
+        // sentence while rivals were the only people who could be somebody.
+        // There are twenty one of those, so the room was exhausted inside
+        // thirty sittings and showed the same faces for the rest of the run.
+        // Magnates are the other kind of somebody. See MAGNATES.
+        for (let seed = 1; seed < 40; seed++) {
+            for (const o of seatTable(true, die(seed))) {
+                expect([seed, o.name, o.kind]).not.toEqual([seed, o.name, 'stranger']);
+            }
+        }
+    });
+
+    it('and it is deep enough that a run does not exhaust it', () => {
+        // MEASURED, and it is the reason any of this changed. The old room
+        // showed 21 distinct faces over a hundred sittings, 95% of seats a
+        // repeat. Walked with a real spread of seeds rather than one.
+        const seen = new Set<string>();
+        for (let seed = 1; seed <= 200; seed++) {
+            for (const o of seatTable(true, die(seed))) seen.add(o.name);
+        }
+        expect(seen.size).toBeGreaterThan(45);
+    });
+
+    it('and a rival is still the face you are most likely to know', () => {
+        // The weighting exists so the room does not become a parade of
+        // strangers-with-titles. A rival should be common without being all
+        // of it.
+        let ceos = 0;
+        let seats = 0;
+        for (let seed = 1; seed <= 400; seed++) {
+            for (const o of seatTable(true, die(seed))) {
+                seats++;
+                if (o.kind === 'ceo') ceos++;
+            }
+        }
+        const share = ceos / seats;
+        expect(share).toBeGreaterThan(0.25);
+        expect(share).toBeLessThan(0.6);
     });
 
     it('and a city table still turns up a rival about half the time', () => {
@@ -153,5 +193,71 @@ describe('and a table never seats the same person twice', () => {
         // Four seats, each a 1/6 chance of a rival: 1 - (5/6)^4 = 0.518.
         const expected = 1 - Math.pow(1 - CITY_CEO_CHANCE, TABLE_SEATS - 1);
         expect(Math.abs(share - expected)).toBeLessThan(0.03);
+    });
+});
+
+// ============================================================================
+//  THE PRIVATE ROOM'S OWN PEOPLE
+// ============================================================================
+//
+//  Added because the room was starved by construction rather than by a short
+//  list: it filled every seat from `rivalCeos()`, which returns one person per
+//  listed rival company, and there are twenty one of those.
+//
+//  Adding names to CEO_NAMES could not have fixed it. That roster is keyed on
+//  stock ids and only yields a person when a company with that id exists, so
+//  its ceiling is the market's, not the casino's.
+// ============================================================================
+
+describe('the magnates', () => {
+    it('there are enough of them to matter', () => {
+        expect(MAGNATES.length).toBeGreaterThanOrEqual(35);
+    });
+
+    it('and no name or id appears twice', () => {
+        expect(new Set(MAGNATES.map(m => m.name)).size).toBe(MAGNATES.length);
+        expect(new Set(MAGNATES.map(m => m.id)).size).toBe(MAGNATES.length);
+    });
+
+    it('and none of them collides with a chief executive', () => {
+        // Two people with one name at one table is a bug that looks like a
+        // bug, and the seating draws from both pools.
+        const ceoNames = new Set(Object.values(CEO_NAMES));
+        for (const m of MAGNATES) {
+            expect([m.name, ceoNames.has(m.name)]).toEqual([m.name, false]);
+        }
+    });
+
+    it('and every one of them carries the line that shows under their name', () => {
+        // A CEO shows their company there. A magnate showing nothing would
+        // read as a stranger who had wandered into the private room.
+        for (const m of MAGNATES) {
+            expect([m.name, m.of.trim().length > 3]).toEqual([m.name, true]);
+        }
+    });
+
+    it('and their names render in an avatar like everybody else"s', () => {
+        for (const m of MAGNATES) {
+            expect([m.name, m.name.includes(' ')]).toEqual([m.name, true]);
+            expect([m.name, initialsOf(m.name).length]).toEqual([m.name, 2]);
+        }
+    });
+
+    it('and none of their lines uses a dash, which is a house rule', () => {
+        // Player visible text. Hyphenated words are fine; a dash is not.
+        for (const m of MAGNATES) {
+            expect([m.name, /—/.test(m.of) || /\s-\s/.test(m.of)]).toEqual([m.name, false]);
+            expect([m.name, /—/.test(m.name) || /\s-\s/.test(m.name)]).toEqual([m.name, false]);
+        }
+    });
+
+    it('and they never sit in a city room', () => {
+        // The cities are public. The whole point of a magnate is that you had
+        // to be somebody to be in the room with them.
+        for (let seed = 1; seed <= 300; seed++) {
+            for (const o of seatTable(false, die(seed))) {
+                expect([seed, o.kind]).not.toEqual([seed, 'magnate']);
+            }
+        }
     });
 });

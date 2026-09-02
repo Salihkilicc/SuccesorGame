@@ -37,6 +37,7 @@ import {
     initialsOf,
     rivalCeos,
     seatTable,
+    type SeatKind,
 } from '../../core/casino/pokerTable';
 import { seatPosition } from './components/PokerTable';
 
@@ -79,7 +80,12 @@ describe('every rival company has a person running it', () => {
 
 describe('who turns up', () => {
     const composition = (vip: boolean) => {
-        const counts = { ceo: 0, board: 0, stranger: 0 };
+        // `magnate` joined SeatKind when the private room stopped being
+        // twenty one people. Written as a Record so a new kind is a compile
+        // error here rather than a silent zero.
+        const counts: Record<SeatKind, number> = {
+            ceo: 0, board: 0, stranger: 0, magnate: 0,
+        };
         let tablesWithCeo = 0;
         const N = 2000;
         for (let i = 0; i < N; i++) {
@@ -87,7 +93,7 @@ describe('who turns up', () => {
             if (table.some(o => o.kind === 'ceo')) tablesWithCeo++;
             for (const o of table) counts[o.kind]++;
         }
-        const total = counts.ceo + counts.board + counts.stranger;
+        const total = counts.ceo + counts.board + counts.stranger + counts.magnate;
         return { ...counts, total, tablesWithCeo: tablesWithCeo / N };
     };
 
@@ -109,9 +115,22 @@ describe('who turns up', () => {
     });
 
     it('but the Noir room has no strangers in it at all', () => {
+        // THE LINE THAT SURVIVED THE ROOM BEING WIDENED. It used to also
+        // assert `ceo / total === 1`, which was the same sentence while a
+        // rival was the only person who could be somebody - and there are
+        // twenty one of those, so the room was exhausted inside thirty
+        // sittings and showed the same faces for the rest of the run.
+        //
+        // Magnates are the other kind of somebody. Every seat is still a
+        // person you had to be somebody to sit with; none of them is a
+        // stranger. See MAGNATES in core/casino/pokerTable.
         const c = composition(true);
         expect(c.stranger).toBe(0);
-        expect(c.ceo / c.total).toBe(1);
+        expect(c.board).toBe(0);
+        expect((c.ceo + c.magnate) / c.total).toBe(1);
+        // And a rival is still the face you are most likely to know.
+        expect(c.ceo / c.total).toBeGreaterThan(0.25);
+        expect(c.ceo / c.total).toBeLessThan(0.6);
     });
 
     it('and nobody is ever sitting at the table twice', () => {

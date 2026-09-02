@@ -98,6 +98,9 @@ const KIND_LABEL: Record<SeatKind, string> = {
     ceo: 'CEO',
     board: 'YOUR BOARD',
     stranger: '',
+    // A magnate always carries their own line - "Shipping, fourth generation"
+    // - so this is only the fallback if one ever arrives without one.
+    magnate: 'PRIVATE WEALTH',
 };
 
 const PokerSeat = ({
@@ -124,8 +127,17 @@ const PokerSeat = ({
             </View>
 
             <Text style={styles.name} numberOfLines={1}>{name}</Text>
+            {/* Lit for the people who are SOMEBODY, muted for your own board.
+                A magnate reads like a rival because that is what they are in
+                the room: a name, not a seat filler. */}
             {kind !== 'stranger' && (
-                <Text style={[styles.kind, { color: kind === 'ceo' ? tint : theme.colors.textMuted }]} numberOfLines={1}>
+                <Text
+                    style={[
+                        styles.kind,
+                        { color: kind === 'ceo' || kind === 'magnate' ? tint : theme.colors.textMuted },
+                    ]}
+                    numberOfLines={1}
+                >
                     {company || KIND_LABEL[kind]}
                 </Text>
             )}
