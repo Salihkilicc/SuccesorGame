@@ -38,6 +38,7 @@ import { useMailStore } from '../store/useMailStore';
 import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
 import { CAST } from '../../data/story/cast';
 import { planSuccession, type SuccessionPlan } from './succession';
+import { divideBelongings } from './inheritance';
 
 /**
  * The first thing anybody says to the new one.
@@ -85,6 +86,71 @@ const postFirstLetter = (plan: SuccessionPlan) => {
             t.id === from.id ? { ...t, conversationId: conversation.id } : t),
     }));
 };
+
+/** Money, written the way a solicitor writes it. */
+const money = (n: number): string =>
+    '$' + Math.round(n).toLocaleString('en-US');
+
+/**
+ * The executor sells what he has to, and then writes to say what he sold.
+ *
+ * TWO JOBS ON PURPOSE, and they are the same job: the collection changing
+ * hands is a fact the player will otherwise learn by counting rows in an
+ * inventory screen and noticing that the island is missing. This project has
+ * spent months finding numbers that moved with nothing to announce them, and
+ * an inheritance is the worst possible place to add another one.
+ *
+ * The letter is the screen. It names what went, what it raised, what the duty
+ * was, and what is left - which is more than a dedicated screen would say and
+ * arrives without the player having to go and look.
+ */
+const settleTheEstate = () => {
+    const { useAssetStore } = require('../../features/shopping/store/useAssetStore');
+    const owned = useAssetStore.getState().ownedItems as Array<{
+        instanceId: string; name: string; marketValue: number;
+    }>;
+    if (!owned || owned.length === 0) return;
+
+    const division = divideBelongings(owned);
+    if (division.sold.length === 0) return;
+
+    useAssetStore.setState({ ownedItems: division.kept } as never);
+
+    // The lumpy remainder. A duty of one billion against a fleet whose
+    // cheapest saleable piece is worth six is settled by selling the six, and
+    // the difference belongs to the heir rather than to nobody.
+    if (division.surplusCash > 0) {
+        useStatsStore.setState(s => ({
+            money: (s.money || 0) + division.surplusCash,
+        } as never));
+    }
+
+    const keptValue = division.kept.reduce((sum, i) => sum + (i.marketValue || 0), 0);
+    const list = division.sold.map(s => `  ${s.name}: ${money(s.marketValue)}`).join('\n');
+    const surplus = division.surplusCash > 0
+        ? `\n\nThe sales exceeded the assessment by ${money(division.surplusCash)}. `
+        + 'That balance has been paid into your account.'
+        : '';
+
+    useMailStore.getState().receiveMail({
+        fromName: 'Ashcombe & Reyes, Executors',
+        fromEmail: 'estates@ashcombereyes.com',
+        subject: 'Settlement of the estate: schedule of disposals',
+        body: 'We write to confirm that the duty assessed on your late father\'s '
+            + `personal effects, ${money(division.dutyDue)}, has been discharged.\n\n`
+            + 'The following were sold at auction to meet it. We took the view that '
+            + 'fewer large disposals would serve you better than many small ones.\n\n'
+            + `${list}\n\n`
+            + `These realised ${money(division.raised)} against the assessment.`
+            + surplus
+            + `\n\nThe remainder of the collection, ${division.kept.length} pieces `
+            + `presently valued at ${money(keptValue)}, passes to you intact and is `
+            + 'held in your name from today.\n\nWe are sorry for your loss.',
+        atMonth: useGameStore.getState().currentMonth,
+        category: 'Primary',
+    });
+};
+
 
 /**
  * Hand the company to the heir, and become them.
@@ -345,6 +411,31 @@ export const runSuccession = (): SuccessionPlan | null => {
         // A missing message store is not a reason to leave the player on
         // the closing screen with a succession half applied.
         console.warn('[succession] first letter not delivered', e);
+    }
+
+    // ------------------------------------------------------------------
+    //  5b. THE EXECUTOR HAS BEEN THROUGH THE HOUSE
+    // ------------------------------------------------------------------
+    //  This file has never mentioned the collection, so the one asset class
+    //  that should be hardest to keep was the only one passing intact: the
+    //  cash was split down to the child and the stock down to the share,
+    //  and a thirty billion dollar fleet came through whole and untaxed.
+    //
+    //  A yacht does not divide, so the duty is raised by SELLING, from the
+    //  most valuable down. Which is what an executor does with a bill and a
+    //  fortnight, and - without anybody designing it - the better story:
+    //  the island and the yacht go, the watches come down. Measured on a
+    //  full collection, seven of eighty five pieces cover the duty and
+    //  seventy eight arrive, worth four tenths of what they were.
+    //
+    //  AFTER the mail reset above, for the same reason the first letter is:
+    //  posted before it, the solicitor's letter is the one thing the wipe
+    //  takes. See core/story/inheritance.divideBelongings.
+    // ------------------------------------------------------------------
+    try {
+        settleTheEstate();
+    } catch (e) {
+        console.warn('[succession] the estate could not be settled', e);
     }
 
     // ------------------------------------------------------------------

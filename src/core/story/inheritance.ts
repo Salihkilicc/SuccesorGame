@@ -222,6 +222,137 @@ export const divideEstate = (
     return out;
 };
 
+// ============================================================================
+//  AND THE THIRD CURRENCY, WHICH IS NOT A CURRENCY
+// ============================================================================
+//
+//  Asked for as "if our father buys everything, does it reset, or does it come
+//  down to us, is it shared out, what happens".
+//
+//  What happened was nothing. `runSuccession` has never mentioned the
+//  collection, so an heir inherited a $30 billion fleet whole, undivided and
+//  untaxed, while the cash and the stock were being split down to the share.
+//  The one asset class that should be hardest to keep was the only one that
+//  passed intact.
+//
+//  ---------------------------------------------------------------------------
+//  IT DOES NOT DIVIDE, SO IT IS SOLD
+//  ---------------------------------------------------------------------------
+//  Cash divides flat and stock divides by rule. A yacht divides into nothing:
+//  three siblings cannot have a third of it each, and an executor with a duty
+//  bill and a fleet does what executors have always done. He sells.
+//
+//  So the chattels follow the SEAT, the way an entailed house always has, and
+//  the siblings are paid out of the cash they were already getting. That is
+//  the same decision the file makes about stock, for the same reason - the
+//  things that cannot be divided without being destroyed go to one person -
+//  and it sharpens the grievance rather than softening it. The passed over
+//  sibling is not poor. They simply do not live in the house.
+//
+//  ---------------------------------------------------------------------------
+//  AND THE TOP OF THE COLLECTION IS WHAT GOES
+//  ---------------------------------------------------------------------------
+//  Sold from the most valuable down, because that is what an executor does
+//  with a bill and a fortnight. It is also, without anybody designing it, the
+//  better story: the island and the yacht go, and the watches come down the
+//  generations. The small things survive an estate. They always have.
+//
+//  A forced sale does not fetch the market price either - the same 70% the
+//  shop pays - so raising a 40% duty costs nearer 57% of the collection. What
+//  survives a generation is a little over four tenths of what was there.
+//
+//  Three generations of that is eight per cent, which is the same shape as the
+//  shareholding: one generation and the family still has it, three and they
+//  are showing visitors a photograph.
+// ============================================================================
+
+/**
+ * The duty on the estate's chattels, as a share of what they are worth.
+ *
+ * Forty per cent, which is what an inheritance tax is in most of the places
+ * that have a serious one.
+ */
+export const CHATTEL_DUTY_RATE = 0.4;
+
+/**
+ * What a forced sale fetches.
+ *
+ * The same fraction the shop's own resale pays, and deliberately the same
+ * number: an estate sale is a resale under time pressure, and if it fetched
+ * more than the player can get voluntarily then dying would be a way to
+ * liquidate well.
+ */
+export const FORCED_SALE_RATE = 0.7;
+
+/** One thing in the collection, as much of it as this file needs. */
+export type Chattel = {
+    instanceId: string;
+    name: string;
+    marketValue: number;
+};
+
+export type ChattelDivision = {
+    /** What the heir wakes up owning. */
+    kept: Chattel[];
+    /** What the executor sold, most valuable first. */
+    sold: Chattel[];
+    /** The bill. */
+    dutyDue: number;
+    /** What the sales actually raised, at the forced sale rate. */
+    raised: number;
+    /**
+     * What is left over once the duty is paid, as cash to the heir.
+     *
+     * Chattels are lumpy: a bill of one billion against a fleet whose
+     * cheapest remaining piece is worth six is settled by selling the six.
+     * The surplus is the heir's, or the estate would be quietly eating the
+     * difference and nothing would ever say so.
+     */
+    surplusCash: number;
+};
+
+/**
+ * What survives the executor.
+ *
+ * PURE, and it takes the values it is given: the caller has already applied
+ * condition and market drift, and a second valuation in here is how two
+ * answers to one question get started.
+ */
+export const divideBelongings = (
+    items: readonly Chattel[],
+    dutyRate: number = CHATTEL_DUTY_RATE,
+): ChattelDivision => {
+    const all = (items || []).filter(i => i && Number.isFinite(i.marketValue));
+    const total = all.reduce((s, i) => s + Math.max(0, i.marketValue), 0);
+    const rate = Math.max(0, Math.min(1, Number.isFinite(dutyRate) ? dutyRate : 0));
+    const dutyDue = total * rate;
+
+    if (dutyDue <= 0 || all.length === 0) {
+        return { kept: [...all], sold: [], dutyDue: 0, raised: 0, surplusCash: 0 };
+    }
+
+    // Most valuable first. An executor with a bill and a fortnight sells the
+    // island, not forty watches.
+    const order = [...all].sort((a, b) => b.marketValue - a.marketValue);
+
+    const sold: Chattel[] = [];
+    let raised = 0;
+    for (const item of order) {
+        if (raised >= dutyDue) break;
+        sold.push(item);
+        raised += Math.max(0, item.marketValue) * FORCED_SALE_RATE;
+    }
+
+    const soldIds = new Set(sold.map(s => s.instanceId));
+    return {
+        kept: all.filter(i => !soldIds.has(i.instanceId)),
+        sold,
+        dutyDue,
+        raised,
+        surplusCash: Math.max(0, raised - dutyDue),
+    };
+};
+
 /**
  * What the family still holds between them, as a fraction of the company.
  *
