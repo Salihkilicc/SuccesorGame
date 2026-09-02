@@ -2674,6 +2674,27 @@ export const useGameStore = create<GameStore>()(
             console.warn('[sponsorship] offer could not be posted', e);
           }
 
+          // ==============================================================
+          //  AND THE BOUTIQUES WRITE TOO
+          // ==============================================================
+          //  The same job as the line above it with a different sender, so
+          //  it sits in the same place. `useMailStore` has had a
+          //  `Promotions` category since it was written and nothing has
+          //  ever put anything in it; this is what it was for.
+          //
+          //  It posts only at the top of a campaign window and only once
+          //  the player is worth writing to, so it cannot become furniture.
+          //  See core/luxury/postLuxuryPromo.ts.
+          // ==============================================================
+          try {
+            require('../luxury/postLuxuryPromo').postLuxuryPromo(
+              require('../story/world').currentQuarter(),
+              require('../../features/shopping/data/shoppingRegistry').SHOPS,
+            );
+          } catch (e) {
+            console.warn('[luxury] promo could not be posted', e);
+          }
+
           try {
             require('../story/deliver').runInbox();
           } catch (e) {

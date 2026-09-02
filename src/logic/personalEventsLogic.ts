@@ -104,12 +104,50 @@ const getCurrentQuarter = (): number => {
 //  to be a single operation when it is two.
 // ============================================================================
 
+// ============================================================================
+//  AND NOT EVERY PURCHASE IS NEWS
+// ============================================================================
+//
+//  Asked for as "I do not want this making news of everything, expensive
+//  things should make news".
+//
+//  Every purchase did, and every one of them was `isHero: true` - so buying a
+//  $500,000 ring took the top of the front page off a quarter in which the
+//  company had launched a product and lost a lawsuit. A wire that reports
+//  everything reports nothing.
+//
+//  THE THRESHOLDS ARE READ OFF THE CATALOGUE rather than picked. 85 items:
+//
+//      under $25M     45% of the shop     silent
+//      $25M to $500M  36%                 a story
+//      over $500M     19%                 the front page
+//
+//  So rings, watches and most cars pass without comment, a jet or a mansion
+//  is written up, and an island or a tower leads the edition. Which is roughly
+//  what a real financial wire does with a rich man's spending.
+//
+//  ABSOLUTE rather than a share of the player's wealth, and that is a
+//  decision. The press cares how big a thing is, not how big it was for you -
+//  a trillionaire buying a tower is still a tower. The RELATIVE reading is
+//  already in the brand surge, which scales with prestige, so the two halves
+//  of this function measure the two different things they should.
+// ============================================================================
+
+/** Below this, the wire does not care. */
+export const NEWS_FLOOR = 25_000_000;
+
+/** Above this, it leads. */
+export const NEWS_HERO_FLOOR = 500_000_000;
+
 /**
  * The part of a purchase that the world sees. NO MONEY MOVES HERE.
  *
  * Raises brand value and publishes the headline. Called on its own by the
  * shop's checkout, which has already paid, and by `handleBuyLuxury` after it
  * has paid.
+ *
+ * The brand surge happens for ANY purchase; the news does not. Being seen in a
+ * new watch is worth something to a reputation and is not worth a column.
  */
 export const announceLuxuryPurchase = (
     asset: LuxuryAsset | { id: string; name: string; price: number; prestigeScore?: number; category?: string; brand?: string },
@@ -130,6 +168,16 @@ export const announceLuxuryPurchase = (
         ...s,
         brandValue: newBrand,
     }));
+
+    // Cheap enough that nobody writes about it. The brand surge above still
+    // happened; the wire simply has better things to lead with.
+    if (price < NEWS_FLOOR) {
+        return {
+            brandValueDelta: brandDelta,
+            newBrandValue: newBrand,
+            newsHeadline: '',
+        };
+    }
 
     // Generate & push the news headline.
     const ceo = getCeoName();
@@ -153,10 +201,24 @@ export const announceLuxuryPurchase = (
         text: newsStoryText,
         quarter: currentQ,
         readTime: '2 min read',
-        isHero: true,
+        // The front page is for islands and towers, not for every jet.
+        isHero: price >= NEWS_HERO_FLOOR,
     };
 
-    useNewsStore.getState().addNewsBatch([newsPayload]);
+    // ------------------------------------------------------------------
+    //  `addSingleNews`, NOT `addNewsBatch`, AND THE DIFFERENCE IS A BUG
+    // ------------------------------------------------------------------
+    //  `addNewsBatch` ends with `set({ newsHistory: formattedItems })`. It
+    //  REPLACES the feed, which is right for what it is - the quarterly
+    //  edition arriving all at once - and catastrophic for a single event.
+    //  Buying one watch wiped every story in the quarter and left the wire
+    //  showing exactly one item.
+    //
+    //  `addSingleNews` prepends and keeps the history, which is what it was
+    //  written for. `relationshipEvents.ts` has always called the right one;
+    //  this file and the partner crisis below called the wrong one.
+    // ------------------------------------------------------------------
+    useNewsStore.getState().addSingleNews(newsPayload);
 
     return {
         brandValueDelta: brandDelta,
@@ -355,7 +417,12 @@ export const handlePartnerCrisis = (
         isHero: true,
     };
 
-    useNewsStore.getState().addNewsBatch([newsPayload]);
+    // The same bug as the luxury purchase above, in the same file. A divorce
+    // wiped the quarter's news and left the wire showing one story. This one
+    // KEEPS `isHero`: a CEO's marriage collapsing in public genuinely does
+    // lead the edition, which is why the two look alike and only one of them
+    // needed a threshold.
+    useNewsStore.getState().addSingleNews(newsPayload);
 
     return {
         success: true,
