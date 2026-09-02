@@ -17,8 +17,8 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
         },
         {
             id: 'shop_avant_garde',
-            name: 'Avant Garde',
-            url: 'www.avantgarde.luxury',
+            name: 'Cabinet Noir',
+            url: 'www.cabinetnoir.watch',
             category: 'WATCH',
             description: 'Engineering insanity.',
             bannerColor: '#FF8A8A',

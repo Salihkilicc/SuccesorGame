@@ -9,32 +9,28 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { ITEMS } from '../data/shoppingRegistry';
+import { iconForItem, shopTheme } from '../data/shopIdentity';
 
+// ------------------------------------------------------------------
+//  THE SHOP'S LOOK COMES FROM ITS ID, NOT FROM PROPS
+// ------------------------------------------------------------------
+//  `emoji` and `color` were passed in and `emoji` was never even read -
+//  the card drew a generic storefront for all twenty seven shops while
+//  the caller dutifully handed it a symbol it ignored. Both are gone;
+//  `shopTheme(shopId)` is the one place a shop's look is decided.
+// ------------------------------------------------------------------
 type ShopPreviewCardProps = {
     shopId: string;
     name: string;
-    emoji: string;
     description: string;
-    color: string;
     onVisit: () => void;
 };
 
-const getCategoryIcon = (category: string) => {
-    switch (category) {
-        case 'VEHICLE':
-            return 'car-sports';
-        case 'WATCH':
-            return 'watch';
-        case 'JEWELRY':
-            return 'diamond-stone';
-        case 'MARINE':
-            return 'ferry';
-        case 'AIRCRAFT':
-            return 'airplane';
-        default:
-            return 'home-city-outline';
-    }
-};
+// SHELVED: a fourth copy of the department icon list, one screen away from
+// three others. `iconForItem` is per ITEM rather than per department, which is
+// the whole point of the change, and there is one of it.
+//
+//   const getCategoryIcon = (category: string) => { switch (category) { ... } };
 
 export const ShopPreviewCard = ({
     shopId,
@@ -42,6 +38,8 @@ export const ShopPreviewCard = ({
     description,
     onVisit,
 }: ShopPreviewCardProps) => {
+    const look = shopTheme(shopId);
+
     const previewItems = useMemo(() => {
         const shopItems = ITEMS.filter((item) => item.shopId === shopId);
         return shopItems.slice(0, 3);
@@ -62,11 +60,11 @@ export const ShopPreviewCard = ({
                 style={({ pressed }) => [styles.header, pressed && styles.headerPressed]}
             >
                 <View style={styles.headerLeft}>
-                    <View style={styles.iconContainer}>
+                    <View style={[styles.iconContainer, { backgroundColor: look.wash, borderColor: look.edge }]}>
                         <MaterialCommunityIcons
-                            name="storefront-outline"
+                            name={look.icon as any}
                             size={20}
-                            color="#05A8F6"
+                            color={look.tint}
                         />
                     </View>
                     <View style={styles.titlesWrap}>
@@ -77,9 +75,9 @@ export const ShopPreviewCard = ({
                     </View>
                 </View>
 
-                <View style={styles.visitButton}>
-                    <Text style={styles.visitText}>ENTER</Text>
-                    <MaterialCommunityIcons name="chevron-right" size={14} color="#7DD3FC" />
+                <View style={[styles.visitButton, { backgroundColor: look.wash, borderColor: look.edge }]}>
+                    <Text style={[styles.visitText, { color: look.tint }]}>ENTER</Text>
+                    <MaterialCommunityIcons name="chevron-right" size={14} color={look.tint} />
                 </View>
             </Pressable>
 
@@ -95,11 +93,11 @@ export const ShopPreviewCard = ({
                         onPress={onVisit}
                         style={({ pressed }) => [styles.itemCard, pressed && styles.itemPressed]}
                     >
-                        <View style={styles.itemImage}>
+                        <View style={[styles.itemImage, { backgroundColor: look.wash }]}>
                             <MaterialCommunityIcons
-                                name={getCategoryIcon(item.category)}
+                                name={iconForItem(item) as any}
                                 size={20}
-                                color="#05A8F6"
+                                color={look.tint}
                             />
                         </View>
                         <View style={styles.itemInfo}>
@@ -143,7 +141,7 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: 10,
-        backgroundColor: '#183D5C',
+        borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -163,7 +161,7 @@ const styles = StyleSheet.create({
     visitButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#183D5C',
+        borderWidth: 1,
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 6,

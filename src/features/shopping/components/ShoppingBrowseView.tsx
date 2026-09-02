@@ -1,3 +1,27 @@
+// src/features/shopping/components/ShoppingBrowseView.tsx
+//
+// ============================================================================
+//  SHELVED: NOTHING MOUNTS THIS
+// ============================================================================
+//
+//  Found during the symbol pass, while going through the shop looking for
+//  emoji to replace. This file has emoji in it and it does not matter, because
+//  no screen renders it: the only reference anywhere in src is a test.
+//
+//  It is an older duplicate of `ShoppingScreen`'s shop detail view, and it is
+//  duplicate in a way that could never have worked. `BRAND_CONFIGS` below
+//  knows FOUR brands - Velocity, Dynasty8, Luxe, Elitas - out of twenty seven
+//  shops, keyed on a `website` string that does not match any shop id in the
+//  catalogue. Twenty three shops would have rendered as Velocity Motors.
+//
+//  So it is left exactly as it is rather than renovated. Polishing a screen
+//  nobody can open is worse than leaving it: it makes the file look maintained
+//  and the next person has to work out again that it is not. If it is ever
+//  wanted back, the work is not the emoji - it is that the brand lookup has to
+//  become `shopTheme(shop.id)` like everything else, and at that point this
+//  file is `ShoppingScreen`'s shop detail and should just be that.
+// ============================================================================
+
 import React, { useMemo } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import {

@@ -13,6 +13,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import { iconForItem, shopTheme } from '../data/shopIdentity';
 import { OwnedAsset } from '../types';
 import { t, useLocale } from '../../../core/i18n';
 import { translateCategory } from '../../../data/i18n/profileLoveShopText';
@@ -33,24 +34,11 @@ const formatCurrency = (amount: number) => {
     return `$${amount.toLocaleString()}`;
 };
 
-const getCategoryTheme = (category: string) => {
-    switch (category) {
-        case 'VEHICLE':
-            return { icon: 'car-sports', color: '#FFA94D', bg: '#4E3A20' };
-        case 'REAL_ESTATE':
-            return { icon: 'home-city-outline', color: '#38BDF8', bg: '#183852' };
-        case 'WATCH':
-            return { icon: 'watch', color: '#C084FC', bg: '#3B2050' };
-        case 'JEWELRY':
-            return { icon: 'diamond-stone', color: '#FBBF24', bg: '#4E3A20' };
-        case 'MARINE':
-            return { icon: 'ferry', color: '#22D3EE', bg: '#163A48' };
-        case 'AIRCRAFT':
-            return { icon: 'airplane', color: '#818CF8', bg: '#282C4A' };
-        default:
-            return { icon: 'briefcase-outline', color: '#05A8F6', bg: '#183D5C' };
-    }
-};
+// SHELVED: the fourth copy of the department icon list, and the one on the
+// screen where it hurt most. A collection of forty things drew six symbols, so
+// the inventory looked like a spreadsheet of categories rather than a vault.
+//
+//   const getCategoryTheme = (category: string) => { switch (category) { ... } };
 
 export const AssetCard: React.FC<AssetCardProps> = ({
     item,
@@ -61,7 +49,11 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 }) => {
     useLocale();
     const isGrid = variant === 'grid';
-    const catTheme = getCategoryTheme(item.category);
+    // The SELLING SHOP'S colour and the ITEM'S own symbol. A vault of forty
+    // things drew six symbols in six colours before this, so an inventory
+    // read as a spreadsheet of departments rather than as a collection.
+    const look = shopTheme(item.shopId);
+    const symbol = iconForItem(item);
     const categoryLabel = translateCategory(item.category);
 
     // Condition color
@@ -73,15 +65,15 @@ export const AssetCard: React.FC<AssetCardProps> = ({
             <View style={styles.gridCard}>
                 {/* Header Icon + Category Badge */}
                 <View style={styles.gridTopRow}>
-                    <View style={[styles.iconWrap, { backgroundColor: catTheme.bg }]}>
+                    <View style={[styles.iconWrap, { backgroundColor: look.wash }]}>
                         <MaterialCommunityIcons
-                            name={catTheme.icon as any}
+                            name={symbol as any}
                             size={18}
-                            color={catTheme.color}
+                            color={look.tint}
                         />
                     </View>
                     <View style={styles.categoryBadge}>
-                        <Text style={[styles.categoryText, { color: catTheme.color }]} numberOfLines={1}>
+                        <Text style={[styles.categoryText, { color: look.tint }]} numberOfLines={1}>
                             {categoryLabel}
                         </Text>
                     </View>
@@ -157,11 +149,11 @@ export const AssetCard: React.FC<AssetCardProps> = ({
     // List Variant
     return (
         <View style={styles.listCard}>
-            <View style={[styles.iconWrap, { backgroundColor: catTheme.bg }]}>
+            <View style={[styles.iconWrap, { backgroundColor: look.wash }]}>
                 <MaterialCommunityIcons
-                    name={catTheme.icon as any}
+                    name={symbol as any}
                     size={22}
-                    color={catTheme.color}
+                    color={look.tint}
                 />
             </View>
 

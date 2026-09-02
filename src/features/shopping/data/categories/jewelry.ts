@@ -44,8 +44,8 @@ export const jewelryData: { shops: Shop[], items: ShoppingItem[] } = {
         },
         {
             id: 'shop_ice_district',
-            name: 'Ice District',
-            url: 'www.ice.vip',
+            name: 'Glacier Row',
+            url: 'www.glacierrow.vip',
             category: 'JEWELRY',
             description: 'Frozen in time.',
             bannerColor: '#CFD0D2',

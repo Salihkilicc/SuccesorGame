@@ -10,6 +10,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { theme } from '../../../core/theme';
 import { SHOPS } from '../data/shoppingRegistry';
 import { featuredFor } from '../../../core/luxury/promotions';
+import { shopTheme } from '../data/shopIdentity';
 import { currentQuarter } from '../../../core/story/world';
 
 const { width } = Dimensions.get('window');
@@ -42,15 +43,11 @@ type AdBannerCarouselProps = {
 //  charges from. There is no second number here to fall out of step.
 // ============================================================================
 
-/** Which symbol a department advertises itself with. */
-const ICON_FOR: Record<string, string> = {
-    VEHICLE: 'car-sports',
-    REAL_ESTATE: 'home-city-outline',
-    MARINE: 'ferry',
-    AIRCRAFT: 'airplane',
-    WATCH: 'watch',
-    JEWELRY: 'diamond-stone',
-};
+// SHELVED, and it lasted one commit. A department icon map written here was
+// six symbols for twenty seven advertisers, which is the same defect one level
+// up from the one it replaced. A shop's mark is its own.
+//
+//   const ICON_FOR: Record<string, string> = { VEHICLE: 'car-sports', ... };
 
 export const AdBannerCarousel: React.FC<AdBannerCarouselProps> = ({ onPressBanner }) => {
     const featured = featuredFor(SHOPS, currentQuarter());
@@ -65,27 +62,35 @@ export const AdBannerCarousel: React.FC<AdBannerCarouselProps> = ({ onPressBanne
                 decelerationRate="fast"
                 snapToInterval={BANNER_WIDTH + 12}
             >
-                {featured.map(({ shop, discount }) => (
+                {featured.map(({ shop, discount }) => {
+                    // The advertiser's own mark and colour, so three banners
+                    // side by side read as three houses rather than as three
+                    // copies of the app's blue.
+                    const look = shopTheme(shop.id);
+                    return (
                     <Pressable
                         key={shop.id}
                         onPress={() => onPressBanner(shop.id)}
                         style={({ pressed }) => [
                             styles.banner,
+                            { borderColor: look.edge },
                             pressed && styles.pressed,
                         ]}
                     >
                         <View style={styles.bannerHeader}>
-                            <View style={styles.iconWrap}>
+                            <View style={[styles.iconWrap, { backgroundColor: look.wash }]}>
                                 <MaterialCommunityIcons
-                                    name={(ICON_FOR[shop.category] || 'shopping-outline') as any}
+                                    name={look.icon as any}
                                     size={22}
-                                    color="#05A8F6"
+                                    color={look.tint}
                                 />
                             </View>
                             {/* The offer, or the invitation. NOT green: green
                                 and red are profit and loss in this game. */}
-                            <View style={[styles.ctaBadge, discount > 0 && styles.offerBadge]}>
-                                <Text style={[styles.ctaText, discount > 0 && styles.offerText]}>
+                            <View style={[styles.ctaBadge, { backgroundColor: look.wash },
+                                discount > 0 && styles.offerBadge]}>
+                                <Text style={[styles.ctaText, { color: look.tint },
+                                    discount > 0 && styles.offerText]}>
                                     {discount > 0
                                         ? `${Math.round(discount * 100)}% OFF`
                                         : 'VISIT'}
@@ -94,13 +99,14 @@ export const AdBannerCarousel: React.FC<AdBannerCarouselProps> = ({ onPressBanne
                         </View>
 
                         <View style={styles.infoBlock}>
-                            <Text style={styles.title}>{shop.name}</Text>
+                            <Text style={[styles.title, { color: look.tint }]}>{shop.name}</Text>
                             <Text style={styles.subtitle} numberOfLines={1}>
                                 {shop.description}
                             </Text>
                         </View>
                     </Pressable>
-                ))}
+                    );
+                })}
             </ScrollView>
         </View>
     );

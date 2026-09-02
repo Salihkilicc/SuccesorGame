@@ -17,8 +17,8 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
         },
         {
             id: 'shop_monarch_auto',
-            name: 'Monarch Auto',
-            url: 'www.monarchauto.luxury',
+            name: 'Regency Motorcars',
+            url: 'www.regencymotorcars.co',
             category: 'VEHICLE',
             description: 'Imperial transport.',
             bannerColor: '#05A8F6',
@@ -44,8 +44,8 @@ export const vehiclesData: { shops: Shop[], items: ShoppingItem[] } = {
         },
         {
             id: 'shop_future_wheels',
-            name: 'Future Wheels',
-            url: 'www.futurewheels.tech',
+            name: 'Dynamo Works',
+            url: 'www.dynamoworks.tech',
             category: 'VEHICLE',
             description: 'Electric dreams.',
             bannerColor: '#CFD0D2',

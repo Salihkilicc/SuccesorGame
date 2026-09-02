@@ -26,8 +26,8 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
         },
         {
             id: 'shop_dynasty8_elite',
-            name: 'Dynasty 8 Elite',
-            url: 'www.dynasty8elite.com',
+            name: 'Marchmont Residences',
+            url: 'www.marchmont.estate',
             category: 'REAL_ESTATE',
             description: 'Residences of distinction.',
             bannerColor: '#535B5F',
@@ -53,8 +53,8 @@ export const realEstateData: { shops: Shop[], items: ShoppingItem[] } = {
         },
         {
             id: 'shop_urban_corp',
-            name: 'Urban Corp',
-            url: 'www.urbancorp.global',
+            name: 'Cornerstone Urban',
+            url: 'www.cornerstone.global',
             category: 'REAL_ESTATE',
             description: 'Commercial dominance.',
             bannerColor: '#CFD0D2',

@@ -34,6 +34,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import AdBannerCarousel from '../components/AdBannerCarousel';
 import { effectivePrice } from '../../../core/luxury/promotions';
+import { iconForItem, shopTheme } from '../data/shopIdentity';
 import { currentQuarter } from '../../../core/story/world';
 import ShopPreviewCard from '../components/ShopPreviewCard';
 import { t, useLocale } from '../../../core/i18n';
@@ -331,7 +332,9 @@ export const ShoppingScreen = () => {
                 >
                     {trendingItems.map((item) => {
                         const shop = SHOPS.find((s) => s.id === item.shopId);
-                        const itemCat = getCategoryTheme(item.category);
+                        // The item's OWN shop, so the trending strip reads as a
+                        // row of different houses rather than six of one colour.
+                        const look = shopTheme(item.shopId);
 
                         return (
                             <Pressable
@@ -342,11 +345,11 @@ export const ShoppingScreen = () => {
                                     pressed && styles.cardPressed,
                                 ]}
                             >
-                                <View style={[styles.trendingIconWrap, { backgroundColor: itemCat.bg }]}>
+                                <View style={[styles.trendingIconWrap, { backgroundColor: look.wash }]}>
                                     <MaterialCommunityIcons
-                                        name={itemCat.icon as any}
+                                        name={iconForItem(item) as any}
                                         size={22}
-                                        color={itemCat.color}
+                                        color={look.tint}
                                     />
                                 </View>
                                 <Text style={styles.trendingName} numberOfLines={2}>
@@ -403,8 +406,6 @@ export const ShoppingScreen = () => {
                         shopId={shop.id}
                         name={shop.name}
                         description={shop.description}
-                        emoji={shop.emoji}
-                        color={shop.bannerColor}
                         onVisit={() => handleVisitShop(shop.id)}
                     />
                 ))}
@@ -419,10 +420,11 @@ export const ShoppingScreen = () => {
         const shop = SHOPS.find((s) => s.id === selectedShopId);
         if (!shop) return null;
 
+        const shopLook = shopTheme(shop.id);
         const shopItems = getShopItems(shop.id).map((item: any) => ({
             ...item,
             website: shop.name,
-            brandColor: shop.bannerColor,
+            brandColor: shopLook.tint,
         }));
 
         return (
@@ -431,11 +433,28 @@ export const ShoppingScreen = () => {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Shop Banner */}
-                <View style={styles.shopBanner}>
+                {/* ------------------------------------------------------
+                    THE SHOP LEADS WITH ITS OWN MARK
+
+                    This was `shop.emoji` in a Text node: a font the game does
+                    not control, drawn by the operating system, in somebody
+                    else's colours, and shared with whichever other shop
+                    happened to pick the same one. Two shops led with a crown.
+
+                    See data/shopIdentity.ts, where the symbol and the colour
+                    are one decision per shop and no two of them collide.
+                   ------------------------------------------------------ */}
+                <View style={[styles.shopBanner, { borderColor: shopLook.edge }]}>
                     <View style={styles.shopTitleRow}>
-                        <Text style={styles.shopEmoji}>{shop.emoji}</Text>
+                        <View style={[styles.shopMark, { backgroundColor: shopLook.wash }]}>
+                            <MaterialCommunityIcons
+                                name={shopLook.icon as any}
+                                size={26}
+                                color={shopLook.tint}
+                            />
+                        </View>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.shopName}>{shop.name}</Text>
+                            <Text style={[styles.shopName, { color: shopLook.tint }]}>{shop.name}</Text>
                             <Text style={styles.shopDesc}>{shop.description}</Text>
                         </View>
                     </View>
@@ -446,16 +465,15 @@ export const ShoppingScreen = () => {
                     {shopItems.map((item: any) => {
                         const owned = isOwned(item.id);
                         const isInCart = cart.some((c) => c.id === item.id);
-                        const itemCat = getCategoryTheme(item.category);
 
                         return (
                             <View key={item.id} style={styles.itemCard}>
                                 <View style={styles.itemTopRow}>
-                                    <View style={[styles.itemIconWrap, { backgroundColor: itemCat.bg }]}>
+                                    <View style={[styles.itemIconWrap, { backgroundColor: shopLook.wash }]}>
                                         <MaterialCommunityIcons
-                                            name={itemCat.icon as any}
+                                            name={iconForItem(item) as any}
                                             size={16}
-                                            color={itemCat.color}
+                                            color={shopLook.tint}
                                         />
                                     </View>
                                     {/* ----------------------------------------------
@@ -860,6 +878,7 @@ const styles = StyleSheet.create({
     shopBanner: {
         backgroundColor: theme.colors.surface,
         borderRadius: 14,
+        borderWidth: 1,
         padding: 16,
         marginBottom: 14,
     },
@@ -868,11 +887,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12,
     },
-    shopEmoji: {
-        fontSize: 32,
+    // SHELVED with the emoji it sized. A `fontSize` is what a symbol needs
+    // when it is a character in somebody else's font.
+    //   shopEmoji: { fontSize: 32 },
+    shopMark: {
+        width: 46,
+        height: 46,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     shopName: {
-        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '800',
     },

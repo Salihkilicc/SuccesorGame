@@ -23,7 +23,24 @@ export interface Shop {
     url: string;
     category: ProductCategory;
     description: string;
+    /**
+     * SHELVED. A shop's colour comes from `data/shopIdentity.shopTheme` now.
+     *
+     * Five values across twenty seven shops, two of them greys, so a boutique
+     * watchmaker and a defence contractor were the same colour. Kept on the
+     * data rather than stripped out of eighty five records, and pinned by a
+     * test so nothing reads it again.
+     */
     bannerColor: string;
+    /**
+     * SHELVED. Same reason, and worse.
+     *
+     * Emoji is a font the game does not control, drawn by the operating
+     * system, in somebody else's colours, and it is the one element on the
+     * screen that ignores the palette entirely - which is why it read as older
+     * than everything round it. Two shops led with a crown, two with a trophy,
+     * two with a diamond. See `SHOP_IDENTITY`.
+     */
     emoji: string;
 }
 

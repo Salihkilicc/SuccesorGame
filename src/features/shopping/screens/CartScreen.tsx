@@ -27,29 +27,18 @@ import { announceLuxuryPurchase } from '../../../logic/personalEventsLogic';
 import { effectivePrice } from '../../../core/luxury/promotions';
 import { currentQuarter } from '../../../core/story/world';
 import { SHOPS } from '../data/shoppingRegistry';
+import { iconForItem, shopTheme } from '../data/shopIdentity';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
 import { t, useLocale } from '../../../core/i18n';
 
-const getCategoryTheme = (category: string) => {
-    switch (category) {
-        case 'VEHICLE':
-            return { icon: 'car-sports', color: '#FFA94D', bg: '#4E3A20' };
-        case 'REAL_ESTATE':
-            return { icon: 'home-city-outline', color: '#38BDF8', bg: '#183852' };
-        case 'WATCH':
-            return { icon: 'watch', color: '#C084FC', bg: '#3B2050' };
-        case 'JEWELRY':
-            return { icon: 'diamond-stone', color: '#FBBF24', bg: '#4E3A20' };
-        case 'MARINE':
-            return { icon: 'ferry', color: '#22D3EE', bg: '#163A48' };
-        case 'AIRCRAFT':
-            return { icon: 'airplane', color: '#818CF8', bg: '#282C4A' };
-        default:
-            return { icon: 'briefcase-outline', color: '#05A8F6', bg: '#183D5C' };
-    }
-};
+// SHELVED: the third copy of the department icon list. A cart full of cars
+// drew one symbol six times, which is the defect the symbol pass exists for.
+// `iconForItem` is per ITEM and `shopTheme` gives it the selling shop's
+// colour, so a cart reads as things from different houses.
+//
+//   const getCategoryTheme = (category: string) => { switch (category) { ... } };
 
 export const CartScreen = () => {
     useLocale();
@@ -189,16 +178,16 @@ export const CartScreen = () => {
                 >
                     {/* Items List */}
                     {cart.map((item) => {
-                        const itemTheme = getCategoryTheme(item.category);
+                        const look = shopTheme(item.shopId);
 
                         return (
                             <View key={item.id} style={styles.cartItemCard}>
                                 <View style={styles.itemRow}>
-                                    <View style={[styles.itemThumbnail, { backgroundColor: itemTheme.bg }]}>
+                                    <View style={[styles.itemThumbnail, { backgroundColor: look.wash }]}>
                                         <MaterialCommunityIcons
-                                            name={itemTheme.icon as any}
+                                            name={iconForItem(item) as any}
                                             size={22}
-                                            color={itemTheme.color}
+                                            color={look.tint}
                                         />
                                     </View>
 
