@@ -39,9 +39,8 @@ import path from 'path';
 import { useAssetStore } from './store/useAssetStore';
 import { ITEMS } from './data/shoppingRegistry';
 import { personalQuarter, CEO_BASE_SALARY_QUARTERLY } from '../../core/market/personalEconomy';
-import {
-    NEGLECT_MULTIPLE, quarterlyUpkeep, valueAt,
-} from '../../core/luxury/upkeep';
+import { NEGLECT_MULTIPLE, quarterlyUpkeep } from '../../core/luxury/upkeep';
+import { driftedPrice, marketValueOf } from '../../core/luxury/valuation';
 
 const SRC = path.join(__dirname, '..', '..');
 
@@ -139,13 +138,20 @@ describe('and time takes it apart', () => {
         // `marketValue` was written once at purchase and never again, while
         // the portfolio hook computed its own copy on the way to the screen.
         // Two answers to one question is this project's oldest habit.
-        const item = dearest();
+        //
+        // A YACHT rather than the dearest thing in the shop, which is a tower
+        // and appreciates. When the market drift landed this test went red on
+        // a real estate item going UP while the condition went down, which is
+        // the two forces working - so the test that pins the condition half
+        // has to hold something the market is not pushing the other way.
+        const item = [...ITEMS].filter(i => i.category === 'MARINE')
+            .sort((a, b) => b.price - a.price)[0];
         buy(item);
         useAssetStore.getState().quarterlyTick(8, true);
 
         const owned = useAssetStore.getState().ownedItems[0];
         expect(owned.marketValue).toBeLessThan(item.price);
-        expect(owned.marketValue).toBe(Math.floor(valueAt(item.price, owned.condition)));
+        expect(owned.marketValue).toBe(Math.floor(marketValueOf(owned)));
     });
 
     it('and an unpaid quarter costs four times as much condition', () => {
@@ -175,7 +181,28 @@ describe('and time takes it apart', () => {
         useAssetStore.getState().repairOwnedItem(wrecked.instanceId, 100);
         const fixed = useAssetStore.getState().ownedItems[0];
         expect(fixed.condition).toBe(100);
-        expect(fixed.marketValue).toBe(Math.floor(item.price));
+        // Back to mint, which is the DRIFTED price rather than the sticker: a
+        // restored classic is worth what a restored classic is worth now, not
+        // what it cost. Checked against the one valuation function so the two
+        // cannot come apart again.
+        expect(fixed.marketValue).toBe(Math.floor(marketValueOf(fixed)));
+        expect(fixed.marketValue).toBe(
+            Math.floor(driftedPrice(item.price, item.category, item.type, fixed.quartersOwned ?? 0)),
+        );
+    });
+
+    it('and the years are counted in GAME quarters, not in wall clock time', () => {
+        // `purchaseDate` is `Date.now()`. Ageing anything off it would mean a
+        // save loaded a year later found its whole collection a year older,
+        // and a player who left the app open all afternoon found nothing had
+        // happened. `quartersOwned` is the only clock the drift reads.
+        const item = dearest();
+        buy(item);
+        expect(useAssetStore.getState().ownedItems[0].quartersOwned).toBe(0);
+
+        useAssetStore.getState().quarterlyTick(3, true);
+        useAssetStore.getState().quarterlyTick(5, true);
+        expect(useAssetStore.getState().ownedItems[0].quartersOwned).toBe(8);
     });
 
     it('and a tick with nothing owned, or no time passing, changes nothing', () => {
@@ -264,8 +291,13 @@ describe('and the quarter actually bills it and actually ages it', () => {
         // costs 5%. Both come from the module now.
         const src = live(path.join('features', 'shopping', 'hooks', 'useAssetPortfolio.ts'));
         expect(src).toMatch(/from '\.\.\/\.\.\/\.\.\/core\/luxury\/upkeep'/);
-        expect(src).toMatch(/repairCost\(asset\.price, asset\.condition, 100\)/);
-        expect(src).toMatch(/valueAt\(asset\.price, asset\.condition\)/);
+        // Priced off the DRIFTED base rather than the sticker, so that a
+        // classic which has doubled is quoted at what it is worth now on both
+        // halves of the sum. Quoting one half at the old price is how the two
+        // formulas came apart in the first place.
+        expect(src).toMatch(/const base = driftedPrice\(/);
+        expect(src).toMatch(/repairCost\(base, asset\.condition, 100\)/);
+        expect(src).toMatch(/valueAt\(base, 100\) - valueAt\(base, asset\.condition\)/);
         // The two old formulas, by shape rather than by value.
         expect(src).not.toMatch(/damagePercent \/ 1000/);
         expect(src).not.toMatch(/0\.5 \+ \(?0\.5 \*/);

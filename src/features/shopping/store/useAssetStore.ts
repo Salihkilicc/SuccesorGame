@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../../storage/persist';
 import { ShoppingItem, OwnedAsset } from '../types';
-import { decayed, portfolioUpkeepQuarterly, valueAt } from '../../../core/luxury/upkeep';
+import { decayed, portfolioUpkeepQuarterly } from '../../../core/luxury/upkeep';
+import { marketValueOf } from '../../../core/luxury/valuation';
 
 // Simple UUID generator (JS only, no native dependencies)
 const generateId = () => {
@@ -120,6 +121,10 @@ export const useAssetStore = create<AssetStore>()(
                         purchaseDate,
                         condition: 100,
                         marketValue: item.price, // Initial value = purchase price
+                        // Game quarters, not `purchaseDate`, which is
+                        // `Date.now()` and would age a collection while the
+                        // app was closed. See types.OwnedAsset.
+                        quartersOwned: 0,
                     }));
 
                     console.log('[AssetStore] Purchased assets:', newAssets.map(a => a.name));
@@ -155,8 +160,8 @@ export const useAssetStore = create<AssetStore>()(
                     // at purchase and never again, and the portfolio hook
                     // recomputed its own copy on the way to the screen. Two
                     // answers to one question, which is this project's oldest
-                    // habit. See core/luxury/upkeep.valueAt.
-                    fixed.marketValue = Math.floor(valueAt(fixed.price, condition));
+                    // habit. See core/luxury/valuation.marketValueOf.
+                    fixed.marketValue = Math.floor(marketValueOf(fixed));
                     newOwned[index] = fixed;
                     return { ...state, ownedItems: newOwned };
                 }),
@@ -176,10 +181,21 @@ export const useAssetStore = create<AssetStore>()(
                         ...state,
                         ownedItems: state.ownedItems.map((asset) => {
                             const condition = decayed(asset.condition, asset.category, q, paid);
+                            // TWO FORCES, and they pull in different
+                            // directions on different things. Condition is
+                            // what it has been through and the player controls
+                            // it; the drift is what the market thinks and they
+                            // control it only by choosing what to buy. A
+                            // neglected classic can still be worth more than
+                            // it cost. See core/luxury/valuation.ts.
+                            const quartersOwned = (asset.quartersOwned ?? 0) + q;
                             return {
                                 ...asset,
                                 condition,
-                                marketValue: Math.floor(valueAt(asset.price, condition)),
+                                quartersOwned,
+                                marketValue: Math.floor(
+                                    marketValueOf({ ...asset, condition, quartersOwned }),
+                                ),
                             };
                         }),
                     };

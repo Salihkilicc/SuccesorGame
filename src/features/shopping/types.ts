@@ -32,4 +32,16 @@ export interface OwnedAsset extends ShoppingItem {
     purchaseDate: number;
     condition: number;
     marketValue: number;
+    /**
+     * How many game quarters this has been owned for.
+     *
+     * `purchaseDate` is `Date.now()` - real world time, which has nothing to
+     * do with the game's calendar and cannot be used to age anything. A save
+     * loaded a year later would find its whole collection had aged a year.
+     *
+     * Optional because saves made before the market drift existed do not carry
+     * it, and a missing count reads as nought - which values an old asset at
+     * its sticker price rather than at a number derived from garbage.
+     */
+    quartersOwned?: number;
 }

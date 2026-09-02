@@ -40,7 +40,7 @@ import path from 'path';
 import { useAssetStore } from './store/useAssetStore';
 import { ITEMS } from './data/shoppingRegistry';
 import { personalNetWorth } from '../../core/market/personalEconomy';
-import { valueAt } from '../../core/luxury/upkeep';
+import { marketValueOf } from '../../core/luxury/valuation';
 
 const SRC = path.join(__dirname, '..', '..');
 const live = (rel: string) =>
@@ -83,14 +83,19 @@ describe('buying something is not the same as burning the money', () => {
     });
 
     it('and the collection is valued at its condition, not at what was paid', () => {
-        const item = dearest();
+        // A JET rather than the dearest thing in the shop, which is a tower
+        // and appreciates. The market drift landed after this test was written
+        // and turned it red on a real estate item going up while its condition
+        // went down - which is the two forces working as designed, so the test
+        // for the condition half holds something the market is not lifting.
+        const item = [...ITEMS].filter(i => i.category === 'AIRCRAFT')
+            .sort((a, b) => b.price - a.price)[0];
         useAssetStore.getState().addToCart(item);
         useAssetStore.getState().purchaseCart();
         expect(owned()).toBe(Math.floor(item.price));
 
         useAssetStore.getState().quarterlyTick(12, true);
-        const cond = useAssetStore.getState().ownedItems[0].condition;
-        expect(owned()).toBe(Math.floor(valueAt(item.price, cond)));
+        expect(owned()).toBe(Math.floor(marketValueOf(useAssetStore.getState().ownedItems[0])));
         expect(owned()).toBeLessThan(item.price);
     });
 

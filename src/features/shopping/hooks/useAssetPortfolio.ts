@@ -4,6 +4,7 @@ import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { OwnedAsset, ProductCategory } from '../types';
 import { repairCost, valueAt } from '../../../core/luxury/upkeep';
+import { driftedPrice, marketValueOf } from '../../../core/luxury/valuation';
 
 export type PortfolioFilter = 'ALL' | 'REAL_ESTATE' | 'VEHICLE' | 'COLLECTION';
 
@@ -27,15 +28,20 @@ export const useAssetPortfolio = () => {
      *  condition cost 5% of its price and put back 25% of its price - a five
      *  to one return on any item in the catalogue, repeatable.
      *
-     *  Both now come from core/luxury/upkeep, where the repair is PRICED OFF
-     *  the value it restores and cannot be profitable by construction.
+     *  Both now come from core/luxury, where the repair is PRICED OFF the
+     *  value it restores and cannot be profitable by construction.
+     *
+     *  `marketValueOf` also carries the market drift, so a vintage watch here
+     *  can be worth more than it cost while a helicopter is worth less. The
+     *  store writes the same figure on every tick; this recomputes it so the
+     *  list is right in the frame before the next quarter lands.
      * ----------------------------------------------------------------------
      */
     const portfolioItems = useMemo(() => {
         // Since ownedItems are now full objects, we just need to calculate dynamic value
         const enriched = ownedItems.map(asset => ({
             ...asset,
-            marketValue: Math.floor(valueAt(asset.price, asset.condition)),
+            marketValue: Math.floor(marketValueOf(asset)),
         }));
 
         // Sort by Market Value (High to Low)
@@ -115,8 +121,15 @@ export const useAssetPortfolio = () => {
         //  - an unpaid quarter takes four times the condition - so this is a
         //  decision about how fast you are losing, not about whether.
         // ------------------------------------------------------------------
-        const cost = Math.floor(repairCost(asset.price, asset.condition, 100));
-        const restored = Math.floor(valueAt(asset.price, 100) - valueAt(asset.price, asset.condition));
+        // Priced off the DRIFTED price, not the sticker. Restoring a classic
+        // that has doubled puts back twice as much value and costs twice as
+        // much to do; quoting either half at the old price would put the two
+        // formulas out of step again, which is the whole defect above.
+        const base = driftedPrice(
+            asset.price, asset.category, asset.type, asset.quartersOwned ?? 0,
+        );
+        const cost = Math.floor(repairCost(base, asset.condition, 100));
+        const restored = Math.floor(valueAt(base, 100) - valueAt(base, asset.condition));
         const loss = cost - restored;
 
         Alert.alert(
