@@ -9,6 +9,7 @@ import { marineData } from './categories/marine';
 import { aircraftData } from './categories/aircraft';
 import { watchesData } from './categories/watches';
 import { jewelryData } from './categories/jewelry';
+import { spaceData } from './categories/space';
 
 // ============================================================================
 // AGGREGATE ALL SHOPS (25+ Distinct Brands)
@@ -32,6 +33,9 @@ export const SHOPS: Shop[] = [
 
     // Jewelry (5 shops)
     ...jewelryData.shops,
+
+    // Space (2 shops). The top of the market. See categories/space.ts.
+    ...spaceData.shops,
 ];
 
 // ============================================================================
@@ -56,6 +60,9 @@ export const ITEMS: ShoppingItem[] = [
 
     // Jewelry
     ...jewelryData.items,
+
+    // Space
+    ...spaceData.items,
 ];
 
 // ============================================================================
@@ -125,6 +132,7 @@ export const validateLuxeNetData = () => {
             AIRCRAFT: SHOPS.filter(s => s.category === 'AIRCRAFT').length,
             WATCH: SHOPS.filter(s => s.category === 'WATCH').length,
             JEWELRY: SHOPS.filter(s => s.category === 'JEWELRY').length,
+            SPACE: SHOPS.filter(s => s.category === 'SPACE').length,
         },
     };
 };

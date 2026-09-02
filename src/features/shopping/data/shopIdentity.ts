@@ -64,6 +64,7 @@ export const CATEGORY_ICON: Record<string, string> = {
     AIRCRAFT: 'airplane',
     WATCH: 'watch-variant',
     JEWELRY: 'diamond-stone',
+    SPACE: 'rocket-launch',
 };
 
 /**
@@ -150,6 +151,30 @@ export const TYPE_ICON: Record<string, string> = {
     engagement_ring: 'ring',
     tiara: 'crown',
     apparel: 'hanger',
+    parure: 'necklace',
+    regalia: 'crown-circle-outline',
+
+    // ---- REAL ESTATE, the top of it -------------------------------------
+    megatower: 'city-variant',
+    free_zone: 'map-marker-radius-outline',
+    terminal: 'gantry-crane',
+    principality: 'shield-crown-outline',
+    compound: 'gate-arrow-right',
+    deep_habitat: 'diving-helmet',
+
+    // ---- MARINE and AIRCRAFT, the top of them ---------------------------
+    seastead: 'ferry',
+    fleet: 'airplane-plus',
+
+    // ---- SPACE -----------------------------------------------------------
+    suborbital_fleet: 'rocket-outline',
+    launch_site: 'rocket-launch',
+    satellite_network: 'satellite-variant',
+    orbital_station: 'space-station',
+    observatory: 'telescope',
+    lunar_claim: 'moon-waning-crescent',
+    asteroid_charter: 'orbit',
+    ark: 'rocket-launch-outline',
 };
 
 /** The symbol for one thing in the shop. */
@@ -211,6 +236,14 @@ export const SHOP_IDENTITY: Record<string, ShopIdentity> = {
     shop_imperial_crown: { icon: 'crown', hue: 312 },
     shop_vow_eternity: { icon: 'ring', hue: 350 },
     shop_ice_district: { icon: 'snowflake', hue: 276 },
+
+    // ---- SPACE -----------------------------------------------------------
+    //  Two hues taken from the widest gap left in the wheel, which is the
+    //  green quarter nothing else wanted. A department that did not exist when
+    //  the others were spaced has to fit between them, and the test that
+    //  demands eight degrees of separation is what says whether it does.
+    shop_ascendant_orbital: { icon: 'rocket-launch', hue: 86 },
+    shop_farside_ventures: { icon: 'moon-waning-crescent', hue: 122 },
 };
 
 // ============================================================================

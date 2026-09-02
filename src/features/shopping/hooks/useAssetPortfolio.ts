@@ -59,7 +59,11 @@ export const useAssetPortfolio = () => {
         }
 
         if (selectedCategory === 'VEHICLE') {
-            return portfolioItems.filter(i => ['VEHICLE', 'MARINE', 'AIRCRAFT'].includes(i.category));
+            // SPACE rides with the other things that move. A department with
+            // one filter tab of its own and eight items in it would be a tab
+            // that is empty for most of a run; a fleet is a fleet.
+            return portfolioItems.filter(
+                i => ['VEHICLE', 'MARINE', 'AIRCRAFT', 'SPACE'].includes(i.category));
         }
 
         if (selectedCategory === 'COLLECTION') {

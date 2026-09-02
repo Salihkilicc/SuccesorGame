@@ -114,10 +114,17 @@ const checkout = (cart: CartItem[]) => {
  *
  * Has to be, or the two cashiers hide behind each other: the second charge is
  * refused for insufficient funds, the wallet is left alone, and the test goes
- * green over the bug it was written for. The catalogue tops out near a
- * billion, so this is above three of the most expensive item.
+ * green over the bug it was written for.
+ *
+ * Was 20 billion, chosen when the catalogue topped out at $6.5B. The space
+ * department arrived and the dearest item is $980B, so this went red - the
+ * right way round, and exactly the failure the paragraph above predicts.
+ * Derived from the catalogue now rather than typed, so the next thing added
+ * at the top of the market does not silently disarm this file.
  */
-const START = 20_000_000_000;
+const START = [...ITEMS].sort((a, b) => b.price - a.price)
+    .slice(0, 3)
+    .reduce((sum, i) => sum + i.price, 0) * 4;
 
 /** The dearest thing in the shop, so the overcharge is at its largest. */
 const dearest = () => [...ITEMS].sort((a, b) => b.price - a.price)[0];

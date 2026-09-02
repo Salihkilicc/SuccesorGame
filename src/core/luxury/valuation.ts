@@ -122,6 +122,10 @@ export const DRIFT_PER_YEAR: Record<LuxuryCategory, number> = {
     VEHICLE: -0.02,
     AIRCRAFT: -0.04,
     MARINE: -0.05,
+    // Steeper than a yacht, because the thing that ages an orbital asset is
+    // not wear, it is that somebody launches a better one. A constellation
+    // bought today is competing with a constellation nobody has built yet.
+    SPACE: -0.07,
 };
 
 /**

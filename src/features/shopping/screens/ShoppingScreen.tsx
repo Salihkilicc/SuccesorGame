@@ -92,6 +92,14 @@ const CATEGORIES = [
         color: '#818CF8',
         bg: '#282C4A',
     },
+    {
+        id: 'SPACE',
+        name: 'Space',
+        icon: 'rocket-launch',
+        desc: 'Orbit & Beyond',
+        color: '#7BD88F',
+        bg: '#1D3A26',
+    },
 ];
 
 const TABS = [
@@ -135,6 +143,7 @@ export const ShoppingScreen = () => {
             case 'JEWELRY': return t('shop.jewelry');
             case 'MARINE': return t('shop.marine');
             case 'AIRCRAFT': return t('shop.aircraft');
+            case 'SPACE': return t('shop.space');
             default: return fallback;
         }
     };
@@ -147,6 +156,7 @@ export const ShoppingScreen = () => {
             case 'JEWELRY': return t('shop.descJewelry');
             case 'MARINE': return t('shop.descMarine');
             case 'AIRCRAFT': return t('shop.descAircraft');
+            case 'SPACE': return t('shop.descSpace');
             default: return fallback;
         }
     };

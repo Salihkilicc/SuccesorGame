@@ -1,4 +1,10 @@
-export type ProductCategory = 'REAL_ESTATE' | 'VEHICLE' | 'MARINE' | 'AIRCRAFT' | 'WATCH' | 'JEWELRY';
+export type ProductCategory =
+    | 'REAL_ESTATE' | 'VEHICLE' | 'MARINE' | 'AIRCRAFT' | 'WATCH' | 'JEWELRY'
+    // The top of the market, and the most expensive thing in the game to own.
+    // See data/categories/space.ts for why it exists and core/luxury for what
+    // it costs: the worst upkeep, the worst decay and the worst drift, all in
+    // one department.
+    | 'SPACE';
 
 export type ShopId = string;
 

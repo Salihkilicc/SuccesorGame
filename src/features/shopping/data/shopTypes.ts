@@ -6,7 +6,7 @@ export interface Shop {
     id: string;
     name: string;
     url: string;
-    category: 'VEHICLE' | 'REAL_ESTATE' | 'WATCH' | 'JEWELRY' | 'MARINE' | 'AIRCRAFT';
+    category: 'VEHICLE' | 'REAL_ESTATE' | 'WATCH' | 'JEWELRY' | 'SPACE' | 'MARINE' | 'AIRCRAFT';
     description: string;
     bannerColor: string;
     emoji: string;

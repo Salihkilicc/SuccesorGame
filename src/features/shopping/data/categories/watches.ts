@@ -204,5 +204,16 @@ export const watchesData: { shops: Shop[], items: ShoppingItem[] } = {
             specs: ['201 Carats', 'Heart Specific', 'Spring Loaded', 'Blinding'],
             description: 'Three heart shaped diamonds reveal the watch dial. Contains 874 diamonds total.',
         },
+        {
+            id: 'wat_gen_003',
+            shopId: 'shop_geneva_atelier',
+            name: 'The Cabinotier Commission',
+            price: 19000000,
+            type: 'bespoke',
+            brand: 'Geneva Atelier',
+            category: 'WATCH',
+            specs: ['Eleven Years', 'Your Sky', 'Single Piece', 'Unrepeatable'],
+            description: 'Eleven years of one man"s work, showing the sky over the place and hour you name.',
+        }
     ],
 };

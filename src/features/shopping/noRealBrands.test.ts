@@ -252,10 +252,33 @@ describe('and the check cannot be passed by making it smaller', () => {
     });
 
     it('and the catalogue was renamed rather than trimmed', () => {
-        // 27 shops and 85 items before this work. Renaming does not change
-        // either number, and deleting the awkward ones would have.
-        expect(SHOPS.length).toBe(27);
-        expect(ITEMS.length).toBe(85);
+        // 27 shops and 85 items when the renaming was done, and this asserted
+        // both exactly - the point being that deleting the awkward items would
+        // have passed a "no real brands" check trivially.
+        //
+        // The catalogue has GROWN since, to 29 and 108, so the assertion is a
+        // floor now rather than an equality. The guarantee it was written for
+        // survives: you still cannot pass this file by deleting things.
+        expect(SHOPS.length).toBeGreaterThanOrEqual(27);
+        expect(ITEMS.length).toBeGreaterThanOrEqual(85);
+    });
+
+    it('and no shop on the front page opens on an empty grid', () => {
+        // Reported as "some shops are empty". Glacier Row had NO ITEMS AT ALL
+        // and nothing anywhere said so: the registry's own validator checks
+        // for orphaned items and duplicate ids and never asked the question
+        // the other way round.
+        const empty = SHOPS
+            .filter(s => !ITEMS.some(i => i.shopId === s.id))
+            .map(s => s.name);
+        expect(empty).toEqual([]);
+    });
+
+    it('and no shop is so thin it looks unfinished', () => {
+        const thin = SHOPS
+            .map(s => ({ name: s.name, n: ITEMS.filter(i => i.shopId === s.id).length }))
+            .filter(s => s.n < 2);
+        expect(thin).toEqual([]);
     });
 
     it('and every item still has a name and a price', () => {

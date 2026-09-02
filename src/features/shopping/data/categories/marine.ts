@@ -83,6 +83,17 @@ export const marineData: { shops: Shop[], items: ShoppingItem[] } = {
             specs: ['143m Length', 'Tallest Masts', 'Underwater Obs', 'Bomb Proof'],
             description: 'The world\'s largest sailing yacht. Futuristic design by Philippe Starck.',
         },
+        {
+            id: 'mar_pos_005',
+            shopId: 'shop_poseidon_yards',
+            name: 'The Floating Principality',
+            price: 18000000000,
+            type: 'seastead',
+            brand: 'Poseidon Yards',
+            category: 'MARINE',
+            specs: ['400m Length', 'Nine Decks', 'Flag Of Its Own', 'Never Docks'],
+            description: 'Four hundred metres, flagged to itself, and it has not touched a harbour in eleven years.',
+        },
 
         // ========================================================================
         // HORIZON CRUISERS - Commercial

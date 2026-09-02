@@ -169,14 +169,40 @@ describe('and a fortune does not survive four generations', () => {
     });
 
     it('and what comes down is the small and the collectible', () => {
-        // Every watch and every piece of jewellery survives; the islands and
-        // the yachts are what went. Emergent, and it is the whole flavour.
-        const kept = divideBelongings(wholeCollection()).kept as Array<Chattel & { category: string }>;
+        // Every watch survives and the top of the market is what went.
+        //
+        // The SECOND half of this used to name REAL_ESTATE, because islands
+        // and towers were the dearest things in the shop. Then the space
+        // department arrived at $1.76B against $265B for everything else, and
+        // the executor started selling orbital assets instead - so every piece
+        // of real estate came through and this went red.
+        //
+        // Which is the rule working, not breaking: whatever sits at the top of
+        // the market is what an estate has to sell. Written against the top of
+        // the catalogue rather than against a named department, so the next
+        // thing added above space does not send it red again.
+        // `divideBelongings` takes and returns `Chattel`, which has no
+        // category - deliberately, since the estate rule does not care what
+        // department a thing came from. The category is carried alongside for
+        // this test only, so both sides are widened rather than the module.
+        type Categorised = Chattel & { category: string };
+        const all = wholeCollection();
+        const division = divideBelongings(all);
+        const kept = division.kept as Categorised[];
+        const sold = division.sold as Categorised[];
         const keptCats = kept.map(k => k.category);
-        const allWatches = wholeCollection().filter(i => i.category === 'WATCH').length;
+
+        const allWatches = all.filter(i => i.category === 'WATCH').length;
         expect(keptCats.filter(c => c === 'WATCH').length).toBe(allWatches);
-        expect(keptCats.filter(c => c === 'REAL_ESTATE').length)
-            .toBeLessThan(wholeCollection().filter(i => i.category === 'REAL_ESTATE').length);
+
+        // The dearest department in the catalogue, whatever it is today.
+        const byValue: Record<string, number> = {};
+        for (const i of all) byValue[i.category] = (byValue[i.category] ?? 0) + i.marketValue;
+        const richest = Object.entries(byValue).sort((a, b) => b[1] - a[1])[0][0];
+
+        const soldCats = sold.map(s => s.category);
+        expect(sold.length).toBeGreaterThan(0);
+        expect(soldCats.every(c => c === richest)).toBe(true);
     });
 
     it('and four generations of it leaves a photograph', () => {

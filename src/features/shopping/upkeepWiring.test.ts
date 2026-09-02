@@ -224,7 +224,12 @@ describe('and time takes it apart', () => {
                 return acc;
             }, {}),
         );
-        expect(oneEach.length).toBe(6);
+        // Every department the catalogue has, whatever that number is today.
+        // Written as a floor and a match rather than a literal 6, because it
+        // WAS a literal 6 and the space department broke it - which is a test
+        // failing for the best possible reason and still a nuisance.
+        expect(oneEach.length).toBeGreaterThanOrEqual(6);
+        expect(oneEach.length).toBe(new Set(ITEMS.map(i => i.category)).size);
 
         buy(...oneEach);
         useAssetStore.getState().quarterlyTick(20, true);

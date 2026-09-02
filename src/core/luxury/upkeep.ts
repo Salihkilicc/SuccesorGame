@@ -66,13 +66,20 @@
 //  answerable rather than a matter of taste:
 //
 //      CATEGORY        N      VALUE      UPKEEP/YR
-//      REAL_ESTATE    17   $23,410M       $210.7M
-//      MARINE         10    $8,085M       $202.1M
-//      AIRCRAFT        9    $1,718M        $30.9M
-//      VEHICLE        23      $384M         $8.4M
-//      JEWELRY        13      $208M         $1.0M
-//      WATCH          13      $149M         $0.4M
-//      ALL            85   $33,954M       $453.7M   (1.34% a year)
+//      SPACE           8  $1,755,400M    $87,770M   5.0%
+//      REAL_ESTATE    23    $233,700M     $2,100M   0.9%
+//      MARINE         11     $26,100M       $650M   2.5%
+//      AIRCRAFT       10      $3,800M        $70M   1.8%
+//      JEWELRY        19      $1,300M        $10M   0.5%
+//      VEHICLE        23        $400M        $10M   2.2%
+//      WATCH          14        $200M         $0M   0.3%
+//      ALL           108  $2,020,800M    $90,610M   (4.48% a year)
+//      without SPACE 100    $265,400M     $2,840M   (1.07% a year)
+//
+//  The space department arrived after these rates were set and did not change
+//  any of them; it is 87% of the catalogue's value on its own, which is why
+//  the whole catalogue average moved from 1.34% to 4.48% with nothing else
+//  moving at all. An average dominated by one line is not a measurement.
 //
 //  And against what the player earns, which is the number that matters:
 //
@@ -92,7 +99,8 @@
 
 /** The six departments of the shop. */
 export type LuxuryCategory =
-    | 'REAL_ESTATE' | 'VEHICLE' | 'MARINE' | 'AIRCRAFT' | 'WATCH' | 'JEWELRY';
+    | 'REAL_ESTATE' | 'VEHICLE' | 'MARINE' | 'AIRCRAFT' | 'WATCH' | 'JEWELRY'
+    | 'SPACE';
 
 /** What a thing costs to keep for a year, as a share of its sticker price. */
 export const UPKEEP_RATE: Record<LuxuryCategory, number> = {
@@ -102,6 +110,20 @@ export const UPKEEP_RATE: Record<LuxuryCategory, number> = {
     AIRCRAFT: 0.018,
     WATCH: 0.003,
     JEWELRY: 0.005,
+    // ------------------------------------------------------------------
+    //  THE WORST NUMBER IN THE GAME, AND IT IS NOT A JOKE
+    // ------------------------------------------------------------------
+    //  A yacht is the standing joke about ownership costs. An orbital asset
+    //  beats it in every direction: a ground crew that never stands down, a
+    //  launch cadence needed to stay up at all, and a vacuum sandblasting it
+    //  the whole time. Five per cent a year, double the yacht.
+    //
+    //  Which makes the Ark Programme at $980M a quarter to keep, before it
+    //  has done anything. That is the intended shape of the top of this
+    //  market: the things that cost the most to buy are the things that cost
+    //  the most to keep, by a widening margin.
+    // ------------------------------------------------------------------
+    SPACE: 0.05,
 };
 
 /**
@@ -118,6 +140,9 @@ export const DECAY_PER_QUARTER: Record<LuxuryCategory, number> = {
     REAL_ESTATE: 0.6,
     JEWELRY: 0.15,
     WATCH: 0.1,
+    // Radiation, micrometeorites and thermal cycling. Nothing in orbit is
+    // being looked after by anybody standing next to it.
+    SPACE: 1.5,
 };
 
 /**

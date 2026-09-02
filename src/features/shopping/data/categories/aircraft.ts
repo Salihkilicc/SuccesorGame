@@ -83,6 +83,17 @@ export const aircraftData: { shops: Shop[], items: ShoppingItem[] } = {
             specs: ['5 Living Areas', 'Circadian Lighting', 'Whisper Quiet', 'Speed Record'],
             description: 'The pinnacle of American business aviation. Unmatched comfort and speed.',
         },
+        {
+            id: 'air_eli_005',
+            shopId: 'shop_elitas_travel',
+            name: 'The Standing Fleet',
+            price: 2100000000,
+            type: 'fleet',
+            brand: 'Elitas Travel',
+            category: 'AIRCRAFT',
+            specs: ['Nine Airframes', 'Crewed Always', 'Four Continents', 'Never Grounded'],
+            description: 'Nine aircraft on four continents, fuelled and crewed, so that one is always an hour away.',
+        },
 
         // ========================================================================
         // MACH 1 DEFENSE - Military Grade
