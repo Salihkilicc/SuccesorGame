@@ -87,6 +87,20 @@
 //  to exist - and its own exploit, since buying low and selling high inside
 //  one screen is a trade rather than a purchase.
 //
+//  ---------------------------------------------------------------------------
+//  NOTED FOR THE GENERATION AFTER NEXT
+//  ---------------------------------------------------------------------------
+//  Asked for and deliberately deferred: when the CHILD takes over, the shop
+//  should have moved on. New pieces on the shelf, some of the father's
+//  favourites gone, as though a decade had passed while nobody was looking.
+//
+//  That is a catalogue with a generation stamp on it rather than a drift rate,
+//  and it wants to be built next to the succession rather than here - the
+//  inherited watch appreciating is THIS file's job, and the shop no longer
+//  selling that watch is not. Written down at the point somebody would look
+//  for it, because a plan agreed in conversation and recorded nowhere is a
+//  plan that gets rediscovered as a missing feature.
+//
 //  PURE. No stores, no React.
 // ============================================================================
 

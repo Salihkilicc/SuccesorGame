@@ -24,6 +24,9 @@ import { theme } from '../../../core/theme';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { announceLuxuryPurchase } from '../../../logic/personalEventsLogic';
+import { effectivePrice } from '../../../core/luxury/promotions';
+import { currentQuarter } from '../../../core/story/world';
+import { SHOPS } from '../data/shoppingRegistry';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
@@ -57,7 +60,21 @@ export const CartScreen = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [orderTotal, setOrderTotal] = useState(0);
 
-    const subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+    // ------------------------------------------------------------------
+    //  THE TILL CHARGES THE PRICE THAT WAS ON THE SHELF
+    // ------------------------------------------------------------------
+    //  Priced HERE, at checkout, rather than frozen into the cart when the
+    //  item was added. A cart that remembers an old price is a cart you can
+    //  fill during a sale and empty ten years later, and a campaign that the
+    //  checkout has never heard of is a banner rather than a mechanic.
+    //
+    //  Both screens and this one call the same `effectivePrice`, so the
+    //  number cannot disagree with itself. See core/luxury/promotions.
+    // ------------------------------------------------------------------
+    const quarter = currentQuarter();
+    const subtotal = cart.reduce(
+        (acc, item) => acc + effectivePrice(item, SHOPS, quarter), 0,
+    );
     const shippingCost = cart.length > 0 ? 5000 : 0;
     const luxuryTax = subtotal * 0.08;
     const calculatedTotal = subtotal + shippingCost + luxuryTax;
@@ -102,7 +119,7 @@ export const CartScreen = () => {
             const result = announceLuxuryPurchase({
                 id: cartItem.id,
                 name: cartItem.name,
-                price: cartItem.price,
+                price: effectivePrice(cartItem, SHOPS, quarter),
                 prestigeScore: Math.min(600, Math.max(50, Math.round(cartItem.price / 80000))),
                 category: cartItem.category,
                 brand: cartItem.name.split(' ')[0] || 'Luxury',

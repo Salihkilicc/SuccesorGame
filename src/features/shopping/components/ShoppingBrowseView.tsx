@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import { theme } from '../../../core/theme';
 import { useAssetStore } from '../store/useAssetStore';
-import { SHOP_DATA } from '../data/shoppingRegistry';
+import { SHOP_DATA, SHOPS } from '../data/shoppingRegistry';
+import { effectivePrice } from '../../../core/luxury/promotions';
+import { currentQuarter } from '../../../core/story/world';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - theme.spacing.xl * 3) / 2;
@@ -45,6 +47,10 @@ const ShoppingBrowseView = ({
 }: ShoppingBrowseViewProps) => {
     useLocale();
     const { addToCart, isOwned, cart } = useAssetStore();
+    // Read once per render rather than per item: the campaign is a pure
+    // function of the quarter, so asking it eighty five times gives the same
+    // answer eighty five times.
+    const quarter = currentQuarter();
     const brandConfig = BRAND_CONFIGS[website] || BRAND_CONFIGS.Velocity;
 
     // Filter items by website
@@ -140,8 +146,10 @@ const ShoppingBrowseView = ({
                                         <Text style={styles.itemName} numberOfLines={2}>
                                             {item.name}
                                         </Text>
+                                        {/* Same price the till charges. See
+                                            core/luxury/promotions. */}
                                         <Text style={styles.itemPrice}>
-                                            {formatPrice(item.price)}
+                                            {formatPrice(effectivePrice(item, SHOPS, quarter))}
                                         </Text>
 
                                         {/* Specs Tags */}

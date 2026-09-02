@@ -33,6 +33,8 @@ import { SHOPS } from '../data/shoppingRegistry';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import AdBannerCarousel from '../components/AdBannerCarousel';
+import { effectivePrice } from '../../../core/luxury/promotions';
+import { currentQuarter } from '../../../core/story/world';
 import ShopPreviewCard from '../components/ShopPreviewCard';
 import { t, useLocale } from '../../../core/i18n';
 
@@ -117,6 +119,10 @@ const getCategoryTheme = (category: string) => {
 
 export const ShoppingScreen = () => {
     useLocale();
+    // Which campaign is running is a pure function of the quarter, so this is
+    // read once and handed to every price on the page. See
+    // core/luxury/promotions - there is no store and nothing to keep in step.
+    const quarter = currentQuarter();
     const navigation = useNavigation<any>();
 
     const getCategoryName = (id: string, fallback: string) => {
@@ -346,7 +352,9 @@ export const ShoppingScreen = () => {
                                 <Text style={styles.trendingName} numberOfLines={2}>
                                     {item.name}
                                 </Text>
-                                <Text style={styles.trendingPrice}>{formatPrice(item.price)}</Text>
+                                <Text style={styles.trendingPrice}>
+                                    {formatPrice(effectivePrice(item, SHOPS, quarter))}
+                                </Text>
                                 <Text style={styles.trendingShop}>
                                     {shop?.name || 'Exclusive'}
                                 </Text>
@@ -450,7 +458,29 @@ export const ShoppingScreen = () => {
                                             color={itemCat.color}
                                         />
                                     </View>
-                                    <Text style={styles.itemPrice}>{formatPrice(item.price)}</Text>
+                                    {/* ----------------------------------------------
+                                        THE PRICE ON THE SHELF IS THE PRICE AT THE TILL
+
+                                        Both come from `effectivePrice`. A banner
+                                        advertising a discount the checkout has never
+                                        heard of is decoration, and decoration that
+                                        looks like a system is what this project has
+                                        spent months finding.
+
+                                        The old price is struck through rather than
+                                        coloured: green and red are profit and loss
+                                        in this game and nothing else.
+                                       ---------------------------------------------- */}
+                                    <View style={styles.priceStack}>
+                                        {effectivePrice(item, SHOPS, quarter) < item.price && (
+                                            <Text style={styles.itemWasPrice}>
+                                                {formatPrice(item.price)}
+                                            </Text>
+                                        )}
+                                        <Text style={styles.itemPrice}>
+                                            {formatPrice(effectivePrice(item, SHOPS, quarter))}
+                                        </Text>
+                                    </View>
                                 </View>
 
                                 <Text style={styles.itemName} numberOfLines={2}>
@@ -882,6 +912,22 @@ const styles = StyleSheet.create({
         color: theme.colors.primary,
         fontSize: 14,
         fontWeight: '800',
+    },
+    priceStack: {
+        alignItems: 'flex-end',
+    },
+    /**
+     * The price before the campaign.
+     *
+     * Struck through and muted rather than coloured. Green and red in this
+     * game are profit and loss and nothing else, so a sale badge cannot be
+     * green however much every real shop makes it green.
+     */
+    itemWasPrice: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        fontWeight: '600',
+        textDecorationLine: 'line-through',
     },
     specsRow: {
         flexDirection: 'row',
