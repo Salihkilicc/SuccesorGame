@@ -1364,10 +1364,15 @@ export const useGameStore = create<GameStore>()(
           ? cashIfPaid
           : cashIfPaid + quarterlyReport.luxuryUpkeep;
 
+        let belongingsValue = 0;
         try {
-          require('../../features/shopping/store/useAssetStore')
-            .useAssetStore.getState()
-            .quarterlyTick(Math.max(1, quarters), upkeepPaid);
+          const { useAssetStore } = require('../../features/shopping/store/useAssetStore');
+          useAssetStore.getState().quarterlyTick(Math.max(1, quarters), upkeepPaid);
+          // AFTER the tick, so the figure written into `netWorth` below is
+          // this quarter's condition rather than last quarter's. Reading it
+          // first would report a fleet as mint the quarter it was neglected.
+          belongingsValue = useAssetStore.getState().ownedItems
+            .reduce((sum: number, a: { marketValue?: number }) => sum + (a.marketValue || 0), 0);
         } catch (e) {
           console.warn('[luxury] collection could not be aged', e);
         }
@@ -2193,7 +2198,20 @@ export const useGameStore = create<GameStore>()(
           ),
           companyDailyChange: changePercent,
           companyOwnership: ownership,
-          netWorth: newPlayerCash + valuation * (ownership / 100),
+          // ------------------------------------------------------------------
+          //  AND THE COLLECTION COUNTS
+          // ------------------------------------------------------------------
+          //  This is the net worth the STORY reads - standing, the wealth
+          //  title at ten billion, the closing record - and it did not know
+          //  the shop existed. So a player who converted a billion of cash
+          //  into an island lost a billion of standing for doing it.
+          //
+          //  Not an inflation. The money was already counted as cash before
+          //  the purchase; this stops it vanishing at the till. Valued at
+          //  CONDITION, so a neglected fleet is worth less and the title gets
+          //  harder rather than easier when the upkeep goes unpaid.
+          // ------------------------------------------------------------------
+          netWorth: newPlayerCash + valuation * (ownership / 100) + belongingsValue,
           revenueHistory: revHistory,
           ebitHistory: ebitHistory,
           earningsPower,

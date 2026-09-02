@@ -5,6 +5,7 @@ import { useShareholderStore } from '../../shareholders/stores/useShareholderSto
 // the note on `equityValue` below.
 // import { useEquityStore } from '../../finance/stores/useEquityStore';
 import { personalNetWorth } from '../../../core/market/personalEconomy';
+import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { calculateQuarterlyFinances } from '../logic/EconomyEngine';
 import { Alert } from 'react-native';
 import { STOCKS } from '../data/marketData';
@@ -29,6 +30,10 @@ export const useAssetsLogic = () => {
     }, 0);
 
     const cash = stats.money;
+
+    /** What the luxury collection is worth right now, at its condition. */
+    const belongingsValue = useAssetStore(s => s.ownedItems)
+        .reduce((sum, a) => sum + (a.marketValue || 0), 0);
 
     // ----------------------------------------------------------------------
     //  `bank` IS SHELVED
@@ -131,7 +136,29 @@ export const useAssetsLogic = () => {
     return {
         cash,
         equityValue,
-        netWorth: personalNetWorth({ cash, equityValue, investmentsValue }),
+        // ------------------------------------------------------------------
+        //  AND THE THINGS YOU BOUGHT ARE THINGS YOU OWN
+        // ------------------------------------------------------------------
+        //  `belongingsValue` has been a term in `personalNetWorth` since it
+        //  was written, with a note saying it was waiting for the shop. It was
+        //  never passed, so buying a $70M car turned $75.6M of cash into an
+        //  object the wealth screen could not see, and the player's net worth
+        //  fell by the whole of it. Spending was indistinguishable from
+        //  burning.
+        //
+        //  So this is not an inflation, it is the correction of one. A
+        //  purchase is now roughly neutral: down by the 8% luxury tax, and
+        //  down further as the condition falls. The player gets poorer for
+        //  owning it, slowly, which is the point of the upkeep work - not
+        //  instantly and by the sticker price.
+        //
+        //  Valued at CONDITION, not at what was paid. A neglected fleet is
+        //  worth less and the number says so. See core/luxury/upkeep.valueAt.
+        // ------------------------------------------------------------------
+        netWorth: personalNetWorth({
+            cash, equityValue, investmentsValue, belongingsValue,
+        }),
+        belongingsValue,
         report, // { totalIncome, totalExpenses, netFlow, breakdowns... }
         handleLiquidation,
         investmentsValue,
