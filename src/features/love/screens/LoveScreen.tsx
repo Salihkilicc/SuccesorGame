@@ -459,8 +459,22 @@ const LoveScreen = () => {
     setSelectedRingInstanceId(null);
     setIsPickingRing(false);
     closeModal();
+    // ------------------------------------------------------------------
+    //  THE SHOP LIVES ON THE ROOT STACK, NOT UNDER ASSETS
+    // ------------------------------------------------------------------
+    //  This was `navigate('Assets', { screen: 'Shopping' })`. That screen
+    //  is registered inside the Assets stack behind `FEATURES.shopping`,
+    //  which is false, so it is not registered at all - and navigating to a
+    //  route that does not exist is a silent no-op.
+    //
+    //  So a player with no ring pressed GO SHOPPING in the proposal flow
+    //  and nothing happened. On a LIVE screen: `love` is true.
+    //
+    //  The shop is on the root stack, which is how the profile banner
+    //  reaches it, and that is the one door into LuxoNet.
+    // ------------------------------------------------------------------
     // @ts-ignore
-    navigation.navigate('Assets', { screen: 'Shopping' });
+    navigation.navigate('Shopping');
   };
 
   // --- Render Modals ---

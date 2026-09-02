@@ -106,11 +106,13 @@ const LifeScreen = () => {
       case 'nightOut': navigation.navigate('NightOut' as never); break;
       case 'spa': navigation.navigate('Sanctuary'); break;
       case 'gym': navigation.navigate('Gym'); break; // Screen navigation
-      case 'shopping': navigation.navigate('Assets', { screen: 'Shopping' }); break;
+      // The root stack, not the Assets stack: the Assets copies are behind
+      // FEATURES.shopping and are not registered. See LoveScreen.
+      case 'shopping': navigation.navigate('Shopping'); break;
 
       // Lifestyle
       case 'travel': navigation.navigate('Travel'); break;
-      case 'belongings': navigation.navigate('Assets', { screen: 'Belongings' }); break;
+      case 'belongings': navigation.navigate('Belongings'); break;
       case 'myCompany': navigation.navigate('Assets', { screen: 'MyCompany' }); break;
       case 'education': navigation.navigate('Education' as never); break;
       case 'dna': navigation.navigate('DNA'); break;
