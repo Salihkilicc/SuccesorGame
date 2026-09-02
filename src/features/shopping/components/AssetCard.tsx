@@ -18,8 +18,17 @@ import { OwnedAsset } from '../types';
 import { t, useLocale } from '../../../core/i18n';
 import { translateCategory } from '../../../data/i18n/profileLoveShopText';
 
+/**
+ * The row carries two figures the store does not.
+ *
+ * `useAssetPortfolio` computes them so the header total and the cards are the
+ * same arithmetic, and they are optional so a caller that has a plain
+ * `OwnedAsset` still renders.
+ */
+type EnrichedAsset = OwnedAsset & { upkeep?: number; gain?: number };
+
 interface AssetCardProps {
-    item: OwnedAsset;
+    item: EnrichedAsset;
     onSell: (item: OwnedAsset) => void;
     onRepair: (item: OwnedAsset) => void;
     onPropose?: (item: OwnedAsset) => void;
@@ -60,6 +69,25 @@ export const AssetCard: React.FC<AssetCardProps> = ({
     const condition = Math.max(0, Math.min(100, item.condition || 100));
     const conditionColor = condition < 60 ? '#FFA94D' : '#05A8F6';
 
+    // ------------------------------------------------------------------
+    //  WHAT IT DID AND WHAT IT COSTS
+    // ------------------------------------------------------------------
+    //  The inventory has never shown either, and both are new facts about
+    //  owning things: the market moves a value away from what was paid, and
+    //  the quarter now bills for keeping it. A player looking at forty rows
+    //  could not tell which one was eating their cash.
+    //
+    //  GREEN AND RED HERE, and this is the one place the house rule allows
+    //  them: `theme.colors.positive` and `negative` exist for profit and
+    //  loss and this is profit and loss. Everything else on this screen -
+    //  the condition bar, the shop tint, the sale badge - deliberately is
+    //  not.
+    // ------------------------------------------------------------------
+    const gain = item.gain ?? 0;
+    const gainColor = gain >= 0 ? theme.colors.positive : theme.colors.negative;
+    const gainLabel = `${gain >= 0 ? '+' : ''}${formatCurrency(Math.abs(gain))}`;
+    const upkeep = item.upkeep ?? 0;
+
     if (isGrid) {
         return (
             <View style={styles.gridCard}>
@@ -89,6 +117,19 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     {formatCurrency(item.marketValue || item.price)}
                 </Text>
 
+                {/* What it did, and what it costs to keep. One row, so the
+                    card gains a line rather than a section. */}
+                <View style={styles.figuresRow}>
+                    <Text style={[styles.gainText, { color: gainColor }]} numberOfLines={1}>
+                        {gain >= 0 ? '\u25B2' : '\u25BC'} {gainLabel}
+                    </Text>
+                    {upkeep > 0 && (
+                        <Text style={styles.upkeepText} numberOfLines={1}>
+                            {formatCurrency(upkeep)}{t('shop.perQuarterShort')}
+                        </Text>
+                    )}
+                </View>
+
                 {/* Condition Bar */}
                 <View style={styles.conditionRow}>
                     <View style={styles.conditionTrack}>
@@ -104,34 +145,41 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     </Text>
                 </View>
 
-                {/* Actions */}
+                {/* ------------------------------------------------------
+                    ACTIONS, AND TWO THINGS THAT WERE WRONG HERE
+
+                    SELL was gated on a hardcoded list of categories -
+                    VEHICLE, MARINE, AIRCRAFT, WATCH, JEWELRY and
+                    'COLLECTION', which is not a category at all but a
+                    filter value. SPACE was not on it, so the $980B ark
+                    could be bought and never sold. A one way door on the
+                    most expensive object in the game.
+
+                    REPAIR was gated on `category === 'REAL_ESTATE'`, which
+                    was survivable while nothing decayed. Everything decays
+                    now - a yacht at 1.2 condition points a quarter, four
+                    times that unpaid - so every other department could
+                    rot to a wreck with no way to stop it.
+
+                    Both gates are gone. Anything can be sold; anything
+                    below mint can be restored.
+                   ------------------------------------------------------ */}
                 <View style={styles.actionRow}>
-                    {['VEHICLE', 'MARINE', 'AIRCRAFT', 'WATCH', 'JEWELRY', 'COLLECTION'].includes(item.category) && (
+                    {condition < 100 && (
                         <Pressable
-                            style={({ pressed }) => [styles.btnAction, pressed && styles.btnPressed]}
-                            onPress={() => onSell(item)}
+                            style={({ pressed }) => [styles.btnAction, styles.btnBlue, pressed && styles.btnPressed]}
+                            onPress={() => onRepair(item)}
                         >
-                            <Text style={styles.btnActionText}>{t('shop.sell')}</Text>
+                            <Text style={styles.btnBlueText}>{t('shop.repair')}</Text>
                         </Pressable>
                     )}
 
-                    {item.category === 'REAL_ESTATE' && (
-                        condition < 100 ? (
-                            <Pressable
-                                style={({ pressed }) => [styles.btnAction, styles.btnBlue, pressed && styles.btnPressed]}
-                                onPress={() => onRepair(item)}
-                            >
-                                <Text style={styles.btnBlueText}>{t('shop.repair')}</Text>
-                            </Pressable>
-                        ) : (
-                            <Pressable
-                                style={({ pressed }) => [styles.btnAction, pressed && styles.btnPressed]}
-                                onPress={() => onSell(item)}
-                            >
-                                <Text style={styles.btnActionText}>{t('shop.sell')}</Text>
-                            </Pressable>
-                        )
-                    )}
+                    <Pressable
+                        style={({ pressed }) => [styles.btnAction, pressed && styles.btnPressed]}
+                        onPress={() => onSell(item)}
+                    >
+                        <Text style={styles.btnActionText}>{t('shop.sell')}</Text>
+                    </Pressable>
 
                     {['shop_vow_eternity', 'shop_the_promise'].includes(item.shopId) && onPropose && (
                         <Pressable
@@ -163,6 +211,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                 </Text>
                 <Text style={styles.listSubtitle}>
                     {categoryLabel} • {formatCurrency(item.marketValue || item.price)}
+                    {upkeep > 0 ? ` • ${formatCurrency(upkeep)}${t('shop.perQuarterShort')}` : ''}
                 </Text>
             </View>
 
@@ -183,7 +232,7 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: 10,
         justifyContent: 'space-between',
-        minHeight: 165,
+        minHeight: 182,
     },
     gridTopRow: {
         flexDirection: 'row',
@@ -221,7 +270,25 @@ const styles = StyleSheet.create({
         color: theme.colors.primary,
         fontSize: 13,
         fontWeight: '800',
+        marginBottom: 4,
+    },
+    figuresRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 6,
         marginBottom: 8,
+    },
+    /** Profit and loss, which is what green and red are for in this game. */
+    gainText: {
+        fontSize: 10,
+        fontWeight: '800',
+    },
+    /** What it costs to keep. Muted: it is a fact, not a warning. */
+    upkeepText: {
+        color: theme.colors.textMuted,
+        fontSize: 10,
+        fontWeight: '600',
     },
     conditionRow: {
         flexDirection: 'row',

@@ -41,6 +41,8 @@ const formatCurrencyMain = (amount: number) => {
     return `$${amount.toLocaleString()}`;
 };
 
+const UPKEEP_LINE_COLOR = 'rgba(226, 232, 240, 0.62)';
+
 const FilterChip = ({
     label,
     active,
@@ -66,6 +68,7 @@ export const BelongingsScreen = () => {
     const {
         filteredItems,
         netWorth,
+        upkeepQuarterly,
         selectedCategory,
         setSelectedCategory,
         sellAsset,
@@ -117,12 +120,29 @@ export const BelongingsScreen = () => {
                             <View style={styles.chipCore} />
                         </View>
 
-                        {/* Net Worth Valuation */}
+                        {/* ------------------------------------------------
+                            THE VALUATION, AND WHAT IT COSTS TO HOLD IT
+
+                            The upkeep line is new and the card is otherwise
+                            untouched. The quarter has billed for this since
+                            the maintenance work landed, and the screen that
+                            owns the things being billed for did not mention
+                            it - so a player could see forty objects and no
+                            reason their cash was going down.
+
+                            Muted rather than red: it is a standing cost, not
+                            a loss, and red in this game means a loss.
+                           ------------------------------------------------ */}
                         <View style={styles.valuationBlock}>
                             <Text style={styles.valuationLabel}>TOTAL ASSET VALUATION</Text>
                             <Text style={styles.valuationValue}>
                                 {formatCurrencyMain(netWorth)}
                             </Text>
+                            {upkeepQuarterly > 0 && (
+                                <Text style={styles.upkeepLine}>
+                                    {t('shop.upkeepLabel')} {formatCurrencyMain(upkeepQuarterly)}
+                                </Text>
+                            )}
                         </View>
                     </View>
 
@@ -299,6 +319,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: '900',
         letterSpacing: 0.5,
+    },
+    upkeepLine: {
+        color: UPKEEP_LINE_COLOR,
+        fontSize: 10,
+        fontWeight: '700',
+        letterSpacing: 0.6,
+        marginTop: 4,
     },
 
     // Card Footer

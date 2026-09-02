@@ -2257,6 +2257,8 @@ export const tr: Record<string, string> = {
     'shop.wireApproved': 'Edinim Onaylandı & Kaydedildi.',
     'shop.wireEncrypted': 'ŞİFRELİ İSVİÇRE BANKA HAVALESİ',
     'shop.sell': 'SAT',
+    'shop.perQuarterShort': '/ç',
+    'shop.upkeepLabel': 'ÇEYREKLİK BAKIM',
     'shop.repair': 'ONAR',
     'shop.propose': 'TEKLİF ET',
     'shop.filterAll': 'TÜMÜ',

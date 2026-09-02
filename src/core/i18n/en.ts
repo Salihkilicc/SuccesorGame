@@ -2274,6 +2274,8 @@ export const en: Record<string, string> = {
     'shop.wireApproved': 'Acquisition Approved & Registered.',
     'shop.wireEncrypted': 'ENCRYPTED SWISS BANKING WIRE',
     'shop.sell': 'SELL',
+    'shop.perQuarterShort': '/q',
+    'shop.upkeepLabel': 'UPKEEP A QUARTER',
     'shop.repair': 'REPAIR',
     'shop.propose': 'PROPOSE',
     'shop.filterAll': 'ALL',

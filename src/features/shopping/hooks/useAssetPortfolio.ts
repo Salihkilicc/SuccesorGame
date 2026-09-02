@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { OwnedAsset, ProductCategory } from '../types';
-import { repairCost, valueAt } from '../../../core/luxury/upkeep';
+import { quarterlyUpkeep, repairCost, valueAt } from '../../../core/luxury/upkeep';
 import { driftedPrice, marketValueOf } from '../../../core/luxury/valuation';
 
 export type PortfolioFilter = 'ALL' | 'REAL_ESTATE' | 'VEHICLE' | 'COLLECTION';
@@ -39,10 +39,25 @@ export const useAssetPortfolio = () => {
      */
     const portfolioItems = useMemo(() => {
         // Since ownedItems are now full objects, we just need to calculate dynamic value
-        const enriched = ownedItems.map(asset => ({
-            ...asset,
-            marketValue: Math.floor(marketValueOf(asset)),
-        }));
+        const enriched = ownedItems.map(asset => {
+            const marketValue = Math.floor(marketValueOf(asset));
+            return {
+                ...asset,
+                marketValue,
+                // ----------------------------------------------------------
+                //  WHAT IT COSTS AND WHAT IT DID, PER THING
+                // ----------------------------------------------------------
+                //  The inventory has never said either. A player paying an
+                //  upkeep bill every quarter could not find out which of
+                //  their forty things was responsible for it, and a watch
+                //  that had doubled looked exactly like a jet that had
+                //  halved. Both are computed HERE rather than in the card,
+                //  so the totals below and the rows are the same arithmetic.
+                // ----------------------------------------------------------
+                upkeep: quarterlyUpkeep(asset),
+                gain: marketValue - (asset.price || 0),
+            };
+        });
 
         // Sort by Market Value (High to Low)
         return enriched.sort((a, b) => b.marketValue - a.marketValue);
@@ -81,6 +96,19 @@ export const useAssetPortfolio = () => {
     }, [portfolioItems]);
 
     const assetCount = portfolioItems.length;
+
+    /**
+     * What the whole collection costs to keep, per quarter.
+     *
+     * The figure the quarterly report already charges, shown on the screen
+     * that owns the things being charged for. `useAssetStore.upkeepQuarterly`
+     * is the same sum over the same list; this one is derived from the
+     * enriched rows so the header and the cards cannot disagree.
+     */
+    const upkeepQuarterly = useMemo(
+        () => portfolioItems.reduce((sum, item) => sum + item.upkeep, 0),
+        [portfolioItems],
+    );
 
     /**
      * Actions
@@ -166,6 +194,7 @@ export const useAssetPortfolio = () => {
         filteredItems,
         netWorth,
         assetCount,
+        upkeepQuarterly,
 
         // State
         selectedCategory,
