@@ -261,9 +261,28 @@ def appearance(name: str, female: bool = False) -> dict:
 #  from the other side, because the model listens to that more.
 # ---------------------------------------------------------------------------
 
-BASE = """flat vector portrait, bold thick outlines, (flat color:1.4),
-(no gradient:1.3), 2 tone shading, posterized, limited palette,
-cut paper look, poster art, screen print, clean geometric shapes,
+# ---------------------------------------------------------------------------
+#  THE STYLE TERMS CARRY WEIGHTS NOW, AND THE REASON IS ARITHMETIC
+# ---------------------------------------------------------------------------
+#  Reported as "this one is not hand drawn like the others, it is too smooth,
+#  it looks like AI". Correct: the first portraits had thick ink lines and
+#  flat planes and this one came back airbrushed.
+#
+#  Nothing about the style words changed. What changed is how many OTHER
+#  words are in the prompt beside them. Adding the gender lead, the female
+#  hair and attire, the collar and the glasses pushed the token count up, and
+#  emphasis in a prompt is a share of a fixed budget: every word added takes
+#  weight away from every word already there. The style was being outvoted by
+#  its own prompt.
+#
+#  So the terms that define the look are weighted rather than merely present.
+#  They have to win an argument, not just be in the room.
+# ---------------------------------------------------------------------------
+
+BASE = """(bold thick ink outlines:1.4), (flat color:1.5), (cel shading:1.4),
+(no gradient:1.4), (hard edged shadows:1.3), 2 tone shading, posterized,
+limited palette, cut paper look, poster art, (screen print:1.3),
+clean geometric shapes, visible linework,
 
 (close up portrait:1.4), (head fills the frame:1.4), tight crop,
 head and top of shoulders only, chin and top of hair inside the frame,
@@ -280,7 +299,9 @@ NEGATIVE = """anime, manga, chibi, big eyes, anime style,
 (full body:1.4), (waist up:1.3), wide shot, distant, small head,
 lots of empty background, torso, chest, hands, arms,
 
-gradient, soft shading, airbrush, smooth shading, rendered, painterly,
+(airbrush:1.4), (smooth shading:1.4), (soft gradient:1.4),
+(rendered:1.3), (digital painting:1.3), (blended shading:1.3),
+gradient, painterly, soft focus, glossy, polished, glow, bloom,
 photorealistic, photograph, detailed hair strands, individual hair,
 stubble texture, skin texture, pores, volumetric light,
 
