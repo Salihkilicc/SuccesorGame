@@ -34,8 +34,9 @@ palette_map.py - force generated portraits into the game's own palette.
  --preview write a sheet showing the portrait at the sizes the app really
            renders it at. This is the only test that decides whether a
            style works, because 46 pixels is where the answer lives.
- --autocrop find the head against the flat background and crop to it, so
-           the framing stops depending on what the model felt like doing.
+ --autocrop find the head and crop to it. NOT RELIABLE, and off by default
+           for a reason: see the note above `head_box`. Only reach for it
+           when a portrait comes out too wide, and always check --preview.
  --flip    mirror horizontally. These portraits carry no lettering and no
            asymmetric prop, so a mirrored one is the same person facing the
            other way and nothing gives it away.
@@ -300,7 +301,37 @@ HEAD_MARGIN = 0.30
 
 
 def head_box(img: Image.Image):
-    """The square to crop to, or None if the picture will not give one up."""
+    """
+    The square to crop to, or None if the picture will not give one up.
+
+    -----------------------------------------------------------------------
+     THIS IS NOT RELIABLE AND THE HONEST THING IS TO SAY SO
+    -----------------------------------------------------------------------
+     Five rounds of fixes, each one passing every fixture I had and then
+     failing on the next real portrait:
+
+         1  all four corners sampled, but the lower two are jacket
+         2  Image.fromarray is read only, so floodfill silently did nothing
+         3  the widest row taken from a window containing the shoulders
+         4  "width jumps at the shoulders" is false of a portrait
+         5  a gradient background makes the mask oscillate, and a hole in
+            it reads as a neck: the second real portrait cropped to the nose
+
+     After the fifth it still cut a chin. The pattern is the problem: every
+     patch is fitted to the last failure, and heuristics fitted one image at
+     a time do not generalise, they just move where they break.
+
+     So it is OFF by default and it is not in the recommended flow. The
+     prompt now asks for a close crop and delivers one, which is where
+     framing belonged all along: the second real portrait needed no crop at
+     all and was damaged by being given one.
+
+     Kept rather than deleted because it is genuinely useful on a portrait
+     that comes out too wide, and because the measurement above is worth
+     more written down than thrown away. Use it deliberately, one image at
+     a time, and look at the --preview sheet before keeping the result.
+    -----------------------------------------------------------------------
+    """
     a = np.asarray(img.convert('RGB'), dtype=np.int16)
     h, w, _ = a.shape
 
@@ -364,21 +395,46 @@ def head_box(img: Image.Image):
     #  A RUNNING maximum fixes it. At the cheekbones the running max IS the
     #  head, because the shoulders have not been reached yet, so the neck
     #  is caught before the coat can ever set the bar.
+    #  AND THE ROW WIDTHS HAVE TO BE SMOOTHED FIRST, because the mask is not
+    #  clean. The second real portrait had a GRADIENT background rather than
+    #  a flat one, so the separation came out full of small holes and the
+    #  widths oscillated down the cheek:
+    #
+    #      414  530
+    #      464  402   <- a hole, read as a neck
+    #      514  413
+    #      564  448
+    #      614  384
+    #      664  503
+    #
+    #  The crop landed at the nose. This is the failure I said must never
+    #  happen: too wide is usable, cropped to a jaw is not.
+    #
+    #  Three things together, rather than another single patch:
+    #    smoothing   a moving average over a fortieth of the height, so one
+    #                bad row cannot be a landmark
+    #    deeper      a real neck is well under two thirds of the head, not
+    #                a few per cent under it
+    #    longer      and it STAYS narrow for a real distance, not ten rows
     MIN_HEAD = h * 0.12
-    NECK_OF_PEAK = 0.72        # narrowed to this share of the widest row above
-    SUSTAIN = max(3, int(h * 0.01))
+    NECK_OF_PEAK = 0.66
+    SUSTAIN = max(8, int(h * 0.04))
+    SMOOTH = max(3, int(h * 0.025))
 
     start = top + max(4, int(h * 0.02))
     if h - start < MIN_HEAD:
         return None
 
-    run_max = np.maximum.accumulate(widths)
+    kernel = np.ones(SMOOTH) / SMOOTH
+    smooth = np.convolve(widths.astype(float), kernel, mode='same')
+
+    run_max = np.maximum.accumulate(smooth)
     neck = None
     for y in range(start + 1, h - SUSTAIN):
         if run_max[y] < w * 0.08 or y - top < MIN_HEAD:
             continue
         line = run_max[y] * NECK_OF_PEAK
-        if widths[y] < line and np.all(widths[y:y + SUSTAIN] < line):
+        if smooth[y] < line and np.all(smooth[y:y + SUSTAIN] < line):
             neck = y
             break
 
