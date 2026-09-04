@@ -1,9 +1,10 @@
 # You (female)
-# ramp   : bright
-# kaydet : assets/portraits/player_female.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
+# ramp    : bright
+# negatif : 00_NEGATIF_kadin.txt
+# kaydet  : assets/portraits/player_female.png
+# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
 
-a person in their thirties, angular sharp cheekbones, long hair swept to one side, no glasses, dark suit and tie,
+(a woman:1.4), (female:1.3) in her thirties, angular sharp cheekbones, long hair swept to one side, no glasses, dark tailored blazer,
 
 flat vector portrait, bold thick outlines, (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

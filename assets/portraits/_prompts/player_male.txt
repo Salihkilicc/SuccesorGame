@@ -1,9 +1,10 @@
 # You (male)
-# ramp   : bright
-# kaydet : assets/portraits/player_male.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
+# ramp    : bright
+# negatif : 00_NEGATIF_erkek.txt
+# kaydet  : assets/portraits/player_male.png
+# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
 
-a person in their thirties, square jaw, short cropped hair, clean shaven, no glasses, dark suit and tie,
+(a man:1.3) in his thirties, square jaw, short cropped hair, clean shaven, no glasses, dark suit and tie,
 
 flat vector portrait, bold thick outlines, (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

@@ -1,7 +1,8 @@
 # Arthur Vance
-# ramp   : steel
-# kaydet : assets/portraits/cfo.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp steel --circle --preview
+# ramp    : steel
+# negatif : 00_NEGATIF_erkek.txt
+# kaydet  : assets/portraits/cfo.png
+# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp steel --circle --preview
 
 a person in their sixties, long thin face, receding hairline, clean shaven, thin rectangular glasses, buttoned waistcoat,
 

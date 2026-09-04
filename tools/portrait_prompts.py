@@ -139,14 +139,111 @@ EXTRA = [
 ]
 
 
-def appearance(name: str) -> dict:
+
+# ===========================================================================
+#  WHO IS A WOMAN, WHICH THE PROMPT WAS NOT SAYING AT ALL
+# ===========================================================================
+#
+#  Every prompt began "a person", which reads as neutral and is not. The
+#  model resolves it to a man essentially always, and "dark suit and tie"
+#  pushes the same way. Reported from the other end: asking for the female
+#  player produced a long haired man.
+#
+#  The consequence was much wider than one portrait. The poker pool is 153
+#  names from fifteen regions and 74 of them are women; the cast has Dana
+#  Whitfield, Priya Raman and Eleanor Ratliff. Every one of them would have
+#  come back male, and the poker seat prints the NAME beside the face, so
+#  "Hanna Virtanen" would have sat there with a beard.
+#
+#  Listed by full name rather than guessed from the first name at runtime,
+#  because no rule survives fifteen naming traditions: "Andrea" is a man in
+#  Italy, "Nguyen Thi Lan" is marked female by the middle name and not the
+#  first, "Ji-woo" is used both ways.
+#
+#  SOME OF THESE ARE GENUINELY UNISEX and I have made a call rather than
+#  leaving them to default male. Marked below. If one reads wrong to you,
+#  move the name and regenerate: nothing else depends on it.
+# ===========================================================================
+
+FEMALE = {
+    # nordic
+    'Hanna Virtanen', 'Sigrid Dahl', 'Elin Bjornsson', 'Ingrid Halvorsen',
+    # britishIsles
+    'Niamh Gallagher', 'Fiona Blackwood', 'Sinead Doherty',
+    # westernEurope
+    'Claire Dubois', 'Sofia Marchetti', 'Rosa Iglesias', 'Greta Hoffmann',
+    'Lena Brandt', 'Anouk Visser',
+    # easternEurope
+    'Ana Petrescu', 'Milena Horvat', 'Katarzyna Zielinska',
+    'Iryna Kovalenko', 'Zsofia Balogh',
+    # mediterranean
+    'Eleni Stavrou', 'Zeynep Aksoy', 'Beatriz Alves', 'Selin Korkmaz',
+    'Ines Cardoso',
+    # middleEast
+    'Leila Haddad', 'Dalia Mansour', 'Nadia Khoury', 'Yara Kassab',
+    'Mona Sleiman',
+    # persianCentralAsia
+    'Roya Tabrizi', 'Aigerim Sultanova', 'Parisa Golzar', 'Nargiz Aliyeva',
+    # southAsia
+    'Priya Nair', 'Fatima Siddiqui', 'Nilanthi Perera', 'Ananya Bose',
+    'Kavya Rajan',
+    # eastAsia   (Ji-woo, Yuki and Sora are used both ways; called female)
+    'Mei Chen', 'Ji-woo Han', 'Yuki Morimoto', 'Seo-yeon Baek',
+    'Wen Xiaoling', 'Sora Nakagawa', 'Fang Yuwen',
+    # southeastAsia   (Thi in Nguyen Thi Lan is the female marker)
+    'Nguyen Thi Lan', 'Dewi Kusuma', 'Aina Rahim', 'Siti Nurhaliza',
+    'Pornthip Chaiya',
+    # westAfrica
+    'Grace Okonkwo', 'Aminata Diallo', 'Yaa Mensah', 'Adaeze Nwosu',
+    'Mariam Cisse',
+    # eastAfrica   (Zawadi is unisex Swahili; called female)
+    'Zawadi Mwangi', 'Hodan Warsame', 'Neema Kimani', 'Selamawit Haile',
+    'Rehema Otieno',
+    # southernAfrica   (Lerato is unisex Sotho; called female)
+    'Lerato Khumalo', 'Anneke Botha', 'Naledi Moyo', 'Refilwe Mokoena',
+    # latinAmerica
+    'Camila Ferreira', 'Valentina Cruz', 'Luana Barbosa', 'Paola Quispe',
+    'Renata Aguilar', 'Yamila Duarte',
+    # northAmericaPacific   (Dana and Harper are unisex; called female)
+    'Dana Kealoha', 'Aroha Waitoa', 'Tiare Moala', 'Harper Vandermeer',
+    'Elodie Tremblay',
+}
+
+#  The named cast, set by hand off cast.ts rather than by any rule.
+CAST_FEMALE = {'coo', 'cto', 'swanson', 'openai', 'player_female'}
+
+#  Pools that cannot be shared. A hairline recedes on a man in this
+#  vocabulary and a tie is a man's tie; everything else (age, jaw, glasses,
+#  the small extras) reads the same either way and stays common.
+HAIR_F = [
+    'short cropped hair', 'shoulder length straight hair',
+    'hair tied back in a bun', 'short curly hair', 'straight bob cut',
+    'long hair swept to one side', 'tight coiled hair',
+    'hair pulled back tightly', 'thick wavy hair', 'blunt fringe',
+]
+
+ATTIRE_F = [
+    'dark tailored blazer', 'open collar shirt',
+    'high collared coat', 'turtleneck sweater',
+    'blazer over a plain shirt', 'buttoned waistcoat',
+    'wide lapel jacket', 'plain work shirt',
+]
+
+
+def is_female(name: str, cast_id: str = '') -> bool:
+    return (cast_id in CAST_FEMALE) or (name in FEMALE)
+
+
+def appearance(name: str, female: bool = False) -> dict:
     return {
         'age': pick(AGE, name, 'age'),
         'build': pick(BUILD, name, 'build'),
-        'hair': pick(HAIR, name, 'hair'),
-        'face_hair': pick(FACE_HAIR, name, 'face_hair'),
+        'hair': pick(HAIR_F if female else HAIR, name, 'hair'),
+        # A woman is clean shaven, so that slot carries nothing rather than
+        # a word the model can misread.
+        'face_hair': '' if female else pick(FACE_HAIR, name, 'face_hair'),
         'glasses': pick(GLASSES, name, 'glasses'),
-        'attire': pick(ATTIRE, name, 'attire'),
+        'attire': pick(ATTIRE_F if female else ATTIRE, name, 'attire'),
         'extra': pick(EXTRA, name, 'extra'),
     }
 
@@ -198,15 +295,37 @@ deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry"""
 
 def prompt_for(name: str, cast_id: str = '') -> str:
     """The cast are written by hand; everybody else comes off the hash."""
+    female = is_female(name, cast_id)
     if cast_id and cast_id in CAST_LOOKS:
         who = CAST_LOOKS[cast_id]
     else:
-        a = appearance(name)
+        a = appearance(name, female)
+        # WEIGHTED, because the plain word is not enough. "a woman" alone
+        # still came back as a man often enough to matter; the emphasis and
+        # the second term together hold it.
+        lead = f"(a woman:1.4), (female:1.3) {a['age']}" if female \
+            else f"(a man:1.3) {a['age']}"
         who = ', '.join(x for x in [
-            f"a person {a['age']}", a['build'], a['hair'], a['face_hair'],
+            lead, a['build'], a['hair'], a['face_hair'],
             a['glasses'], a['attire'], a['extra'],
         ] if x)
     return f'{who},\n\n{BASE}'
+
+
+def negative_for(name: str, cast_id: str = '') -> str:
+    """
+    The shared negative, plus the push away from the wrong gender.
+
+    This has to live in the negative as well as the positive. Asking for a
+    woman and getting a long haired man is the model reaching for what it
+    saw most of; naming that outcome is what stops it.
+    """
+    if is_female(name, cast_id):
+        return NEGATIVE + (
+            '\n\n(man:1.4), (male:1.3), masculine face, beard, moustache,\n'
+            'stubble, necktie, receding hairline, bald'
+        )
+    return NEGATIVE + '\n\n(woman:1.3), (female:1.2), long flowing hair'
 
 
 def ramp_for(cast_id: str) -> str:
@@ -266,8 +385,8 @@ RAMP_BY_ID = {
     # a row of Hales. Same palette, one step brighter.
     'player_male': 'bright', 'player_female': 'bright',
     'father': 'cool', 'brother': 'cool', 'heir': 'cool',
-    'coo': 'bright', 'friend': 'bright',
-    'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
+    'coo': '(a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, plain work shirt', 'friend': 'bright',
+    'cto': '(a woman:1.4), (female:1.3) in her thirties, narrow face, shoulder length straight hair, no glasses, turtleneck sweater', 'openai': 'violet', 'hacker': 'violet',
     'pear': 'warm', 'edison': 'warm',
     'cfo': 'steel', 'swanson': 'steel',
 }
@@ -287,12 +406,12 @@ CAST_LOOKS = {
     #  choose. It also keeps them clear of the brother, who owns the slicked
     #  hair and the square glasses.
     # ------------------------------------------------------------------
-    'player_male': 'a person in their thirties, square jaw, '
+    'player_male': '(a man:1.3) in his thirties, square jaw, '
                    'short cropped hair, clean shaven, no glasses, '
                    'dark suit and tie',
-    'player_female': 'a person in their thirties, angular sharp cheekbones, '
-                     'long hair swept to one side, no glasses, '
-                     'dark suit and tie',
+    'player_female': '(a woman:1.4), (female:1.3) in her thirties, '
+                     'angular sharp cheekbones, long hair swept to one side, '
+                     'no glasses, dark tailored blazer',
 
     'father': 'a person elderly, broad heavy jaw, receding hairline, '
               'clean shaven, no glasses, dark suit and tie',
@@ -303,9 +422,9 @@ CAST_LOOKS = {
             'clean shaven, no glasses, open collar shirt, no tie',
     'cfo': 'a person in their sixties, long thin face, receding hairline, '
            'clean shaven, thin rectangular glasses, buttoned waistcoat',
-    'coo': 'a person in their forties, square jaw, hair tied back in a bun, '
-           'no glasses, plain work shirt',
-    'cto': 'a person in their thirties, narrow face, '
+    'coo': '(a woman:1.4), (female:1.3) in her forties, square jaw, '
+           'hair tied back in a bun, no glasses, plain work shirt',
+    'cto': '(a woman:1.4), (female:1.3) in her thirties, narrow face, '
            'shoulder length straight hair, no glasses, turtleneck sweater',
     'friend': 'a person in their forties, round full face, short curly hair, '
               'short stubble, no glasses, open collar shirt, no tie',
@@ -313,10 +432,9 @@ CAST_LOOKS = {
             'side parted hair, clean shaven, no glasses, dark suit and tie',
     'edison': 'a person in their sixties, broad heavy jaw, bald on top, '
               'thick moustache, no glasses, plain work shirt',
-    'openai': 'a person in their thirties, narrow face, straight bob cut, '
-              'clean shaven, thin rectangular glasses, turtleneck sweater',
-    'swanson': 'a person in their sixties, long thin face, short cropped hair, '
-               'clean shaven, heavy black frames, buttoned waistcoat',
+    'openai': '(a woman:1.4), (female:1.3) in her thirties, narrow face, '
+              'straight bob cut, thin rectangular glasses, turtleneck sweater',
+    'swanson': '(a woman:1.4), (female:1.3) in her sixties, long thin face, short cropped hair, heavy black frames, buttoned waistcoat',
     'hacker': 'a person in their thirties, narrow face, shaved head, '
               'short stubble, heavy black frames, high collared coat',
 }

@@ -14,3 +14,5 @@ silhouette, featureless face, blank face, multiple people, crowd,
 cropped head, cut off chin, head touching edge, off-center, tilted,
 text, watermark, signature, logo, frame, border, blurry, low detail,
 deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry
+
+(woman:1.3), (female:1.2), long flowing hair

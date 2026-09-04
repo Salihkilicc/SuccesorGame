@@ -1,9 +1,10 @@
 # Wen Zhao-Lindqvist
-# ramp   : violet
-# kaydet : assets/portraits/openai.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --circle --preview
+# ramp    : violet
+# negatif : 00_NEGATIF_kadin.txt
+# kaydet  : assets/portraits/openai.png
+# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --circle --preview
 
-a person in their thirties, narrow face, straight bob cut, clean shaven, thin rectangular glasses, turtleneck sweater,
+(a woman:1.4), (female:1.3) in her thirties, narrow face, straight bob cut, thin rectangular glasses, turtleneck sweater,
 
 flat vector portrait, bold thick outlines, (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,
