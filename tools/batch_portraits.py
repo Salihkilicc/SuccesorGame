@@ -306,12 +306,24 @@ def main() -> int:
             print(f'  [{i}/{len(todo)}] {cid:24s} FAILED  {e}')
             failed += 1
             continue
-        open(os.path.join(RAW_DIR, f'{cid}.png'), 'wb').write(raw)
-        img = Image.open(io.BytesIO(raw)).convert('RGB')
-        lut = PM.build_lut(PM.RAMPS[ramp])
-        mapped = Image.fromarray(lut[PM.luminance(img)], mode='RGB')
-        mapped.resize((512, 512), Image.LANCZOS).save(
-            os.path.join(OUT_DIR, f'{cid}.png'))
+        raw_path = os.path.join(RAW_DIR, f'{cid}.png')
+        open(raw_path, 'wb').write(raw)
+        # ONE implementation of the mapping, and it lives in palette_map.
+        # This used to inline its own copy and got the ORDER wrong: it
+        # mapped at 1024 and then resized to 512, and LANCZOS blends
+        # neighbouring pixels, so a 242 colour image came back with 11,922
+        # of them and none of the extras on the ramp. Measured on one file:
+        #
+        #     raw               26,346 colours
+        #     after the map        242   correct
+        #     after the resize  11,922   ruined
+        #
+        # palette_map.convert resizes FIRST and maps last, which is why the
+        # portraits made by hand were right and the batched ones were not.
+        # Calling it rather than copying it is the actual fix; the ordering
+        # was only the symptom.
+        PM.convert(raw_path, OUT_DIR, PM.build_lut(PM.RAMPS[ramp]),
+                   512, circle=False)
         done += 1
         print(f'  [{i}/{len(todo)}] {cid:24s} {ramp:7s} ok')
 
