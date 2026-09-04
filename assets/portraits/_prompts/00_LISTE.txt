@@ -1,18 +1,18 @@
 # KADRO PORTRE LISTESI
 
-# NEGATIF IKI TANE. Kadinlarda 00_NEGATIF_kadin.txt, erkeklerde
-# 00_NEGATIF_erkek.txt. Karistirma, model yanlis cinsiyete kayiyor.
+# Kadinlarda 00_NEGATIF_kadin.txt, erkeklerde 00_NEGATIF_erkek.txt.
 
    id             kim                        ramp    K/E  dosya
 --------------------------------------------------------------------------------
 OK player_male    You (male)                 bright  E    player_male.png
 OK player_female  You (female)               bright  K    player_female.png
+   heir_male      Your Successor (male)      cool    E    heir_male.png
+   heir_female    Your Successor (female)    cool    K    heir_female.png
 OK father         Your Father                cool    E    father.png
 OK brother        Julian Hale                cool    E    brother.png
 OK cfo            Arthur Vance               steel   E    cfo.png
-   coo            Dana Whitfield             bright  K    coo.png
-   cto            Priya Raman                violet  K    cto.png
-   heir           Your Successor             cool    E    heir.png
+OK coo            Dana Whitfield             bright  K    coo.png
+OK cto            Priya Raman                violet  K    cto.png
    friend         Marco Alvarez              bright  E    friend.png
    pear           Nathan Vogel               warm    E    pear.png
    edison         Hal Brennerman             warm    E    edison.png
@@ -20,8 +20,8 @@ OK cfo            Arthur Vance               steel   E    cfo.png
    swanson        Dr. Eleanor Ratliff        steel   K    swanson.png
    hacker         Cipher                     violet  E    hacker.png
 
-YUZ YOK (portre yapma):
-   unknown        Unknown Number             the whole point is that you do not know who it is
-   vulture        Halberd Partners           a fund, not a person
-   regulator      Consumer Safety Directorate a division with letterhead
-   fbi            Field Office               a field office, not a face
+YUZ YOK:
+   unknown        the whole point is that you do not know who it is
+   vulture        a fund, not a person
+   regulator      a division with letterhead
+   fbi            a field office, not a face

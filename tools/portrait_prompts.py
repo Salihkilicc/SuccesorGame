@@ -210,7 +210,8 @@ FEMALE = {
 }
 
 #  The named cast, set by hand off cast.ts rather than by any rule.
-CAST_FEMALE = {'coo', 'cto', 'swanson', 'openai', 'player_female'}
+CAST_FEMALE = {'coo', 'cto', 'swanson', 'openai',
+               'player_female', 'heir_female'}
 
 #  Pools that cannot be shared. A hairline recedes on a man in this
 #  vocabulary and a tie is a man's tie; everything else (age, jaw, glasses,
@@ -433,7 +434,13 @@ RAMP_BY_ID = {
     # header, the home screen - and you should not read as one more Hale in
     # a row of Hales. Same palette, one step brighter.
     'player_male': 'bright', 'player_female': 'bright',
-    'father': 'cool', 'brother': 'cool', 'heir': 'cool',
+    # The heir is a Child, and Child.gender is 'Male' | 'Female' in
+    # useFamilyStore. Same shape of bug as the player, found the same way:
+    # by listing the roster and asking what a single file would show half
+    # the players. Two portraits, and the child who takes over is the one
+    # whose portrait the profile header switches to.
+    'heir_male': 'cool', 'heir_female': 'cool',
+    'father': 'cool', 'brother': 'cool',
     'coo': 'bright', 'friend': 'bright',
     'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
     'pear': 'warm', 'edison': 'warm',
@@ -507,8 +514,10 @@ CAST_LOOKS = {
     'brother': 'a person in their forties, angular sharp cheekbones, '
                'slicked back hair, clean shaven, thick square glasses, '
                'blazer over a plain shirt',
-    'heir': 'a person in their late teens, narrow face, messy tousled hair, '
-            'clean shaven, no glasses, open collar shirt, no tie',
+    'heir_male': '(a young man:1.3) in his late teens, narrow face, '
+                 'messy tousled hair, clean shaven, open collar shirt',
+    'heir_female': '(a young woman:1.4), (female:1.3) in her late teens, '
+                   'narrow face, hair tied back, open collar shirt',
     'cfo': 'a person in their sixties, long thin face, receding hairline, '
            'clean shaven, thin rectangular glasses, buttoned waistcoat',
     'coo': '(a woman:1.4), (female:1.3) in her forties, square jaw, '
@@ -536,6 +545,13 @@ PLAYER = {
     'player_female': 'You (female)',
 }
 
+#  The heir is in cast.ts as one entry, but the child who inherits has a
+#  gender, so the single entry is split on the way through.
+HEIR_SPLIT = {
+    'heir_male': 'Your Successor (male)',
+    'heir_female': 'Your Successor (female)',
+}
+
 
 def read_cast() -> dict:
     """{id: name} out of src/data/story/cast.ts, plus the player."""
@@ -550,7 +566,8 @@ def read_cast() -> dict:
         nm = re.search(r"name:\s*'((?:[^'\\]|\\.)*)'", body)
         if nm:
             out[key] = nm.group(1).replace("\\'", "'")
-    return {**PLAYER, **out}
+    out.pop('heir', None)
+    return {**PLAYER, **HEIR_SPLIT, **out}
 
 
 # ---------------------------------------------------------------------------
