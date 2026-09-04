@@ -196,13 +196,120 @@ text, watermark, signature, logo, frame, border, blurry, low detail,
 deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry"""
 
 
-def prompt_for(name: str) -> str:
-    a = appearance(name)
-    who = ', '.join(x for x in [
-        f"a person {a['age']}", a['build'], a['hair'], a['face_hair'],
-        a['glasses'], a['attire'], a['extra'],
-    ] if x)
+def prompt_for(name: str, cast_id: str = '') -> str:
+    """The cast are written by hand; everybody else comes off the hash."""
+    if cast_id and cast_id in CAST_LOOKS:
+        who = CAST_LOOKS[cast_id]
+    else:
+        a = appearance(name)
+        who = ', '.join(x for x in [
+            f"a person {a['age']}", a['build'], a['hair'], a['face_hair'],
+            a['glasses'], a['attire'], a['extra'],
+        ] if x)
     return f'{who},\n\n{BASE}'
+
+
+def ramp_for(cast_id: str) -> str:
+    """Which ramp a character carries. Strangers get the neutral one."""
+    return RAMP_BY_ID.get(cast_id, 'steel')
+
+
+# ===========================================================================
+#  THE NAMED CAST, WHO ARE NOT STRANGERS
+# ===========================================================================
+#
+#  The 153 in the poker pool are people you meet once, so a hash picking
+#  their face is exactly right. The sixteen in src/data/story/cast.ts are
+#  not: they are written characters with a stated voice, and deriving their
+#  appearance from the letters of their name would be throwing that away.
+#
+#  So these are set by hand, off the tone lines in cast.ts. Arthur Vance
+#  "has outlived four CEOs and expects to outlive you", so he is old and
+#  buttoned up. Priya Raman "talks in what is possible in eighteen months",
+#  so she is young and dressed like a lab rather than a board.
+#
+#  ---------------------------------------------------------------------------
+#  AND FOUR OF THEM MUST NOT HAVE A FACE
+#  ---------------------------------------------------------------------------
+#  Not an oversight, a rule. "Unknown Number" is written as "no greeting, no
+#  sign-off, every message a door left slightly open"; the whole effect is
+#  that you do not know who it is. Halberd Partners is a fund, the Consumer
+#  Safety Directorate is a division, the Field Office is a building. Give any
+#  of them a portrait and the character is gone: an anonymous threat with a
+#  face is just a man, and a process with a face is somebody you can argue
+#  with.
+#
+#  They keep the initials-in-a-circle they already have, which is the right
+#  picture of an institution.
+# ===========================================================================
+
+FACELESS = {
+    'unknown': 'the whole point is that you do not know who it is',
+    'vulture': 'a fund, not a person',
+    'regulator': 'a division with letterhead',
+    'fbi': 'a field office, not a face',
+}
+
+#  Which ramp a character carries, and why. The ramp is doing work here: it
+#  says what KIND of person is looking at you before the name is read.
+#
+#      cool    family, your own blood
+#      bright  the people inside your company who are with you
+#      violet  research and the technical world
+#      warm    money and rival power, lit by the brand's own orange
+#      steel   process and institutions, owing you nothing
+RAMP_BY_ID = {
+    'father': 'cool', 'brother': 'cool', 'heir': 'cool',
+    'coo': 'bright', 'friend': 'bright',
+    'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
+    'pear': 'warm', 'edison': 'warm',
+    'cfo': 'steel', 'swanson': 'steel',
+}
+
+#  Appearance, in the same silhouette vocabulary as the pools above.
+CAST_LOOKS = {
+    'father': 'a person elderly, broad heavy jaw, receding hairline, '
+              'clean shaven, no glasses, dark suit and tie',
+    'brother': 'a person in their forties, angular sharp cheekbones, '
+               'slicked back hair, clean shaven, thick square glasses, '
+               'blazer over a plain shirt',
+    'heir': 'a person in their late teens, narrow face, messy tousled hair, '
+            'clean shaven, no glasses, open collar shirt, no tie',
+    'cfo': 'a person in their sixties, long thin face, receding hairline, '
+           'clean shaven, thin rectangular glasses, buttoned waistcoat',
+    'coo': 'a person in their forties, square jaw, hair tied back in a bun, '
+           'no glasses, plain work shirt',
+    'cto': 'a person in their thirties, narrow face, '
+           'shoulder length straight hair, no glasses, turtleneck sweater',
+    'friend': 'a person in their forties, round full face, short curly hair, '
+              'short stubble, no glasses, open collar shirt, no tie',
+    'pear': 'a person in their fifties, angular sharp cheekbones, '
+            'side parted hair, clean shaven, no glasses, dark suit and tie',
+    'edison': 'a person in their sixties, broad heavy jaw, bald on top, '
+              'thick moustache, no glasses, plain work shirt',
+    'openai': 'a person in their thirties, narrow face, straight bob cut, '
+              'clean shaven, thin rectangular glasses, turtleneck sweater',
+    'swanson': 'a person in their sixties, long thin face, short cropped hair, '
+               'clean shaven, heavy black frames, buttoned waistcoat',
+    'hacker': 'a person in their thirties, narrow face, shaved head, '
+              'short stubble, heavy black frames, high collared coat',
+}
+
+
+def read_cast() -> dict:
+    """{id: name} out of src/data/story/cast.ts, so the two cannot drift."""
+    path = os.path.join(HERE, '..', 'src', 'data', 'story', 'cast.ts')
+    try:
+        src = open(path, encoding='utf8').read()
+    except OSError:
+        return {}
+    out = {}
+    for m in re.finditer(r"\n    (\w+): \{(.*?)\n    \},", src, re.S):
+        key, body = m.group(1), m.group(2)
+        nm = re.search(r"name:\s*'((?:[^'\\]|\\.)*)'", body)
+        if nm:
+            out[key] = nm.group(1).replace("\\'", "'")
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -235,6 +342,9 @@ def main() -> int:
     ap.add_argument('--out', help='write one .txt per character into this folder')
     ap.add_argument('--csv', action='store_true', help='name and traits, as csv')
     ap.add_argument('--negative', action='store_true', help='print the negative and stop')
+    ap.add_argument('--cast', action='store_true',
+                    help='the named cast, with the ramp each one carries')
+    ap.add_argument('--id', help='a cast id such as brother or cfo')
     args = ap.parse_args()
 
     if args.negative:
@@ -248,6 +358,32 @@ def main() -> int:
         for region, names in regions.items():
             print(f'{region:16s} {len(names):3d}  {", ".join(names[:3])} ...')
         print(f'\n{len(everyone)} names in {len(regions)} regions')
+        return 0
+
+    cast = read_cast()
+
+    if args.cast:
+        print(f'{"id":10s} {"name":26s} {"ramp":7s} file')
+        print('-' * 72)
+        for cid, nm in cast.items():
+            if cid in FACELESS:
+                print(f'{cid:10s} {nm:26s} {"-":7s} YUZ YOK: {FACELESS[cid]}')
+            else:
+                print(f'{cid:10s} {nm:26s} {ramp_for(cid):7s} assets/portraits/{cid}.png')
+        drawn = [c for c in cast if c not in FACELESS]
+        print(f'\n{len(drawn)} portre, {len(FACELESS)} yuzsuz, {len(cast)} kadro')
+        return 0
+
+    if args.id:
+        cid = args.id
+        if cid in FACELESS:
+            print(f'{cid}: bu karaktere portre YAPMA. {FACELESS[cid]}')
+            return 1
+        if cid not in cast:
+            print(f'{cid} kadroda yok. --cast ile listeye bak.')
+            return 1
+        print(f'# {cast[cid]}  ->  ramp {ramp_for(cid)}  ->  assets/portraits/{cid}.png\n')
+        print(prompt_for(cast[cid], cid))
         return 0
 
     if args.name:
