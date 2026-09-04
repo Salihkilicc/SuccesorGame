@@ -5,7 +5,7 @@
 
 a person in their fifties, angular sharp cheekbones, side parted hair, clean shaven, no glasses, dark suit and tie,
 
-flat vector portrait, bold thick outlines, (flat color:1.4),
+flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,
 cut paper look, poster art, screen print, clean geometric shapes,
 

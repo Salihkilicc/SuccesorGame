@@ -279,6 +279,13 @@ def appearance(name: str, female: bool = False) -> dict:
 #  So this is exactly what produced the four that were kept, and the rule
 #  for anything that comes out wrong from here is to change ONE line and
 #  look, rather than to raise a weight and add three words.
+#
+#  ONE line has since changed, under that rule. Reported as "the brush is
+#  slightly off, otherwise good": `bold thick outlines` now carries 1.3.
+#  Nothing else moved, no word was added, and if the next one is still soft
+#  the answer is 1.4 on that same term. The four kept portraits were made at
+#  no weight at all, so regenerating one now would come back marginally
+#  bolder, which is the direction asked for anyway.
 # ---------------------------------------------------------------------------
 #  Reported as "this one is not hand drawn like the others, it is too smooth,
 #  it looks like AI". Correct: the first portraits had thick ink lines and
@@ -295,7 +302,7 @@ def appearance(name: str, female: bool = False) -> dict:
 #  They have to win an argument, not just be in the room.
 # ---------------------------------------------------------------------------
 
-BASE = """flat vector portrait, bold thick outlines, (flat color:1.4),
+BASE = """flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,
 cut paper look, poster art, screen print, clean geometric shapes,
 
