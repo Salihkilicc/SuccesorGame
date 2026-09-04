@@ -1,7 +1,7 @@
 # Priya Raman
 # ramp   : violet
 # kaydet : assets/portraits/cto.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --circle --preview
 
 a person in their thirties, narrow face, shoulder length straight hair, no glasses, turtleneck sweater,
 

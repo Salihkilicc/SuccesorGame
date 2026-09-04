@@ -1,7 +1,7 @@
 # Your Father
 # ramp   : cool
 # kaydet : assets/portraits/father.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp cool --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp cool --circle --preview
 
 a person elderly, broad heavy jaw, receding hairline, clean shaven, no glasses, dark suit and tie,
 

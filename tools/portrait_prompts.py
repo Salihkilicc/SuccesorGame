@@ -259,6 +259,12 @@ FACELESS = {
 #      warm    money and rival power, lit by the brand's own orange
 #      steel   process and institutions, owing you nothing
 RAMP_BY_ID = {
+    # THE PLAYER IS BRIGHT AND THEIR FAMILY IS COOL, which is the one place
+    # the ramp is doing something other than sorting people into camps. You
+    # are the only face that ever carries a screen alone - the profile
+    # header, the home screen - and you should not read as one more Hale in
+    # a row of Hales. Same palette, one step brighter.
+    'player_male': 'bright', 'player_female': 'bright',
     'father': 'cool', 'brother': 'cool', 'heir': 'cool',
     'coo': 'bright', 'friend': 'bright',
     'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
@@ -268,6 +274,26 @@ RAMP_BY_ID = {
 
 #  Appearance, in the same silhouette vocabulary as the pools above.
 CAST_LOOKS = {
+    # ------------------------------------------------------------------
+    #  YOU, TWICE, BECAUSE THE GAME ASKS
+    # ------------------------------------------------------------------
+    #  src/core/identity.ts declares `Gender = 'male' | 'female'` and the
+    #  opening asks for it. One player portrait would show half the players
+    #  somebody else, on the profile header, every session.
+    #
+    #  Deliberately plainer than the rest of the cast: no glasses, no
+    #  moustache, no flat cap. The protagonist is the face the player brings
+    #  themselves to, and a strong tic on it is a character they did not
+    #  choose. It also keeps them clear of the brother, who owns the slicked
+    #  hair and the square glasses.
+    # ------------------------------------------------------------------
+    'player_male': 'a person in their thirties, square jaw, '
+                   'short cropped hair, clean shaven, no glasses, '
+                   'dark suit and tie',
+    'player_female': 'a person in their thirties, angular sharp cheekbones, '
+                     'long hair swept to one side, no glasses, '
+                     'dark suit and tie',
+
     'father': 'a person elderly, broad heavy jaw, receding hairline, '
               'clean shaven, no glasses, dark suit and tie',
     'brother': 'a person in their forties, angular sharp cheekbones, '
@@ -296,8 +322,16 @@ CAST_LOOKS = {
 }
 
 
+#  The player is not in cast.ts - they are the person holding the phone -
+#  so they are added to the roster here rather than read from it.
+PLAYER = {
+    'player_male': 'You (male)',
+    'player_female': 'You (female)',
+}
+
+
 def read_cast() -> dict:
-    """{id: name} out of src/data/story/cast.ts, so the two cannot drift."""
+    """{id: name} out of src/data/story/cast.ts, plus the player."""
     path = os.path.join(HERE, '..', 'src', 'data', 'story', 'cast.ts')
     try:
         src = open(path, encoding='utf8').read()
@@ -309,7 +343,7 @@ def read_cast() -> dict:
         nm = re.search(r"name:\s*'((?:[^'\\]|\\.)*)'", body)
         if nm:
             out[key] = nm.group(1).replace("\\'", "'")
-    return out
+    return {**PLAYER, **out}
 
 
 # ---------------------------------------------------------------------------

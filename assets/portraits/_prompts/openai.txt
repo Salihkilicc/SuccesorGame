@@ -1,7 +1,7 @@
 # Wen Zhao-Lindqvist
 # ramp   : violet
 # kaydet : assets/portraits/openai.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --circle --preview
 
 a person in their thirties, narrow face, straight bob cut, clean shaven, thin rectangular glasses, turtleneck sweater,
 

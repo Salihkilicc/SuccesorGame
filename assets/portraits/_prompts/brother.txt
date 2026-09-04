@@ -1,7 +1,7 @@
 # Julian Hale
 # ramp   : cool
 # kaydet : assets/portraits/brother.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp cool --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp cool --circle --preview
 
 a person in their forties, angular sharp cheekbones, slicked back hair, clean shaven, thick square glasses, blazer over a plain shirt,
 

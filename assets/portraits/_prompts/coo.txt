@@ -1,7 +1,7 @@
 # Dana Whitfield
 # ramp   : bright
 # kaydet : assets/portraits/coo.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
 
 a person in their forties, square jaw, hair tied back in a bun, no glasses, plain work shirt,
 

@@ -1,7 +1,7 @@
 # Dr. Eleanor Ratliff
 # ramp   : steel
 # kaydet : assets/portraits/swanson.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp steel --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp steel --circle --preview
 
 a person in their sixties, long thin face, short cropped hair, clean shaven, heavy black frames, buttoned waistcoat,
 

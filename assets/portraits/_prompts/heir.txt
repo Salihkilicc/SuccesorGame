@@ -1,7 +1,7 @@
 # Your Successor
 # ramp   : cool
 # kaydet : assets/portraits/heir.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp cool --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp cool --circle --preview
 
 a person in their late teens, narrow face, messy tousled hair, clean shaven, no glasses, open collar shirt, no tie,
 

@@ -1,7 +1,7 @@
 # Marco Alvarez
 # ramp   : bright
 # kaydet : assets/portraits/friend.png
-# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --autocrop --preview
+# komut  : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
 
 a person in their forties, round full face, short curly hair, short stubble, no glasses, open collar shirt, no tie,
 
