@@ -262,7 +262,23 @@ def appearance(name: str, female: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-#  THE STYLE TERMS CARRY WEIGHTS NOW, AND THE REASON IS ARITHMETIC
+#  I WEIGHTED ALL OF THIS AND IT MADE IT WORSE, SO IT IS BACK
+# ---------------------------------------------------------------------------
+#  One portrait came back too smooth, so I raised the weights on every style
+#  term and added anti-smooth words to the negative. The next one came back
+#  as a pulp comic cover: ink splattered background, exaggerated hair, an
+#  angry face. Overcorrected past the target in one step.
+#
+#  The plain reading is that this file is the same mistake as autocrop. Four
+#  portraits were already right - father, brother, cfo, player_male - and
+#  they were made with the UNWEIGHTED text below. I kept adding to a thing
+#  that worked, one reasonable sounding step at a time, and each step took
+#  emphasis from the step before it until the prompt was arguing with
+#  itself.
+#
+#  So this is exactly what produced the four that were kept, and the rule
+#  for anything that comes out wrong from here is to change ONE line and
+#  look, rather than to raise a weight and add three words.
 # ---------------------------------------------------------------------------
 #  Reported as "this one is not hand drawn like the others, it is too smooth,
 #  it looks like AI". Correct: the first portraits had thick ink lines and
@@ -279,10 +295,9 @@ def appearance(name: str, female: bool = False) -> dict:
 #  They have to win an argument, not just be in the room.
 # ---------------------------------------------------------------------------
 
-BASE = """(bold thick ink outlines:1.4), (flat color:1.5), (cel shading:1.4),
-(no gradient:1.4), (hard edged shadows:1.3), 2 tone shading, posterized,
-limited palette, cut paper look, poster art, (screen print:1.3),
-clean geometric shapes, visible linework,
+BASE = """flat vector portrait, bold thick outlines, (flat color:1.4),
+(no gradient:1.3), 2 tone shading, posterized, limited palette,
+cut paper look, poster art, screen print, clean geometric shapes,
 
 (close up portrait:1.4), (head fills the frame:1.4), tight crop,
 head and top of shoulders only, chin and top of hair inside the frame,
@@ -299,9 +314,7 @@ NEGATIVE = """anime, manga, chibi, big eyes, anime style,
 (full body:1.4), (waist up:1.3), wide shot, distant, small head,
 lots of empty background, torso, chest, hands, arms,
 
-(airbrush:1.4), (smooth shading:1.4), (soft gradient:1.4),
-(rendered:1.3), (digital painting:1.3), (blended shading:1.3),
-gradient, painterly, soft focus, glossy, polished, glow, bloom,
+gradient, soft shading, airbrush, smooth shading, rendered, painterly,
 photorealistic, photograph, detailed hair strands, individual hair,
 stubble texture, skin texture, pores, volumetric light,
 
@@ -349,9 +362,10 @@ def negative_for(name: str, cast_id: str = '') -> str:
             'heavy makeup, long eyelashes, pin up,\n\n'
             # The second drift, named the same way the first one was. These
             # are the words for "somebody who works for the boss".
-            '(doe eyed:1.3), wide innocent eyes, girlish, cute, ingenue,\n'
-            'student, nurse, doctor, lab coat, scrubs, timid, deferential,\n'
-            'big round glasses, loose flowing hair, windswept hair'
+            'doe eyed, wide innocent eyes, girlish, cute, ingenue,\n'
+            'student, nurse, doctor, lab coat, scrubs, timid,\n'
+            'big round glasses, loose flowing hair, windswept hair,\n'
+            'ink splatter, paint splatter, busy background, comic cover'
         )
     return NEGATIVE + '\n\n(woman:1.3), (female:1.2), long flowing hair'
 
@@ -454,14 +468,14 @@ CAST_LOOKS = {
     #
     # Pulled back hair also survives the circle at 46 pixels, where a loose
     # mane is one dark blob filling half of it.
+    #  Third pass, and the lesson is that authority is worn, not shouted.
+    #  "(chief executive:1.3), (commanding presence:1.3)" produced a scowling
+    #  comic villain; the same person described plainly reads as somebody who
+    #  runs things. Age and restrained hair do the work, in ordinary words.
     'player_female': '(a woman:1.4), (female:1.3) in her forties, '
-                     '(chief executive:1.3), (commanding presence:1.3), '
                      'angular sharp cheekbones, strong jawline, '
-                     '(hair pulled back tightly:1.3), '
-                     '(sharp rectangular glasses:1.2), '
-                     'crisp white collared shirt, '
-                     'structured dark power suit with peaked lapels, '
-                     '(composed level gaze:1.2)',
+                     'hair pulled back tightly, thin rectangular glasses, '
+                     'crisp white collared shirt under a dark tailored suit',
 
     'father': 'a person elderly, broad heavy jaw, receding hairline, '
               'clean shaven, no glasses, dark suit and tie',
