@@ -34,6 +34,8 @@ palette_map.py - force generated portraits into the game's own palette.
  --preview write a sheet showing the portrait at the sizes the app really
            renders it at. This is the only test that decides whether a
            style works, because 46 pixels is where the answer lives.
+ --autocrop find the head against the flat background and crop to it, so
+           the framing stops depending on what the model felt like doing.
 """
 
 import argparse
@@ -175,9 +177,165 @@ def circle_crop(img: Image.Image) -> Image.Image:
     return out
 
 
+# ---------------------------------------------------------------------------
+#  CROP TO THE HEAD, BECAUSE THE PROMPT WILL NOT DO IT
+# ---------------------------------------------------------------------------
+#  Asked for repeatedly and never delivered: "the head is too small and too
+#  far away". Every prompt fix moved it a little and none of them held. The
+#  model decides framing, the model is not reliable about it, and 153
+#  portraits is far too many to inspect one at a time.
+#
+#  But these images have a property worth using: a plain solid background,
+#  because the prompt asks for one and the palette map flattens it further.
+#  That makes the subject separable without any face detection at all.
+#
+#      1. the background colour is whatever the corners agree on
+#      2. the subject is every pixel far enough from it
+#      3. walking down from the top, the subject's width creeps through the
+#         head and then JUMPS at the shoulders
+#      4. so the head is everything above that jump
+#
+#  Deterministic, no model, no extra dependency, and it fails safe: if no
+#  shoulder line is found the frame is returned untouched rather than
+#  guessed at.
+# ---------------------------------------------------------------------------
+
+#  The floor under the subject threshold. The threshold itself is chosen per
+#  image (see `subject_mask`); this only stops a picture of nothing from
+#  deciding that its own sensor noise is a person.
+#
+#  A FIXED THRESHOLD WAS WRONG AND THE TEST CAUGHT IT. At a flat 34, a
+#  portrait with dark hair on the ink coloured ground lost the hair
+#  entirely: the two differ by 27, so the crown read as background, the
+#  "top of the head" was found at the forehead, and the crop came back
+#  160 pixels tall on a 1024 image. Three of four cases passed, which is
+#  exactly the kind of nearly right that ships.
+SUBJECT_FLOOR = 12
+
+
+def subject_mask(a: np.ndarray, bg: np.ndarray) -> np.ndarray:
+    """
+    Subject versus background, thresholded per image rather than by a constant.
+
+    Distance from the background colour is strongly bimodal in these
+    portraits - there is a person and there is a flat backdrop - so Otsu's
+    method finds the split without being told where it is. That holds for a
+    dark head on a dark ground and for a light head on a light one, which a
+    single number never will.
+    """
+    dist = np.abs(a - bg).sum(axis=2)
+    hist = np.bincount(np.clip(dist, 0, 765).ravel().astype(np.int64), minlength=766)
+    total = dist.size
+    w0 = np.cumsum(hist)
+    w1 = total - w0
+    levels = np.arange(766)
+    csum = np.cumsum(hist * levels)
+    grand = csum[-1]
+    with np.errstate(invalid='ignore', divide='ignore'):
+        m0 = csum / w0
+        m1 = (grand - csum) / w1
+        between = w0 * w1 * (m0 - m1) ** 2
+    between[~np.isfinite(between)] = 0
+    thresh = max(SUBJECT_FLOOR, int(np.argmax(between)))
+    return dist > thresh
+
+#  The width jump that means shoulders. Measured against the median width of
+#  the head rows above it. A head is roughly one unit wide and a pair of
+#  shoulders is roughly two, so 1.55 sits clear of both.
+SHOULDER_RATIO = 1.55
+
+#  Breathing room around the head, as a share of its height. Without this the
+#  circle mask shaves the top of the hair and the point of the chin.
+HEAD_MARGIN = 0.30
+
+
+def head_box(img: Image.Image):
+    """The square to crop to, or None if the picture will not give one up."""
+    a = np.asarray(img.convert('RGB'), dtype=np.int16)
+    h, w, _ = a.shape
+
+    # The background is what the four corners agree on. A corner patch rather
+    # than a single pixel, so one stray dark speck cannot define it.
+    k = max(4, min(h, w) // 32)
+    corners = np.concatenate([
+        a[:k, :k].reshape(-1, 3), a[:k, -k:].reshape(-1, 3),
+        a[-k:, :k].reshape(-1, 3), a[-k:, -k:].reshape(-1, 3),
+    ])
+    bg = np.median(corners, axis=0)
+
+    subject = subject_mask(a, bg)
+    widths = subject.sum(axis=1)
+
+    rows = np.flatnonzero(widths > w * 0.02)
+    if rows.size == 0:
+        return None
+    top = int(rows[0])
+
+    # Walk down from the crown looking for the shoulders. Start measuring
+    # after a little of the head so the first few thin rows of hair do not
+    # set the baseline.
+    #
+    # TWO GUARDS, BOTH PUT THERE BY A FAILING CASE. On a portrait whose hair
+    # was nearly the colour of the ground, the crown read as background, the
+    # face below it widened suddenly, and that single widening row was taken
+    # for a pair of shoulders: the crop came back 160 pixels tall on a 1024
+    # image, which is a chin and nothing else.
+    #
+    #   sustained  a real shoulder line stays wide. One wide row is an ear,
+    #              a collar point, or a gap in a badly separated crown.
+    #   plausible  a head that is under an eighth of the frame means the
+    #              crown was missed. Keep looking rather than believe it.
+    #
+    # If neither ever agrees, this returns None and the caller leaves the
+    # framing alone. Failing safe matters more than framing every one: a
+    # portrait that is merely too wide is usable, a portrait cropped to a
+    # jaw is not.
+    SUSTAIN = max(3, int(h * 0.01))
+    MIN_HEAD = h * 0.12
+
+    start = top + max(4, int(h * 0.02))
+    shoulder = None
+    for y in range(start + 1, h - SUSTAIN):
+        seen = widths[start:y]
+        seen = seen[seen > 0]
+        if seen.size < max(8, h * 0.03):
+            continue
+        line = np.median(seen) * SHOULDER_RATIO
+        if widths[y] > line and np.all(widths[y:y + SUSTAIN] > line):
+            if y - top < MIN_HEAD:
+                continue
+            shoulder = y
+            break
+    if shoulder is None:
+        return None
+
+    # Centre on the head itself, not on the whole picture: a head turned to
+    # one side does not sit in the middle of the frame.
+    band = subject[top:shoulder]
+    cols = np.flatnonzero(band.sum(axis=0) > 0)
+    if cols.size == 0:
+        return None
+    cx = (int(cols[0]) + int(cols[-1])) // 2
+
+    head_h = shoulder - top
+    side = int(head_h * (1 + HEAD_MARGIN * 2))
+    cy = top + head_h // 2
+
+    left = max(0, min(w - side, cx - side // 2))
+    upper = max(0, min(h - side, cy - side // 2))
+    side = min(side, w - left, h - upper)
+    return (left, upper, left + side, upper + side)
+
+
 def convert(path: str, out_dir: str, lut: np.ndarray, size: int, circle: bool,
-            preview: bool = False) -> str:
-    img = Image.open(path)
+            preview: bool = False, autocrop: bool = False) -> str:
+    img = Image.open(path).convert('RGB')
+    if autocrop:
+        box = head_box(img)
+        if box:
+            img = img.crop(box)
+        else:
+            print(f'    (kafa bulunamadi, kadraj degismedi: {os.path.basename(path)})')
     if img.size[0] != img.size[1]:
         side = min(img.size)
         left = (img.size[0] - side) // 2
@@ -264,6 +422,8 @@ def main() -> int:
                     help='also write the ramp itself as ramp_<name>.png')
     ap.add_argument('--preview', action='store_true',
                     help='write a sheet showing the real 80px and 46px avatar')
+    ap.add_argument('--autocrop', action='store_true',
+                    help='find the head against the flat background and crop to it')
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -288,7 +448,7 @@ def main() -> int:
         return 1
 
     for f in files:
-        print(f'  {os.path.basename(f)} -> {os.path.basename(convert(f, args.out, lut, args.size, args.circle, args.preview))}')
+        print(f'  {os.path.basename(f)} -> {os.path.basename(convert(f, args.out, lut, args.size, args.circle, args.preview, args.autocrop))}')
     print(f'\n{len(files)} image(s), ramp "{args.ramp}", {args.size}px')
     return 0
 
