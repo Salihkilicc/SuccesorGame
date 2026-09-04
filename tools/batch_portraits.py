@@ -92,7 +92,8 @@ def find_checkpoint(preferred: str = '') -> str:
     return names[0]
 
 
-def workflow(ckpt: str, positive: str, negative: str, seed: int) -> dict:
+def workflow(ckpt: str, positive: str, negative: str, seed: int,
+             ramp: str = 'warm') -> dict:
     """
     The API format graph, which is NOT the format the interface saves.
 
@@ -101,11 +102,19 @@ def workflow(ckpt: str, positive: str, negative: str, seed: int) -> dict:
     here by hand rather than converted, so a change in the interface's save
     format cannot quietly break the batch.
 
-    NO PALETTE NODE. Measured: applying a ramp here and a different one in
-    palette_map afterwards is not the same as applying the right one once -
-    19/255 mean difference, and the first map flattens 256 tonal steps to
-    182 for the second one to work from. The colour is applied exactly once,
-    downstream.
+    THE PALETTE NODE IS IN THE GRAPH, asked for as "I want it generated
+    warm, not raw". So ComfyUI hands back a portrait that is already on the
+    ramp and nothing downstream touches the colour.
+
+    The rule that mattered still holds and is the reason the second map was
+    removed rather than left in: the colour is applied EXACTLY ONCE. Mapping
+    here and again in palette_map would be the double map measured earlier -
+    19/255 apart from a single correct map, with 256 tonal steps flattened
+    to 182 before the second one starts.
+
+    The cost, stated once: there is no unmapped master any more. Changing a
+    character's colour later means generating them again rather than
+    remapping in a second. That was the trade asked for.
     """
     return {
         '1': {'class_type': 'CheckpointLoaderSimple',
@@ -124,14 +133,18 @@ def workflow(ckpt: str, positive: str, negative: str, seed: int) -> dict:
                          'latent_image': ['4', 0]}},
         '6': {'class_type': 'VAEDecode',
               'inputs': {'samples': ['5', 0], 'vae': ['1', 2]}},
-        '7': {'class_type': 'SaveImage',
-              'inputs': {'filename_prefix': 'batch', 'images': ['6', 0]}},
+        '8': {'class_type': 'SuccesorPaletteMap',
+              'inputs': {'image': ['6', 0], 'ramp': ramp, 'strength': 1.0}},
+        '9': {'class_type': 'SaveImage',
+              'inputs': {'filename_prefix': 'batch', 'images': ['8', 0]}},
     }
 
 
-def run_one(ckpt: str, positive: str, negative: str, seed: int, timeout=300):
+def run_one(ckpt: str, positive: str, negative: str, seed: int,
+            ramp: str = 'warm', timeout=300):
     """Queue it, wait for it, hand back the PNG bytes."""
-    pid = api('/prompt', {'prompt': workflow(ckpt, positive, negative, seed)})['prompt_id']
+    pid = api('/prompt',
+              {'prompt': workflow(ckpt, positive, negative, seed, ramp)})['prompt_id']
     waited = 0
     while waited < timeout:
         hist = api(f'/history/{pid}')
@@ -301,29 +314,24 @@ def main() -> int:
         # Seeded from the name, so a rerun of one person is the same person.
         seed = PP.wide_hash(nm) % (2 ** 31)
         try:
-            raw = run_one(ckpt, pos, neg, seed)
+            raw = run_one(ckpt, pos, neg, seed, ramp)
         except Exception as e:                      # noqa: BLE001
             print(f'  [{i}/{len(todo)}] {cid:24s} FAILED  {e}')
             failed += 1
             continue
-        raw_path = os.path.join(RAW_DIR, f'{cid}.png')
-        open(raw_path, 'wb').write(raw)
-        # ONE implementation of the mapping, and it lives in palette_map.
-        # This used to inline its own copy and got the ORDER wrong: it
-        # mapped at 1024 and then resized to 512, and LANCZOS blends
-        # neighbouring pixels, so a 242 colour image came back with 11,922
-        # of them and none of the extras on the ramp. Measured on one file:
-        #
-        #     raw               26,346 colours
-        #     after the map        242   correct
-        #     after the resize  11,922   ruined
-        #
-        # palette_map.convert resizes FIRST and maps last, which is why the
-        # portraits made by hand were right and the batched ones were not.
-        # Calling it rather than copying it is the actual fix; the ordering
-        # was only the symptom.
-        PM.convert(raw_path, OUT_DIR, PM.build_lut(PM.RAMPS[ramp]),
-                   512, circle=False)
+        # Already on the ramp: ComfyUI applied it. The full size copy is
+        # kept as the master, but it is a MAPPED master now, not a raw one.
+        master = os.path.join(RAW_DIR, f'{cid}.png')
+        open(master, 'wb').write(raw)
+        # NO SECOND MAP. Only a resize, and it has to be a resize of an
+        # image that is already on the ramp, which LANCZOS will blur across
+        # ramp steps. Measured when the batch did map then resize: a 242
+        # colour image came back with 11,922, none of the extras on the
+        # ramp. So the shrink is NEAREST, which cannot invent a colour that
+        # was not already there.
+        img = Image.open(io.BytesIO(raw)).convert('RGB')
+        img.resize((512, 512), Image.NEAREST).save(
+            os.path.join(OUT_DIR, f'{cid}.png'))
         done += 1
         print(f'  [{i}/{len(todo)}] {cid:24s} {ramp:7s} ok')
 
