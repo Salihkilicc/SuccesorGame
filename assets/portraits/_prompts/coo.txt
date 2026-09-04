@@ -2,7 +2,6 @@
 # ramp    : (a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, plain work shirt
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/coo.png
-# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp (a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, plain work shirt --circle --preview
 
 (a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, collared work shirt,
 

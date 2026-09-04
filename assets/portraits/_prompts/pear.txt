@@ -2,7 +2,6 @@
 # ramp    : warm
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/pear.png
-# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp warm --circle --preview
 
 a person in their fifties, angular sharp cheekbones, side parted hair, clean shaven, no glasses, dark suit and tie,
 

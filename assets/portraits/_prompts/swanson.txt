@@ -2,7 +2,6 @@
 # ramp    : steel
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/swanson.png
-# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp steel --circle --preview
 
 (a woman:1.4), (female:1.3) in her sixties, long thin face, short cropped hair, heavy black frames, buttoned waistcoat,
 

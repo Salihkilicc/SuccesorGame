@@ -21,4 +21,8 @@ deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry
 stubble, necktie, receding hairline, bald,
 
 bare shoulders, strapless, evening gown, glamour, fashion model,
-heavy makeup, long eyelashes, pin up
+heavy makeup, long eyelashes, pin up,
+
+(doe eyed:1.3), wide innocent eyes, girlish, cute, ingenue,
+student, nurse, doctor, lab coat, scrubs, timid, deferential,
+big round glasses, loose flowing hair, windswept hair

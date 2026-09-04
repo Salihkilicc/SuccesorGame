@@ -2,7 +2,6 @@
 # ramp    : violet
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/hacker.png
-# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp violet --circle --preview
 
 a person in their thirties, narrow face, shaved head, short stubble, heavy black frames, high collared coat,
 

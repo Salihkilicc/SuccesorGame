@@ -2,7 +2,6 @@
 # ramp    : warm
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/edison.png
-# komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp warm --circle --preview
 
 a person in their sixties, broad heavy jaw, bald on top, thick moustache, no glasses, plain work shirt,
 

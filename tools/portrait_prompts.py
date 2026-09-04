@@ -346,7 +346,12 @@ def negative_for(name: str, cast_id: str = '') -> str:
             '\n\n(man:1.4), (male:1.3), masculine face, beard, moustache,\n'
             'stubble, necktie, receding hairline, bald,\n\n'
             'bare shoulders, strapless, evening gown, glamour, fashion model,\n'
-            'heavy makeup, long eyelashes, pin up'
+            'heavy makeup, long eyelashes, pin up,\n\n'
+            # The second drift, named the same way the first one was. These
+            # are the words for "somebody who works for the boss".
+            '(doe eyed:1.3), wide innocent eyes, girlish, cute, ingenue,\n'
+            'student, nurse, doctor, lab coat, scrubs, timid, deferential,\n'
+            'big round glasses, loose flowing hair, windswept hair'
         )
     return NEGATIVE + '\n\n(woman:1.3), (female:1.2), long flowing hair'
 
@@ -436,10 +441,27 @@ CAST_LOOKS = {
     # came back reading as a fashion portrait rather than somebody who runs
     # a company. The collar is what does most of that work, and it survives
     # the circle mask because it sits right under the chin.
-    'player_female': '(a woman:1.4), (female:1.3) in her thirties, '
-                     'angular sharp cheekbones, long hair swept to one side, '
-                     'thin rectangular glasses, white collared shirt '
-                     'under a dark tailored blazer',
+    # THE THIRD PASS, and the note is the useful part. Asked for a chief
+    # executive and got, twice, somebody who works for one: first a fashion
+    # portrait, then "she looks like a doctor".
+    #
+    # The words that were doing it are not the ones you would suspect. Round
+    # glasses, wide eyes and loose flowing hair together read as young and
+    # deferential no matter what the clothes say, and "in her thirties" was
+    # letting the model pick the youngest reading of it. Authority is carried
+    # by AGE, by CONTROL - hair that is deliberately restrained rather than
+    # styled - and by a level gaze, and only then by the suit.
+    #
+    # Pulled back hair also survives the circle at 46 pixels, where a loose
+    # mane is one dark blob filling half of it.
+    'player_female': '(a woman:1.4), (female:1.3) in her forties, '
+                     '(chief executive:1.3), (commanding presence:1.3), '
+                     'angular sharp cheekbones, strong jawline, '
+                     '(hair pulled back tightly:1.3), '
+                     '(sharp rectangular glasses:1.2), '
+                     'crisp white collared shirt, '
+                     'structured dark power suit with peaked lapels, '
+                     '(composed level gaze:1.2)',
 
     'father': 'a person elderly, broad heavy jaw, receding hairline, '
               'clean shaven, no glasses, dark suit and tie',
