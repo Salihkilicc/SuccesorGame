@@ -434,8 +434,8 @@ RAMP_BY_ID = {
     # a row of Hales. Same palette, one step brighter.
     'player_male': 'bright', 'player_female': 'bright',
     'father': 'cool', 'brother': 'cool', 'heir': 'cool',
-    'coo': '(a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, plain work shirt', 'friend': 'bright',
-    'cto': '(a woman:1.4), (female:1.3) in her thirties, narrow face, shoulder length straight hair, no glasses, turtleneck sweater', 'openai': 'violet', 'hacker': 'violet',
+    'coo': 'bright', 'friend': 'bright',
+    'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
     'pear': 'warm', 'edison': 'warm',
     'cfo': 'steel', 'swanson': 'steel',
 }

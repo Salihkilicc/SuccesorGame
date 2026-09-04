@@ -1,27 +1,27 @@
 # KADRO PORTRE LISTESI
 
-# NEGATIF IKI TANE: kadin karakterlerde 00_NEGATIF_kadin.txt,
-# erkeklerde 00_NEGATIF_erkek.txt. Karistirma, model yanlis cinsiyete kayiyor.
+# NEGATIF IKI TANE. Kadinlarda 00_NEGATIF_kadin.txt, erkeklerde
+# 00_NEGATIF_erkek.txt. Karistirma, model yanlis cinsiyete kayiyor.
 
-id             kim                        ramp    K/E  dosya
-------------------------------------------------------------------------------
-player_male    You (male)                 bright  E    player_male.png
-player_female  You (female)               bright  K    player_female.png
-father         Your Father                cool    E    father.png
-brother        Julian Hale                cool    E    brother.png
-cfo            Arthur Vance               steel   E    cfo.png
-coo            Dana Whitfield             (a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, plain work shirt K    coo.png
-cto            Priya Raman                (a woman:1.4), (female:1.3) in her thirties, narrow face, shoulder length straight hair, no glasses, turtleneck sweater K    cto.png
-heir           Your Successor             cool    E    heir.png
-friend         Marco Alvarez              bright  E    friend.png
-pear           Nathan Vogel               warm    E    pear.png
-edison         Hal Brennerman             warm    E    edison.png
-openai         Wen Zhao-Lindqvist         violet  K    openai.png
-swanson        Dr. Eleanor Ratliff        steel   K    swanson.png
-hacker         Cipher                     violet  E    hacker.png
+   id             kim                        ramp    K/E  dosya
+--------------------------------------------------------------------------------
+OK player_male    You (male)                 bright  E    player_male.png
+OK player_female  You (female)               bright  K    player_female.png
+OK father         Your Father                cool    E    father.png
+OK brother        Julian Hale                cool    E    brother.png
+OK cfo            Arthur Vance               steel   E    cfo.png
+   coo            Dana Whitfield             bright  K    coo.png
+   cto            Priya Raman                violet  K    cto.png
+   heir           Your Successor             cool    E    heir.png
+   friend         Marco Alvarez              bright  E    friend.png
+   pear           Nathan Vogel               warm    E    pear.png
+   edison         Hal Brennerman             warm    E    edison.png
+   openai         Wen Zhao-Lindqvist         violet  K    openai.png
+   swanson        Dr. Eleanor Ratliff        steel   K    swanson.png
+   hacker         Cipher                     violet  E    hacker.png
 
 YUZ YOK (portre yapma):
-  unknown        Unknown Number             the whole point is that you do not know who it is
-  vulture        Halberd Partners           a fund, not a person
-  regulator      Consumer Safety Directorate a division with letterhead
-  fbi            Field Office               a field office, not a face
+   unknown        Unknown Number             the whole point is that you do not know who it is
+   vulture        Halberd Partners           a fund, not a person
+   regulator      Consumer Safety Directorate a division with letterhead
+   fbi            Field Office               a field office, not a face

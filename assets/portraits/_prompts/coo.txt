@@ -1,5 +1,5 @@
 # Dana Whitfield
-# ramp    : (a woman:1.4), (female:1.3) in her forties, square jaw, hair tied back in a bun, no glasses, plain work shirt
+# ramp    : bright
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/coo.png
 

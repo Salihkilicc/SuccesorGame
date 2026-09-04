@@ -1,5 +1,5 @@
 # Priya Raman
-# ramp    : (a woman:1.4), (female:1.3) in her thirties, narrow face, shoulder length straight hair, no glasses, turtleneck sweater
+# ramp    : violet
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/cto.png
 
