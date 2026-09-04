@@ -479,10 +479,28 @@ CAST_LOOKS = {
     #  "(chief executive:1.3), (commanding presence:1.3)" produced a scowling
     #  comic villain; the same person described plainly reads as somebody who
     #  runs things. Age and restrained hair do the work, in ordinary words.
+    #  FOURTH PASS, and this time the difference was countable rather than
+    #  aesthetic. Side by side, the four kept portraits are built from
+    #  faceted planes and she was built from smooth surfaces and fine line
+    #  detail. It looked like a brush problem. It was a length problem:
+    #
+    #      brother        21 words of description
+    #      father         16
+    #      cfo            17
+    #      player_male    18
+    #      player_female  27   <- 26% of the prompt, against their 19%
+    #
+    #  Style got 74% of her prompt and 81% of theirs, and that gap is the
+    #  whole visible difference. Every extra descriptor she carried - the
+    #  second gender term, the jawline, "crisp", "tailored" - was taken out
+    #  of the thing that makes them look like one set.
+    #
+    #  So she is cut to their length rather than shouted louder. Same fix as
+    #  the last two, arrived at from the other end: the answer to a diluted
+    #  prompt is fewer words, never more weight.
     'player_female': '(a woman:1.4), (female:1.3) in her forties, '
-                     'angular sharp cheekbones, strong jawline, '
-                     'hair pulled back tightly, thin rectangular glasses, '
-                     'crisp white collared shirt under a dark tailored suit',
+                     'sharp cheekbones, hair pulled back tightly, '
+                     'thin rectangular glasses, dark suit and white collar',
 
     'father': 'a person elderly, broad heavy jaw, receding hairline, '
               'clean shaven, no glasses, dark suit and tie',

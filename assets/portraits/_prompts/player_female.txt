@@ -3,7 +3,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/player_female.png
 
-(a woman:1.4), (female:1.3) in her forties, angular sharp cheekbones, strong jawline, hair pulled back tightly, thin rectangular glasses, crisp white collared shirt under a dark tailored suit,
+(a woman:1.4), (female:1.3) in her forties, sharp cheekbones, hair pulled back tightly, thin rectangular glasses, dark suit and white collar,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,
