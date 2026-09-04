@@ -4,7 +4,7 @@
 # kaydet  : assets/portraits/player_female.png
 # komut   : python3 tools/palette_map.py CIKTI.png /tmp/tek --ramp bright --circle --preview
 
-(a woman:1.4), (female:1.3) in her thirties, angular sharp cheekbones, long hair swept to one side, no glasses, dark tailored blazer,
+(a woman:1.4), (female:1.3) in her thirties, angular sharp cheekbones, long hair swept to one side, thin rectangular glasses, white collared shirt under a dark tailored blazer,
 
 flat vector portrait, bold thick outlines, (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

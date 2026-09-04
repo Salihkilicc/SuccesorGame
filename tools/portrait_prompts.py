@@ -323,7 +323,9 @@ def negative_for(name: str, cast_id: str = '') -> str:
     if is_female(name, cast_id):
         return NEGATIVE + (
             '\n\n(man:1.4), (male:1.3), masculine face, beard, moustache,\n'
-            'stubble, necktie, receding hairline, bald'
+            'stubble, necktie, receding hairline, bald,\n\n'
+            'bare shoulders, strapless, evening gown, glamour, fashion model,\n'
+            'heavy makeup, long eyelashes, pin up'
         )
     return NEGATIVE + '\n\n(woman:1.3), (female:1.2), long flowing hair'
 
@@ -409,9 +411,14 @@ CAST_LOOKS = {
     'player_male': '(a man:1.3) in his thirties, square jaw, '
                    'short cropped hair, clean shaven, no glasses, '
                    'dark suit and tie',
+    # Glasses and a collar were asked for after seeing the first pass: it
+    # came back reading as a fashion portrait rather than somebody who runs
+    # a company. The collar is what does most of that work, and it survives
+    # the circle mask because it sits right under the chin.
     'player_female': '(a woman:1.4), (female:1.3) in her thirties, '
                      'angular sharp cheekbones, long hair swept to one side, '
-                     'no glasses, dark tailored blazer',
+                     'thin rectangular glasses, white collared shirt '
+                     'under a dark tailored blazer',
 
     'father': 'a person elderly, broad heavy jaw, receding hairline, '
               'clean shaven, no glasses, dark suit and tie',
@@ -423,9 +430,9 @@ CAST_LOOKS = {
     'cfo': 'a person in their sixties, long thin face, receding hairline, '
            'clean shaven, thin rectangular glasses, buttoned waistcoat',
     'coo': '(a woman:1.4), (female:1.3) in her forties, square jaw, '
-           'hair tied back in a bun, no glasses, plain work shirt',
+           'hair tied back in a bun, no glasses, collared work shirt',
     'cto': '(a woman:1.4), (female:1.3) in her thirties, narrow face, '
-           'shoulder length straight hair, no glasses, turtleneck sweater',
+           'shoulder length straight hair, no glasses, high collared turtleneck',
     'friend': 'a person in their forties, round full face, short curly hair, '
               'short stubble, no glasses, open collar shirt, no tie',
     'pear': 'a person in their fifties, angular sharp cheekbones, '

@@ -16,4 +16,7 @@ text, watermark, signature, logo, frame, border, blurry, low detail,
 deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry
 
 (man:1.4), (male:1.3), masculine face, beard, moustache,
-stubble, necktie, receding hairline, bald
+stubble, necktie, receding hairline, bald,
+
+bare shoulders, strapless, evening gown, glamour, fashion model,
+heavy makeup, long eyelashes, pin up
