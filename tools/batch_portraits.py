@@ -171,15 +171,28 @@ def run_one(ckpt: str, positive: str, negative: str, seed: int, timeout=300):
 #  stranger is the same colour every time you sit down with them.
 # ---------------------------------------------------------------------------
 
+#  SUPERSEDED: the split above described the world correctly and is kept
+#  because the reasoning still holds if the colour ever moves back offline.
+#  The colour is now applied in the app at runtime, so what gets written
+#  here is the SOURCE, and a source has to be neutral - see the note on the
+#  'neutral' ramp in palette_map. Everybody is written grey; who is steel
+#  and who is warm is decided by the app, from RAMP_BY_ID and this split.
+#
+#    def stranger_ramp(name: str) -> str:
+#        return 'warm' if PP.wide_hash(f'{name}:ramp') % 2 else 'steel'
+
+SOURCE_RAMP = 'neutral'
+
+
 def stranger_ramp(name: str) -> str:
-    return 'warm' if PP.wide_hash(f'{name}:ramp') % 2 else 'steel'
+    return SOURCE_RAMP
 
 
 def roster(cast_only: bool):
     """[(id, name, ramp, female)] for whichever set was asked for."""
     if cast_only:
         cast = PP.read_cast()
-        return [(cid, nm, PP.ramp_for(cid), PP.is_female(nm, cid))
+        return [(cid, nm, SOURCE_RAMP, PP.is_female(nm, cid))
                 for cid, nm in cast.items() if cid not in PP.FACELESS]
     out = []
     for names in PP.read_names().values():

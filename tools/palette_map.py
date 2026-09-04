@@ -127,6 +127,22 @@ RAMPS = {
 
     # The research violet. Scientists, the laboratory, anything clinical.
     'violet': [(0.00, C['ink']), (0.55, C['blueDeep']), (1.00, C['violet'])],
+
+    # ----------------------------------------------------------------------
+    #  NEUTRAL, WHICH IS NOT A LOOK BUT A SOURCE FORMAT
+    # ----------------------------------------------------------------------
+    #  For portraits that will be tinted at RUNTIME rather than here. A
+    #  runtime duotone reads luminance and maps it, exactly as this does, so
+    #  handing it an already coloured image maps twice. Measured earlier:
+    #  warm then violet against violet directly is 19/255 apart and the
+    #  first map flattens 256 tonal steps to 182 for the second to work
+    #  from.
+    #
+    #  Pure black to white, so the full range survives to the filter and any
+    #  ramp can be reached from it at full fidelity. Also the safe fallback:
+    #  if the filter ever fails to apply, a grey portrait is a portrait.
+    # ----------------------------------------------------------------------
+    'neutral': [(0.00, '#000000'), (0.50, '#808080'), (1.00, '#FFFFFF')],
 }
 
 
