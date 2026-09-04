@@ -181,7 +181,29 @@ def run_one(ckpt: str, positive: str, negative: str, seed: int, timeout=300):
 #    def stranger_ramp(name: str) -> str:
 #        return 'warm' if PP.wide_hash(f'{name}:ramp') % 2 else 'steel'
 
-SOURCE_RAMP = 'neutral'
+# ---------------------------------------------------------------------------
+#  WARM, ASKED FOR AND MEASURED
+# ---------------------------------------------------------------------------
+#  I argued for neutral twice, on the grounds that a source which is tinted
+#  again later is mapped twice. That is true and it is measurable, at 46
+#  pixels as much as at 1024:
+#
+#      warm source + filter, against neutral source + filter
+#          1024px   13 to 16 / 255
+#            46px   13 to 16 / 255
+#      for scale:  the eye notices about 2, two different portraits are 50
+#
+#  So the difference is real and does not shrink at avatar size. What it is
+#  NOT is damage: nothing tears, nothing bands, the face is the same face in
+#  a slightly softer colour. It was chosen by looking at the two, which is
+#  the right way to settle a question about how something looks, and the
+#  numbers above are the cost of that choice rather than an argument
+#  against it.
+#
+#  Written down so nobody re-derives the same measurement in a year and
+#  assumes it was an oversight.
+# ---------------------------------------------------------------------------
+SOURCE_RAMP = 'warm'
 
 
 def stranger_ramp(name: str) -> str:
