@@ -36,6 +36,12 @@ palette_map.py - force generated portraits into the game's own palette.
            style works, because 46 pixels is where the answer lives.
  --autocrop find the head against the flat background and crop to it, so
            the framing stops depending on what the model felt like doing.
+ --flip    mirror horizontally. These portraits carry no lettering and no
+           asymmetric prop, so a mirrored one is the same person facing the
+           other way and nothing gives it away.
+           (--face-right, which guessed the direction, is SHELVED: it
+           scored 0 of 2 on heads whose direction was known. Look once and
+           pass --flip.)
 """
 
 import argparse
@@ -215,13 +221,33 @@ SUBJECT_FLOOR = 12
 
 def subject_mask(a: np.ndarray, bg: np.ndarray) -> np.ndarray:
     """
-    Subject versus background, thresholded per image rather than by a constant.
+    Subject versus background, by CONNECTION rather than by colour alone.
 
-    Distance from the background colour is strongly bimodal in these
-    portraits - there is a person and there is a flat backdrop - so Otsu's
-    method finds the split without being told where it is. That holds for a
-    dark head on a dark ground and for a light head on a light one, which a
-    single number never will.
+    ---------------------------------------------------------------------
+     WHY COLOUR ALONE WAS NOT ENOUGH, WHICH A REAL PORTRAIT SHOWED AND MY
+     OWN TEST IMAGES DID NOT
+    ---------------------------------------------------------------------
+     The first version called a pixel "subject" when it was far enough from
+     the background colour. That is fine while a person and a backdrop do
+     not share a tone. On the first real portrait they did: the ground was
+     (163,151,111) and the lit side of the face was almost exactly that, so
+     the face came back full of holes. Row widths went 391, 448, 224, 135,
+     124 down the cheek, the sudden widening below a hole was taken for a
+     shoulder line, and the crop landed just under the eyes. A chin and
+     nothing else.
+
+     Every synthetic case I had written passed, because I had drawn faces
+     that did not happen to match their own background.
+
+     The fix is to stop asking what colour a pixel is and ask what it is
+     CONNECTED to. The background is the region that reaches the border. A
+     cheek the same colour as the backdrop is still enclosed by an outline,
+     so it is not part of it. Flood fill answers exactly that question, and
+     PIL's is in C, so it costs nothing.
+
+     Otsu still chooses the tolerance, so it adapts per image the way it
+     did before.
+    ---------------------------------------------------------------------
     """
     dist = np.abs(a - bg).sum(axis=2)
     hist = np.bincount(np.clip(dist, 0, 765).ravel().astype(np.int64), minlength=766)
@@ -237,7 +263,31 @@ def subject_mask(a: np.ndarray, bg: np.ndarray) -> np.ndarray:
         between = w0 * w1 * (m0 - m1) ** 2
     between[~np.isfinite(between)] = 0
     thresh = max(SUBJECT_FLOOR, int(np.argmax(between)))
-    return dist > thresh
+
+    # Flood the background in from all four corners. 255 is reserved as the
+    # sentinel, so the data is clipped to 254 and cannot be mistaken for it.
+    from PIL import ImageDraw
+    # .copy() IS LOad BEARING. Image.fromarray hands back an image backed by
+    # the numpy buffer, and floodfill on it does NOTHING - no error, no
+    # exception, it simply fills zero pixels and returns. Measured: 0 filled
+    # at every threshold from 20 to 254, which read as "the whole picture is
+    # subject" and made head_box decline every real portrait. A silent no-op
+    # is the worst kind of bug and this file has now produced two.
+    flat = Image.fromarray(
+        np.clip(dist, 0, 254).astype(np.uint8), mode='L').copy()
+    h, w = dist.shape
+    # Seeded along the TOP edge only, for the same reason the colour is
+    # sampled there: the bottom of a portrait is a person, not a backdrop.
+    seeds = [(0, 0), (w - 1, 0), (w // 2, 0), (0, h // 8), (w - 1, h // 8)]
+    for seed in seeds:
+        if flat.getpixel(seed) != 255:
+            ImageDraw.floodfill(flat, seed, 255, thresh=thresh)
+    background = np.asarray(flat) == 255
+
+    # Subject is everything the flood could not reach. Colour still has the
+    # last word on the edges: a pixel far from the background is subject
+    # even if the fill leaked through a soft outline somewhere.
+    return (~background) | (dist > thresh)
 
 #  The width jump that means shoulders. Measured against the median width of
 #  the head rows above it. A head is roughly one unit wide and a pair of
@@ -254,12 +304,20 @@ def head_box(img: Image.Image):
     a = np.asarray(img.convert('RGB'), dtype=np.int16)
     h, w, _ = a.shape
 
-    # The background is what the four corners agree on. A corner patch rather
-    # than a single pixel, so one stray dark speck cannot define it.
+    # ONLY THE TOP CORNERS, and the reason is the whole shape of a portrait.
+    #
+    # I sampled all four and it was wrong on the first real image: in a head
+    # and shoulders portrait the body runs off the BOTTOM of the frame, so
+    # the lower corners are jacket. Measured on that portrait, a tenth of the
+    # border ring sat 200 away from the colour I was calling the background.
+    # The median was polluted by clothing, and worse, seeding a flood fill
+    # down there starts it INSIDE the person: it filled the entire image and
+    # declared 100% background.
+    #
+    # Above the head there is always backdrop. Below it there need not be.
     k = max(4, min(h, w) // 32)
     corners = np.concatenate([
         a[:k, :k].reshape(-1, 3), a[:k, -k:].reshape(-1, 3),
-        a[-k:, :k].reshape(-1, 3), a[-k:, -k:].reshape(-1, 3),
     ])
     bg = np.median(corners, axis=0)
 
@@ -271,43 +329,65 @@ def head_box(img: Image.Image):
         return None
     top = int(rows[0])
 
-    # Walk down from the crown looking for the shoulders. Start measuring
-    # after a little of the head so the first few thin rows of hair do not
-    # set the baseline.
+    # ------------------------------------------------------------------
+    #  LOOK FOR THE NECK, NOT THE SHOULDERS
+    # ------------------------------------------------------------------
+    #  The first rule here was "the subject's width jumps at the shoulders".
+    #  It is true of a full length figure and false of a portrait, which is
+    #  the only thing this will ever be handed. Measured down the first real
+    #  one, row widths went:
     #
-    # TWO GUARDS, BOTH PUT THERE BY A FAILING CASE. On a portrait whose hair
-    # was nearly the colour of the ground, the crown read as background, the
-    # face below it widened suddenly, and that single widening row was taken
-    # for a pair of shoulders: the crop came back 160 pixels tall on a 1024
-    # image, which is a chin and nothing else.
+    #      crown   41      24
+    #      cheeks  201    469     <- the head is widest here
+    #      jaw     521    463
+    #      neck    681    322     <- and NARROWEST here
+    #      collar  921    550
+    #      edge   1001    862     <- the shoulders, at the bottom of the frame
     #
-    #   sustained  a real shoulder line stays wide. One wide row is an ear,
-    #              a collar point, or a gap in a badly separated crown.
-    #   plausible  a head that is under an eighth of the frame means the
-    #              crown was missed. Keep looking rather than believe it.
+    #  The shoulders never widen inside the head's neighbourhood; they arrive
+    #  at the very bottom, so the old rule put the cut at y=960 and the crop
+    #  came back as the entire image.
     #
-    # If neither ever agrees, this returns None and the caller leaves the
-    # framing alone. Failing safe matters more than framing every one: a
-    # portrait that is merely too wide is usable, a portrait cropped to a
-    # jaw is not.
-    SUSTAIN = max(3, int(h * 0.01))
+    #  The neck is the reliable landmark, because a head is wide at the
+    #  cheekbones and narrow under the chin, always, in every framing. So:
+    #  find the widest row, then walk down to where the width has fallen
+    #  away. That point is the bottom of the head.
+    # ------------------------------------------------------------------
+    #  AND THE WIDEST ROW HAS TO BE FOUND ON THE WAY DOWN, NOT IN A WINDOW.
+    #
+    #  My first version took the widest row inside the top three quarters of
+    #  the frame. The shoulders are in that window, and they are wider than
+    #  any head, so the peak came back as the coat: the neck line was then
+    #  measured against a shoulder width, nothing was ever narrow enough,
+    #  and six of seven framings were declined. Safe, and useless.
+    #
+    #  A RUNNING maximum fixes it. At the cheekbones the running max IS the
+    #  head, because the shoulders have not been reached yet, so the neck
+    #  is caught before the coat can ever set the bar.
     MIN_HEAD = h * 0.12
+    NECK_OF_PEAK = 0.72        # narrowed to this share of the widest row above
+    SUSTAIN = max(3, int(h * 0.01))
 
     start = top + max(4, int(h * 0.02))
-    shoulder = None
-    for y in range(start + 1, h - SUSTAIN):
-        seen = widths[start:y]
-        seen = seen[seen > 0]
-        if seen.size < max(8, h * 0.03):
-            continue
-        line = np.median(seen) * SHOULDER_RATIO
-        if widths[y] > line and np.all(widths[y:y + SUSTAIN] > line):
-            if y - top < MIN_HEAD:
-                continue
-            shoulder = y
-            break
-    if shoulder is None:
+    if h - start < MIN_HEAD:
         return None
+
+    run_max = np.maximum.accumulate(widths)
+    neck = None
+    for y in range(start + 1, h - SUSTAIN):
+        if run_max[y] < w * 0.08 or y - top < MIN_HEAD:
+            continue
+        line = run_max[y] * NECK_OF_PEAK
+        if widths[y] < line and np.all(widths[y:y + SUSTAIN] < line):
+            neck = y
+            break
+
+    # No narrowing at all means the head runs off the bottom of the frame,
+    # or the separation failed. Decline rather than guess: a portrait that
+    # is merely too wide is usable, one cropped to a jaw is not.
+    if neck is None or neck - top < MIN_HEAD:
+        return None
+    shoulder = neck
 
     # Centre on the head itself, not on the whole picture: a head turned to
     # one side does not sit in the middle of the frame.
@@ -327,9 +407,94 @@ def head_box(img: Image.Image):
     return (left, upper, left + side, upper + side)
 
 
+# ---------------------------------------------------------------------------
+#  WHICH WAY THE HEAD FACES, AND WHY THIS IS NOT A CONTROLNET PROBLEM
+# ---------------------------------------------------------------------------
+#  The cast is meant to face right. It was going to be the expensive part:
+#  text to image models ignore direction words, the weights only shift the
+#  odds, and the real fix looked like installing ControlNet and driving every
+#  portrait off a reference.
+#
+#  It is not, because these portraits are FLAT VECTOR. No lettering, no
+#  badge, no watch, no parting that anyone has seen before. Mirror one and
+#  it is the same person facing the other way, and there is nothing left in
+#  the frame to give it away. So a whole subsystem collapses into one axis
+#  flip, which is exact rather than probabilistic: the model does not have
+#  to cooperate at all.
+#
+#  WHAT WAS MEASURED, including the part that failed.
+#
+#      mirroring        exact. Flipping reverses the verdict every time and
+#                       flipping twice is bit for bit the original.
+#
+#      faces_right()    DOES NOT WORK. The idea was that in a three quarter
+#                       view the hair sits behind the face, so the dark mass
+#                       leans away from the gaze. On two synthetic heads
+#                       whose direction was known by construction it scored
+#                       0 of 2, returning "cannot tell" for both, and on four
+#                       real portraits it reached a verdict on one.
+#
+#  So --face-right is SHELVED rather than shipped hopefully. A wrong
+#  automatic flip is worse than no flip: it is silent, and it would run over
+#  a portrait that was already correct.
+#
+#  What would actually fix it is a real facial landmark (the nose tip
+#  against the midline of the head), which means a face detector and a
+#  dependency. Not worth it while --flip costs one look and one word.
+# ---------------------------------------------------------------------------
+
+def faces_right(img: Image.Image):
+    """
+    True, False, or None when the head is too square on to tell.
+
+    Compares where the dark mass (hair, the back of the skull) sits against
+    the centre of the head. Facing right puts the hair on the left.
+    """
+    box = head_box(img)
+    crop = img.crop(box) if box else img
+    a = np.asarray(crop.convert('RGB'), dtype=np.int16)
+    h, w, _ = a.shape
+
+    k = max(4, min(h, w) // 32)
+    bg = np.median(np.concatenate([
+        a[:k, :k].reshape(-1, 3), a[:k, -k:].reshape(-1, 3),
+    ]), axis=0)
+    head = subject_mask(a, bg)
+    if head.sum() < h * w * 0.05:
+        return None
+
+    lum = 0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2]
+    inside = lum[head]
+    dark = head & (lum < np.percentile(inside, 30))
+    if dark.sum() < head.sum() * 0.05:
+        return None
+
+    xs = np.arange(w)
+    head_cx = (head.sum(axis=0) * xs).sum() / head.sum()
+    dark_cx = (dark.sum(axis=0) * xs).sum() / dark.sum()
+
+    # As a share of head width, so it does not depend on the crop size.
+    lean = (dark_cx - head_cx) / w
+    if abs(lean) < 0.015:
+        return None          # square on, or too close to call
+    return lean < 0          # hair to the left means the face points right
+
+
 def convert(path: str, out_dir: str, lut: np.ndarray, size: int, circle: bool,
-            preview: bool = False, autocrop: bool = False) -> str:
+            preview: bool = False, autocrop: bool = False,
+            flip: bool = False, face_right: bool = False) -> str:
     img = Image.open(path).convert('RGB')
+
+    # Direction first, so the crop and the preview show what will be kept.
+    if flip:
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+    # SHELVED with --face-right, see the note above `faces_right`. Scored
+    # 0 of 2 on heads whose direction was known, so it stays off.
+    #   elif face_right:
+    #       looking = faces_right(img)
+    #       if looking is False:
+    #           img = img.transpose(Image.FLIP_LEFT_RIGHT)
+
     if autocrop:
         box = head_box(img)
         if box:
@@ -424,6 +589,14 @@ def main() -> int:
                     help='write a sheet showing the real 80px and 46px avatar')
     ap.add_argument('--autocrop', action='store_true',
                     help='find the head against the flat background and crop to it')
+    ap.add_argument('--flip', action='store_true',
+                    help='mirror horizontally. The certain way to face the other side.')
+    # SHELVED: --face-right. The detector below it does not work; see the
+    # note above `faces_right`. Left wired to False so the call sites stay
+    # honest rather than half removed.
+    #   ap.add_argument('--face-right', dest='face_right', action='store_true',
+    #                   help='guess the direction and mirror if it looks left')
+    ap.set_defaults(face_right=False)
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -448,7 +621,9 @@ def main() -> int:
         return 1
 
     for f in files:
-        print(f'  {os.path.basename(f)} -> {os.path.basename(convert(f, args.out, lut, args.size, args.circle, args.preview, args.autocrop))}')
+        dest = convert(f, args.out, lut, args.size, args.circle,
+                       args.preview, args.autocrop, args.flip, args.face_right)
+        print(f'  {os.path.basename(f)} -> {os.path.basename(dest)}')
     print(f'\n{len(files)} image(s), ramp "{args.ramp}", {args.size}px')
     return 0
 
