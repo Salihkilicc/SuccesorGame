@@ -153,6 +153,28 @@ def run_one(ckpt: str, positive: str, negative: str, seed: int, timeout=300):
     raise TimeoutError(f'{timeout}s with no result')
 
 
+# ---------------------------------------------------------------------------
+#  WHY STRANGERS GET TWO RAMPS AND NOT ONE, AND NOT FIVE
+# ---------------------------------------------------------------------------
+#  Every stranger on steel is the correct meaning - grey is "owes you
+#  nothing" - and it looks wrong, because five of them sit down together and
+#  the table comes out as five grey circles.
+#
+#  All five ramps would fix the look and break the meaning: a stranger in
+#  cool reads as family, a stranger in violet reads as somebody from the
+#  laboratory. The ramp is carrying information everywhere else in this
+#  game and it cannot be decoration in one place.
+#
+#  Steel and warm are the two that both mean "not yours". Steel is nobody in
+#  particular; warm is private money, which is exactly what half a casino
+#  table is. So the pool splits between them, off the name, so a given
+#  stranger is the same colour every time you sit down with them.
+# ---------------------------------------------------------------------------
+
+def stranger_ramp(name: str) -> str:
+    return 'warm' if PP.wide_hash(f'{name}:ramp') % 2 else 'steel'
+
+
 def roster(cast_only: bool):
     """[(id, name, ramp, female)] for whichever set was asked for."""
     if cast_only:
@@ -163,9 +185,7 @@ def roster(cast_only: bool):
     for names in PP.read_names().values():
         for nm in names:
             slug = re.sub(r'[^a-z0-9]+', '_', nm.lower()).strip('_')
-            # Strangers all carry steel: they owe you nothing and they are
-            # not meant to read as anybody's ally.
-            out.append((slug, nm, 'steel', PP.is_female(nm)))
+            out.append((slug, nm, stranger_ramp(nm), PP.is_female(nm)))
     return out
 
 
