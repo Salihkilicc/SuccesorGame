@@ -31,6 +31,9 @@ palette_map.py - force generated portraits into the game's own palette.
            is a circle and a square that looks fine can lose a chin to it.
  --strip   write the ramp itself as a PNG, for feeding a ComfyUI gradient
            map node instead of using this script.
+ --preview write a sheet showing the portrait at the sizes the app really
+           renders it at. This is the only test that decides whether a
+           style works, because 46 pixels is where the answer lives.
 """
 
 import argparse
@@ -172,22 +175,25 @@ def circle_crop(img: Image.Image) -> Image.Image:
     return out
 
 
-def convert(path: str, out_dir: str, lut: np.ndarray, size: int, circle: bool) -> str:
+def convert(path: str, out_dir: str, lut: np.ndarray, size: int, circle: bool,
+            preview: bool = False) -> str:
     img = Image.open(path)
     if img.size[0] != img.size[1]:
         side = min(img.size)
         left = (img.size[0] - side) // 2
         top = (img.size[1] - side) // 2
         img = img.crop((left, top, left + side, top + side))
-    img = img.resize((size, size), Image.LANCZOS)
+    img = img.resize((max(size, 512), max(size, 512)), Image.LANCZOS)
 
     mapped = Image.fromarray(lut[luminance(img)], mode='RGB')
 
     base = os.path.splitext(os.path.basename(path))[0]
     dest = os.path.join(out_dir, f'{base}.png')
-    mapped.save(dest)
+    mapped.resize((size, size), Image.LANCZOS).save(dest)
     if circle:
         circle_crop(mapped).save(os.path.join(out_dir, f'{base}_circle.png'))
+    if preview:
+        preview_sheet(mapped, os.path.join(out_dir, f'{base}_preview.png'))
     return dest
 
 
@@ -195,6 +201,56 @@ def write_strip(stops: list, dest: str) -> None:
     """The ramp as an image, for a ComfyUI gradient map node."""
     lut = build_lut(stops)
     Image.fromarray(np.tile(lut[None, :, :], (64, 1, 1)), mode='RGB').save(dest)
+
+
+# ---------------------------------------------------------------------------
+#  THE ONLY TEST THAT DECIDES ANYTHING
+# ---------------------------------------------------------------------------
+#  Every one of these portraits is going to be shown as a circle between 44
+#  and 80 points across. Measured off the real styles: the poker seat is 46,
+#  the family and succession lists are 44, the shareholder modals are 80.
+#
+#  A portrait judged at 1024 is judged at twenty times the size it will ever
+#  be seen at, and the things that make it look good there - hair strands,
+#  stubble, the line weight around an eyelid - are exactly the things that
+#  disappear first. So "is this the style we want" cannot be answered by
+#  looking at the render. It has to be answered by looking at 46 pixels.
+#
+#  This writes both, on one sheet, so the question answers itself.
+# ---------------------------------------------------------------------------
+
+#  The sizes the app actually renders an avatar at, smallest last so the eye
+#  ends on the hardest case.
+REAL_SIZES = [80, 46]
+
+
+def preview_sheet(mapped: Image.Image, dest: str) -> None:
+    """Full size, then the real avatar sizes, then those magnified."""
+    from PIL import ImageDraw
+    pad, big = 24, 300
+    cell = 190
+    w = pad + big + pad + len(REAL_SIZES) * (cell + pad)
+    h = pad + big + pad + 34
+    sheet = Image.new('RGB', (w, h), hex_to_rgb(C['ink']))
+    d = ImageDraw.Draw(sheet)
+
+    shown = circle_crop(mapped.resize((big, big), Image.LANCZOS))
+    sheet.paste(shown, (pad, pad), shown)
+    d.text((pad, pad + big + 10), 'rendered', fill=hex_to_rgb(C['greyLight']))
+
+    x = pad + big + pad
+    for size in REAL_SIZES:
+        small = circle_crop(mapped.resize((size, size), Image.LANCZOS))
+        # Actual size, top: this is literally what the player sees.
+        sheet.paste(small, (x + (cell - size) // 2, pad), small)
+        # Magnified with NEAREST, below: what survived, made legible.
+        blown = small.resize((cell, cell), Image.NEAREST)
+        sheet.paste(blown, (x, pad + 100), blown)
+        d.text((x, pad + big + 10), f'{size}px, real then magnified',
+               fill=hex_to_rgb(C['greyLight']))
+        x += cell + pad
+
+    sheet.save(dest)
 
 
 def main() -> int:
@@ -206,6 +262,8 @@ def main() -> int:
     ap.add_argument('--circle', action='store_true')
     ap.add_argument('--strip', action='store_true',
                     help='also write the ramp itself as ramp_<name>.png')
+    ap.add_argument('--preview', action='store_true',
+                    help='write a sheet showing the real 80px and 46px avatar')
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -230,7 +288,7 @@ def main() -> int:
         return 1
 
     for f in files:
-        print(f'  {os.path.basename(f)} -> {os.path.basename(convert(f, args.out, lut, args.size, args.circle))}')
+        print(f'  {os.path.basename(f)} -> {os.path.basename(convert(f, args.out, lut, args.size, args.circle, args.preview))}')
     print(f'\n{len(files)} image(s), ramp "{args.ramp}", {args.size}px')
     return 0
 
