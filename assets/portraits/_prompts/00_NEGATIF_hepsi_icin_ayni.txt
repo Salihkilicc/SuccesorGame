@@ -1,0 +1,16 @@
+anime, manga, chibi, big eyes, anime style,
+
+(full body:1.4), (waist up:1.3), wide shot, distant, small head,
+lots of empty background, torso, chest, hands, arms,
+
+gradient, soft shading, airbrush, smooth shading, rendered, painterly,
+photorealistic, photograph, detailed hair strands, individual hair,
+stubble texture, skin texture, pores, volumetric light,
+
+(frontal view:1.4), (looking at viewer:1.4), (symmetrical face:1.3),
+eye contact, straight on, back of head,
+
+silhouette, featureless face, blank face, multiple people, crowd,
+cropped head, cut off chin, head touching edge, off-center, tilted,
+text, watermark, signature, logo, frame, border, blurry, low detail,
+deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry

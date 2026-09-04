@@ -1,0 +1,25 @@
+# KADRO PORTRE LISTESI
+
+# Her dosyanin ilk satirlari hangi ramp ve hangi dosya adi
+# oldugunu soyluyor. Negatif prompt herkes icin ayni.
+
+id         kim                        ramp    dosya
+----------------------------------------------------------------------
+father     Your Father                cool    father.png
+brother    Julian Hale                cool    brother.png
+cfo        Arthur Vance               steel   cfo.png
+coo        Dana Whitfield             bright  coo.png
+cto        Priya Raman                violet  cto.png
+heir       Your Successor             cool    heir.png
+friend     Marco Alvarez              bright  friend.png
+pear       Nathan Vogel               warm    pear.png
+edison     Hal Brennerman             warm    edison.png
+openai     Wen Zhao-Lindqvist         violet  openai.png
+swanson    Dr. Eleanor Ratliff        steel   swanson.png
+hacker     Cipher                     violet  hacker.png
+
+YUZ YOK (portre yapma):
+  unknown    Unknown Number             the whole point is that you do not know who it is
+  vulture    Halberd Partners           a fund, not a person
+  regulator  Consumer Safety Directorate a division with letterhead
+  fbi        Field Office               a field office, not a face
