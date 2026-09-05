@@ -161,6 +161,7 @@ export const runNeglect = (): string[] => {
         // this design exists to avoid.
         if (who.channels === 'mail') {
             useMailStore.getState().receiveMail({
+                fromId: who.id,
                 fromName: who.name,
                 fromEmail: emailOf(who) ?? '',
                 subject: line.subject ?? 'Following up',

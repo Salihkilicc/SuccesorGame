@@ -11,6 +11,8 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { theme, avatarTintFor } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { portraitFor } from '../../../core/portraits';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
@@ -25,8 +27,12 @@ import {
 
 const formatMonth = (m: number) => `M${m}`;
 
-const getInitials = (name: string): string =>
-    name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+// SHELVED, not deleted: the row's own initials. Portrait derives the same two
+// letters from the name through initialsOf, which is now the single place
+// that answers the question for every avatar in the game.
+//
+// const getInitials = (name: string): string =>
+//     name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
 // The palette and the hash moved to core/theme.ts. MailDetailScreen carried a
 // SECOND copy of both, so the same sender could be drawn in one colour in the
@@ -45,10 +51,30 @@ const MailRow = ({ mail, onPress }: { mail: Mail; onPress: () => void }) => {
             onPress={onPress}
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
             
+            {/* ------------------------------------------------------------
+                THE SENDER'S FACE, WHEN THE SENDER IS A PERSON.
+
+                A great many letters are not from anyone: Facilities, a
+                bank, a contacts service. Those keep the tinted circle
+                and their initials, which is why `fromId` is optional and
+                why the tint is still computed here.
+
+                The tint is a LIGHT fill carrying black text, and that is
+                deliberate - the note below records that white on these
+                measured 1.45 to 2.03 and the whole column was under the
+                floor. A portrait covers the fill entirely, so it takes
+                no contrast risk with it.
+               ------------------------------------------------------------ */}
             <View style={styles.avatarWrap}>
-                <View style={[styles.avatar, { backgroundColor: avatarTintFor(mail.fromName) }]}>
-                    <Text style={styles.avatarText}>{getInitials(mail.fromName)}</Text>
-                </View>
+                <Portrait
+                    id={mail.fromId || mail.fromName}
+                    name={mail.fromName}
+                    size={44}
+                    borderWidth={0}
+                    fill={avatarTintFor(mail.fromName)}
+                    source={mail.fromId ? portraitFor(mail.fromId) as number | null : null}
+                    initialsColour={theme.colors.onLight}
+                />
                 {isUnread && (
                     <View style={styles.unreadIndicatorRow}>
                         <Text style={styles.unreadIndicatorRowText}>!</Text>
@@ -279,18 +305,27 @@ const styles = StyleSheet.create({
         marginRight: 16,
         paddingTop: 2,
     },
-    avatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    // Black. Every avatar tint is a light fill and prefers it by at
-    // least 10:1; white on them measured 1.45 to 2.03 - the whole avatar
-    // column was below the floor and nothing reported it, because the fill
-    // comes out of a function and the audit can only read tokens.
-    avatarText: { color: theme.colors.onLight, fontWeight: '600', fontSize: 16 },
+    // SHELVED, not deleted: the circle this row drew before it could hold a
+    // face. Portrait takes the same 44 points, the same radius and the same
+    // tint, and the black letter colour is passed as initialsColour - the
+    // contrast finding below is the reason that prop exists at all.
+    //
+    // Two differences, both deliberate and both small: Portrait weights the
+    // letters 800 rather than 600, matching every other avatar in the game,
+    // and sizes them 44 * 0.36 = 16, which is what this said.
+    //
+    // avatar: {
+    //     width: 44,
+    //     height: 44,
+    //     borderRadius: 22,
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    // },
+    // // Black. Every avatar tint is a light fill and prefers it by at
+    // // least 10:1; white on them measured 1.45 to 2.03 - the whole avatar
+    // // column was below the floor and nothing reported it, because the fill
+    // // comes out of a function and the audit can only read tokens.
+    // avatarText: { color: theme.colors.onLight, fontWeight: '600', fontSize: 16 },
     
     // ------------------------------------------------------------------
     //  THE UNREAD BADGE IS TOBACCO, NOT RED

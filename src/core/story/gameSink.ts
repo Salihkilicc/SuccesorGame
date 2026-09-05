@@ -199,6 +199,7 @@ export const gameSink = (): EffectSink => ({
         const from = CAST[m.from];
         if (!from) throw new Error(`story: no cast member "${m.from}"`);
         useMailStore.getState().receiveMail({
+            fromId: from.id,
             fromName: from.name,
             fromEmail: emailOf(from) ?? '',
             subject: m.subject,

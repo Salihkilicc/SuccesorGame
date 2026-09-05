@@ -113,6 +113,8 @@ export const deliver = (conversationId: string): boolean => {
             //  line says who AND where. It costs nothing and it is the one
             //  thing a player needs before they decide whether to open it.
             // ------------------------------------------------------------------
+            // The label is for the player; the id is for the lookup.
+            fromId: from.id,
             fromName: senderLabel(from),
             fromEmail: emailOf(from) ?? '',
             subject: c.subject ?? '(no subject)',

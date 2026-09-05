@@ -74,6 +74,17 @@ type Props = {
     /** Show only the first letter, as the partner card always has. */
     singleInitial?: boolean;
     /**
+     * Letter colour. White by default, which is right on every DARK fill.
+     *
+     * The mail list is the exception and a load-bearing one: its circles are
+     * tinted LIGHT, and white letters on them were measured at 1.45 to 2.03
+     * against a 4.5 floor. The whole column was illegible and nothing caught
+     * it, because the fill comes out of a function and the contrast audit can
+     * only read tokens. Black text on a light fill is the house rule, and
+     * this prop is how that screen keeps it.
+     */
+    initialsColour?: string;
+    /**
      * Override the portrait lookup with a source of your own.
      *
      * This is for the characters who are generated at runtime and cannot have
@@ -86,7 +97,7 @@ type Props = {
 
 const Portrait = ({
     id, name, size, borderColor, borderWidth = 2, source, style, fill: fillProp,
-    initialsSize, singleInitial,
+    initialsSize, singleInitial, initialsColour,
 }: Props) => {
     const hue = avatarHue(id);
     const fill = fillProp ?? `hsl(${hue}, 32%, 26%)`;
@@ -130,7 +141,14 @@ const Portrait = ({
                     fadeDuration={0}
                 />
             ) : (
-                <Text style={[styles.initials, { fontSize: letters }]} numberOfLines={1}>
+                <Text
+                    style={[
+                        styles.initials,
+                        { fontSize: letters },
+                        initialsColour ? { color: initialsColour } : null,
+                    ]}
+                    numberOfLines={1}
+                >
                     {text}
                 </Text>
             )}

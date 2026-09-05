@@ -9,6 +9,24 @@ export type MailCategory = 'Primary' | 'Updates' | 'Promotions';
 
 export type Mail = {
     id: string;
+    /**
+     * WHO SENT IT, as opposed to what the sender line says.
+     *
+     * `fromName` is a LABEL and deliberately so - deliver.ts builds it as
+     * "Nathan Vogel, CEO, Pear" because a bare name at the top of an inbox is
+     * unrecognisable. That makes it useless as a key: measured, looking every
+     * cast member up by their name found ZERO, because the portraits are
+     * filed under cast ids ('cfo', 'coo') and the names never matched.
+     *
+     * So the id is carried too. Both senders already had it and both threw it
+     * away, exactly as the succession did with the heir's.
+     *
+     * OPTIONAL: the three seeded letters come from Facilities, a bank and a
+     * contacts service rather than from a person, and no save written before
+     * this field has one. Absent means "not a member of the cast", which is
+     * the true answer for all of them.
+     */
+    fromId?: string;
     fromName: string;
     fromEmail: string;
     subject: string;
