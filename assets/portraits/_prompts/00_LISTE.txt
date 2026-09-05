@@ -1,15 +1,15 @@
 # KADRO PORTRE LISTESI
 
-# Hepsi warm. Kadin/erkek negatifi K-E sutununa gore.
+# Hepsi warm.
 
    id                 kim                        K/E 
 --------------------------------------------------------
 OK player_male        You (male)                 E
 OK player_female      You (female)               K
 OK heir_m_01          Successor, boy 1           E
-   heir_m_02          Successor, boy 2           E
-   heir_m_03          Successor, boy 3           E
-   heir_m_04          Successor, boy 4           E
+OK heir_m_02          Successor, boy 2           E
+OK heir_m_03          Successor, boy 3           E
+OK heir_m_04          Successor, boy 4           E
    heir_m_05          Successor, boy 5           E
    heir_m_06          Successor, boy 6           E
    heir_m_07          Successor, boy 7           E
@@ -30,6 +30,26 @@ OK heir_m_01          Successor, boy 1           E
    npc-elena-vance    Elena Vance                K
    npc-victor-k       Victor K.                  E
    npc-sarah-jen      Sarah Jen                  K
+   board_m_01         Director, man 1            E
+   board_m_02         Director, man 2            E
+   board_m_03         Director, man 3            E
+   board_m_04         Director, man 4            E
+   board_m_05         Director, man 5            E
+   board_m_06         Director, man 6            E
+   board_m_07         Director, man 7            E
+   board_m_08         Director, man 8            E
+   board_m_09         Director, man 9            E
+   board_m_10         Director, man 10           E
+   board_f_01         Director, woman 1          K
+   board_f_02         Director, woman 2          K
+   board_f_03         Director, woman 3          K
+   board_f_04         Director, woman 4          K
+   board_f_05         Director, woman 5          K
+   board_f_06         Director, woman 6          K
+   board_f_07         Director, woman 7          K
+   board_f_08         Director, woman 8          K
+   board_f_09         Director, woman 9          K
+   board_f_10         Director, woman 10         K
 OK father             Your Father                E
 OK brother            Julian Hale                E
 OK cfo                Arthur Vance               E

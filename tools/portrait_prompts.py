@@ -623,6 +623,67 @@ def heir_look(cid: str, female: bool) -> str:
     ])
 
 
+# ---------------------------------------------------------------------------
+#  AND THE BOARD HAS THE SAME PROBLEM, FOUND THE SAME WAY
+# ---------------------------------------------------------------------------
+#  boardSuccession.ts already replaces every director each generation: the
+#  seat and the family stay, the person does not. The new id is
+#  `npc-elena-vance::g2` and the new name is the same surname with a first
+#  name drawn from SUCCESSOR_FIRST_NAMES.
+#
+#  So board ids are unbounded exactly like children's, and four fixed
+#  portraits would have shown generation two the same four faces their
+#  parents had. Same fix: a pool, drawn from the id, so a given director in a
+#  given generation is always the same face.
+#
+#  A TRAP WORTH WRITING DOWN. SUCCESSOR_FIRST_NAMES looks like it alternates
+#  male, female, male, female all the way down - Adrian, Beatrice, Caleb,
+#  Delia - and it does for twenty two entries and then stops: Wendell and
+#  Yusuf are adjacent and both male. Anything that picked a gender from the
+#  index being odd would put a woman's face on Yusuf Vance. The app has to
+#  read the NAME, not the position.
+#
+#  Ten each is enough: four seats, and a dynasty that runs ten generations
+#  before a face repeats has bigger things to notice.
+# ---------------------------------------------------------------------------
+
+BOARD_POOL_COUNT = 10
+
+#  Directors, not executives: older, heavier, dressed for a boardroom. Kept
+#  clear of the named four so a successor never looks like the parent's twin.
+ATTIRE_BOARD = [
+    'dark suit and tie', 'buttoned waistcoat', 'wide lapel jacket',
+    'high collared coat', 'blazer over a collared shirt',
+    'dark suit and white collar',
+]
+
+AGE_BOARD = [
+    'in their forties', 'in their fifties', 'in their sixties', 'elderly',
+]
+
+
+def board_look(cid: str, female: bool) -> str:
+    """One director, from the id. Adult, corporate, and not a twin."""
+    lead = ('(a woman:1.4), (female:1.3) ' if female else '(a man:1.3) ')
+    parts = [
+        lead + pick(AGE_BOARD, cid, 'age'),
+        pick(BUILD, cid, 'build'),
+        pick(HAIR_F if female else HAIR, cid, 'hair'),
+    ]
+    if not female:
+        parts.append(pick(FACE_HAIR, cid, 'face_hair'))
+    parts += [pick(GLASSES, cid, 'glasses'), pick(ATTIRE_BOARD, cid, 'attire')]
+    return ', '.join(parts)
+
+
+BOARD_POOL = {
+    **{f'board_m_{i:02d}': f'Director, man {i}'
+       for i in range(1, BOARD_POOL_COUNT + 1)},
+    **{f'board_f_{i:02d}': f'Director, woman {i}'
+       for i in range(1, BOARD_POOL_COUNT + 1)},
+}
+
+
 HEIR_SPLIT = {
     **{f'heir_m_{i:02d}': f'Successor, boy {i}' for i in range(1, HEIR_COUNT + 1)},
     **{f'heir_f_{i:02d}': f'Successor, girl {i}' for i in range(1, HEIR_COUNT + 1)},
@@ -634,6 +695,13 @@ HEIR_SPLIT = {
 for _i in range(1, HEIR_COUNT + 1):
     CAST_LOOKS[f'heir_m_{_i:02d}'] = heir_look(f'heir_m_{_i:02d}', False)
     CAST_LOOKS[f'heir_f_{_i:02d}'] = heir_look(f'heir_f_{_i:02d}', True)
+
+for _i in range(1, BOARD_POOL_COUNT + 1):
+    CAST_LOOKS[f'board_m_{_i:02d}'] = board_look(f'board_m_{_i:02d}', False)
+    CAST_LOOKS[f'board_f_{_i:02d}'] = board_look(f'board_f_{_i:02d}', True)
+    RAMP_BY_ID[f'board_m_{_i:02d}'] = 'warm'
+    RAMP_BY_ID[f'board_f_{_i:02d}'] = 'warm'
+    CAST_FEMALE.add(f'board_f_{_i:02d}')
 
 # ---------------------------------------------------------------------------
 #  THE BOARD, WHICH IS FIXED AND WAS NOT ON THE LIST
@@ -673,7 +741,7 @@ def read_cast() -> dict:
         if nm:
             out[key] = nm.group(1).replace("\\'", "'")
     out.pop('heir', None)
-    return {**PLAYER, **HEIR_SPLIT, **BOARD, **out}
+    return {**PLAYER, **HEIR_SPLIT, **BOARD, **BOARD_POOL, **out}
 
 
 # ---------------------------------------------------------------------------
