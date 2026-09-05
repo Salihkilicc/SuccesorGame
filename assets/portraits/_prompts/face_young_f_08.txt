@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_young_f_08.png
 
-(a woman:1.4), (female:1.3) in their mid twenties, broad heavy jaw, shoulder length straight hair, thin rectangular glasses, plain work shirt,
+(a woman:1.4), (female:1.3) in their mid twenties, Southeast Asian features, broad heavy jaw, shoulder length straight hair, thin rectangular glasses, plain work shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

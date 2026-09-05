@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_mid_m_02.png
 
-(a man:1.3) in their late thirties, long thin face, shaved head, clean shaven, round wire glasses, collared shirt,
+(a man:1.3) in their late thirties, East Asian features, long thin face, shoulder length straight hair, clean shaven, round wire glasses, collared shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

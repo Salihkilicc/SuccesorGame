@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_mid_f_07.png
 
-(a woman:1.4), (female:1.3) in their late thirties, narrow face, thick wavy hair, heavy black frames, crew neck sweater,
+(a woman:1.4), (female:1.3) in their late thirties, Southern African features, narrow face, shoulder length locs, heavy black frames, crew neck sweater,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

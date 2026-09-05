@@ -227,14 +227,16 @@ def roster(cast_only: bool):
     """[(id, name, ramp, female)] for whichever set was asked for."""
     if cast_only:
         cast = PP.read_cast()
-        return [(cid, nm, SOURCE_RAMP, PP.is_female(nm, cid))
+        return [(cid, nm, SOURCE_RAMP, PP.is_female(nm, cid), '')
                 for cid, nm in cast.items() if cid not in PP.FACELESS]
     out = []
     groups = {**PP.read_names(), **PP.read_rivals()}
-    for names in groups.values():
+    for region, names in groups.items():
         for nm in names:
             slug = re.sub(r'[^a-z0-9]+', '_', nm.lower()).strip('_')
-            out.append((slug, nm, stranger_ramp(nm), PP.is_female(nm)))
+            # The region rides along so the prompt can say what somebody
+            # looks like. It was being read and thrown away before.
+            out.append((slug, nm, stranger_ramp(nm), PP.is_female(nm), region))
     return out
 
 
@@ -247,7 +249,7 @@ def contact_sheet(rows, dest: str, px: int = 46):
     only those. Nobody should open 153 files.
     """
     from PIL import Image, ImageDraw
-    have = [(cid, nm) for cid, nm, _, _ in rows
+    have = [(cid, nm) for cid, nm, *_ in rows
             if os.path.exists(os.path.join(OUT_DIR, f'{cid}.png'))]
     if not have:
         print('nothing written yet')
@@ -298,9 +300,9 @@ def main() -> int:
     print(f'{len(rows)} in the roster, {len(todo)} to draw\n')
 
     if args.dry_run:
-        for cid, nm, ramp, fem in todo[:5]:
+        for cid, nm, ramp, fem, region in todo[:5]:
             print(f'--- {cid}  ({nm})  ramp={ramp}  {"female" if fem else "male"}')
-            print(PP.prompt_for(nm, cid if args.cast else '').split('\n')[0])
+            print(PP.prompt_for(nm, cid if args.cast else '', region).split('\n')[0])
         print(f'\n(dry run, {len(todo)} would be queued)')
         return 0
 
@@ -309,8 +311,8 @@ def main() -> int:
 
     from PIL import Image
     done = failed = 0
-    for i, (cid, nm, ramp, fem) in enumerate(todo, 1):
-        pos = PP.prompt_for(nm, cid if args.cast else '')
+    for i, (cid, nm, ramp, fem, region) in enumerate(todo, 1):
+        pos = PP.prompt_for(nm, cid if args.cast else '', region)
         neg = PP.negative_for(nm, cid if args.cast else '')
         # Seeded from the name, so a rerun of one person is the same person.
         seed = PP.wide_hash(nm) % (2 ** 31)

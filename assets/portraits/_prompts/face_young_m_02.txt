@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_young_m_02.png
 
-(a man:1.3) in their late twenties, narrow face, side parted hair, thick square glasses, dark suit and tie,
+(a man:1.3) in their late twenties, East Asian features, narrow face, straight black hair, thick square glasses, dark suit and tie,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

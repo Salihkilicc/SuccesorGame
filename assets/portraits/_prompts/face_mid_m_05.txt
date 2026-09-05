@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_mid_m_05.png
 
-(a man:1.3) in their thirties, broad heavy jaw, thick wavy hair, clean shaven, heavy black frames, high collared coat,
+(a man:1.3) in their thirties, Latin American features, broad heavy jaw, thick wavy hair, clean shaven, heavy black frames, high collared coat,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

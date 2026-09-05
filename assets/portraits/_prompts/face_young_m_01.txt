@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_young_m_01.png
 
-(a man:1.3) in their mid twenties, square jaw, bald on top, round wire glasses, open collar shirt,
+(a man:1.3) in their mid twenties, West African features, square jaw, braided hair, round wire glasses, open collar shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

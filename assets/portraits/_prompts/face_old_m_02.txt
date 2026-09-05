@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_old_m_02.png
 
-(a man:1.3) in their fifties, broad heavy jaw, shoulder length straight hair, clean shaven, no glasses, blazer over a plain shirt,
+(a man:1.3) in their fifties, East Asian features, broad heavy jaw, side parted hair, clean shaven, no glasses, blazer over a plain shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

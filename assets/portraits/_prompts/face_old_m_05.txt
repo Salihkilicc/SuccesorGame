@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_old_m_05.png
 
-(a man:1.3) in their sixties, narrow face, short curly hair, short stubble, no glasses, crew neck sweater,
+(a man:1.3) in their sixties, Latin American features, narrow face, short curly hair, short stubble, no glasses, crew neck sweater,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

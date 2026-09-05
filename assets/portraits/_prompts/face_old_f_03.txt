@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_old_f_03.png
 
-(a woman:1.4), (female:1.3) in their fifties, square jaw, short curly hair, thick square glasses, high collared coat,
+(a woman:1.4), (female:1.3) in their fifties, South Asian features, square jaw, short curly hair, thick square glasses, high collared coat,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

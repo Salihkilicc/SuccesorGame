@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_mid_m_01.png
 
-(a man:1.3) in their thirties, round full face, tight coiled hair, short stubble, no glasses, blazer over a plain shirt,
+(a man:1.3) in their thirties, West African features, round full face, close cropped coils, short stubble, no glasses, blazer over a plain shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

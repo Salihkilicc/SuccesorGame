@@ -256,11 +256,87 @@ def is_female(name: str, cast_id: str = '') -> bool:
     return (cast_id in CAST_FEMALE) or (name in FEMALE)
 
 
-def appearance(name: str, female: bool = False) -> dict:
+# ===========================================================================
+#  WHERE SOMEBODY IS FROM, WHICH THE PROMPT ALSO WAS NOT SAYING
+# ===========================================================================
+#
+#  Reported as "there are no Black people at all". True, and measured: not
+#  one of the 153 prompts carried any description of features. Kwame
+#  Boateng, Aminata Diallo, Thabo Ndlovu, Mei Chen and Priya Nair all went
+#  to the model as "a person in their forties" and came back looking like
+#  whatever the model reaches for by default.
+#
+#  Exactly the same shape as the gender bug and with the same consequence:
+#  the poker seat prints the NAME beside the face, so the mismatch is on
+#  screen and named.
+#
+#  And exactly as avoidable, because the answer was already in the data.
+#  STRANGER_REGIONS is keyed BY REGION - the names were grouped that way
+#  from the start - and I read the values and threw the keys away.
+#
+#  ---------------------------------------------------------------------------
+#  IT HAS TO BE FEATURES AND HAIR, NOT COLOUR
+#  ---------------------------------------------------------------------------
+#  The palette map destroys skin tone by construction: every portrait lands
+#  on the same three stop ramp, so "dark skin" and "pale skin" arrive
+#  identical. Asking for a colour would change nothing at all.
+#
+#  What survives is SHAPE: the features themselves, and hair texture, which
+#  is why the African regions get their own hair pool. Coils, locs and
+#  braids are silhouette, and silhouette is the one thing still legible at
+#  46 pixels in a single colour.
+# ===========================================================================
+
+REGION_FEATURES = {
+    'nordic': 'Northern European features',
+    'britishIsles': 'British features',
+    'westernEurope': 'Western European features',
+    'easternEurope': 'Eastern European features',
+    'mediterranean': 'Mediterranean features',
+    'middleEast': 'Middle Eastern features',
+    'persianCentralAsia': 'Central Asian features',
+    'southAsia': 'South Asian features',
+    'eastAsia': 'East Asian features',
+    'southeastAsia': 'Southeast Asian features',
+    'westAfrica': 'West African features',
+    'eastAfrica': 'East African features',
+    'southernAfrica': 'Southern African features',
+    'latinAmerica': 'Latin American features',
+    'northAmericaPacific': 'Pacific Islander features',
+}
+
+#  Hair that belongs with the features. Only where the default pool would be
+#  wrong; everybody else keeps HAIR and HAIR_F.
+HAIR_AFRICAN = [
+    'tight coiled hair', 'short afro', 'shoulder length locs',
+    'braided hair', 'shaved head', 'close cropped coils',
+    'high top fade', 'hair wrapped in a headscarf',
+]
+
+HAIR_EAST_ASIAN = [
+    'straight black hair', 'short cropped hair', 'straight bob cut',
+    'hair tied back in a bun', 'buzz cut', 'side parted hair',
+    'shoulder length straight hair', 'blunt fringe',
+]
+
+AFRICAN = ('westAfrica', 'eastAfrica', 'southernAfrica')
+EAST_ASIAN = ('eastAsia', 'southeastAsia')
+
+
+def hair_pool(region: str, female: bool) -> list:
+    if region in AFRICAN:
+        return HAIR_AFRICAN
+    if region in EAST_ASIAN:
+        return HAIR_EAST_ASIAN
+    return HAIR_F if female else HAIR
+
+
+def appearance(name: str, female: bool = False, region: str = "") -> dict:
     return {
+        'features': REGION_FEATURES.get(region, ''),
         'age': pick(AGE, name, 'age'),
         'build': pick(BUILD, name, 'build'),
-        'hair': pick(HAIR_F if female else HAIR, name, 'hair'),
+        'hair': pick(hair_pool(region, female), name, 'hair'),
         # A woman is clean shaven, so that slot carries nothing rather than
         # a word the model can misread.
         'face_hair': '' if female else pick(FACE_HAIR, name, 'face_hair'),
@@ -356,20 +432,20 @@ text, watermark, signature, logo, frame, border, blurry, low detail,
 deformed face, extra eyes, asymmetric eyes, wrinkles, scowl, angry"""
 
 
-def prompt_for(name: str, cast_id: str = '') -> str:
+def prompt_for(name: str, cast_id: str = '', region: str = '') -> str:
     """The cast are written by hand; everybody else comes off the hash."""
     female = is_female(name, cast_id)
     if cast_id and cast_id in CAST_LOOKS:
         who = CAST_LOOKS[cast_id]
     else:
-        a = appearance(name, female)
+        a = appearance(name, female, region)
         # WEIGHTED, because the plain word is not enough. "a woman" alone
         # still came back as a man often enough to matter; the emphasis and
         # the second term together hold it.
         lead = f"(a woman:1.4), (female:1.3) {a['age']}" if female \
             else f"(a man:1.3) {a['age']}"
         who = ', '.join(x for x in [
-            lead, a['build'], a['hair'], a['face_hair'],
+            lead, a['features'], a['build'], a['hair'], a['face_hair'],
             a['glasses'], a['attire'], a['extra'],
         ] if x)
     return f'{who},\n\n{BASE}'
@@ -546,8 +622,13 @@ CAST_LOOKS = {
            'hair tied back in a bun, no glasses, collared work shirt',
     'cto': '(a woman:1.4), (female:1.3) in her thirties, narrow face, '
            'shoulder length straight hair, no glasses, high collared turtleneck',
-    'friend': 'a person in their forties, round full face, short curly hair, '
-              'short stubble, no glasses, open collar shirt, no tie',
+    #  Asked for younger and hungrier: 25 to 28, somebody who started a
+    #  company rather than inherited one. cast.ts has him writing in
+    #  fragments and lower case and being bad at asking for help, which is a
+    #  young founder, not a man in his forties.
+    'friend': '(a man:1.3) in his mid twenties, Latin American features, '
+              'narrow face, short curly hair, short stubble, no glasses, '
+              'plain t shirt under a jacket',
     'pear': 'a person in their fifties, angular sharp cheekbones, '
             'side parted hair, clean shaven, no glasses, dark suit and tie',
     'edison': 'a person in their sixties, broad heavy jaw, bald on top, '
@@ -713,12 +794,29 @@ ATTIRE_FACE = [
 ]
 
 
+#  The anonymous pool carried no features either, which would have made
+#  every partner and every future director the model's default face. Spread
+#  ACROSS the pool rather than picked per id, so eight faces in a band are
+#  eight different origins instead of eight rolls that might land the same
+#  way twice.
+FACE_ORIGINS = [
+    'West African features', 'East Asian features', 'South Asian features',
+    'Northern European features', 'Latin American features',
+    'Middle Eastern features', 'Southern African features',
+    'Southeast Asian features',
+]
+
+
 def face_look(cid: str, female: bool, band: str) -> str:
     lead = ('(a woman:1.4), (female:1.3) ' if female else '(a man:1.3) ')
+    origin = FACE_ORIGINS[(int(cid[-2:]) - 1) % len(FACE_ORIGINS)]
     parts = [
         lead + pick(AGE_BANDS[band], cid, 'age'),
+        origin,
         pick(BUILD, cid, 'build'),
-        pick(HAIR_F if female else HAIR, cid, 'hair'),
+        pick(hair_pool('westAfrica' if 'African' in origin
+                       else 'eastAsia' if 'East Asian' in origin
+                       else '', female), cid, 'hair'),
     ]
     # No beards on a woman, and none on a teenager either.
     if not female and band != 'young':

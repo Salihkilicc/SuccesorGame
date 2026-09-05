@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_old_f_05.png
 
-(a woman:1.4), (female:1.3) elderly, round full face, short curly hair, thick square glasses, open collar shirt,
+(a woman:1.4), (female:1.3) elderly, Latin American features, round full face, short curly hair, thick square glasses, open collar shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

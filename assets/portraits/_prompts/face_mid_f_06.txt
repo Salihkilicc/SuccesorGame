@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_mid_f_06.png
 
-(a woman:1.4), (female:1.3) in their forties, broad heavy jaw, long hair swept to one side, no glasses, plain work shirt,
+(a woman:1.4), (female:1.3) in their forties, Middle Eastern features, broad heavy jaw, long hair swept to one side, no glasses, plain work shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

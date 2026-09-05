@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_mid_m_08.png
 
-(a man:1.3) in their late forties, narrow face, buzz cut, clean shaven, thin rectangular glasses, dark suit and tie,
+(a man:1.3) in their late forties, Southeast Asian features, narrow face, buzz cut, clean shaven, thin rectangular glasses, dark suit and tie,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

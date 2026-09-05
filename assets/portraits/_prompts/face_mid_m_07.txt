@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/face_mid_m_07.png
 
-(a man:1.3) in their forties, broad heavy jaw, buzz cut, clean shaven, round wire glasses, plain work shirt,
+(a man:1.3) in their forties, Southern African features, broad heavy jaw, hair wrapped in a headscarf, clean shaven, round wire glasses, plain work shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

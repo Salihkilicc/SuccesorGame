@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_old_f_08.png
 
-(a woman:1.4), (female:1.3) in their sixties, angular sharp cheekbones, hair tied back in a bun, heavy black frames, crew neck sweater,
+(a woman:1.4), (female:1.3) in their sixties, Southeast Asian features, angular sharp cheekbones, hair tied back in a bun, heavy black frames, crew neck sweater,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

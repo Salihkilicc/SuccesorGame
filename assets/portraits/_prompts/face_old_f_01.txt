@@ -2,7 +2,7 @@
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/face_old_f_01.png
 
-(a woman:1.4), (female:1.3) elderly, square jaw, shoulder length straight hair, heavy black frames, plain work shirt,
+(a woman:1.4), (female:1.3) elderly, West African features, square jaw, hair wrapped in a headscarf, heavy black frames, plain work shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,
