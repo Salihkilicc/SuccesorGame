@@ -1,5 +1,4 @@
 # Julian Hale
-# ramp    : cool
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/brother.png
 

@@ -1,5 +1,4 @@
 # Your Successor (male)
-# ramp    : cool
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/heir_male.png
 

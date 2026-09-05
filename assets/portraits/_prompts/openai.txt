@@ -1,5 +1,4 @@
 # Wen Zhao-Lindqvist
-# ramp    : violet
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/openai.png
 

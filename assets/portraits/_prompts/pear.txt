@@ -1,5 +1,4 @@
 # Nathan Vogel
-# ramp    : warm
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/pear.png
 

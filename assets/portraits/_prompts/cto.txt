@@ -1,5 +1,4 @@
 # Priya Raman
-# ramp    : violet
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/cto.png
 

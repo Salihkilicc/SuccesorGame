@@ -1,5 +1,4 @@
 # Your Successor (female)
-# ramp    : cool
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/heir_female.png
 

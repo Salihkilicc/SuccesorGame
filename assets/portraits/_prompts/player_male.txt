@@ -1,5 +1,4 @@
 # You (male)
-# ramp    : bright
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/player_male.png
 

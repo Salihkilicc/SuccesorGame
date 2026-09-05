@@ -1,5 +1,4 @@
 # You (female)
-# ramp    : bright
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/player_female.png
 

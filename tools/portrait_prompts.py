@@ -211,7 +211,8 @@ FEMALE = {
 
 #  The named cast, set by hand off cast.ts rather than by any rule.
 CAST_FEMALE = {'coo', 'cto', 'swanson', 'openai',
-               'player_female', 'heir_female'}
+               'player_female', 'heir_female',
+               'npc-elena-vance', 'npc-sarah-jen'}
 
 #  Pools that cannot be shared. A hairline recedes on a man in this
 #  vocabulary and a tie is a man's tie; everything else (age, jaw, glasses,
@@ -445,6 +446,10 @@ RAMP_BY_ID = {
     'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
     'pear': 'warm', 'edison': 'warm',
     'cfo': 'steel', 'swanson': 'steel',
+    # The board is outside capital sitting at your own table. Warm is the
+    # ramp for money that is not yours, which is what every one of them is.
+    'npc-marcus-wolf': 'warm', 'npc-elena-vance': 'warm',
+    'npc-victor-k': 'warm', 'npc-sarah-jen': 'warm',
 }
 
 #  Appearance, in the same silhouette vocabulary as the pools above.
@@ -535,6 +540,20 @@ CAST_LOOKS = {
     'swanson': '(a woman:1.4), (female:1.3) in her sixties, long thin face, short cropped hair, heavy black frames, buttoned waistcoat',
     'hacker': 'a person in their thirties, narrow face, shaved head, '
               'short stubble, heavy black frames, high collared coat',
+
+    # The board. Four silhouettes that cannot be confused with each other or
+    # with the executives, because these are the faces you argue with.
+    'npc-marcus-wolf': 'a person in their fifties, broad heavy jaw, '
+                       'slicked back hair, clean shaven, no glasses, '
+                       'dark suit and tie',
+    'npc-elena-vance': '(a woman:1.4), (female:1.3) in her fifties, '
+                       'angular sharp cheekbones, hair tied back tightly, '
+                       'thin rectangular glasses, dark suit and white collar',
+    'npc-victor-k': 'a person in their sixties, long thin face, shaved head, '
+                    'thick moustache, heavy black frames, high collared coat',
+    'npc-sarah-jen': '(a woman:1.4), (female:1.3) in her forties, '
+                     'round full face, straight bob cut, no glasses, '
+                     'blazer over a collared shirt',
 }
 
 
@@ -552,6 +571,29 @@ HEIR_SPLIT = {
     'heir_female': 'Your Successor (female)',
 }
 
+# ---------------------------------------------------------------------------
+#  THE BOARD, WHICH IS FIXED AND WAS NOT ON THE LIST
+# ---------------------------------------------------------------------------
+#  Asked as "what about the board, and does my child's board change?". It
+#  does not. useShareholderStore seats five people and they are the same five
+#  in every run and in every generation: these four and Julian Hale, who is
+#  already drawn as `brother`.
+#
+#  There IS an appointDirectorFromNetwork, which would put a stranger on the
+#  board and would have made this a pool rather than a list. It is called
+#  from nowhere - governance.ts already carries a note saying so - so the
+#  board is four portraits and no mechanism can add a fifth.
+#
+#  Ids are the store's own, so the app can look a member up by the id it
+#  already holds rather than by matching a name.
+# ---------------------------------------------------------------------------
+BOARD = {
+    'npc-marcus-wolf': "Marcus 'The Wolf'",
+    'npc-elena-vance': 'Elena Vance',
+    'npc-victor-k': 'Victor K.',
+    'npc-sarah-jen': 'Sarah Jen',
+}
+
 
 def read_cast() -> dict:
     """{id: name} out of src/data/story/cast.ts, plus the player."""
@@ -567,7 +609,7 @@ def read_cast() -> dict:
         if nm:
             out[key] = nm.group(1).replace("\\'", "'")
     out.pop('heir', None)
-    return {**PLAYER, **HEIR_SPLIT, **out}
+    return {**PLAYER, **HEIR_SPLIT, **BOARD, **out}
 
 
 # ---------------------------------------------------------------------------

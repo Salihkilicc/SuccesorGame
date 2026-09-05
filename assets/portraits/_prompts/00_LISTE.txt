@@ -1,27 +1,32 @@
 # KADRO PORTRE LISTESI
 
-# Kadinlarda 00_NEGATIF_kadin.txt, erkeklerde 00_NEGATIF_erkek.txt.
+# Hepsi warm uretiliyor. Kadinlarda 00_NEGATIF_kadin.txt,
+# erkeklerde 00_NEGATIF_erkek.txt.
 
-   id             kim                        ramp    K/E  dosya
---------------------------------------------------------------------------------
-OK player_male    You (male)                 bright  E    player_male.png
-OK player_female  You (female)               bright  K    player_female.png
-   heir_male      Your Successor (male)      cool    E    heir_male.png
-   heir_female    Your Successor (female)    cool    K    heir_female.png
-OK father         Your Father                cool    E    father.png
-OK brother        Julian Hale                cool    E    brother.png
-OK cfo            Arthur Vance               steel   E    cfo.png
-OK coo            Dana Whitfield             bright  K    coo.png
-OK cto            Priya Raman                violet  K    cto.png
-   friend         Marco Alvarez              bright  E    friend.png
-   pear           Nathan Vogel               warm    E    pear.png
-   edison         Hal Brennerman             warm    E    edison.png
-   openai         Wen Zhao-Lindqvist         violet  K    openai.png
-   swanson        Dr. Eleanor Ratliff        steel   K    swanson.png
-   hacker         Cipher                     violet  E    hacker.png
+   id                 kim                        K/E  dosya
+------------------------------------------------------------------------
+OK player_male        You (male)                 E    player_male.png
+OK player_female      You (female)               K    player_female.png
+   heir_male          Your Successor (male)      E    heir_male.png
+   heir_female        Your Successor (female)    K    heir_female.png
+   npc-marcus-wolf    Marcus 'The Wolf'          E    npc-marcus-wolf.png
+   npc-elena-vance    Elena Vance                K    npc-elena-vance.png
+   npc-victor-k       Victor K.                  E    npc-victor-k.png
+   npc-sarah-jen      Sarah Jen                  K    npc-sarah-jen.png
+OK father             Your Father                E    father.png
+OK brother            Julian Hale                E    brother.png
+OK cfo                Arthur Vance               E    cfo.png
+OK coo                Dana Whitfield             K    coo.png
+OK cto                Priya Raman                K    cto.png
+   friend             Marco Alvarez              E    friend.png
+OK pear               Nathan Vogel               E    pear.png
+OK edison             Hal Brennerman             E    edison.png
+   openai             Wen Zhao-Lindqvist         K    openai.png
+   swanson            Dr. Eleanor Ratliff        K    swanson.png
+   hacker             Cipher                     E    hacker.png
 
 YUZ YOK:
-   unknown        the whole point is that you do not know who it is
-   vulture        a fund, not a person
-   regulator      a division with letterhead
-   fbi            a field office, not a face
+   unknown            the whole point is that you do not know who it is
+   vulture            a fund, not a person
+   regulator          a division with letterhead
+   fbi                a field office, not a face

@@ -1,5 +1,4 @@
 # Arthur Vance
-# ramp    : steel
 # negatif : 00_NEGATIF_erkek.txt
 # kaydet  : assets/portraits/cfo.png
 

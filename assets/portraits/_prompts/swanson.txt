@@ -1,5 +1,4 @@
 # Dr. Eleanor Ratliff
-# ramp    : steel
 # negatif : 00_NEGATIF_kadin.txt
 # kaydet  : assets/portraits/swanson.png
 
