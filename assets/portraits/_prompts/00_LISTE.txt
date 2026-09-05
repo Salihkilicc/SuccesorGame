@@ -1,32 +1,43 @@
 # KADRO PORTRE LISTESI
 
-# Hepsi warm uretiliyor. Kadinlarda 00_NEGATIF_kadin.txt,
-# erkeklerde 00_NEGATIF_erkek.txt.
+# Hepsi warm. Kadin/erkek negatifi K-E sutununa gore.
 
-   id                 kim                        K/E  dosya
-------------------------------------------------------------------------
-OK player_male        You (male)                 E    player_male.png
-OK player_female      You (female)               K    player_female.png
-   heir_male          Your Successor (male)      E    heir_male.png
-   heir_female        Your Successor (female)    K    heir_female.png
-   npc-marcus-wolf    Marcus 'The Wolf'          E    npc-marcus-wolf.png
-   npc-elena-vance    Elena Vance                K    npc-elena-vance.png
-   npc-victor-k       Victor K.                  E    npc-victor-k.png
-   npc-sarah-jen      Sarah Jen                  K    npc-sarah-jen.png
-OK father             Your Father                E    father.png
-OK brother            Julian Hale                E    brother.png
-OK cfo                Arthur Vance               E    cfo.png
-OK coo                Dana Whitfield             K    coo.png
-OK cto                Priya Raman                K    cto.png
-   friend             Marco Alvarez              E    friend.png
-OK pear               Nathan Vogel               E    pear.png
-OK edison             Hal Brennerman             E    edison.png
-   openai             Wen Zhao-Lindqvist         K    openai.png
-   swanson            Dr. Eleanor Ratliff        K    swanson.png
-   hacker             Cipher                     E    hacker.png
-
-YUZ YOK:
-   unknown            the whole point is that you do not know who it is
-   vulture            a fund, not a person
-   regulator          a division with letterhead
-   fbi                a field office, not a face
+   id                 kim                        K/E 
+--------------------------------------------------------
+OK player_male        You (male)                 E
+OK player_female      You (female)               K
+OK heir_m_01          Successor, boy 1           E
+   heir_m_02          Successor, boy 2           E
+   heir_m_03          Successor, boy 3           E
+   heir_m_04          Successor, boy 4           E
+   heir_m_05          Successor, boy 5           E
+   heir_m_06          Successor, boy 6           E
+   heir_m_07          Successor, boy 7           E
+   heir_m_08          Successor, boy 8           E
+   heir_m_09          Successor, boy 9           E
+   heir_m_10          Successor, boy 10          E
+   heir_f_01          Successor, girl 1          K
+   heir_f_02          Successor, girl 2          K
+   heir_f_03          Successor, girl 3          K
+   heir_f_04          Successor, girl 4          K
+   heir_f_05          Successor, girl 5          K
+   heir_f_06          Successor, girl 6          K
+   heir_f_07          Successor, girl 7          K
+   heir_f_08          Successor, girl 8          K
+   heir_f_09          Successor, girl 9          K
+   heir_f_10          Successor, girl 10         K
+   npc-marcus-wolf    Marcus 'The Wolf'          E
+   npc-elena-vance    Elena Vance                K
+   npc-victor-k       Victor K.                  E
+   npc-sarah-jen      Sarah Jen                  K
+OK father             Your Father                E
+OK brother            Julian Hale                E
+OK cfo                Arthur Vance               E
+OK coo                Dana Whitfield             K
+OK cto                Priya Raman                K
+   friend             Marco Alvarez              E
+OK pear               Nathan Vogel               E
+OK edison             Hal Brennerman             E
+   openai             Wen Zhao-Lindqvist         K
+   swanson            Dr. Eleanor Ratliff        K
+   hacker             Cipher                     E

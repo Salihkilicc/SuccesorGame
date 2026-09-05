@@ -1,8 +1,8 @@
-# Your Successor (female)
-# negatif : 00_NEGATIF_kadin.txt
-# kaydet  : assets/portraits/heir_female.png
+# Successor, boy 7
+# negatif : 00_NEGATIF_erkek.txt
+# kaydet  : assets/portraits/heir_m_07.png
 
-(a young woman:1.4), (female:1.3) in her late teens, narrow face, hair tied back, open collar shirt,
+(a young man:1.3) in his late teens, square jaw, slicked back hair, no glasses, open collar shirt,
 
 flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
 (no gradient:1.3), 2 tone shading, posterized, limited palette,

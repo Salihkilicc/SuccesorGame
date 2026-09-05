@@ -211,7 +211,8 @@ FEMALE = {
 
 #  The named cast, set by hand off cast.ts rather than by any rule.
 CAST_FEMALE = {'coo', 'cto', 'swanson', 'openai',
-               'player_female', 'heir_female',
+               'player_female',
+               *(f'heir_f_{i:02d}' for i in range(1, 11)),
                'npc-elena-vance', 'npc-sarah-jen'}
 
 #  Pools that cannot be shared. A hairline recedes on a man in this
@@ -440,7 +441,8 @@ RAMP_BY_ID = {
     # by listing the roster and asking what a single file would show half
     # the players. Two portraits, and the child who takes over is the one
     # whose portrait the profile header switches to.
-    'heir_male': 'cool', 'heir_female': 'cool',
+    **{f'heir_m_{i:02d}': 'cool' for i in range(1, 11)},
+    **{f'heir_f_{i:02d}': 'cool' for i in range(1, 11)},
     'father': 'cool', 'brother': 'cool',
     'coo': 'bright', 'friend': 'bright',
     'cto': 'violet', 'openai': 'violet', 'hacker': 'violet',
@@ -519,10 +521,6 @@ CAST_LOOKS = {
     'brother': 'a person in their forties, angular sharp cheekbones, '
                'slicked back hair, clean shaven, thick square glasses, '
                'blazer over a plain shirt',
-    'heir_male': '(a young man:1.3) in his late teens, narrow face, '
-                 'messy tousled hair, clean shaven, open collar shirt',
-    'heir_female': '(a young woman:1.4), (female:1.3) in her late teens, '
-                   'narrow face, hair tied back, open collar shirt',
     'cfo': 'a person in their sixties, long thin face, receding hairline, '
            'clean shaven, thin rectangular glasses, buttoned waistcoat',
     'coo': '(a woman:1.4), (female:1.3) in her forties, square jaw, '
@@ -566,10 +564,76 @@ PLAYER = {
 
 #  The heir is in cast.ts as one entry, but the child who inherits has a
 #  gender, so the single entry is split on the way through.
+# ---------------------------------------------------------------------------
+#  TEN AND TEN, BECAUSE ONE HEIR IS NOT A RANDOM HEIR
+# ---------------------------------------------------------------------------
+#  I had this as two files, one per gender, and that was wrong. The number of
+#  children is not fixed and which one inherits is not decided in advance, so
+#  a single face per gender would mean every run's successor looked like
+#  every other run's. The randomness would be a claim rather than a fact.
+#
+#  Ten each. The child who takes over draws one from their own id, so the
+#  same child is the same face for the whole of their generation, and two
+#  different playthroughs get different heirs.
+#
+#  Their looks come off the SAME hash as the poker pool, but from teenage
+#  pools: no receding hairlines, no beards, no waistcoats. They are sixteen
+#  or a little older and they should read as somebody's child.
+# ---------------------------------------------------------------------------
+
+HEIR_COUNT = 10
+
+HAIR_TEEN_M = [
+    'messy tousled hair', 'short cropped hair', 'buzz cut',
+    'thick wavy hair', 'short curly hair', 'side parted hair',
+    'shaved head', 'slicked back hair', 'tight coiled hair',
+    'long hair swept to one side',
+]
+
+HAIR_TEEN_F = [
+    'hair tied back in a bun', 'shoulder length straight hair',
+    'straight bob cut', 'short curly hair', 'long hair swept to one side',
+    'tight coiled hair', 'messy tousled hair', 'hair pulled back tightly',
+    'blunt fringe', 'short cropped hair',
+]
+
+ATTIRE_TEEN = [
+    'open collar shirt', 'plain t shirt under a jacket',
+    'hooded sweatshirt', 'crew neck sweater', 'collared school shirt',
+    'plain work shirt', 'blazer over a plain shirt', 'turtleneck sweater',
+]
+
+#  Weighted towards none: a teenager in glasses is a choice, not a default.
+GLASSES_TEEN = [
+    'no glasses', 'no glasses', 'no glasses', 'no glasses',
+    'round wire glasses', 'thin rectangular glasses', 'heavy black frames',
+]
+
+
+def heir_look(cid: str, female: bool) -> str:
+    """A different child every time, from the id, deterministically."""
+    lead = ('(a young woman:1.4), (female:1.3) in her late teens' if female
+            else '(a young man:1.3) in his late teens')
+    return ', '.join([
+        lead,
+        pick(BUILD, cid, 'build'),
+        pick(HAIR_TEEN_F if female else HAIR_TEEN_M, cid, 'hair'),
+        pick(GLASSES_TEEN, cid, 'glasses'),
+        pick(ATTIRE_TEEN, cid, 'attire'),
+    ])
+
+
 HEIR_SPLIT = {
-    'heir_male': 'Your Successor (male)',
-    'heir_female': 'Your Successor (female)',
+    **{f'heir_m_{i:02d}': f'Successor, boy {i}' for i in range(1, HEIR_COUNT + 1)},
+    **{f'heir_f_{i:02d}': f'Successor, girl {i}' for i in range(1, HEIR_COUNT + 1)},
 }
+
+#  Filled in here rather than inside CAST_LOOKS because the teenage pools are
+#  defined below it, and one table read from top to bottom beats two tables
+#  that have to be kept in the same order.
+for _i in range(1, HEIR_COUNT + 1):
+    CAST_LOOKS[f'heir_m_{_i:02d}'] = heir_look(f'heir_m_{_i:02d}', False)
+    CAST_LOOKS[f'heir_f_{_i:02d}'] = heir_look(f'heir_f_{_i:02d}', True)
 
 # ---------------------------------------------------------------------------
 #  THE BOARD, WHICH IS FIXED AND WAS NOT ON THE LIST
