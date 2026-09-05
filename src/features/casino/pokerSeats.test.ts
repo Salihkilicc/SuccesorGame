@@ -40,6 +40,7 @@ import {
     type SeatKind,
 } from '../../core/casino/pokerTable';
 import { seatPosition } from './components/PokerTable';
+import { portraitForPerson } from '../../core/portraits';
 
 const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, ...p), 'utf8');
 
@@ -217,13 +218,49 @@ describe('the seats sit on an arc', () => {
     });
 });
 
+/**
+ * Source read with the comments taken out.
+ *
+ * These checks used to read the raw file, and that was safe only for as long
+ * as nothing was ever commented out. The seat's own avatar styles have now
+ * been shelved in place - kept as comments, per the rule that code is not
+ * deleted - and `/borderRadius: 23/` still matched them perfectly. The test
+ * would have stayed green while the circle it describes no longer existed:
+ * this codebase's signature failure, in a test rather than in a screen.
+ */
+const readLive = (...p: string[]): string =>
+    read(...p)
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/^\s*\/\/.*$/gm, '');
+
 describe('the avatars', () => {
     it('are circles from the start, so a photograph drops straight in', () => {
         // Building it square and rounding it later is how a UI ends up with
-        // two kinds of avatar.
-        const src = read('components', 'PokerSeat.tsx');
-        expect(src).toMatch(/borderRadius: 23/);
-        expect(src).toMatch(/width: 46,\s*height: 46,/);
+        // two kinds of avatar. The circle now lives in one component, which is
+        // the whole reason a photograph could drop in at all, so that is where
+        // this looks.
+        const seat = readLive('components', 'PokerSeat.tsx');
+        expect(seat).toMatch(/<Portrait/);
+        expect(seat).toMatch(/size=\{46\}/);
+
+        const portrait = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'components', 'common', 'Portrait.tsx'),
+            'utf8',
+        );
+        // Radius follows the diameter rather than being written down beside
+        // it, so a circle cannot become an oval by editing one of two numbers.
+        expect(portrait).toMatch(/borderRadius: size \/ 2/);
+        // Without this the image corners escape the circle on iOS.
+        expect(portrait).toMatch(/overflow: 'hidden'/);
+    });
+
+    it('and a seat shows the real photograph when there is one', () => {
+        // The point of the whole exercise. 299 files sat in assets/portraits
+        // and not one line of the app read them; this is what fails if the
+        // seat ever goes back to initials only.
+        const seat = readLive('components', 'PokerSeat.tsx');
+        expect(seat).not.toMatch(/initialsOf\(name\)/);
+        expect(portraitForPerson('mg_kowalczyk', 'Zofia Kowalczyk')).not.toBeNull();
     });
 
     it('and the same person is the same colour every time', () => {
@@ -234,8 +271,17 @@ describe('the avatars', () => {
     it('and the colour is a HUE, so the initials always clear it', () => {
         // Lightness is fixed; only the hue carries the identity. A random
         // colour would eventually produce white on white.
-        const src = read('components', 'PokerSeat.tsx');
-        expect(src).toMatch(/hsl\(\$\{hue\}, 32%, 26%\)/);
+        //
+        // The fill moved into Portrait with the rest of the circle. The seat
+        // still computes the RING, because all 299 faces sit on one warm ramp
+        // by construction and without a per person ring a table of five is
+        // five near identical oranges.
+        const portrait = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'components', 'common', 'Portrait.tsx'),
+            'utf8',
+        );
+        expect(portrait).toMatch(/hsl\(\$\{hue\}, 32%, 26%\)/);
+        expect(readLive('components', 'PokerSeat.tsx')).toMatch(/hsl\(\$\{hue\}, 45%, 52%\)/);
     });
 
     it('and initials handle one name, three names and an apostrophe', () => {

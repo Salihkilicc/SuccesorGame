@@ -28,7 +28,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
-import { avatarHue, initialsOf, type SeatKind } from '../../../core/casino/pokerTable';
+import { avatarHue, type SeatKind } from '../../../core/casino/pokerTable';
+import Portrait from '../../../components/common/Portrait';
 import type { Action } from '../../../core/casino/pokerBots';
 import type { Card } from '../../../core/casino/blackjack';
 import AnimatedCard from './AnimatedCard';
@@ -109,22 +110,31 @@ const PokerSeat = ({
 }: Props) => {
     const showing = !!hole && hole.length > 0;
     const hue = avatarHue(id);
-    // A dark, desaturated fill so white initials always clear it. The identity
-    // is in the HUE; the lightness is fixed so no seat is ever unreadable.
-    const fill = `hsl(${hue}, 32%, 26%)`;
     const ring = `hsl(${hue}, 45%, 52%)`;
 
     return (
         <View style={[styles.wrap, folded && styles.folded]}>
-            <View
-                style={[
-                    styles.avatar,
-                    { backgroundColor: fill, borderColor: active || winner ? tint : ring },
-                    (active || winner) && styles.avatarActive,
-                ]}
-            >
-                <Text style={styles.initials}>{initialsOf(name)}</Text>
-            </View>
+            {/* ----------------------------------------------------------------
+                The photograph the circle was always built for.
+
+                This file has said since it was written that "the photograph
+                drops into exactly the same circle later with one line
+                changed". This is that line. Portrait keeps the fill, the
+                initials and the hue that were here, so a person with no file
+                looks exactly as they did before - a partner generated at
+                runtime out of 66,040 name combinations never will have one.
+
+                The ring stays the person's own colour because all 299 faces
+                sit on one warm ramp by construction; without it a table of
+                five is five near identical oranges.
+               ---------------------------------------------------------------- */}
+            <Portrait
+                id={id}
+                name={name}
+                size={46}
+                borderColor={active || winner ? tint : ring}
+                borderWidth={active || winner ? 3 : 2}
+            />
 
             <Text style={styles.name} numberOfLines={1}>{name}</Text>
             {/* Lit for the people who are SOMEBODY, muted for your own board.
@@ -188,22 +198,36 @@ const styles = StyleSheet.create({
     wrap: { alignItems: 'center', width: 86 },
     /** Dimmed, not hidden: who folded is information for the rest of the hand. */
     folded: { opacity: 0.38 },
-    avatar: {
-        width: 46,
-        height: 46,
-        borderRadius: 23,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 2,
-    },
-    /** The one whose turn it is. A ring rather than a fill, so nothing moves. */
-    avatarActive: { borderWidth: 3 },
-    initials: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '800',
-        letterSpacing: 0.5,
-    },
+    // ------------------------------------------------------------------
+    //  SHELVED, not deleted: the seat's own avatar styles.
+    // ------------------------------------------------------------------
+    //  These three moved into components/common/Portrait.tsx so that every
+    //  avatar in the game is one component rather than five copies. The
+    //  numbers are unchanged there - 46 across, radius half of it, 2 point
+    //  ring going to 3 for whoever is to act - and Portrait derives the
+    //  initials size from the diameter instead of fixing it at 16, which is
+    //  what lets a 46 point seat and a 96 point profile header read alike.
+    //
+    //  Kept here because they are the record of what the seat looked like
+    //  before there were photographs, and because if Portrait ever has to be
+    //  backed out this is what goes back in.
+    //
+    // avatar: {
+    //     width: 46,
+    //     height: 46,
+    //     borderRadius: 23,
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     borderWidth: 2,
+    // },
+    // /** The one whose turn it is. A ring rather than a fill, so nothing moves. */
+    // avatarActive: { borderWidth: 3 },
+    // initials: {
+    //     color: '#FFFFFF',
+    //     fontSize: 16,
+    //     fontWeight: '800',
+    //     letterSpacing: 0.5,
+    // },
     name: {
         marginTop: 4,
         color: theme.colors.textPrimary,

@@ -138,7 +138,12 @@ describe('and the seat draws the hand it was given', () => {
         // The house rule: green and red are profit and loss and nothing else.
         // The room's tint carries it, and only as TEXT and a ring.
         const src = seat();
-        expect(src).toMatch(/borderColor: active \|\| winner \? tint : ring/);
+        // The ring is now a prop on the shared Portrait component rather than
+        // a style object built inside the seat, so this is the same rule
+        // written as JSX: the winner and whoever is to act get the ROOM's
+        // tint, everybody else gets their own hue. Still no fill, still no
+        // green.
+        expect(src).toMatch(/borderColor=\{active \|\| winner \? tint : ring\}/);
         expect(src).toMatch(/winner && \{ color: tint \}/);
         expect(src).not.toMatch(/backgroundColor: *['"]#([0-9A-Fa-f]{0,2})(4A|22|00)[0-9A-Fa-f]*['"].*win/i);
     });
