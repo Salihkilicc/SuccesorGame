@@ -178,6 +178,19 @@ describe('the board member and the home screen ask for a face', () => {
         expect(src).toMatch(/getTraitVisual\(member\.trait\)\.icon/);
     });
 
+    it('and the board room LIST shows them too, not just the member page', () => {
+        // Asked for as "boardin kendi sayfasi var ya hemen girise oraya da
+        // koy sembollerin yerine". The row carried a rounded square with the
+        // trait icon in it, and the trait is already written in words on the
+        // line below - so the symbol said twice what the row said once.
+        const src = live('components', 'MyCompany', 'Shares', 'BoardRoomModal.tsx');
+        expect(src).toMatch(/<Portrait/);
+        expect(src).toMatch(/id=\{m\.id\}/);
+        // The trait colour stays, as the ring. It is what tells five
+        // directors apart when a later generation falls back to initials.
+        expect(src).toMatch(/borderColor=\{`\$\{traitVisual\.color\}35`\}/);
+    });
+
     it('and the home screen uses the same two player files as the profile', () => {
         const src = live('screens', 'Home', 'HomeScreen.tsx');
         expect(src).toMatch(/player_female/);

@@ -9,6 +9,7 @@ import {
 } from '../../../data/relationshipTypes';
 import { Partner } from '../types';
 import { generatePartner } from '../logic/partnerGenerator';
+import { cheatingOutcome } from '../logic/startRelationship';
 import { runCourtship } from '../logic/runCourtship';
 import { ENCOUNTER_DATA, EncounterScenario } from '../data/encounterData';
 
@@ -284,32 +285,22 @@ export const useEncounterSystem = () => {
             const statsStore = useStatsStore.getState();
             const currentMoney = statsStore.money;
 
-            // Calculate potential settlement
-            if (partner.isMarried && !partner.hasPrenup) {
-                settlement = currentMoney * 0.5;
-            }
-
-            // 50% chance of being caught immediately if partner is jealous.
-            // But if MARRIED -> 100% chance (High Stakes)
-            let catchChance = partner.stats.jealousy > 70 ? 50 : 10;
-            if (partner.isMarried) {
-                catchChance = 100;
-                console.log('🚨 MARRIED PARTNER, 100% CATCH RATE ACTIVATED');
-            }
-
-            console.log(`🎲 Catch Probability: ${catchChance}% | isMarried: ${partner.isMarried} | Jealousy: ${partner.stats.jealousy}`);
-
-            const roll = Math.random() * 100;
-            console.log(`🎲 Roll: ${roll.toFixed(2)} vs ${catchChance}`);
-
-            if (roll < catchChance) {
-                wasCaught = true;
-                console.log('💔 CAUGHT! Breaking up with reason: cheated');
-                breakUp('cheated');
-            } else {
-                console.log('😌 Not caught. Silent breakup (drifted)');
-                breakUp('drifted');
-            }
+            // ------------------------------------------------------------
+            //  THE ARITHMETIC MOVED TO logic/startRelationship.ts
+            // ------------------------------------------------------------
+            //  Unchanged in behaviour, and moved for one reason: the swipe
+            //  app starts relationships now too, and it needs the same rules.
+            //  Two copies of a settlement calculation become two rules the
+            //  moment either one is edited.
+            //
+            //  The roll is drawn HERE and passed in, so the decision itself
+            //  is pure and a test can ask what happens on either side of the
+            //  line instead of running it a thousand times and hoping.
+            // ------------------------------------------------------------
+            const outcome = cheatingOutcome(partner, currentMoney, Math.random() * 100);
+            settlement = outcome.settlement;
+            wasCaught = outcome.caught;
+            breakUp(wasCaught ? 'cheated' : 'drifted');
 
             // Set consequence state to trigger modal (regardless of caught/drifted)
             // Using setTimeout to allow EncounterModal to close properly before showing BreakupModal

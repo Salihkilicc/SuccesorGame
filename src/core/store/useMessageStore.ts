@@ -169,6 +169,53 @@ const initials = (name: string): string =>
  * like - no figures in it, because a hardcoded figure that disagrees with the
  * player's actual quarter is worse than no message.
  */
+/**
+ * Ids that were wrong when a save was written, and what they should be.
+ *
+ * ---------------------------------------------------------------------------
+ *  WHY A MIGRATION AND NOT JUST A CORRECTED SEED
+ * ---------------------------------------------------------------------------
+ *  The seed thread carried Dana Whitfield under 'ops-lead'. She is the chief
+ *  operating officer - cast.ts, id 'coo' - and the story engine writes to her
+ *  as 'coo', so a save that had both held two threads from the same woman.
+ *  Fixing the seed fixed new games and did nothing for anybody already
+ *  playing: reported straight back as her still having no face.
+ *
+ *  A thread id is not just a key. It is what the portrait lookup reads, so a
+ *  stale one is a person who is quietly faceless for the rest of that save.
+ */
+const THREAD_ID_FIXES: Record<string, string> = {
+    'ops-lead': 'coo',
+};
+
+/**
+ * Bring a rehydrated list of threads up to date.
+ *
+ * Merges rather than renames when the correct id is already present: a save
+ * that has both is exactly the case this exists for, and two threads from one
+ * person have to become one. The messages are concatenated in time order and
+ * the unread counts added, because both halves really were sent.
+ */
+export const migrateThreads = (threads: Thread[] | undefined): Thread[] => {
+    if (!Array.isArray(threads)) return [];
+    const out: Thread[] = [];
+    for (const t of threads) {
+        const id = THREAD_ID_FIXES[t?.id] ?? t?.id;
+        const existing = out.find(x => x.id === id);
+        if (!existing) {
+            out.push(id === t.id ? t : { ...t, id });
+            continue;
+        }
+        existing.messages = [...existing.messages, ...(t.messages ?? [])]
+            .sort((a, b) => (a.atMonth ?? 0) - (b.atMonth ?? 0));
+        existing.unread += t.unread ?? 0;
+        // A conversation waiting to be played is worth more than one that is
+        // finished, so it survives the merge.
+        existing.conversationId = existing.conversationId ?? t.conversationId;
+    }
+    return out;
+};
+
 const seedThreads = (): Thread[] => [
     {
         // ------------------------------------------------------------------
@@ -363,6 +410,7 @@ export const useMessageStore = create<MessageStore>()(
             partialize: state => ({ threads: state.threads }),
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);
+                if (state) state.threads = migrateThreads(state.threads);
             },
         },
     ),

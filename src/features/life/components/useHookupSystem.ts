@@ -5,15 +5,38 @@
 
 import { useState, useCallback } from 'react';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
+import { useFamilyStore } from '../../../core/store/useFamilyStore';
+import { useStatsStore } from '../../../core/store';
+import {
+    cheatingOutcome,
+    partnerFromCandidate,
+} from '../../love/logic/startRelationship';
 import { generateCandidate, HookupCandidate } from './hookupData';
 
 type MatchStatus = 'IDLE' | 'MATCHED' | 'NO_MATCH';
+
+/** What leaving the partner you had cost, if you had one. */
+export type MatchConsequence = {
+    /** Whether they found out. A marriage always does. */
+    caught: boolean;
+    /** Money lost. Only ever above zero for a marriage with no prenup. */
+    settlement: number;
+    partnerName: string;
+};
 
 interface UseHookupSystemReturn {
     // State
     currentCandidate: HookupCandidate | null;
     matchStatus: MatchStatus;
     isModalVisible: boolean;
+    /**
+     * What the last match cost, when there was somebody to leave.
+     *
+     * Null when the player was single. Exposed rather than swallowed because
+     * a settlement that happens silently is the hidden counter this game's
+     * design keeps arguing against.
+     */
+    lastConsequence: MatchConsequence | null;
 
     // Actions
     startHookup: () => void;
@@ -27,6 +50,7 @@ export function useHookupSystem(): UseHookupSystemReturn {
     const [currentCandidate, setCurrentCandidate] = useState<HookupCandidate | null>(null);
     const [matchStatus, setMatchStatus] = useState<MatchStatus>('IDLE');
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [lastConsequence, setLastConsequence] = useState<MatchConsequence | null>(null);
 
     // Get player charm from store
     const playerCharm = usePlayerStore((state) => state.attributes.charm);
@@ -75,6 +99,41 @@ export function useHookupSystem(): UseHookupSystemReturn {
         const isMatch = totalScore >= currentCandidate.difficulty;
 
         if (isMatch) {
+            // ------------------------------------------------------------------
+            //  A MATCH IS A RELATIONSHIP NOW, NOT A STATUS FLAG
+            // ------------------------------------------------------------------
+            //  This used to set MATCHED and nothing else. The overlay came up,
+            //  the player closed it, and the person they had just matched with
+            //  did not exist anywhere - reported as "date de eslesince de
+            //  profilde esin dursun".
+            //
+            //  It goes through the SAME door the VIP encounter uses, including
+            //  what it costs to leave the partner you already have. The rules
+            //  live in logic/startRelationship.ts so that the two ways in
+            //  cannot disagree about what cheating means.
+            //
+            //  The break up happens BEFORE the new partner is set, in that
+            //  order, because setPartner overwrites and `breakup` reads the
+            //  person it is ending things with.
+            // ------------------------------------------------------------------
+            const family = useFamilyStore.getState();
+            const existing = family.partner;
+            if (existing) {
+                const outcome = cheatingOutcome(
+                    existing,
+                    useStatsStore.getState().money,
+                    Math.random() * 100,
+                );
+                setLastConsequence({
+                    caught: outcome.caught,
+                    settlement: outcome.settlement,
+                    partnerName: existing.name,
+                });
+                family.breakup(outcome.caught ? 'cheated' : 'drifted');
+            } else {
+                setLastConsequence(null);
+            }
+            useFamilyStore.getState().setPartner(partnerFromCandidate(currentCandidate));
             setMatchStatus('MATCHED');
         } else {
             setMatchStatus('NO_MATCH');
@@ -96,6 +155,7 @@ export function useHookupSystem(): UseHookupSystemReturn {
         currentCandidate,
         matchStatus,
         isModalVisible,
+        lastConsequence,
 
         // Actions
         startHookup,

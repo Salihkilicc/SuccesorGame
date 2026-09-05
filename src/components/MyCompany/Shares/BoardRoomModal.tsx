@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Portrait from '../../common/Portrait';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 // `useStatsStore` went with the shelved default proposal.
 import { useGameStore } from '../../../core/store';
@@ -363,9 +364,29 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
                                                 pressed && { opacity: 0.85 },
                                             ]}>
                                             <View style={styles.memberTop}>
-                                                <View style={[styles.traitBadge, { backgroundColor: `${traitVisual.color}15`, borderColor: `${traitVisual.color}35` }]}>
-                                                    <MaterialCommunityIcons name={traitVisual.icon} size={20} color={traitVisual.color} />
-                                                </View>
+                                                {/* ------------------------------------------
+                                                    THE DIRECTOR, NOT THEIR TRAIT SYMBOL.
+
+                                                    Asked for as "sembollerin yerine". The
+                                                    badge was a rounded square carrying the
+                                                    trait icon, and the trait is already
+                                                    written in words on the line below it, so
+                                                    the symbol was saying twice what the row
+                                                    said once.
+
+                                                    Their own colour keeps the ring, which is
+                                                    what tells five directors apart when a
+                                                    later generation has no portrait and falls
+                                                    back to initials.
+                                                   ------------------------------------------ */}
+                                                <Portrait
+                                                    id={m.id}
+                                                    name={m.name}
+                                                    size={38}
+                                                    borderWidth={1}
+                                                    borderColor={`${traitVisual.color}35`}
+                                                    fill={`${traitVisual.color}15`}
+                                                />
                                                 <View style={{ flex: 1, marginLeft: 10 }}>
                                                     <Text style={styles.memberName}>{m.name}</Text>
                                                     <Text style={styles.memberTrait}>
@@ -509,14 +530,21 @@ const styles = StyleSheet.create({
 
     memberCard: { backgroundColor: '#323A40', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
     memberTop: { flexDirection: 'row', alignItems: 'center' },
-    traitBadge: {
-        width: 38,
-        height: 38,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-    },
+    // SHELVED, not deleted: the rounded square that carried the trait icon.
+    //
+    // It was a SQUARE with a 10 point radius, and the portrait that replaced
+    // it is a circle - the shape every other avatar in the game is, and the
+    // shape a face has to be cropped to. That is the one visible difference.
+    // getTraitVisual is still exported and still used by the member page.
+    //
+    // traitBadge: {
+    //     width: 38,
+    //     height: 38,
+    //     borderRadius: 10,
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     borderWidth: 1,
+    // },
     memberName: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
     memberTrait: { fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 2 },
     memberRel: { fontSize: 9, color: '#FFFFFF', marginTop: 2 },
