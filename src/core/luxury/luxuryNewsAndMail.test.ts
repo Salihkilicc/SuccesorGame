@@ -273,3 +273,56 @@ describe('the partner crisis publishes the same way', () => {
         expect((file.match(/addSingleNews/g) || []).length).toBe(2);
     });
 });
+
+// ============================================================================
+//  AND HOW OFTEN THE BOUTIQUE WRITES
+// ============================================================================
+//
+//  Reported as arriving nearly every quarter and reading too long to be
+//  believable. It was every SECOND quarter, for the whole run, and the body
+//  ran to about a hundred and thirty words of boutique prose.
+// ============================================================================
+
+describe('the private client letter is rare and short', () => {
+    const { PROMO_EVERY_WINDOWS, promoLetter } = require('./postLuxuryPromo');
+    const { CAMPAIGN_QUARTERS } = require('./promotions');
+
+    /** The quarters a letter can go out on, by the two rules in the file. */
+    const sendsOn = (upTo: number) => {
+        const out: number[] = [];
+        for (let q = 0; q <= upTo; q++) {
+            if (q % CAMPAIGN_QUARTERS !== 0) continue;
+            if (Math.floor(q / CAMPAIGN_QUARTERS) % PROMO_EVERY_WINDOWS !== 0) continue;
+            out.push(q);
+        }
+        return out;
+    };
+
+    it('one letter every six quarters, not every two', () => {
+        const qs = sendsOn(40);
+        expect(qs.length).toBeGreaterThan(3);
+        for (let i = 1; i < qs.length; i++) {
+            expect(qs[i] - qs[i - 1]).toBe(CAMPAIGN_QUARTERS * PROMO_EVERY_WINDOWS);
+        }
+        // A year and a half apart.
+        expect(CAMPAIGN_QUARTERS * PROMO_EVERY_WINDOWS).toBe(6);
+    });
+
+    it('and it still lands at the top of a live campaign window', () => {
+        // The offer inside has to be running, or the letter advertises
+        // nothing. Every send quarter is a window opening.
+        for (const q of sendsOn(40)) expect(q % CAMPAIGN_QUARTERS).toBe(0);
+    });
+
+    it('and the body is two lines rather than an essay', () => {
+        const letter = promoLetter(
+            [{ shop: { name: 'A House', description: 'x' }, discount: 0.2 }] as never,
+            'Mr Hale',
+        );
+        expect(letter).not.toBeNull();
+        const words = letter!.body.trim().split(/\s+/).length;
+        expect(words).toBeLessThan(40);
+        // The claim the letter is actually making.
+        expect(letter!.body).toContain('20 per cent');
+    });
+});

@@ -192,6 +192,15 @@ export type GameState = {
    * TUM rapor ekranlari bunu okur — kendi tahminlerini uretmezler.
    */
   lastQuarterReport: QuarterReport | null;
+  /**
+   * The one before it, so the report can tell NEW from ONGOING.
+   *
+   * Measured over sixty quarters: five of the report's warnings fired on 93
+   * to 100 per cent of them. A warning that appears every quarter is
+   * wallpaper. buildObservations compares against this and says a thing when
+   * it starts rather than for ever after.
+   */
+  previousQuarterReport: QuarterReport | null;
 };
 
 type GameStore = GameState & {
@@ -228,6 +237,7 @@ export const initialGameState: GameState = {
   ceoBonusAccrual: { ...EMPTY_ACCRUAL },
   lastCeoBonus: null,
   lastQuarterReport: null,
+  previousQuarterReport: null,
 };
 
 // ============================================================================
@@ -1992,6 +2002,7 @@ export const useGameStore = create<GameStore>()(
 
         set(state => ({
           ...state,
+          previousQuarterReport: state.lastQuarterReport,
           lastQuarterReport: quarterReport,
           ceoBonusAccrual: bonus.next,
           // Only overwritten when a year actually closed, so the finance
@@ -3281,6 +3292,7 @@ export const useGameStore = create<GameStore>()(
         // Rapor ekranlari uygulama yeniden acildiginda da son ceyregi
         // gosterebilsin diye kalici.
         lastQuarterReport: state.lastQuarterReport,
+        previousQuarterReport: state.previousQuarterReport,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

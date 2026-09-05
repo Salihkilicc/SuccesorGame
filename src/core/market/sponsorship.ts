@@ -39,9 +39,10 @@
 //  signed one has a different, larger problem.
 // ============================================================================
 
-export type SponsorTier = 'local' | 'national' | 'global';
+export type SponsorTier = 'local' | 'national' | 'global' | 'era';
 
-export const TIERS: readonly SponsorTier[] = ['local', 'national', 'global'] as const;
+export const TIERS: readonly SponsorTier[] =
+    ['local', 'national', 'global', 'era'] as const;
 
 export interface SponsorOffer {
     id: string;
@@ -81,6 +82,20 @@ export const TIER_MINIMUM_VALUE: Record<SponsorTier, number> = {
     local: 0,
     national: 250_000_000,
     global: 4_000_000_000,
+    // ----------------------------------------------------------------------
+    //  AND THE ONE ABOVE THAT, BECAUSE THE GAME DOES NOT STOP AT FOUR BILLION
+    // ----------------------------------------------------------------------
+    //  Reported as sponsors drying up late on. Measured: thirty offers in the
+    //  whole game, ten a tier, one letter every three quarters, and every one
+    //  removed from the pool once seen. A company past the global floor has
+    //  ninety quarters of letters and then silence for the rest of the
+    //  dynasty - while the drought penalty starts biting at twelve.
+    //
+    //  These are the things only a company of that size is asked about, and
+    //  the money is an order of magnitude above global, because that is the
+    //  point: an heir inherits a name worth putting on this.
+    // ----------------------------------------------------------------------
+    era: 40_000_000_000,
 };
 
 export const tiersOpenAt = (companyValue: number): SponsorTier[] =>
@@ -204,6 +219,17 @@ const global_ = (
     quarterlyCost: number, brandPerQuarter: number,
 ): SponsorOffer => ({ id, tier: 'global', name, pitch, quarterlyCost, brandPerQuarter, quarters: 16 });
 
+/**
+ * A generation, not a season. Twenty four quarters is six years.
+ *
+ * The term is what makes these different in kind rather than in size: an era
+ * deal is signed by one chief executive and inherited by the next.
+ */
+const era = (
+    id: string, name: string, pitch: string,
+    quarterlyCost: number, brandPerQuarter: number,
+): SponsorOffer => ({ id, tier: 'era', name, pitch, quarterlyCost, brandPerQuarter, quarters: 24 });
+
 export const SPONSOR_OFFERS: SponsorOffer[] = [
     // ------------------------------------------------------------------
     //  LOCAL — a season, a few hundred thousand, and somebody who is
@@ -309,6 +335,40 @@ export const SPONSOR_OFFERS: SponsorOffer[] = [
     global_('spon-g-10', 'The concert hall',
         'Two thousand four hundred seats and the best acoustic in the world, which is a sentence three cities are currently arguing about. Ours is the true one.',
         7_400_000, 4.8),
+    // ------------------------------------------------------------------
+    //  ERA — a name on something that outlives the person who signed it.
+    //  Six year terms, and the money to match a company past forty billion.
+    // ------------------------------------------------------------------
+    era('spon-e-1', 'The orbital launch programme',
+        'Eleven flights a year for six years, and a fairing that four hundred million people watch separate on a live feed. Nobody has ever bought that surface.',
+        180_000_000, 14.0),
+    era('spon-e-2', 'The vaccine access compact',
+        'Forty two countries, no branding, no press conference. In thirty years the histories will say who paid for it and they will say it in one sentence.',
+        240_000_000, 11.5),
+    era('spon-e-3', 'The transcontinental rail corridor',
+        'Nine hundred miles of new track and eleven stations, every one of which carries a name for as long as the line runs. The line is expected to run for a century.',
+        310_000_000, 16.0),
+    era('spon-e-4', 'The global film archive',
+        'Everything shot before 1970, scanned and kept. It is the most photographed cause on earth and the least commercial one, which is exactly why it is worth your name.',
+        95_000_000, 9.0),
+    era('spon-e-5', 'The world exposition, principal partner',
+        'Six months, seventy million visitors, and a pavilion you design. The last principal partner is still introduced by it forty years later.',
+        420_000_000, 19.0),
+    era('spon-e-6', 'The deep ocean mapping mission',
+        'Eighty per cent of the sea floor has never been seen. Six years of ships would finish it, and the charts would carry your name on every sheet.',
+        130_000_000, 10.5),
+    era('spon-e-7', 'The fusion demonstration plant',
+        'It may not work. If it does, the photograph of the first grid connection is the photograph of the century and your name is on the building behind it.',
+        550_000_000, 22.0),
+    era('spon-e-8', 'The Olympic movement, tier one',
+        'Three summer games and two winter. There are nine of these worldwide and one has come free for the first time since 1988.',
+        380_000_000, 20.0),
+    era('spon-e-9', 'The manuscript conservation trust',
+        'Twelve libraries, four hundred thousand documents, and a reading room that will carry the family name after the company is gone.',
+        70_000_000, 7.5),
+    era('spon-e-10', 'The lunar surface consortium',
+        'A permanent station, six rotations, and the first commercial name to leave the planet. It is absurd money and it is the only one of these nobody can buy twice.',
+        700_000_000, 25.0),
 ];
 
 // ============================================================================
@@ -384,12 +444,40 @@ export const maxContractValue = (): number =>
     Math.max(...SPONSOR_OFFERS.map(totalContractValue));
 
 /**
+ * What forty brand points is measured against.
+ *
+ * ---------------------------------------------------------------------------
+ *  THIS USED TO BE "THE BIGGEST DEAL IN THE GAME", AND THAT WAS A TRAP
+ * ---------------------------------------------------------------------------
+ *  `sponsorPeak` divided by `maxContractValue()`, so the scale was whatever
+ *  the largest contract happened to be. Adding the era tier - one letter of
+ *  DATA, no logic touched - raised that ceiling from 384M to 16.8B and
+ *  quietly made every local, national and global sponsorship worth about a
+ *  sixth of what it had been. Caught by sponsorGlow.test and brandUnits.test,
+ *  which is what those files are for.
+ *
+ *  So the reference is named and fixed. The three tiers that existed keep the
+ *  exact curve they were tuned against, and an era deal is allowed to go ABOVE
+ *  forty points, because that is what makes it an era deal rather than a large
+ *  global one.
+ *
+ *  It is the top of the GLOBAL tier: the largest thing a company could be
+ *  offered before the era tier existed.
+ * ---------------------------------------------------------------------------
+ */
+export const PEAK_REFERENCE_VALUE = (): number =>
+    Math.max(...offersInTier('global').map(totalContractValue));
+
+/**
  * What a deal is worth on the quarter it is signed, in brand points.
  *
  * Added to the EQUILIBRIUM rather than to the value. See the note above.
  */
 export const sponsorPeak = (offer: SponsorOffer): number => {
-    const top = maxContractValue();
+    // The fixed reference, not "whatever the biggest deal is". See the note
+    // on PEAK_REFERENCE_VALUE: the other way round, adding a tier repriced
+    // every deal that already existed.
+    const top = PEAK_REFERENCE_VALUE();
     if (!(top > 0)) return 0;
     return SPONSOR_PEAK_POINTS * Math.sqrt(totalContractValue(offer) / top);
 };
@@ -441,6 +529,35 @@ export const nextOffer = (
     for (const tier of [...open].reverse()) {
         const unseen = offersInTier(tier).filter(o => !seen.includes(o.id));
         if (unseen.length) return unseen[0];
+    }
+
+    // ----------------------------------------------------------------------
+    //  AND WHEN EVERYTHING HAS BEEN SEEN, THEY ASK AGAIN
+    // ----------------------------------------------------------------------
+    //  This returned undefined, and undefined here means silence for the rest
+    //  of the run. Measured: thirty offers, ten a tier, one letter every three
+    //  quarters - ninety quarters of post and then nothing, for a dynasty that
+    //  lasts far longer.
+    //
+    //  Worse in the middle. A company worth a billion has local and national
+    //  open and global shut, so once it has been written to twenty times it
+    //  hears NOTHING until it reaches four billion - while the drought penalty
+    //  starts biting at twelve quarters and climbs to fifteen points of brand.
+    //  The game made the silence and then charged for it.
+    //
+    //  A sponsorship is not a one-time thing in any case: a contract ends, the
+    //  rights come back to the market, and the same arena writes to whoever
+    //  looks likely. So the oldest one seen is offered again rather than
+    //  nothing at all - oldest, so the round trip is as long as the pool
+    //  allows and nobody is asked twice running.
+    // ----------------------------------------------------------------------
+    for (const tier of [...open].reverse()) {
+        const inTier = offersInTier(tier);
+        if (!inTier.length) continue;
+        const byAge = inTier
+            .map(o => ({ o, at: seen.indexOf(o.id) }))
+            .sort((a, b) => a.at - b.at);
+        return byAge[0].o;
     }
     return undefined;
 };

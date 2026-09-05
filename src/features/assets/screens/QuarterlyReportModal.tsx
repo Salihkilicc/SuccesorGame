@@ -134,11 +134,72 @@ const StatementLine = ({ label, amount, negative, subtotal, emphasis, explanatio
  */
 const brandFigure = (v: number | undefined): string => String(brandDisplay(v ?? 0));
 
-const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; text: string }[] => {
-  const notes: { tone: 'bad' | 'warn' | 'good'; text: string }[] = [];
+/**
+ * Exported for measurement only.
+ *
+ * It is pure - a report in, a list of sentences out - and the only way to ask
+ * "which of these 31 warnings ever actually fires, and does it still mean
+ * anything" is to run real quarters through it. Rendering the modal 200 times
+ * would measure React.
+ */
+/** One line of the report's own commentary. */
+export type Observation = {
+    /** Which sentence this is, independent of the numbers in it. */
+    key: string;
+    tone: 'bad' | 'warn' | 'good';
+    text: string;
+};
+
+/**
+ * The few that are worth repeating every single quarter.
+ *
+ * Everything else goes quiet once it has been said. These do not, because
+ * they are counting down to something: a player who stops being told how many
+ * quarters are left has not stopped running out of them.
+ */
+export const ALWAYS_WORTH_REPEATING: ReadonlySet<string> = new Set([
+    'obs.insolvencyCountdown',
+    'obs.insolvencyLastCall',
+    'obs.covenantBreach',
+]);
+
+/**
+ * Say it when it changes, not every quarter.
+ *
+ * ---------------------------------------------------------------------------
+ *  MEASURED, OVER SIXTY REAL QUARTERS
+ * ---------------------------------------------------------------------------
+ *  Thirty one warnings are written in this file. Six of them ever appeared,
+ *  and five appeared on almost every quarter:
+ *
+ *      60/60  you ran out of stock
+ *      60/60  healthy quarter
+ *      59/60  the demand you could not serve has left a lasting mark
+ *      59/60  the way back is one thing and it is slow
+ *      56/60  your marketing budget is X, and holding the brand where it is
+ *
+ *  A warning that appears fifty nine times out of sixty is not a warning, it
+ *  is wallpaper - which is what "bazilari anlamsiz gibi geliyor" was about.
+ *  And the top two contradicted each other on the SAME quarter: running out
+ *  of stock is what makes sell-through a hundred per cent, so the report
+ *  congratulated the player for the thing it had just complained about.
+ *
+ *  So a note is shown when it STARTS, and then not again until it has stopped
+ *  and come back. The countdowns above are the exception.
+ * ---------------------------------------------------------------------------
+ *
+ * `prev` is the previous quarter's report. Without one - the first quarter of
+ * a run, or an old save - everything is new and everything is shown.
+ */
+export const buildObservations = (
+  r: QuarterReport,
+  prev?: QuarterReport | null,
+): Observation[] => {
+  const notes: Observation[] = [];
 
   if (r.unitsProduced === 0) {
     notes.push({
+      key: 'company.youProducedNothingThisQuarter',
       tone: 'warn',
       text: t('company.youProducedNothingThisQuarter'),
     });
@@ -146,6 +207,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.unitsProduced > 0 && r.sellThrough < 50) {
     notes.push({
+      key: 'obs.onlyVOfYour',
       tone: 'bad',
       text: t('obs.onlyVOfYour', { v1: formatPercent(r.sellThrough) }),
     });
@@ -155,6 +217,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   if (r.totalUnmetDemand > 0) {
     const missRate = r.totalMarketDemand > 0 ? (r.totalUnmetDemand / r.totalMarketDemand) * 100 : 0;
     notes.push({
+      key: 'obs.youRanOutOf',
       tone: 'bad',
       text: t('obs.youRanOutOf', { v1: formatNumber(r.totalMarketDemand), v2: formatNumber(r.unitsSold), v3: formatNumber(r.totalUnmetDemand), v4: formatPercent(missRate) }),
     });
@@ -200,10 +263,12 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   const reach = r.reachIndex;
   if (reach !== undefined && reach < 0.95) {
     notes.push({
+      key: 'obs.reachLost',
       tone: 'bad',
       text: t('obs.reachLost', { v1: formatPercent(Math.round((1 - reach) * 100)) }),
     });
     notes.push({
+      key: 'obs.reachWayBack',
       tone: 'bad',
       text: t('obs.reachWayBack', {
         v1: formatPercent(Math.round(REACH_SERVE_TARGET * 100)),
@@ -223,6 +288,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   // ------------------------------------------------------------------
   if (r.insolvencyQuartersLeft !== undefined) {
     notes.push({
+      key: 'obs.insolvencyCountdown',
       tone: 'bad',
       text: r.insolvencyQuartersLeft > 0
         ? t('obs.insolvencyCountdown', { v1: String(r.insolvencyQuartersLeft) })
@@ -248,6 +314,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   const upkeep = r.brandMaintenance ?? 0;
   if (upkeep > 0 && marketingSpend < upkeep) {
     notes.push({
+      key: 'obs.marketingUnderUpkeep',
       tone: 'warn',
       text: t('obs.marketingUnderUpkeep', {
         v1: formatMoney(marketingSpend),
@@ -259,6 +326,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
     // sat at exactly 26.0 against a ceiling of 26 for quarters on end, and
     // nothing on this screen said the money was doing nothing.
     notes.push({
+      key: 'obs.brandAtFacilityCeiling',
       tone: 'warn',
       text: t('obs.brandAtFacilityCeiling', { v1: brandFigure(r.brandCeiling) }),
     });
@@ -266,11 +334,13 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.brandChange < -0.5) {
     notes.push({
+      key: 'obs.brandValueFellV',
       tone: 'bad',
       text: t('obs.brandValueFellV', { v1: brandFigure(Math.abs(r.brandChange)), v2: brandFigure(r.brandValue), v3: formatMoney(r.brandMaintenance ?? 0) }),
     });
   } else if (r.brandChange > 0.5) {
     notes.push({
+      key: 'obs.brandValueRoseV',
       tone: 'good',
       text: t('obs.brandValueRoseV', { v1: brandFigure(r.brandChange), v2: brandFigure(r.brandValue) }),
     });
@@ -278,6 +348,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.isRetooling) {
     notes.push({
+      key: 'obs.yourFacilityIsBeing',
       tone: 'warn',
       text: t('obs.yourFacilityIsBeing', { v1: Math.round(r.buildQuartersRemaining ?? 0) }),
     });
@@ -285,6 +356,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.headcount < r.crewRequired) {
     notes.push({
+      key: 'obs.youAreVPeople',
       tone: 'warn',
       text: t('obs.youAreVPeople', { v1: formatNumber(r.crewRequired - r.headcount) }),
     });
@@ -292,6 +364,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.utilization > 0 && r.utilization < 60) {
     notes.push({
+      key: 'obs.capacityUtilizationWasOnly',
       tone: 'bad',
       text: t('obs.capacityUtilizationWasOnly', { v1: formatPercent(r.utilization) }),
     });
@@ -299,6 +372,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.brandCeiling && r.brandValue >= r.brandCeiling - 0.5) {
     notes.push({
+      key: 'obs.brandValueHasHit',
       tone: 'warn',
       text: t('obs.brandValueHasHit', { v1: r.facilityName, v2: brandFigure(r.brandCeiling) }),
     });
@@ -306,6 +380,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if ((r.hiresBlocked ?? 0) > 0) {
     notes.push({
+      key: 'obs.youAskedForV',
       tone: 'warn',
       text: t('obs.youAskedForV', { v1: formatNumber((r.hiresQueued ?? 0) + (r.hiresBlocked ?? 0)), v2: formatNumber(r.hiresQueued) }),
     });
@@ -313,6 +388,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if ((r.moraleChange ?? 0) < -2) {
     notes.push({
+      key: 'obs.moraleFellVPoints',
       tone: 'bad',
       text: t('obs.moraleFellVPoints', { v1: Math.abs(r.moraleChange ?? 0).toFixed(1), v2: r.employeeMorale.toFixed(0), v3: Math.round((r.salaryRatio ?? 1) * 100), v4: Math.round(r.moraleWageTarget ?? 70), v5: (r.moraleEfficiency ?? 1).toFixed(2) }),
     });
@@ -320,6 +396,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.overtime) {
     notes.push({
+      key: 'company.overtimeWasRunningYouGot',
       tone: 'warn',
       text: t('company.overtimeWasRunningYouGot'),
     });
@@ -327,16 +404,19 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if ((r.acquisitionImpairment ?? 0) > 0) {
     notes.push({
+      key: 'obs.youWroteOffV',
       tone: 'bad',
       text: t('obs.youWroteOffV', { v1: formatMoney(r.acquisitionImpairment ?? 0) }),
     });
   } else if ((r.acquisitionEbit ?? 0) < 0) {
     notes.push({
+      key: 'obs.acquisitionsCostYouV',
       tone: 'warn',
       text: t('obs.acquisitionsCostYouV', { v1: formatMoney(Math.abs(r.acquisitionEbit ?? 0)) }),
     });
   } else if ((r.acquisitionEbit ?? 0) > 0) {
     notes.push({
+      key: 'obs.acquisitionsAddedVTo',
       tone: 'good',
       text: t('obs.acquisitionsAddedVTo', { v1: formatMoney(r.acquisitionEbit ?? 0), v2: formatMoney(r.acquisitionSynergy ?? 0) }),
     });
@@ -344,6 +424,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.creditRating && ['BB', 'B', 'CCC', 'D'].includes(r.creditRating)) {
     notes.push({
+      key: 'obs.yourCreditRatingIs',
       tone: r.creditRating === 'BB' ? 'warn' : 'bad',
       text: t('obs.yourCreditRatingIs', { v1: r.creditRating, v2: (r.leverage ?? 0).toFixed(1), v3: (r.coverage ?? 0).toFixed(1) }),
     });
@@ -351,6 +432,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.covenantBreach) {
     notes.push({
+      key: 'obs.covenantBreach',
       tone: 'bad',
       text: r.distressMessage || 'You have breached a loan covenant. The banks have changed your terms.',
     });
@@ -368,7 +450,8 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
   {
     const demandNotice = useStatsStore.getState().boardDemandNotice as string | undefined;
     if (demandNotice) {
-      notes.push({ tone: 'warn', text: demandNotice });
+      notes.push({
+      key: 'report.capacitySqueeze', tone: 'warn', text: demandNotice });
     }
   }
 
@@ -384,6 +467,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
     const util = r.capacityUtilization;
     if (typeof util === 'number' && util < 0.999) {
       notes.push({
+        key: 'report.capacitySqueeze',
         tone: util < 0.7 ? 'bad' : 'warn',
         text: t('report.capacitySqueeze', { v1: String(Math.round(util * 100)) }),
       });
@@ -392,6 +476,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.layoffs > 0) {
     notes.push({
+      key: 'obs.youLetVPeople',
       tone: 'bad',
       text: t('obs.youLetVPeople', { v1: formatNumber(r.layoffs) }),
     });
@@ -399,6 +484,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.products.some(p => p.produced > 0 && (p.marketingBudget ?? 0) === 0)) {
     notes.push({
+      key: 'company.someProductsHaveZeroMarketing',
       tone: 'warn',
       text: t('company.someProductsHaveZeroMarketing'),
     });
@@ -406,6 +492,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.totalExpenses > 0 && r.expenses.storage / r.totalExpenses > 0.1) {
     notes.push({
+      key: 'obs.storageIsVOf',
       tone: 'bad',
       text: t('obs.storageIsVOf', { v1: formatPercent((r.expenses.storage / r.totalExpenses) * 100) }),
     });
@@ -413,6 +500,7 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.operationalSetback) {
     notes.push({
+      key: 'obs.lowMoraleVCost',
       tone: 'bad',
       text: t('obs.lowMoraleVCost', { v1: Math.round(r.employeeMorale), v2: formatNumber(r.lostUnits), v3: formatMoney(r.lostRevenue) }),
     });
@@ -420,13 +508,23 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.revenue > 0 && r.grossMargin < 20) {
     notes.push({
+      key: 'obs.grossMarginIsOnly',
       tone: 'warn',
       text: t('obs.grossMarginIsOnly', { v1: formatPercent(r.grossMargin) }),
     });
   }
 
-  if (r.netProfit > 0 && r.sellThrough >= 70) {
+  // ------------------------------------------------------------------
+  //  A QUARTER YOU COULD NOT SUPPLY IS NOT A HEALTHY ONE
+  // ------------------------------------------------------------------
+  //  `totalUnmetDemand > 0` is what MAKES sell-through a hundred per cent -
+  //  everything you built sold because you did not build enough. Measured,
+  //  both notes fired on 60 of 60 quarters, so the report complained about
+  //  the shortage and congratulated the player for it in the same breath.
+  // ------------------------------------------------------------------
+  if (r.netProfit > 0 && r.sellThrough >= 70 && r.totalUnmetDemand === 0) {
     notes.push({
+      key: 'obs.healthyQuarterVSell',
       tone: 'good',
       text: t('obs.healthyQuarterVSell', { v1: formatPercent(r.sellThrough), v2: formatPercent(r.netMargin) }),
     });
@@ -434,12 +532,37 @@ const buildObservations = (r: QuarterReport): { tone: 'bad' | 'warn' | 'good'; t
 
   if (r.researchGained > 0) {
     notes.push({
+      key: 'obs.yourResearchersGeneratedV',
       tone: 'good',
       text: t('obs.yourResearchersGeneratedV', { v1: formatNumber(r.researchGained) }),
     });
   }
 
-  return notes;
+  // ------------------------------------------------------------------
+  //  AND NOW DROP THE ONES THAT WERE ALREADY TRUE LAST QUARTER
+  // ------------------------------------------------------------------
+  //  Without a previous report there is nothing to compare against, which is
+  //  the first quarter of a run and every save written before this. Those get
+  //  everything, which is right: it is all new to them.
+  // ------------------------------------------------------------------
+  if (!prev) return notes;
+
+  // ------------------------------------------------------------------
+  //  AND ONCE A YEAR, THE WHOLE PICTURE AGAIN
+  // ------------------------------------------------------------------
+  //  Saying a thing once and never again is the opposite failure to saying it
+  //  sixty times: measured, suppression alone took the report from roughly
+  //  290 lines over sixty quarters to FIVE, and a player who looked away for
+  //  one quarter would never be told about a problem that lasted a decade.
+  //
+  //  Q4 restates everything still true. It is the year end, which is where a
+  //  person expects to be told where they stand, and it is predictable rather
+  //  than a rule nobody can see.
+  // ------------------------------------------------------------------
+  if (/\bQ4\b/.test(r.periodLabel || '')) return notes;
+
+  const saidLastTime = new Set(buildObservations(prev).map(n => n.key));
+  return notes.filter(n => ALWAYS_WORTH_REPEATING.has(n.key) || !saidLastTime.has(n.key));
 };
 
 // ─── Urun satiri ─────────────────────────────────────────────────────────────
@@ -626,7 +749,10 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   //  reads `boardDemandNotice` off the stats store with getState(), which is
   //  not reactive, so a memo keyed on the report would hold a stale notice.
   // --------------------------------------------------------------------
-  const observations = report ? buildObservations(report) : [];
+  // The quarter before, so a problem that has been true for a year is stated
+  // once rather than sixty times. See the note on buildObservations.
+  const priorReport = useGameStore(state => state.previousQuarterReport);
+  const observations = report ? buildObservations(report, priorReport) : [];
 
   // ------------------------------------------------------------------
   //  WHETHER THIS SECTION IS WORTH OPENING, ON ITS CLOSED HEADER

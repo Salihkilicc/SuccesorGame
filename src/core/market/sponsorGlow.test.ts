@@ -60,10 +60,30 @@ const lifts = (offerId: string, extraQuarters = 8): number[] => {
 
 describe('the size of a deal', () => {
     it('comes from what it costs', () => {
-        const biggest = SPONSOR_OFFERS
+        // ------------------------------------------------------------------
+        //  FORTY IS THE TOP OF GLOBAL, NOT THE TOP OF THE GAME
+        // ------------------------------------------------------------------
+        //  This read "the biggest offer anywhere peaks at exactly forty",
+        //  which was the same thing while global was the top tier. Adding the
+        //  era tier - one letter of data - would have silently rescaled every
+        //  deal in the game to a sixth of its old value, and this test is one
+        //  of the two that caught it.
+        //
+        //  The reference is fixed at the top of GLOBAL now, so the three
+        //  original tiers keep the curve they were tuned against, and an era
+        //  deal is allowed above forty. That is what makes it an era deal
+        //  rather than a large global one.
+        // ------------------------------------------------------------------
+        const biggestGlobal = SPONSOR_OFFERS
+            .filter(o => o.tier === 'global')
             .reduce((a, b) => (totalContractValue(a) > totalContractValue(b) ? a : b));
-        expect(sponsorPeak(biggest)).toBeCloseTo(SPONSOR_PEAK_POINTS, 6);
-        expect(totalContractValue(biggest)).toBe(maxContractValue());
+        expect(sponsorPeak(biggestGlobal)).toBeCloseTo(SPONSOR_PEAK_POINTS, 6);
+
+        const biggestAnywhere = SPONSOR_OFFERS
+            .reduce((a, b) => (totalContractValue(a) > totalContractValue(b) ? a : b));
+        expect(biggestAnywhere.tier).toBe('era');
+        expect(sponsorPeak(biggestAnywhere)).toBeGreaterThan(SPONSOR_PEAK_POINTS);
+        expect(totalContractValue(biggestAnywhere)).toBe(maxContractValue());
     });
 
     it('by its square root, so the small ones are still worth reading', () => {

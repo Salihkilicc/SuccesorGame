@@ -68,16 +68,31 @@ describe('the letter arrives', () => {
         expect(postSponsorOffer(OFFER_EVERY_QUARTERS)).toBeUndefined();
     });
 
-    it('and the same offer is never sent twice', () => {
+    it('and every offer in the tier is sent before any is sent again', () => {
+        // ------------------------------------------------------------------
+        //  IT USED TO RUN DRY HERE, AND THAT WAS THE BUG
+        // ------------------------------------------------------------------
+        //  This asserted that no offer is ever repeated, and it held because
+        //  the pool emptied - which meant a small company got ten letters and
+        //  then silence for the rest of the run, while the drought penalty
+        //  charged it for the quiet. See sponsorship.ts.
+        //
+        //  A tier still has to be exhausted before anything comes round, so
+        //  the same letter cannot arrive twice in a row.
+        // ------------------------------------------------------------------
         fresh();
-        const seen = new Set<string>();
+        const order: string[] = [];
         for (let q = 1; q <= 40; q++) {
             const offer = postSponsorOffer(q * OFFER_EVERY_QUARTERS);
-            if (!offer) continue;
-            expect(seen.has(offer.id)).toBe(false);
-            seen.add(offer.id);
+            if (offer) order.push(offer.id);
         }
-        expect(seen.size).toBe(10);   // a small company: its own tier only
+        expect(order.length).toBeGreaterThan(10);
+        // The first ten are the whole tier, each exactly once.
+        expect(new Set(order.slice(0, 10)).size).toBe(10);
+        // And nothing arrives twice running.
+        for (let i = 1; i < order.length; i++) {
+            expect(order[i]).not.toBe(order[i - 1]);
+        }
     });
 
     it('and the letter says what it costs, in the letter', () => {

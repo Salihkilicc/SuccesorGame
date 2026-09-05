@@ -72,8 +72,21 @@ export const useSponsorshipStore = create<Store>()(
             setHasHydrated: v => set({ _hasHydrated: v }),
 
             nextFor: companyValue => nextOffer(companyValue, get().seen),
+            // ------------------------------------------------------------------
+            //  SEEN IS AN ORDER, NOT A SET
+            // ------------------------------------------------------------------
+            //  It used to refuse to record an offer twice, which was right
+            //  while `nextOffer` could only ever hand back an unseen one.
+            //
+            //  It cannot any more: once every offer in every open tier has been
+            //  written, the pool comes round again rather than going silent -
+            //  a contract ends, the rights return to the market, and the same
+            //  arena writes to whoever looks likely. `nextOffer` picks the one
+            //  seen LONGEST ago, so this has to move a repeat to the back or
+            //  the same letter arrives for the rest of the run.
+            // ------------------------------------------------------------------
             markSeen: offerId =>
-                set(s => (s.seen.includes(offerId) ? s : { seen: [...s.seen, offerId] })),
+                set(s => ({ seen: [...s.seen.filter(id => id !== offerId), offerId] })),
 
             sign: offerId => {
                 const offer = offerById(offerId);

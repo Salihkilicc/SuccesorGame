@@ -24,23 +24,35 @@ import {
     DROUGHT_GRACE_QUARTERS, DROUGHT_PENALTY_CAP, DROUGHT_PENALTY_PER_QUARTER,
 } from './sponsorship';
 
-describe('thirty offers, ten a tier', () => {
+// ============================================================================
+//  TEN A TIER, AND THE COUNT COMES FROM THE TIERS
+// ============================================================================
+//  These read 30 three times over. Adding the `era` tier - because a company
+//  past forty billion had run out of anybody to write to it - broke all three
+//  for the same reason, which is a number written down four times.
+//
+//  Derived now, so the next tier costs nothing here and the RULE is what is
+//  asserted: ten in each, no thin one.
+// ============================================================================
+const PER_TIER = 10;
+const TOTAL = TIERS.length * PER_TIER;
+
+describe('ten offers a tier', () => {
     it('and exactly ten in each, so no tier is the thin one', () => {
-        expect(SPONSOR_OFFERS).toHaveLength(30);
+        expect(SPONSOR_OFFERS).toHaveLength(TOTAL);
         for (const tier of TIERS) {
-            expect({ tier, n: offersInTier(tier).length }).toEqual({ tier, n: 10 });
+            expect({ tier, n: offersInTier(tier).length }).toEqual({ tier, n: PER_TIER });
         }
     });
 
     it('every id is unique, or the seen list would silently skip one', () => {
-        expect(new Set(SPONSOR_OFFERS.map(o => o.id)).size).toBe(30);
+        expect(new Set(SPONSOR_OFFERS.map(o => o.id)).size).toBe(TOTAL);
     });
 
     it('and every one of them is a different thing to put a name on', () => {
-        // Thirty names and thirty pitches. Two offers that read the same are
-        // twenty-nine offers with a bug.
-        expect(new Set(SPONSOR_OFFERS.map(o => o.name)).size).toBe(30);
-        expect(new Set(SPONSOR_OFFERS.map(o => o.pitch)).size).toBe(30);
+        // Two offers that read the same are one offer with a bug.
+        expect(new Set(SPONSOR_OFFERS.map(o => o.name)).size).toBe(TOTAL);
+        expect(new Set(SPONSOR_OFFERS.map(o => o.pitch)).size).toBe(TOTAL);
     });
 
     it('the tiers climb in money, in brand and in commitment', () => {
@@ -81,29 +93,51 @@ describe('the big ones are gated on what the company is worth', () => {
     });
 });
 
-describe('the well empties rather than looping', () => {
-    it('nothing is ever offered twice', () => {
+// ============================================================================
+//  THE WELL WAS SUPPOSED TO EMPTY. IT SHOULD NOT HAVE.
+// ============================================================================
+//  This block asserted the opposite of what it now does, and the old header
+//  argued for it: "the well runs dry rather than looping - and when it does,
+//  that is honest too: there really are only so many things worth putting a
+//  name on."
+//
+//  Measured, that reads differently. Thirty offers, one letter every three
+//  quarters, each removed once seen: ninety quarters of post and then silence
+//  for the rest of a dynasty. And worse in the middle than at the end - a
+//  company worth a billion has local and national open and global shut, so
+//  after twenty letters it hears nothing at all until it reaches four billion,
+//  while the drought penalty starts at twelve quarters and climbs to fifteen
+//  points of brand. The game made the silence and then charged for it.
+//
+//  Reported as sponsors not arriving for fifteen quarters late on. The pool
+//  comes round now, oldest first - a contract ends and the rights return to
+//  the market, which is also what happens. Full behaviour in
+//  sponsorDrought.test.ts.
+// ============================================================================
+describe('the well comes round rather than emptying', () => {
+    it('nothing is offered twice until everything has been offered once', () => {
         const seen: string[] = [];
-        let offer = nextOffer(TIER_MINIMUM_VALUE.global, seen);
-        while (offer) {
+        const all = SPONSOR_OFFERS.filter(o => o.tier !== 'era').length;
+        for (let i = 0; i < all; i++) {
+            const offer = nextOffer(TIER_MINIMUM_VALUE.global, seen)!;
+            expect(offer).toBeDefined();
             expect(seen).not.toContain(offer.id);
             seen.push(offer.id);
-            offer = nextOffer(TIER_MINIMUM_VALUE.global, seen);
         }
-        // Every offer in the game, exactly once.
-        expect(seen).toHaveLength(30);
-        expect(new Set(seen).size).toBe(30);
+        expect(new Set(seen).size).toBe(all);
     });
 
-    it('and it runs dry rather than repeating, which is honest', () => {
+    it('and then it comes round rather than going quiet', () => {
         const all = SPONSOR_OFFERS.map(o => o.id);
-        expect(nextOffer(TIER_MINIMUM_VALUE.global, all)).toBeUndefined();
+        expect(nextOffer(TIER_MINIMUM_VALUE.global, all)).toBeDefined();
     });
 
-    it('a small company only exhausts its own tier', () => {
+    it('a small company hears from its own tier again, not from a larger one', () => {
         const localIds = offersInTier('local').map(o => o.id);
-        expect(nextOffer(0, localIds)).toBeUndefined();
-        // ...and the same company, once it is worth something, has twenty more.
+        const again = nextOffer(0, localIds);
+        expect(again).toBeDefined();
+        expect(again!.tier).toBe('local');
+        // ...and the same company, once it is worth something, has more.
         expect(nextOffer(TIER_MINIMUM_VALUE.national, localIds)!.tier).toBe('national');
     });
 

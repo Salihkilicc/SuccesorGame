@@ -50,6 +50,15 @@ import type { Shop } from '../../features/shopping/types';
  */
 export const PROMO_NET_WORTH_FLOOR = 100_000_000;
 
+/**
+ * How many campaign windows pass between letters.
+ *
+ * A window is two quarters, so three windows is six - one letter every year
+ * and a half. Enough that the envelope is worth opening, which is the whole
+ * claim the letter makes about itself.
+ */
+export const PROMO_EVERY_WINDOWS = 3;
+
 export type PromoLetter = {
     fromName: string;
     fromEmail: string;
@@ -89,13 +98,17 @@ export const promoLetter = (
         fromName: `${lead.shop.name} Private Clients`,
         fromEmail: addressFor(lead.shop),
         subject: `A private allocation for you, ${honorificName}`,
+        // ------------------------------------------------------------------
+        //  SHORT, BECAUSE A LONG ONE IS NOT READ
+        // ------------------------------------------------------------------
+        //  This ran to about a hundred and thirty words of boutique prose -
+        //  "you will not have seen this offered publicly", "we do not extend
+        //  it and we do not advertise it" - and was reported as too long and
+        //  not believable. A private client note is two lines and a number.
+        // ------------------------------------------------------------------
         body: `${honorificName},\n\n`
-            + 'You will not have seen this offered publicly, and it will not be. '
-            + `For the next two quarters we are releasing ${Math.round(lead.discount * 100)} per cent `
-            + 'of the list price to a small number of clients whose custom we would like to keep.\n\n'
-            + `${lead.shop.description}\n\n`
-            + 'The allocation closes when the season does. We do not extend it and we do not '
-            + 'advertise it, so there is no need to mention where you heard.'
+            + `${Math.round(lead.discount * 100)} per cent off the list, this season only, `
+            + 'for a small number of clients.'
             + alsoRunning
             + '\n\nWith our compliments.',
     };
@@ -110,9 +123,20 @@ export const promoLetter = (
 export const postLuxuryPromo = (quarter: number, shops: readonly Shop[]): void => {
     const q = Number.isFinite(quarter) ? Math.max(0, Math.floor(quarter)) : 0;
 
-    // The top of a campaign window. Anywhere else in it, the offer is already
-    // known and a second letter about it is furniture.
+    // ----------------------------------------------------------------------
+    //  ONE SEASON IN THREE, NOT EVERY OTHER QUARTER
+    // ----------------------------------------------------------------------
+    //  The rule above was already about not being furniture - a campaign
+    //  window is two quarters, so the boutique wrote once at the top of each
+    //  one. Reported anyway as arriving nearly every quarter, and it was:
+    //  every second quarter, for ever, for the whole run.
+    //
+    //  A private client list does not write six times a year. PROMO_EVERY
+    //  quarters keeps the letter tied to the top of a campaign window - the
+    //  offer inside it has to be live - and then only takes every third one.
+    // ----------------------------------------------------------------------
     if (q % CAMPAIGN_QUARTERS !== 0) return;
+    if (Math.floor(q / CAMPAIGN_QUARTERS) % PROMO_EVERY_WINDOWS !== 0) return;
 
     const netWorth = (useStatsStore.getState() as { netWorth?: number }).netWorth ?? 0;
     if (netWorth < PROMO_NET_WORTH_FLOOR) return;
