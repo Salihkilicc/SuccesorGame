@@ -17,6 +17,9 @@ import {
     ScrollView
 } from 'react-native';
 import { theme } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
+import { useIdentityStore } from '../../../core/store/useIdentityStore';
 import { HookupCandidate } from './hookupData';
 import AppLaunchLoader from '../../../components/common/AppLaunchLoader';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -34,6 +37,16 @@ interface HookupModalProps {
     onClose: () => void;
 }
 
+/**
+ * Which of the two player portraits to show in the match overlay.
+ *
+ * The same pair the profile header uses. Read here rather than passed in
+ * because the overlay is about the player and nothing above it knows or
+ * cares - and a prop nobody remembers to pass is how a face goes missing.
+ */
+const usePlayerPortraitId = (): string =>
+    useIdentityStore(s => (s.gender === 'female' ? 'player_female' : 'player_male'));
+
 export function HookupModal({
     visible,
     candidate,
@@ -44,6 +57,7 @@ export function HookupModal({
     onClose,
 }: HookupModalProps) {
     useLocale();
+    const playerId = usePlayerPortraitId();
     // Animation Values
     const translateX = useRef(new Animated.Value(0)).current;
 
@@ -121,8 +135,11 @@ export function HookupModal({
         extrapolate: 'clamp',
     });
 
-    // Determine emoji based on gender
-    const avatarEmoji = candidate?.gender === 'female' ? '👩' : '👨';
+    // SHELVED, not deleted: the two emoji this card used for a whole dating
+    // pool. Kept as the record of what it was, and because if the portraits
+    // ever have to be backed out this is what goes back in.
+    //
+    // const avatarEmoji = candidate?.gender === 'female' ? '\u{1F469}' : '\u{1F468}';
 
     return (
         <Modal
@@ -152,7 +169,35 @@ export function HookupModal({
                             >
                                 {/* Top Half - Profile Image */}
                                 <View style={[styles.imageSection, { backgroundColor: candidate.imageColor }]}>
-                                    <Text style={styles.avatarEmoji}>{avatarEmoji}</Text>
+                                    {/* ------------------------------------------
+                                        A FACE, WHERE THERE WAS AN EMOJI.
+
+                                        Two emoji for a whole dating pool meant
+                                        every woman was the same woman. The
+                                        candidate carries a real age and a real
+                                        gender, so the face can match the number
+                                        printed under it.
+
+                                        It fills the panel rather than sitting in
+                                        a circle, because this is the photograph
+                                        half of a swipe card and that is what a
+                                        swipe card is.
+                                       ------------------------------------------ */}
+                                    <Portrait
+                                        id={candidate.id}
+                                        name={candidate.name}
+                                        fill={candidate.imageColor}
+                                        borderWidth={0}
+                                        initialsSize={100}
+                                        singleInitial
+                                        source={faceFor({
+                                            id: candidate.id,
+                                            name: candidate.name,
+                                            female: candidate.gender === 'female',
+                                            age: candidate.age,
+                                        }) as number | null}
+                                        style={styles.avatarFill}
+                                    />
 
                                     {/* Swipe Feedback Overlay - LIKE */}
                                     <Animated.View style={[styles.swipeFeedback, styles.likeFeedback, { opacity: likeOpacity }]}>
@@ -245,13 +290,38 @@ export function HookupModal({
                                         You and {candidate.name} passed the vibe check.
                                     </Text>
 
+                                    {/* The two of you. The player's own portrait
+                                        on the left, theirs on the right - the
+                                        same two faces the rest of the game
+                                        uses, rather than a sunglasses emoji
+                                        standing in for whoever is playing. */}
                                     <View style={styles.overlayAvatarRow}>
-                                        <View style={[styles.smallAvatar, { backgroundColor: '#434B50' }]}>
-                                            <Text style={{ fontSize: 40 }}>😎</Text>
-                                        </View>
-                                        <View style={[styles.smallAvatar, { backgroundColor: candidate.imageColor }]}>
-                                            <Text style={{ fontSize: 40 }}>{avatarEmoji}</Text>
-                                        </View>
+                                        <Portrait
+                                            id={playerId}
+                                            name="You"
+                                            size={70}
+                                            borderWidth={1}
+                                            borderColor="rgba(255,255,255,0.06)"
+                                            fill="#434B50"
+                                            initialsSize={26}
+                                            style={styles.smallAvatar}
+                                        />
+                                        <Portrait
+                                            id={candidate.id}
+                                            name={candidate.name}
+                                            size={70}
+                                            borderWidth={1}
+                                            borderColor="rgba(255,255,255,0.06)"
+                                            fill={candidate.imageColor}
+                                            initialsSize={26}
+                                            source={faceFor({
+                                                id: candidate.id,
+                                                name: candidate.name,
+                                                female: candidate.gender === 'female',
+                                                age: candidate.age,
+                                            }) as number | null}
+                                            style={styles.smallAvatar}
+                                        />
                                     </View>
 
                                     <TouchableOpacity
@@ -308,9 +378,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         position: 'relative',
     },
-    avatarEmoji: {
-        fontSize: 100,
+    /**
+     * The photograph half of the swipe card.
+     *
+     * Absolute rather than sized, so it fills whatever the panel is: the
+     * panel is 45% of a card whose height depends on the device, and a fixed
+     * number here would leave a band at one screen size or another.
+     */
+    avatarFill: {
+        ...StyleSheet.absoluteFillObject,
     },
+    // SHELVED with the emoji above.
+    //
+    // avatarEmoji: {
+    //     fontSize: 100,
+    // },
     swipeFeedback: {
         position: 'absolute',
         top: 20,
@@ -493,15 +575,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 24,
     },
+    /** Only the overlap. Portrait owns the circle and the hairline ring. */
     smallAvatar: {
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        justifyContent: 'center',
-        alignItems: 'center',
         marginHorizontal: -10,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
     },
     keepPlayingBtn: {
         backgroundColor: '#FFFFFF',

@@ -26,6 +26,8 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import { PartnerProfile, SocialClass } from '../../../data/relationshipTypes';
 import { EncounterScenario } from '../data/encounterData';
 
@@ -123,14 +125,17 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
     const isDeepPersona = 'job' in candidate && 'personality' in candidate && 'finances' in candidate;
     const deepPartner = isDeepPersona ? (candidate as any) : null;
 
-    const initials = candidate.name
-        ? candidate.name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')
-              .substring(0, 2)
-              .toUpperCase()
-        : 'VIP';
+    // SHELVED, not deleted: the initials this card drew before it could show
+    // a face. Portrait derives the same two letters from the name, through
+    // the one function that answers that question for every avatar.
+    //
+    // const initials = candidate.name ? ... : 'VIP';
+
+    //  Which way they were drawn. Undefined is a real answer and means the
+    //  card keeps its letters rather than taking a coin flip on a picture
+    //  this size.
+    const gender: 'male' | 'female' | undefined =
+        (candidate as { gender?: 'male' | 'female' }).gender ?? deepPartner?.gender;
 
     const socialClass = candidate.stats?.socialClass || deepPartner?.job?.tier || 'HighSociety';
     const classTheme = getSocialClassTheme(socialClass);
@@ -161,9 +166,37 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 
                         {/* Candidate Identity Block */}
                         <View style={styles.identitySection}>
-                            <View style={styles.avatarCircle}>
-                                <Text style={styles.avatarText}>{initials}</Text>
-                            </View>
+                            {/* --------------------------------------------
+                                THE FACE OF THE PERSON BEING OFFERED.
+
+                                The age is printed on the very next line -
+                                "Mira Sen, 27" - so the band follows that
+                                number and nothing else.
+
+                                Every candidate here comes from
+                                generatePartner, which carries both gender and
+                                age: measured, 200 of 200 resolve to a face.
+                                The initials remain for the encounters that
+                                arrive from somewhere else without one.
+                               -------------------------------------------- */}
+                            <Portrait
+                                id={candidate.id || 'encounter'}
+                                name={candidate.name || ''}
+                                size={76}
+                                fill={theme.colors.surfaceHigh}
+                                borderWidth={2}
+                                borderColor={theme.colors.accent}
+                                initialsSize={26}
+                                source={faceFor({
+                                    id: candidate.id || 'encounter',
+                                    name: candidate.name,
+                                    female: gender === undefined
+                                        ? undefined
+                                        : gender === 'female',
+                                    age,
+                                }) as number | null}
+                                style={styles.avatarCircle}
+                            />
 
                             <Text style={styles.nameText}>
                                 {candidate.name}
@@ -344,23 +377,32 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 14,
     },
+    /** Only the spacing. Portrait owns the circle, through props. */
     avatarCircle: {
-        width: 76,
-        height: 76,
-        borderRadius: 38,
-        backgroundColor: theme.colors.surfaceHigh,
-        borderWidth: 2,
-        borderColor: theme.colors.accent,
-        justifyContent: 'center',
-        alignItems: 'center',
         marginBottom: 12,
     },
-    avatarText: {
-        fontSize: 26,
-        fontWeight: '800',
-        color: '#FFFFFF',
-        letterSpacing: 0.5,
-    },
+    // SHELVED, not deleted: the circle this card drew before it could hold a
+    // face. Portrait takes the same 76 points, the same radius, the same
+    // surfaceHigh fill, the same 2 point accent ring and the same 26 point
+    // monogram.
+    //
+    // avatarCircle: {
+    //     width: 76,
+    //     height: 76,
+    //     borderRadius: 38,
+    //     backgroundColor: theme.colors.surfaceHigh,
+    //     borderWidth: 2,
+    //     borderColor: theme.colors.accent,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     marginBottom: 12,
+    // },
+    // avatarText: {
+    //     fontSize: 26,
+    //     fontWeight: '800',
+    //     color: '#FFFFFF',
+    //     letterSpacing: 0.5,
+    // },
     nameText: {
         fontSize: 20,
         fontWeight: '800',

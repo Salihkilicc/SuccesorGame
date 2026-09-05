@@ -39,6 +39,8 @@ import { startNewQuarter } from '../../features/life/components/Sanctuary/store/
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
 import { startNewGameAsking } from '../../core/newGamePrompt';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
+import Portrait from '../../components/common/Portrait';
+import { portraitFor } from '../../core/portraits';
 import { fullName } from '../../core/identity';
 import UnreadBadge from '../../components/common/UnreadBadge';
 import { useMessageStore, unreadCount } from '../../core/store/useMessageStore';
@@ -378,6 +380,10 @@ const HomeScreen = () => {
   const unreadMail = useMailStore(st => unreadMailCount(st.inbox));
 
   const displayName = fullName(firstName, lastName) || 'New Player';
+  //  The two files drawn OF THE PLAYER. Chosen the same way the profile
+  //  header chooses, so the same person looks the same on both screens.
+  const playerPortraitId = gender === 'female' ? 'player_female' : 'player_male';
+  const playerFace = portraitFor(playerPortraitId);
   // ------------------------------------------------------------------
   //  THE LINE UNDER THE NAME IS WHAT YOU ARE, NOT WHAT THE BUILD IS
   // ------------------------------------------------------------------
@@ -552,16 +558,41 @@ const HomeScreen = () => {
             {/* Top Row: Avatar + Name/Bio + Age/Month chips */}
             <View style={styles.headerTopRow}>
               {/* Avatar */}
-              <LinearGradient
-                colors={[theme.colors.primary, theme.colors.secondary, theme.colors.surfaceRaised]}
-                style={styles.avatarCircle}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.avatarInitial}>
-                  {displayName.charAt(0).toUpperCase()}
-                </Text>
-              </LinearGradient>
+              {/* ----------------------------------------------------------
+                  THE PLAYER'S OWN FACE, ON THEIR OWN HOME SCREEN.
+
+                  Two portraits were drawn of the player - player_male and
+                  player_female - and the profile header was reading them
+                  while this screen, the first thing anybody sees, still drew
+                  a letter.
+
+                  The gradient stays for the case with no face. It is not a
+                  case that can happen today, because identity.gender always
+                  has a value, but the gradient is this screen's own look and
+                  deleting it to save a branch would be trading a fallback
+                  for nothing.
+                 ---------------------------------------------------------- */}
+              {playerFace ? (
+                <Portrait
+                  id={playerPortraitId}
+                  name={displayName}
+                  size={50}
+                  borderWidth={0}
+                  source={playerFace as number}
+                  style={styles.avatarCircle}
+                />
+              ) : (
+                <LinearGradient
+                  colors={[theme.colors.primary, theme.colors.secondary, theme.colors.surfaceRaised]}
+                  style={styles.avatarCircle}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Text style={styles.avatarInitial}>
+                    {displayName.charAt(0).toUpperCase()}
+                  </Text>
+                </LinearGradient>
+              )}
 
               {/* Name + Bio */}
               <View style={styles.headerNameBlock}>

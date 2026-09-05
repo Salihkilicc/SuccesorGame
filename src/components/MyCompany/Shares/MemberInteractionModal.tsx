@@ -30,6 +30,7 @@ import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Portrait from '../../common/Portrait';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
@@ -599,9 +600,30 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                     are now stated plainly.
                    ------------------------------------------------------------ */}
                 <View style={styles.characterCard}>
-                    {/* The trait, once, as a mark rather than a sixty pixel
-                        portrait. The header already says the word. */}
+                    {/* ------------------------------------------------------
+                        THE FACE, BESIDE THE TRAIT RATHER THAN INSTEAD OF IT
+
+                        Asked for as "board membersda sembol var foto yerine".
+                        The symbol was a deliberate choice: a sixty pixel hero
+                        portrait used to open this page and was cut because
+                        most of a phone screen went on saying who you were
+                        looking at, on a page reached by tapping their name.
+
+                        That reasoning was about the HERO, not about having no
+                        face at all. So the portrait comes back at 40 points,
+                        inside the row that was already there, and the page
+                        keeps the height it won. The four directors have real
+                        files - npc-elena-vance and the rest - and a director
+                        from a later generation falls back to their initials.
+                       ------------------------------------------------------ */}
                     <View style={styles.traitRow}>
+                        <Portrait
+                            id={member.id}
+                            name={member.name}
+                            size={40}
+                            borderWidth={0}
+                            fill={theme.colors.surfaceRaised}
+                        />
                         <MaterialCommunityIcons
                             name={getTraitVisual(member.trait).icon}
                             size={18}
