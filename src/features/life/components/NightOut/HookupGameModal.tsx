@@ -10,6 +10,8 @@ import {
     Animated,
 } from 'react-native';
 import { theme } from '../../../../core/theme';
+import Portrait from '../../../../components/common/Portrait';
+import { faceFor } from '../../../../core/portraits/faces';
 import { HookupScenario, HookupStrategy } from './data/hookupGameData';
 import { Partner } from '../../../love/types';
 
@@ -132,11 +134,24 @@ const HookupGameModal = ({
 
 const PartnerHeader = ({ partner }: { partner: Partner }) => (
     <View style={styles.partnerSection}>
-        <View style={styles.partnerAvatar}>
-            <Text style={styles.avatarEmoji}>
-                {partner.gender === 'female' ? '💃' : '🕺'}
-            </Text>
-        </View>
+        {/* A face rather than a dancing emoji. Partner carries a real gender
+            and a real age, and the age is a line away on this card. */}
+        <Portrait
+            id={partner.id}
+            name={partner.name}
+            size={80}
+            borderWidth={1}
+            borderColor="rgba(255,255,255,0.06)"
+            fill="#434B50"
+            initialsSize={29}
+            source={faceFor({
+                id: partner.id,
+                name: partner.name,
+                female: partner.gender === 'female',
+                age: partner.age,
+            }) as number | null}
+            style={styles.partnerAvatar}
+        />
         <Text style={styles.partnerName}>{partner.name}</Text>
         <Text style={styles.partnerJob}>{partner.job.title}</Text>
     </View>
@@ -225,18 +240,21 @@ const styles = StyleSheet.create({
     },
     partnerAvatar: {
         width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#434B50',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
         marginBottom: 12,
     },
-    avatarEmoji: {
-        fontSize: 40,
-    },
+    // SHELVED with the two dancing emoji. Portrait takes the same 80 points,
+    // the same radius, the same fill and the same hairline ring.
+    //
+    // height: 80,
+    // borderRadius: 40,
+    // backgroundColor: '#434B50',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // borderWidth: 1,
+    // borderColor: 'rgba(255,255,255,0.06)',
+    // avatarEmoji: {
+    //     fontSize: 40,
+    // },
     partnerName: {
         fontSize: 24,
         fontWeight: '800',

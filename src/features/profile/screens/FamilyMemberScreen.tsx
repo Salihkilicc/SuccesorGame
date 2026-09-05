@@ -23,6 +23,8 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import { useFamilyStore, FALLBACK_CHILD_NAME } from '../../../core/store/useFamilyStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -317,9 +319,47 @@ export const FamilyMemberScreen: React.FC = () => {
             >
                 {/* Member Identity Header Card */}
                 <View style={styles.headerCard}>
-                    <View style={styles.avatar}>
-                        <Text style={styles.avatarText}>{initials}</Text>
-                    </View>
+                    {/* --------------------------------------------------
+                        THE SAME FACE THE ROW YOU TAPPED WAS SHOWING.
+
+                        Reported as "partner sayfasina giriyorum ve profil
+                        sayfasindaki foto icinde yok". The row had a
+                        photograph and the page you opened from it had two
+                        letters, which reads as the wrong page rather than
+                        as a missing feature.
+
+                        One page, two kinds of person: a partner carries
+                        their age on stats and a child carries it directly,
+                        and both are printed a line below this circle.
+                       -------------------------------------------------- */}
+                    <Portrait
+                        id={memberId || (isPartner ? 'partner' : 'child')}
+                        name={name}
+                        size={52}
+                        borderWidth={0}
+                        fill="#183D5C"
+                        initialsColour="#7DD3FC"
+                        source={faceFor(
+                            isPartner
+                                ? {
+                                    id: partner?.id || 'partner',
+                                    name,
+                                    female: partner?.gender === undefined
+                                        ? undefined
+                                        : partner.gender === 'female',
+                                    age: partner?.stats?.age,
+                                }
+                                : {
+                                    id: child?.id || 'child',
+                                    name,
+                                    female: child?.gender === undefined
+                                        ? undefined
+                                        : child.gender === 'Female',
+                                    age: child?.age,
+                                },
+                        ) as number | null}
+                        style={styles.avatar}
+                    />
                     <View style={styles.identityBlock}>
                         <Text style={styles.memberName}>{name}</Text>
                         <Text style={styles.memberSub}>
@@ -711,20 +751,29 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 12,
     },
+    /** Only the spacing. Portrait owns the circle, through props. */
     avatar: {
-        width: 52,
-        height: 52,
-        borderRadius: 26,
-        backgroundColor: '#183D5C',
-        alignItems: 'center',
-        justifyContent: 'center',
         marginRight: 14,
     },
-    avatarText: {
-        color: '#7DD3FC',
-        fontSize: 18,
-        fontWeight: '800',
-    },
+    // SHELVED, not deleted: the circle this header drew before it could hold
+    // a face. Portrait takes the same 52 points, the same radius, the same
+    // #183D5C fill and the same pale blue letters, and sizes them
+    // 52 * 0.36 = 19 rather than 18.
+    //
+    // avatar: {
+    //     width: 52,
+    //     height: 52,
+    //     borderRadius: 26,
+    //     backgroundColor: '#183D5C',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     marginRight: 14,
+    // },
+    // avatarText: {
+    //     color: '#7DD3FC',
+    //     fontSize: 18,
+    //     fontWeight: '800',
+    // },
     identityBlock: {
         flex: 1,
     },

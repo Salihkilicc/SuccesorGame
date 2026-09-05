@@ -12,6 +12,8 @@ import {
     ScrollView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Portrait from '../../common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import { useNavigation } from '@react-navigation/native';
 import { buyoutAsk, acceptanceChance, MAX_ASK_PREMIUM } from '../../../core/market/buyout';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
@@ -320,9 +322,29 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                         what is left here is the picture. */}
                     <View style={styles.header}>
                         <View style={styles.avatarContainer}>
-                            <View style={[styles.avatar, { backgroundColor: `${getTraitVisual(member.trait).color}15`, borderWidth: 2, borderColor: `${getTraitVisual(member.trait).color}40` }]}>
-                                <MaterialCommunityIcons name={getTraitVisual(member.trait).icon} size={36} color={getTraitVisual(member.trait).color} />
-                            </View>
+                            {/* The director, where their trait symbol was.
+                                Same reasoning as the board list and the
+                                member page: the trait is written in words
+                                elsewhere on this card, and a face is the one
+                                thing that tells five directors apart. Their
+                                trait colour stays as the ring. */}
+                            <Portrait
+                                id={member.id}
+                                name={member.name}
+                                size={80}
+                                borderWidth={2}
+                                borderColor={`${getTraitVisual(member.trait).color}40`}
+                                fill={`${getTraitVisual(member.trait).color}15`}
+                                source={faceFor({
+                                    id: member.id,
+                                    name: member.name,
+                                    female: member.gender === undefined
+                                        ? undefined
+                                        : member.gender === 'female',
+                                    age: member.age,
+                                }) as number | null}
+                                style={styles.avatar}
+                            />
                         </View>
 
                         <Text style={styles.memberName}>{member.name}</Text>
@@ -684,13 +706,17 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     avatar: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        // SHELVED with the symbol it framed. Portrait takes the same 80
+        // points, the same radius and the same trait tinted ring through
+        // props; only the spacing is left here.
+        //
+        // width: 80,
+        // height: 80,
+        // borderRadius: 40,
+        // alignItems: 'center',
+        // justifyContent: 'center',
+        // borderWidth: 1,
+        // borderColor: 'rgba(255,255,255,0.06)',
     },
     avatarText: {
         fontSize: 40,

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Portrait from '../../common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import ScreenHeader from '../../common/ScreenHeader';
 import GameModal from '../../common/GameModal';
 import { useShareholderStore, type BoardMember } from '../../../features/shareholders/stores/useShareholderStore';
@@ -213,9 +215,27 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                 </View>
                 {/* Lender Info */}
                 <View style={styles.lenderCard}>
-                    <View style={[styles.lenderAvatar, { backgroundColor: 'rgba(248, 113, 113, 0.15)', borderWidth: 1, borderColor: 'rgba(248, 113, 113, 0.35)' }]}>
-                        <MaterialCommunityIcons name="shark" size={24} color="#F87171" />
-                    </View>
+                    {/* The lender is a DIRECTOR - sharkMember is a
+                        BoardMember - so he has a face like the rest of them,
+                        and a shark icon was standing in for a person the
+                        player already knows by name. */}
+                    <Portrait
+                        id={sharkMember.id}
+                        name={sharkMember.name}
+                        size={48}
+                        borderWidth={1}
+                        borderColor="rgba(248, 113, 113, 0.35)"
+                        fill="rgba(248, 113, 113, 0.15)"
+                        source={faceFor({
+                            id: sharkMember.id,
+                            name: sharkMember.name,
+                            female: sharkMember.gender === undefined
+                                ? undefined
+                                : sharkMember.gender === 'female',
+                            age: sharkMember.age,
+                        }) as number | null}
+                        style={styles.lenderAvatar}
+                    />
                     <View>
                         <Text style={styles.lenderName}>{sharkMember.name}</Text>
                         <Text style={styles.lenderRole}>{t('finance.privateEquityInvestor')}</Text>

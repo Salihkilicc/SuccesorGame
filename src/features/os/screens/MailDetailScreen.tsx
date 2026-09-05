@@ -12,6 +12,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { theme, avatarTintFor } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { portraitFor } from '../../../core/portraits';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
@@ -281,9 +283,21 @@ const MailDetailScreen = () => {
                 {/* Sender Info */}
                 <AnimatedBubble delay={50}>
                     <View style={styles.senderSection}>
-                        <View style={[styles.avatar, { backgroundColor: avatarTintFor(mail.fromName) }]}>
-                            <Text style={styles.avatarText}>{getInitials(mail.fromName)}</Text>
-                        </View>
+                        {/* The sender, the same as in the list. A letter
+                            from Facilities or a bank keeps its tinted
+                            circle: fromId is absent for those on purpose.
+                            The letters are BLACK on these light fills -
+                            see MailScreen for the contrast numbers. */}
+                        <Portrait
+                            id={mail.fromId || mail.fromName}
+                            name={mail.fromName}
+                            size={44}
+                            borderWidth={0}
+                            fill={avatarTintFor(mail.fromName)}
+                            initialsColour={theme.colors.onLight}
+                            source={mail.fromId ? portraitFor(mail.fromId) as number | null : null}
+                            style={styles.avatar}
+                        />
                         <View style={styles.senderInfo}>
                             <View style={styles.senderNameRow}>
                                 <Text style={styles.detailFromName}>{displayFromName}</Text>

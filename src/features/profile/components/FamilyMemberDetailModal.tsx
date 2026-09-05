@@ -22,6 +22,8 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import { PartnerProfile, Child } from '../../../core/store/useFamilyStore';
 import { t, useLocale } from '../../../core/i18n';
 import {
@@ -100,9 +102,37 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
                     >
                         {/* Member Identity Header Card */}
                         <View style={styles.headerCard}>
-                            <View style={styles.avatar}>
-                                <Text style={styles.avatarText}>{initials}</Text>
-                            </View>
+                            {/* The same face the row and the full screen
+                                show. This modal and FamilyMemberScreen are
+                                two views of one person, so they cannot
+                                disagree about what that person looks like. */}
+                            <Portrait
+                                id={(isPartner ? partner?.id : child?.id) || 'member'}
+                                name={name}
+                                size={48}
+                                borderWidth={0}
+                                fill={theme.colors.surfaceRaised}
+                                source={faceFor(
+                                    isPartner
+                                        ? {
+                                            id: partner?.id || 'partner',
+                                            name,
+                                            female: partner?.gender === undefined
+                                                ? undefined
+                                                : partner.gender === 'female',
+                                            age: partner?.stats?.age,
+                                        }
+                                        : {
+                                            id: child?.id || 'child',
+                                            name,
+                                            female: child?.gender === undefined
+                                                ? undefined
+                                                : child.gender === 'Female',
+                                            age: child?.age,
+                                        },
+                                ) as number | null}
+                                style={styles.avatar}
+                            />
                             <View style={styles.identityBlock}>
                                 <Text style={styles.memberName}>{name}</Text>
                                 <Text style={styles.memberSub}>
@@ -437,19 +467,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: theme.colors.surfaceRaised,
-        alignItems: 'center',
-        justifyContent: 'center',
         marginRight: 12,
     },
-    avatarText: {
-        color: theme.colors.textPrimary,
-        fontSize: 16,
-        fontWeight: '800',
-    },
+    // SHELVED with the circle above: Portrait takes the same 48 points, the
+    // same radius and the same raised fill through props, and 48 * 0.36 is
+    // the 17 point monogram rather than 16.
+    //
+    // avatarText: {
+    //     color: theme.colors.textPrimary,
+    //     fontSize: 16,
+    //     fontWeight: '800',
+    // },
     identityBlock: {
         flex: 1,
     },

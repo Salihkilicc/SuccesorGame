@@ -708,19 +708,29 @@ const styles = StyleSheet.create({
         gap: 12,
         marginBottom: 12,
     },
-    sharkAvatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#434B50',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    sharkAvatarText: {
-        fontSize: 24,
-        fontWeight: '900',
-        color: '#FFFFFF',
-    },
+    // ------------------------------------------------------------------
+    //  SHELVED: BOTH OF THESE WERE ALREADY DEAD
+    // ------------------------------------------------------------------
+    //  `styles.sharkAvatar` and `styles.sharkAvatarText` are referenced
+    //  NOWHERE in this file. The shark's card lives in SharkDealModal, which
+    //  draws his portrait now. Found by the avatar sweep in
+    //  features/everyAvatar.test.ts, which flagged this file as drawing an
+    //  avatar without going through Portrait - and it was drawing nothing at
+    //  all.
+    //
+    //  sharkAvatar: {
+    //      width: 48,
+    //      height: 48,
+    //      borderRadius: 24,
+    //      backgroundColor: '#434B50',
+    //      alignItems: 'center',
+    //      justifyContent: 'center',
+    //  },
+    //  sharkAvatarText: {
+    //      fontSize: 24,
+    //      fontWeight: '900',
+    //      color: '#FFFFFF',
+    //  },
     sharkDealInfo: {
         flex: 1,
     },
