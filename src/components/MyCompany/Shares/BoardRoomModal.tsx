@@ -4,6 +4,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Portrait from '../../common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 // `useStatsStore` went with the shelved default proposal.
 import { useGameStore } from '../../../core/store';
@@ -386,6 +387,14 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
                                                     borderWidth={1}
                                                     borderColor={`${traitVisual.color}35`}
                                                     fill={`${traitVisual.color}15`}
+                                                    source={faceFor({
+                                                        id: m.id,
+                                                        name: m.name,
+                                                        female: m.gender === undefined
+                                                            ? undefined
+                                                            : m.gender === 'female',
+                                                        age: m.age,
+                                                    }) as number | null}
                                                 />
                                                 <View style={{ flex: 1, marginLeft: 10 }}>
                                                     <Text style={styles.memberName}>{m.name}</Text>

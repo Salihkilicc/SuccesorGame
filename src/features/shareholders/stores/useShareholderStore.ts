@@ -91,6 +91,23 @@ export interface BoardMember {
     name: string;
     shareCount: number; // Absolute share count (e.g., 1,250,000)
     trait: TraitType;
+    /**
+     * Which way they were born, and how old they read.
+     *
+     * BOTH OPTIONAL AND BOTH ONLY FOR THE PORTRAIT. The four founding
+     * directors have files of their own and need neither; their heirs are
+     * generated and cannot, so they borrow a face from the pool - and the
+     * pool refuses to guess a gender, which is the whole reason this is
+     * carried rather than inferred.
+     *
+     * Set by boardSuccession.succeedBoard from the same draw that chooses the
+     * heir's first name, so Helena is never handed a man's face. Absent on
+     * every save written before this and on all four founders, which is the
+     * correct answer for them.
+     */
+    gender?: 'male' | 'female';
+    /** See gender. Not a birthday: no screen shows a director's age. */
+    age?: number;
     /** SONUCLARIN olusturdugu profesyonel guven. Oyu YALNIZCA bu belirler. */
     trust: number; // 0-100
     /** JESTLERIN olusturdugu kisisel yakinlik. Oy vermez, kapi acar.

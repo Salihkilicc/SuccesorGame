@@ -31,6 +31,7 @@ import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Portrait from '../../common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
@@ -623,6 +624,14 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                             size={40}
                             borderWidth={0}
                             fill={theme.colors.surfaceRaised}
+                            source={faceFor({
+                                id: member.id,
+                                name: member.name,
+                                female: member.gender === undefined
+                                    ? undefined
+                                    : member.gender === 'female',
+                                age: member.age,
+                            }) as number | null}
                         />
                         <MaterialCommunityIcons
                             name={getTraitVisual(member.trait).icon}

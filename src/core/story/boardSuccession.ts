@@ -77,12 +77,52 @@ export const SUCCESSOR_TRUST = 50;
  * plain - these are directors, not characters, and a memorable name here
  * would compete with the cast that does have a story.
  */
-export const SUCCESSOR_FIRST_NAMES: readonly string[] = [
-    'Adrian', 'Beatrice', 'Caleb', 'Delia', 'Emmett', 'Freya',
-    'Gideon', 'Helena', 'Isaac', 'Juno', 'Konrad', 'Lena',
-    'Marcus', 'Nadia', 'Otto', 'Priya', 'Quentin', 'Rosa',
-    'Silas', 'Tessa', 'Ulrich', 'Vera', 'Wendell', 'Yusuf',
+/**
+ * The pool, with the one fact the names alone could not carry.
+ *
+ * ---------------------------------------------------------------------------
+ *  WHY THE GENDER IS WRITTEN DOWN RATHER THAN GUESSED FROM THE NAME
+ * ---------------------------------------------------------------------------
+ *  It was not here at all, and the whole board went faceless the moment a
+ *  generation turned. Measured over four generations: gen 1 had four
+ *  portraits and gens 2, 3 and 4 had none, because a successor correctly
+ *  misses the ancestor's file and the pool needs a gender to lend a face.
+ *
+ *  Guessing from the name would be a table of names mapping to genders in
+ *  another file, which is this table with an extra step and a way to
+ *  disagree with itself. The list is 24 lines long and each line knows.
+ */
+export const SUCCESSOR_NAMES: readonly { first: string; gender: 'male' | 'female' }[] = [
+    { first: 'Adrian', gender: 'male' }, { first: 'Beatrice', gender: 'female' },
+    { first: 'Caleb', gender: 'male' }, { first: 'Delia', gender: 'female' },
+    { first: 'Emmett', gender: 'male' }, { first: 'Freya', gender: 'female' },
+    { first: 'Gideon', gender: 'male' }, { first: 'Helena', gender: 'female' },
+    { first: 'Isaac', gender: 'male' }, { first: 'Juno', gender: 'female' },
+    { first: 'Konrad', gender: 'male' }, { first: 'Lena', gender: 'female' },
+    { first: 'Marcus', gender: 'male' }, { first: 'Nadia', gender: 'female' },
+    { first: 'Otto', gender: 'male' }, { first: 'Priya', gender: 'female' },
+    { first: 'Quentin', gender: 'male' }, { first: 'Rosa', gender: 'female' },
+    { first: 'Silas', gender: 'male' }, { first: 'Tessa', gender: 'female' },
+    { first: 'Ulrich', gender: 'male' }, { first: 'Vera', gender: 'female' },
+    { first: 'Wendell', gender: 'male' }, { first: 'Yusuf', gender: 'male' },
 ] as const;
+
+/** The names on their own. Derived, so the two cannot drift apart. */
+export const SUCCESSOR_FIRST_NAMES: readonly string[] =
+    SUCCESSOR_NAMES.map(n => n.first);
+
+/**
+ * How old a director READS, for the portrait band and nothing else.
+ *
+ * Not a birthday and not simulated: no screen shows a director's age, and
+ * inventing one that the rest of the game would then have to keep consistent
+ * would be a fact nobody asked for. This exists because a board where every
+ * inherited seat looks forty is duller than one with some grey in it, and the
+ * pool splits at fifty.
+ *
+ * Deterministic on the id and the generation, like everything else here.
+ */
+const AGE_SPREAD = [41, 47, 53, 58, 44, 62, 50, 56] as const;
 
 /**
  * The family name, taken off a full name.
@@ -135,11 +175,29 @@ const hash = (s: string): number => {
  */
 export const heirNameFor = (member: SucceedableMember, generation: number): string => {
     const family = surnameOf(member.name);
-    const pick = SUCCESSOR_FIRST_NAMES[
-        hash(`${member.id}|${generation}`) % SUCCESSOR_FIRST_NAMES.length
-    ];
+    const pick = successorNameFor(member, generation).first;
     return family ? `${pick} ${family}` : pick;
 };
+
+/** The pool entry this seat draws in this generation. One index, one truth. */
+const successorNameFor = (member: SucceedableMember, generation: number) =>
+    SUCCESSOR_NAMES[hash(`${member.id}|${generation}`) % SUCCESSOR_NAMES.length];
+
+/**
+ * Which way this seat's heir was born, so a face can be lent to them.
+ *
+ * Comes from the SAME index that chose their first name, so Helena is never
+ * handed a man's portrait. That is the failure the female prompts were
+ * rewritten to fix and it would have come straight back here.
+ */
+export const heirGenderFor = (
+    member: SucceedableMember,
+    generation: number,
+): 'male' | 'female' => successorNameFor(member, generation).gender;
+
+/** How old this seat's heir reads. See the note on AGE_SPREAD. */
+export const heirAgeFor = (member: SucceedableMember, generation: number): number =>
+    AGE_SPREAD[hash(`${member.id}|age|${generation}`) % AGE_SPREAD.length];
 
 /**
  * The same board, one generation on.
@@ -165,6 +223,22 @@ export const succeedBoard = <T extends SucceedableMember>(
         // shuffle the board.
         id: `${m.id}::g${generation}`,
         name: heirNameFor(m, generation),
+        // ------------------------------------------------------------------
+        //  AND A FACE TO GO WITH THE NAME
+        // ------------------------------------------------------------------
+        //  The four founding directors have portraits of their own. Their
+        //  heirs cannot - they are generated - so they borrow one from the
+        //  pool, and the pool needs to be told who it is lending to.
+        //
+        //  Without these two the whole board went blank the moment a
+        //  generation turned. Measured over four: four portraits in the
+        //  first, none in the second, third or fourth.
+        //
+        //  Both come from the same draw as the name, so Helena is never
+        //  handed a man's face.
+        // ------------------------------------------------------------------
+        gender: heirGenderFor(m, generation),
+        age: heirAgeFor(m, generation),
         // Untouched, and this is the load-bearing line: no splitting, no
         // rounding, no drift. The total on the register is identical.
         shareCount: m.shareCount,
