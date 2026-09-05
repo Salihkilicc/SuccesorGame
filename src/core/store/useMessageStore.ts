@@ -171,7 +171,24 @@ const initials = (name: string): string =>
  */
 const seedThreads = (): Thread[] => [
     {
-        id: 'ops-lead',
+        // ------------------------------------------------------------------
+        //  'coo', BECAUSE THAT IS WHO SHE IS
+        // ------------------------------------------------------------------
+        //  This said 'ops-lead'. Dana Whitfield is the chief operating
+        //  officer - data/story/cast.ts, id 'coo' - and the story engine
+        //  writes as 'coo', so the moment she sent anything through the
+        //  ordinary door the inbox held TWO threads from the same woman.
+        //  Measured, not guessed: seeding then sending one message as the
+        //  COO gave 'coo/Dana Whitfield, ops-lead/Dana Whitfield'.
+        //
+        //  Found while giving the inbox faces: her portrait is coo.png and
+        //  the thread could not reach it under the other id. The duplicate
+        //  was the older bug and the face was only what made it visible.
+        //
+        //  An existing save keeps whatever thread it already had; this is
+        //  the seed for a new one.
+        // ------------------------------------------------------------------
+        id: 'coo',
         name: 'Dana Whitfield',
         role: 'Head of Production',
         initials: 'DW',

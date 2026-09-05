@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import SwipeToDelete from '../../../components/common/SwipeToDelete';
+import Portrait from '../../../components/common/Portrait';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMessageStore, type Thread } from '../../../core/store/useMessageStore';
 import { t, useLocale } from '../../../core/i18n';
@@ -68,8 +69,29 @@ const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void })
                ------------------------------------------------------ */}
             {unread && <View style={styles.unreadEdge} />}
 
-            <View style={[styles.avatar, unread && styles.avatarUnread]}>
-                <Text style={styles.avatarText}>{thread.initials}</Text>
+            {/* ------------------------------------------------------
+                THE FACE OF WHOEVER IS WRITING.
+
+                The named cast resolve straight off their thread id - the
+                chief financial officer writes as 'cfo', and cfo.png is
+                his. Everybody else keeps the letters: a courtship
+                candidate, a partner and a child all reach the inbox
+                under ids no portrait was drawn for, and this screen has
+                no gender or age on the thread to draw a pool face with.
+
+                The circle is unchanged, badge included. It sits in a
+                wrapper now only because Portrait draws the circle and
+                the badge has to sit on top of it.
+               ------------------------------------------------------ */}
+            <View style={styles.avatarWrap}>
+                <Portrait
+                    id={thread.id}
+                    name={thread.name}
+                    size={50}
+                    fill={theme.colors.surfaceHigh}
+                    borderWidth={unread ? 1.5 : 0}
+                    borderColor={unread ? theme.colors.unread : undefined}
+                />
                 {unread && (
                     <View style={styles.unreadIndicatorRow}>
                         <Text style={styles.unreadIndicatorRowText}>
@@ -183,20 +205,41 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.unread,
     },
     rowPressed: { opacity: 0.7 },
-    avatar: {
+    /**
+     * A box the size of the circle, so the unread badge still lands on it.
+     *
+     * The circle itself is Portrait's now. The unread RING is passed as
+     * props rather than layered as a second style: a ring rather than a
+     * different fill, because the avatar is a face and not a state.
+     */
+    avatarWrap: {
         width: 50,
         height: 50,
-        borderRadius: 25,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: theme.colors.surfaceHigh,
     },
-    /** A ring rather than a different fill: the avatar is a face, not a state. */
-    avatarUnread: {
-        borderWidth: 1.5,
-        borderColor: theme.colors.unread,
-    },
-    avatarText: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 18 },
+    // SHELVED, not deleted. Portrait takes the same 50 points, the same
+    // radius, the same surfaceHigh fill and the same 1.5 point unread ring.
+    // Its monogram is 50 * 0.36 = 18, which is what avatarText said.
+    //
+    // The letters now come from the NAME rather than from thread.initials,
+    // which was stored "so it cannot drift". Both take the first letter of
+    // the first two words, so they agree; the stored field is left in place
+    // and is simply no longer the one being read.
+    //
+    // avatar: {
+    //     width: 50,
+    //     height: 50,
+    //     borderRadius: 25,
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     backgroundColor: theme.colors.surfaceHigh,
+    // },
+    // avatarUnread: {
+    //     borderWidth: 1.5,
+    //     borderColor: theme.colors.unread,
+    // },
+    // avatarText: { color: theme.colors.textPrimary, fontWeight: '800', fontSize: 18 },
     // ------------------------------------------------------------------
     //  THE UNREAD BADGE IS TOBACCO, NOT RED
     // ------------------------------------------------------------------

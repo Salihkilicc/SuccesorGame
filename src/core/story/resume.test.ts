@@ -90,8 +90,8 @@ describe('a scene that has been played out', () => {
         // scene and the thread fell back to whatever plain messages it had,
         // so a player who finished a conversation with their father and
         // opened the thread again found no trace of it.
-        useMessageStore.getState().appendTranscript('ops-lead', lines, 5);
-        const t = useMessageStore.getState().threads.find(x => x.id === 'ops-lead')!;
+        useMessageStore.getState().appendTranscript(SEED_THREAD, lines, 5);
+        const t = useMessageStore.getState().threads.find(x => x.id === SEED_THREAD)!;
         expect(t.messages.slice(-3).map(m => m.text)).toEqual(lines.map(l => l.text));
         expect(t.messages.slice(-3).map(m => m.from))
             .toEqual(['them', 'player', 'them']);
@@ -102,9 +102,9 @@ describe('a scene that has been played out', () => {
     it('with ids that do not collide with what was already there', () => {
         // They are React keys. Two messages sharing one is a rendering bug
         // that looks like a missing message.
-        useMessageStore.getState().appendTranscript('ops-lead', lines, 5);
-        useMessageStore.getState().appendTranscript('ops-lead', lines, 9);
-        const t = useMessageStore.getState().threads.find(x => x.id === 'ops-lead')!;
+        useMessageStore.getState().appendTranscript(SEED_THREAD, lines, 5);
+        useMessageStore.getState().appendTranscript(SEED_THREAD, lines, 9);
+        const t = useMessageStore.getState().threads.find(x => x.id === SEED_THREAD)!;
         expect(new Set(t.messages.map(m => m.id)).size).toBe(t.messages.length);
     });
 
@@ -151,6 +151,17 @@ describe('a scene that has been played out', () => {
 
 import { gameSink } from './gameSink';
 import { CONVERSATIONS } from '../../data/story';
+
+/**
+ * The seed thread, by name rather than by literal.
+ *
+ * These two checks are about appendTranscript, not about who the seed thread
+ * belongs to, and they broke when its id changed from 'ops-lead' to 'coo' -
+ * which is the chief operating officer's real id, and the reason she used to
+ * appear in the inbox twice. Named here so the next such change moves one
+ * line instead of five.
+ */
+const SEED_THREAD = 'coo';
 
 describe('when somebody stops writing to you', () => {
     beforeEach(() => {
