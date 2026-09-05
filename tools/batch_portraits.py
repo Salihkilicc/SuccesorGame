@@ -230,7 +230,8 @@ def roster(cast_only: bool):
         return [(cid, nm, SOURCE_RAMP, PP.is_female(nm, cid))
                 for cid, nm in cast.items() if cid not in PP.FACELESS]
     out = []
-    for names in PP.read_names().values():
+    groups = {**PP.read_names(), **PP.read_rivals()}
+    for names in groups.values():
         for nm in names:
             slug = re.sub(r'[^a-z0-9]+', '_', nm.lower()).strip('_')
             out.append((slug, nm, stranger_ramp(nm), PP.is_female(nm)))

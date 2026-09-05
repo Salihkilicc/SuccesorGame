@@ -207,6 +207,25 @@ FEMALE = {
     # northAmericaPacific   (Dana and Harper are unisex; called female)
     'Dana Kealoha', 'Aroha Waitoa', 'Tiare Moala', 'Harper Vandermeer',
     'Elodie Tremblay',
+
+    # -----------------------------------------------------------------
+    #  THE RIVAL CHIEF EXECUTIVES, from CEO_NAMES in pokerTable.ts
+    # -----------------------------------------------------------------
+    #  (Kaya and Yuki are used both ways; called female)
+    'Petra Lindqvist', 'Ines Duarte', 'Kaya Aydin', 'Delphine Roy',
+    'Deborah Tran', 'Margaret Osei', 'Vera Holm', 'Dr Amara Diallo',
+    'Yuki Tanabe', 'Nadia Rahman',
+
+    # -----------------------------------------------------------------
+    #  THE MAGNATES, from MAGNATES in pokerTable.ts
+    # -----------------------------------------------------------------
+    #  (Camille is used both ways in French; called female)
+    'Sylvie Valmorel', 'Adaora Okonjo', 'Britta Lindqvist',
+    'Reiko Takahara', 'Giulia Moretti', 'Marisol Ferreyra',
+    'Rosalind St Clair', 'Nasrin Haddadi', 'Astrid Bergqvist',
+    'Yelena Kirilenko', 'Eleanor Whitcombe', 'Camille Dubois',
+    'Layla Farsi', 'Beatriz Calderon', 'Zofia Kowalczyk',
+    'Folake Oyelaran', 'Priscilla Wexley', 'Odile Delacroix',
 }
 
 #  The named cast, set by hand off cast.ts rather than by any rule.
@@ -747,6 +766,36 @@ def read_cast() -> dict:
 # ---------------------------------------------------------------------------
 #  THE ROSTER, READ OUT OF THE APP
 # ---------------------------------------------------------------------------
+
+def read_rivals() -> dict:
+    """
+    The other two named pools at the poker table.
+
+    MISSED THE FIRST TIME, and the miss is worth writing down: seatTable
+    draws from THREE named sources - STRANGER_REGIONS, CEO_NAMES and
+    MAGNATES - and the roster here only read the first. 153 portraits were
+    generated and 61 people who sit at the same table had none.
+
+    Worse than a plain gap: the VIP table seats a rival chief executive
+    FIRST, by weight, so the sixty one who were missing are the ones most
+    often on screen.
+
+    Read out of pokerTable.ts rather than copied, same as the strangers, so
+    adding a rival there puts them in the next batch automatically.
+    """
+    try:
+        src = open(POKER_TABLE, encoding='utf8').read()
+    except OSError:
+        return {}
+    out = {}
+    m = re.search(r'CEO_NAMES[^=]*=\s*\{(.*?)\n\};', src, re.S)
+    if m:
+        out['rivalCeos'] = re.findall(r"'?[\w-]+'?:\s*'([^']+)'", m.group(1))
+    m = re.search(r'MAGNATES[^=]*=\s*\[(.*?)\n\];', src, re.S)
+    if m:
+        out['magnates'] = re.findall(r"name:\s*'([^']+)'", m.group(1))
+    return out
+
 
 def read_names() -> dict:
     """{region: [names]} straight out of STRANGER_REGIONS."""
