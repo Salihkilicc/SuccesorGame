@@ -58,14 +58,29 @@ export const FACELESS: ReadonlySet<string> = new Set([
  *  falls back to initials and looks like a character who was never drawn.
  *  portraits.test.ts walks the real rosters and checks every one resolves.
  *
- *  The two strips come first because a runtime id carries decoration a file
- *  name never had: board succession issues 'npc-elena-vance::g2' for the same
- *  person the cast calls 'elena_vance', and without this every director would
- *  lose their face the moment the second generation began.
- *
  *  Both keys land here on purpose. The poker table holds NAMES for its
  *  magnates ('Zofia Kowalczyk' under the id 'mg_kowalczyk') while the cast
  *  holds bare ids ('coo'), and callers should not have to know which they are.
+ *
+ *  ---------------------------------------------------------------------------
+ *  IT USED TO STRIP 'npc-' AND '::g2'. THAT COST THE BOARD ITS FACES.
+ *  ---------------------------------------------------------------------------
+ *  The four directors are filed under their whole id, hyphens included:
+ *  npc-elena-vance.png. Stripping the prefix turned the lookup into
+ *  'elena_vance' and matched nothing, so all four - the people the player
+ *  negotiates with every single quarter - came back faceless while their
+ *  portraits sat on disk. Measured, not guessed: byId=no, byName=no, for
+ *  every one of them.
+ *
+ *  Nothing is stripped now. The registry is indexed under both its raw keys
+ *  and their normalised forms, so 'npc-elena-vance' matches whether the caller
+ *  writes it with hyphens, underscores or capitals.
+ *
+ *  Dropping the '::g2' strip is a decision, not just a repair. A successor
+ *  carries the seat and the surname but a NEW first name - Marcus Vance, where
+ *  Elena Vance sat - so handing them the ancestor's exact face would put one
+ *  photograph under two different names in the same save. They miss here on
+ *  purpose and take a face from the anonymous pool instead.
  */
 const normalise = (id: unknown): string =>
     // typeof rather than `id || ''`: the types say string, but these ids come
@@ -73,10 +88,23 @@ const normalise = (id: unknown): string =>
     // a number arriving here threw. A face is never worth a crash.
     (typeof id === 'string' ? id : '')
         .toLowerCase()
-        .replace(/::.*$/, '')          // a generation suffix: ::g2
-        .replace(/^npc-/, '')          // the runtime prefix
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '');
+
+/**
+ * The registry, reachable by either spelling.
+ *
+ * Built once. Raw keys win over normalised ones, so a file that is genuinely
+ * named 'victor_k' can never be shadowed by one that merely normalises to it.
+ */
+const INDEX: Record<string, number> = (() => {
+    const out: Record<string, number> = {};
+    for (const [key, src] of Object.entries(PORTRAITS)) {
+        const n = normalise(key);
+        if (out[n] === undefined) out[n] = src;
+    }
+    return { ...out, ...PORTRAITS };
+})();
 
 /**
  * The face for this id, or null when there is not one.
@@ -85,10 +113,11 @@ const normalise = (id: unknown): string =>
  */
 export const portraitFor = (id: string | undefined | null): ImageSourcePropType | null => {
     if (!id) return null;
-    const key = normalise(id);
-    if (FACELESS.has(key)) return null;
-    const direct = PORTRAITS[key];
-    return direct === undefined ? null : (direct as ImageSourcePropType);
+    if (FACELESS.has(normalise(id))) return null;
+    // Raw first: an id that IS a file name should not have to survive a round
+    // trip through the normaliser to be found.
+    const hit = INDEX[id as string] ?? INDEX[normalise(id)];
+    return hit === undefined ? null : (hit as ImageSourcePropType);
 };
 
 /** Whether this id has a face. Same rules as portraitFor, without the source. */

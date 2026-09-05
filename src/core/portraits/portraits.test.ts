@@ -130,15 +130,36 @@ describe('a portrait resolves, or it does not, and neither throws', () => {
         expect(portraitFor('nobody_at_all')).toBeNull();
     });
 
-    it('a runtime id finds the same face as the plain one', () => {
-        // Board succession hands out ids like 'npc-elena-vance::g2' and the
-        // cast uses 'elena_vance'. Without the normalisation every director
-        // would lose their face the moment the next generation started - and
-        // it would look like a design choice, not a bug.
+    it('hyphens, underscores and capitals are the same person', () => {
+        // The rosters do not agree on spelling: a file is zofia_kowalczyk, a
+        // director id is npc-elena-vance, a name is 'Victor K.'. All three
+        // spellings of one person have to land on one face.
         const id = PORTRAIT_IDS.find(x => x.includes('_'))!;
-        const dashed = id.replace(/_/g, '-');
-        expect(portraitFor(`npc-${dashed}::g2`)).toBe(portraitFor(id));
+        expect(portraitFor(id.replace(/_/g, '-'))).toBe(portraitFor(id));
         expect(portraitFor(id.replace(/_/g, ' ').toUpperCase())).toBe(portraitFor(id));
+        expect(portraitFor(` ${id} `)).toBe(portraitFor(id));
+    });
+
+    it('but a successor does not inherit the ancestor face', () => {
+        // ------------------------------------------------------------------
+        //  THIS TEST USED TO ASSERT THE OPPOSITE, AND IT WAS WRONG
+        // ------------------------------------------------------------------
+        //  The lookup stripped '::g2' so that a second generation director
+        //  kept their predecessor's portrait. But succession keeps the SEAT
+        //  and the SURNAME and issues a NEW FIRST NAME - Marcus Vance takes
+        //  Elena Vance's chair - so that put one photograph under two
+        //  different names in the same save.
+        //
+        //  Worse, the same strip removed the 'npc-' prefix, and the four
+        //  directors are filed under their whole id. Measured: all four came
+        //  back faceless while npc-elena-vance.png sat on disk.
+        //
+        //  A successor misses here on purpose. The anonymous pool gives them
+        //  a face of their own.
+        // ------------------------------------------------------------------
+        expect(portraitFor('npc-elena-vance')).not.toBeNull();
+        expect(portraitFor('npc-elena-vance::g2')).toBeNull();
+        expect(portraitFor('npc-elena-vance::g3')).toBeNull();
     });
 
     it('and the same id gives the same source every time', () => {
@@ -181,6 +202,27 @@ describe('the people who actually sit at the table have faces', () => {
         const strangers = STRANGERS.map(n => ({ id: n, name: n }));
         expect(strangers.length).toBeGreaterThan(100);
         expect(missing(strangers)).toEqual([]);
+    });
+
+    it('and the four directors, who are on screen every quarter', () => {
+        // ------------------------------------------------------------------
+        //  THE GAP THE FIRST VERSION OF THIS FILE DID NOT LOOK FOR
+        // ------------------------------------------------------------------
+        //  The coverage checks above walked the poker rosters and passed, so
+        //  the wiring looked proved. The board was never walked - and all four
+        //  directors resolved to nothing, with their portraits on disk, for
+        //  exactly the reason the whole exercise exists.
+        //
+        //  Read out of the store rather than typed here, so a fifth director
+        //  added there has to have a face too.
+        // ------------------------------------------------------------------
+        const src = fs.readFileSync(
+            path.join(ROOT, 'src', 'features', 'shareholders', 'stores', 'useShareholderStore.ts'),
+            'utf8',
+        );
+        const ids = [...src.matchAll(/id:\s*'(npc-[\w-]+)'/g)].map(m => m[1]);
+        expect(ids.length).toBeGreaterThanOrEqual(4);
+        expect(ids.filter(id => portraitFor(id) === null)).toEqual([]);
     });
 
     it('and a seated table resolves every face, over a thousand tables', () => {
