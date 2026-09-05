@@ -15,10 +15,13 @@
 //  letter is the correct behaviour rather than a failure.
 // ============================================================================
 
+import fs from 'fs';
+import path from 'path';
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { Image, Text } from 'react-native';
 import PartnerCard from './components/PartnerCard';
+import { PartnerCard as ProfilePartnerCard } from '../profile/components/PartnerCard';
 import { PORTRAITS } from '../../core/portraits/registry';
 import type { PartnerProfile } from '../../data/relationshipTypes';
 
@@ -55,6 +58,118 @@ const render = (p: PartnerProfile) => {
     renderer.act(() => { tree.unmount(); });
     return { faces, texts };
 };
+
+// ============================================================================
+//  FIRST: IS ANYONE LOOKING AT THIS COMPONENT AT ALL
+// ============================================================================
+//
+//  There are two components called PartnerCard. The faces were wired into
+//  features/love/components/PartnerCard first, and every test below passed -
+//  because a test can mount a component that no screen ever renders. Nothing
+//  imports that file. The player would not have seen one of those faces.
+//
+//  Exactly the failure this whole exercise exists to undo, committed while
+//  undoing it. So the wiring is checked before the behaviour, for both.
+// ============================================================================
+
+const SRC = path.resolve(__dirname, '..', '..');
+
+/**
+ * Every non test file that imports the module at `target`.
+ *
+ * Each import specifier is RESOLVED against the importing file rather than
+ * matched as text. The first version of this compared strings and reported
+ * zero importers for a file that ProfileScreen imports every day, because
+ * ProfileScreen writes it as '../components/PartnerCard'. A wiring check that
+ * cannot see a relative import is worse than none: it would have called the
+ * live card dead and sent me to rewire the wrong one again.
+ */
+const importersOf = (target: string): string[] => {
+    const want = path.resolve(SRC, target);
+    const out: string[] = [];
+    const walk = (dir: string) => {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+            const p = path.join(dir, e.name);
+            if (e.isDirectory()) { walk(p); continue; }
+            if (!/\.tsx?$/.test(e.name) || /\.test\./.test(e.name)) continue;
+            const src = fs.readFileSync(p, 'utf8');
+            for (const m of src.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) {
+                if (path.resolve(path.dirname(p), m[1]) === want) {
+                    out.push(path.relative(SRC, p));
+                }
+            }
+        }
+    };
+    walk(SRC);
+    return out;
+};
+
+describe('the card with the faces in it is on a screen', () => {
+    it('profile/components/PartnerCard is imported by something', () => {
+        expect(importersOf('features/profile/components/PartnerCard')).not.toEqual([]);
+    });
+
+    it('and the resolver is not just always returning nothing', () => {
+        // The check above passes trivially if importersOf is broken - it was,
+        // twice, once by matching text instead of resolving paths and once by
+        // being handed the wrong prefix. A negative and a positive control,
+        // so an empty result means the module really is unimported.
+        expect(importersOf('features/love/components/PartnerCard')).toEqual([]);
+        expect(importersOf('components/common/Portrait').length).toBeGreaterThan(2);
+    });
+
+    it('and it is the one that draws a Portrait', () => {
+        const live = fs.readFileSync(
+            path.join(SRC, 'features', 'profile', 'components', 'PartnerCard.tsx'), 'utf8',
+        ).replace(/^\s*\/\/.*$/gm, '');
+        expect(live).toMatch(/<Portrait/);
+        expect(live).toMatch(/faceFor\(/);
+    });
+});
+
+describe('the profile row shows a face that matches the partner', () => {
+    const renderRow = (p: PartnerProfile) => {
+        let tree!: renderer.ReactTestRenderer;
+        renderer.act(() => {
+            tree = renderer.create(
+                <ProfilePartnerCard partner={p} onPress={() => undefined} />,
+            );
+        });
+        const faces = tree.root.findAllByType(Image).map(n => nameOf(n.props.source));
+        renderer.act(() => { tree.unmount(); });
+        return faces;
+    };
+
+    it('a woman of twenty four gets a young woman', () => {
+        expect(renderRow(partner({
+            id: 'row-f', gender: 'female',
+            stats: { ...partner({ id: 'x' }).stats, age: 24 },
+        }))[0]).toMatch(/^face_young_f_/);
+    });
+
+    it('a man of sixty gets an older man', () => {
+        expect(renderRow(partner({
+            id: 'row-m', gender: 'male',
+            stats: { ...partner({ id: 'x' }).stats, age: 60 },
+        }))[0]).toMatch(/^face_old_m_/);
+    });
+
+    it('and no gender means initials, not a coin flip', () => {
+        expect(renderRow(partner({ id: 'row-none' }))).toEqual([]);
+    });
+
+    it('and no partner at all does not throw', () => {
+        expect(() => {
+            let tree!: renderer.ReactTestRenderer;
+            renderer.act(() => {
+                tree = renderer.create(
+                    <ProfilePartnerCard partner={null} onPress={() => undefined} />,
+                );
+            });
+            renderer.act(() => { tree.unmount(); });
+        }).not.toThrow();
+    });
+});
 
 describe('the partner card shows a face that matches what it prints', () => {
     it('a woman in her twenties gets a young woman', () => {

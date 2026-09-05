@@ -16,6 +16,8 @@ import { theme } from '../../../core/theme';
 import { PartnerProfile } from '../../../data/relationshipTypes';
 import { t, useLocale } from '../../../core/i18n';
 import { translateSocialClass } from '../../../data/i18n/profileLoveShopText';
+import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 
 interface PartnerCardProps {
     partner: PartnerProfile | null;
@@ -53,13 +55,6 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
 
     const lovePercent = Math.max(0, Math.min(100, partner.love));
     const isMarried = partner.isMarried;
-    const initials = partner.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .substring(0, 2)
-        .toUpperCase();
-
     const statusLabel = isMarried ? t('partner.married') : t('partner.dating');
     const socialClassLabel = translateSocialClass(partner.stats.socialClass);
 
@@ -68,10 +63,37 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
             onPress={onPress}
         >
-            {/* Avatar Initials */}
-            <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{initials}</Text>
-            </View>
+            {/* ------------------------------------------------------------
+                THE PARTNER ROW THE PLAYER ACTUALLY SEES.
+
+                There are two components called PartnerCard. The other one,
+                in features/love, is the big card with the picture across the
+                top - and NOTHING IMPORTS IT. It was wired up first, and the
+                faces went into a component no screen renders; the test
+                passed because it mounted the component directly. This is the
+                one ProfileScreen puts on the page.
+
+                A partner with no gender on record keeps their initials.
+                gender is optional on PartnerProfile because saves older than
+                the field have none, and guessing is a coin flip on the one
+                person the player sees most.
+               ------------------------------------------------------------ */}
+            <Portrait
+                id={partner.id}
+                name={partner.name}
+                size={44}
+                borderWidth={0}
+                fill={theme.colors.surfaceRaised}
+                source={faceFor({
+                    id: partner.id,
+                    name: partner.name,
+                    female: partner.gender === undefined
+                        ? undefined
+                        : partner.gender === 'female',
+                    age: partner.stats?.age,
+                }) as number | null}
+                style={styles.avatar}
+            />
 
             {/* Name and Subtitle */}
             <View style={styles.infoBlock}>
@@ -114,20 +136,28 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceRaised,
         transform: [{ scale: 0.99 }],
     },
+    /** Only the row spacing. The circle itself is Portrait's, through props. */
     avatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: theme.colors.surfaceRaised,
-        alignItems: 'center',
-        justifyContent: 'center',
         marginRight: 12,
     },
-    avatarText: {
-        color: theme.colors.textPrimary,
-        fontSize: 15,
-        fontWeight: '800',
-    },
+    // SHELVED, not deleted: the circle this row drew before it could hold a
+    // face. Same 44 points, same radius, same raised fill, passed to Portrait
+    // now so one component owns what an avatar looks like everywhere.
+    //
+    // avatar: {
+    //     width: 44,
+    //     height: 44,
+    //     borderRadius: 22,
+    //     backgroundColor: theme.colors.surfaceRaised,
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     marginRight: 12,
+    // },
+    // avatarText: {
+    //     color: theme.colors.textPrimary,
+    //     fontSize: 15,
+    //     fontWeight: '800',
+    // },
     infoBlock: {
         flex: 1,
         justifyContent: 'center',
