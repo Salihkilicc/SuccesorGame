@@ -54,10 +54,40 @@ export interface WatchContext {
  * enjoying your downfall has HIGH trust and would otherwise have counted as a
  * character witness. See core/market/governance.ts.
  */
+/**
+ * What an empty board is worth as a defence.
+ *
+ * The midpoint, because there is nobody in the room either way. Not 100: a
+ * player who bought out every director has no one to vouch for them either,
+ * and a company held alone should not be a licence.
+ */
+export const NO_BOARD_LOYALTY = 50;
+
 export const boardLoyalty = (): number => {
     try {
         const members = useShareholderStore.getState().members || [];
-        if (members.length === 0) return 0;
+        // ------------------------------------------------------------------
+        //  NO BOARD IS NOT A BOARD THAT HATES YOU
+        // ------------------------------------------------------------------
+        //  This returned 0, and 0 on this scale means every director in the
+        //  room testifying against you. But the player with no board is the
+        //  player who BOUGHT THEM ALL OUT - which the game offers as a way to
+        //  win - and it left them with no defence at all.
+        //
+        //  Reported as "hisselerim yuzde yuzune sahipken birden barred oldum,
+        //  illegal bir sey de yapmadim". Measured on one purchase at 35% of
+        //  reference with the price recovering:
+        //
+        //      an adoring board   fine
+        //      an ordinary board  fine
+        //      a cool board       barred
+        //      NO BOARD           barred, with a defence of 0.010
+        //
+        //  So owning the whole company was punished harder than owning most
+        //  of it, for the same act. Neutral is the honest reading: nobody
+        //  spoke for you and nobody spoke against you.
+        // ------------------------------------------------------------------
+        if (members.length === 0) return NO_BOARD_LOYALTY;
         const total = members.reduce((sum, m) => sum + loyaltyOf(m as any), 0);
         return total / members.length;
     } catch {

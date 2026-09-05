@@ -245,8 +245,19 @@ describe('and the angles the animation will need', () => {
 
     it('and it stops on the pocket the engine already chose', () => {
         for (const n of [0, 17, 32, 26, 36]) {
+            // ------------------------------------------------------------
+            //  THIS ASSERTED THE MIRROR, WHICH IS WHY THE BUG SURVIVED
+            // ------------------------------------------------------------
+            //  It read `numberAtAngle(-ballTo)`, so it agreed with the code
+            //  rather than with the wheel. Measured on the screen geometry:
+            //  the wheel always rests at a multiple of 360, so pocket n sits
+            //  where it is drawn, at pocketAngle(n) - and the ball sat at
+            //  MINUS that. 36 of the 37 numbers came to rest under the wrong
+            //  one, and the two conventions agree only at 0 and 180, which is
+            //  why exactly one number looked right.
+            // ------------------------------------------------------------
             const { ballTo } = spinAngles(n);
-            expect(`${n}:${numberAtAngle(-ballTo)}`).toBe(`${n}:${n}`);
+            expect(`${n}:${numberAtAngle(ballTo)}`).toBe(`${n}:${n}`);
         }
     });
 

@@ -16,7 +16,7 @@
 import { useStoryStore } from '../store/useStoryStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
-import { runManipulationWatch, boardLoyalty, applyVerdict } from './runManipulation';
+import { runManipulationWatch, boardLoyalty, NO_BOARD_LOYALTY, applyVerdict } from './runManipulation';
 import { INVESTIGATION_WINDOW, judge } from './manipulation';
 import { ENDINGS } from '../../data/story/endings';
 
@@ -122,9 +122,26 @@ describe('the defence comes from the real board', () => {
         expect(src).not.toMatch(/sum \+ m\.trust/);
     });
 
-    it('and an empty board defends nobody', () => {
+    it('and an empty board is neutral rather than hostile', () => {
+        // ------------------------------------------------------------------
+        //  THIS ASSERTED 0, WHICH IS WHAT MADE OWNING THE COMPANY A CRIME
+        // ------------------------------------------------------------------
+        //  Zero on this scale is every director in the room testifying
+        //  AGAINST you. But the player with no board is the one who bought
+        //  them all out, which the game offers as a way to win.
+        //
+        //  Reported as being barred while holding a hundred per cent having
+        //  done nothing illegal. Measured on one purchase at 35% of
+        //  reference with the price recovering: an ordinary board gave a
+        //  fine and no board gave barred, for the identical act.
+        //
+        //  The test agreed with the code rather than with the game, which is
+        //  why it survived.
+        // ------------------------------------------------------------------
         useShareholderStore.setState({ members: [] });
-        expect(boardLoyalty()).toBe(0);
+        expect(boardLoyalty()).toBe(NO_BOARD_LOYALTY);
+        expect(NO_BOARD_LOYALTY).toBeGreaterThan(0);
+        expect(NO_BOARD_LOYALTY).toBeLessThan(100);
     });
 
     it('and the opening board gives a real number', () => {

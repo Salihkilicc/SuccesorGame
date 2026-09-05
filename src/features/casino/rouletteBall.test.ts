@@ -96,7 +96,8 @@ describe('and it lands exactly where it always did', () => {
         let ballAt = 0;
         for (const n of WHEEL_ORDER) {
             const { ballTo } = spinAngles(n, 0, ballAt);
-            expect(residue(ballTo)).toBeCloseTo(residue(-pocketAngle(n)), 6);
+            // Was residue(-pocketAngle(n)) - the reflection across twelve o'clock.
+            expect(residue(ballTo)).toBeCloseTo(residue(pocketAngle(n)), 6);
             ballAt = ballTo;
         }
     });

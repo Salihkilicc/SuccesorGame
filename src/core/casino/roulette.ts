@@ -275,7 +275,29 @@ export const spinAngles = (
     //  residue is unchanged - it still finishes at -pocket, so the landing
     //  is identical - only the distance travelled is fixed.
     // ------------------------------------------------------------------
-    const wanted = -pocket;
+    // ------------------------------------------------------------------
+    //  AND IT HAS TO LAND ON THE POCKET, NOT ON ITS MIRROR IMAGE
+    // ------------------------------------------------------------------
+    //  Reported as "carkta ustunde duran sayiyla cikan sayi farkli", and it
+    //  was: measured, 36 of the 37 numbers came to rest under the wrong one.
+    //
+    //  The geometry. The wheel always stops at a multiple of 360 - `wheelTo`
+    //  adds `360 - (fromWheel % 360)` precisely so that it does - so at rest
+    //  pocket n sits on screen exactly where it is drawn, at pocketAngle(n).
+    //  The ball sits at the top of its own layer, so its screen angle is
+    //  whatever that layer is rotated by.
+    //
+    //  This wanted `-pocket`, which is the reflection of the pocket across
+    //  twelve o'clock. The two agree only where pocket is 0 or 180, which is
+    //  why exactly one number on the wheel looked right and nobody could see
+    //  a pattern in the rest.
+    //
+    //  The ball still travels ANTICLOCKWISE - `atLeast` is six full turns
+    //  below where it was, and the walk below only ever subtracts - so the
+    //  direction the croupier launches it is unchanged. Only the resting
+    //  place is corrected.
+    // ------------------------------------------------------------------
+    const wanted = pocket;
     const atLeast = fromBall - BALL_TURNS * 360;
     // How far past the target that overshoots, as a positive angle.
     const drift = (((atLeast - wanted) % 360) + 360) % 360;

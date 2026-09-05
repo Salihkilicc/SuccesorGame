@@ -382,8 +382,26 @@ describe('handing the company over', () => {
         const plan = runSuccession();
         expect(plan).not.toBeNull();
         expect(plan!.yearsHeld).toBe(7);
-        // The calendar moves with them, or the family reads as frozen.
-        expect(useGameStore.getState().currentMonth).toBe(month + 7 * 12);
+        // ------------------------------------------------------------------
+        //  THE YEARS GO ON THE AGE, NOT ON THE MONTH OF THE YEAR
+        // ------------------------------------------------------------------
+        //  This asserted `month + 7 * 12`, which is 85 - and `currentMonth`
+        //  is a month of the YEAR, one to twelve. advanceMonth wraps it with
+        //  `while (m > 12) { m -= 12; age += 1 }`, so leaving it out of range
+        //  meant the next quarter ran that loop seven times.
+        //
+        //  Measured on a thirteen year wait: the calendar read month 163, and
+        //  three months later the sixteen year old who had just inherited the
+        //  company was TWENTY NINE. Reported as a child becoming chief
+        //  executive at the wrong age.
+        //
+        //  The test agreed with the code rather than with the calendar. The
+        //  years are already carried by `age`, which is 16 on the line below.
+        // ------------------------------------------------------------------
+        const m = useGameStore.getState().currentMonth;
+        expect(m).toBeGreaterThanOrEqual(1);
+        expect(m).toBeLessThanOrEqual(12);
+        expect(m).toBe(month);
         expect(useGameStore.getState().age).toBe(16);
         // And the run is running again.
         expect(useStoryStore.getState().ending).toBeNull();

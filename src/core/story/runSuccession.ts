@@ -235,8 +235,25 @@ export const runSuccession = (): SuccessionPlan | null => {
     //  the day of the death, whatever year the new one starts reading it.
     // ------------------------------------------------------------------
     if (plan.yearsHeld > 0) {
+        // ------------------------------------------------------------------
+        //  THE MONTH IS 1 TO 12, AND THIS USED TO WRITE 163 INTO IT
+        // ------------------------------------------------------------------
+        //  `currentMonth` is a month of the YEAR. advanceMonth wraps it with
+        //  `while (newMonth > 12) { newMonth -= 12; newAge += 1; }` - so every
+        //  twelve months it steps over, somebody has a birthday.
+        //
+        //  Adding `yearsHeld * 12` straight onto it put the calendar outside
+        //  its own range and left the wrapping to the next quarter, which then
+        //  ran thirteen times in one tick. Measured: a chair held thirteen
+        //  years wrote month 163, and three months later the sixteen year old
+        //  who had just inherited the company was TWENTY NINE.
+        //
+        //  The years belong on the age, which is where planSuccession already
+        //  put them - the heir is sixteen on the day they take it. So the
+        //  month stays where it was and only the year moves.
+        // ------------------------------------------------------------------
         useGameStore.setState(g => ({
-            currentMonth: (g.currentMonth ?? 1) + plan.yearsHeld * 12,
+            currentMonth: ((((g.currentMonth ?? 1) - 1) % 12) + 12) % 12 + 1,
         }) as never);
     }
 

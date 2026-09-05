@@ -120,7 +120,8 @@ describe('and the four things that make a wheel read as a wheel', () => {
 
     it('two: it arrives at the pocket the engine already chose', () => {
         for (const n of WHEEL_ORDER) {
-            expect(`${n}:${numberAtAngle(-spinAngles(n).ballTo)}`).toBe(`${n}:${n}`);
+            // The mirror, not the pocket. See the note in core/casino/roulette.test.ts.
+            expect(`${n}:${numberAtAngle(spinAngles(n).ballTo)}`).toBe(`${n}:${n}`);
         }
     });
 
