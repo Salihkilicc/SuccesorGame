@@ -283,6 +283,21 @@ def main() -> int:
     ap.add_argument('--sheet', action='store_true', help='contact sheet only')
     ap.add_argument('--checkpoint', default='', help='substring of the ckpt name')
     ap.add_argument('--redo', action='store_true', help='overwrite existing')
+    # ------------------------------------------------------------------
+    #  REDO ONLY WHERE IT SHOWS
+    # ------------------------------------------------------------------
+    #  The features line was added to all 214 prompts, but only 52 of them
+    #  changed their HAIR pool, and hair is the one thing legible at 46
+    #  pixels in a single colour. Redrawing all 214 costs 2.7 hours for a
+    #  line that will not read on 101 of them.
+    #
+    #    --region westAfrica,eastAfrica,southernAfrica    30 people, 22 min
+    #
+    #  Comma separated, matched against the keys of STRANGER_REGIONS and
+    #  the two rival groups.
+    # ------------------------------------------------------------------
+    ap.add_argument('--region', default='',
+                    help='only these regions, comma separated (implies --redo)')
     args = ap.parse_args()
 
     rows = roster(args.cast)
@@ -292,6 +307,16 @@ def main() -> int:
     if args.sheet:
         contact_sheet(rows, os.path.join(OUT_DIR, '_contact_sheet.png'))
         return 0
+
+    if args.region:
+        want = {r.strip().lower() for r in args.region.split(',') if r.strip()}
+        known = {r[4].lower() for r in rows if len(r) > 4}
+        unknown = want - known
+        if unknown:
+            raise SystemExit(f'unknown region(s): {sorted(unknown)}\n'
+                             f'have: {sorted(known)}')
+        rows = [r for r in rows if len(r) > 4 and r[4].lower() in want]
+        args.redo = True
 
     todo = [r for r in rows
             if args.redo or not os.path.exists(os.path.join(OUT_DIR, f'{r[0]}.png'))]
