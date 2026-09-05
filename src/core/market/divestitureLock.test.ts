@@ -178,7 +178,19 @@ describe('the wiring', () => {
         // that already had one, and it was the answer the player was using.
         const store = read('features', 'finance', 'stores', 'useCorporateFinanceStore.ts');
         const attempt = store.slice(store.indexOf('attemptToSellCompany: (id, askingPrice)'));
-        expect(attempt).toMatch(/quoteDivestiture\(company\.deal\)/);
+        // ------------------------------------------------------------
+        //  THE CALL TAKES THE LIVE VALUATION NOW
+        // ------------------------------------------------------------
+        //  It used to be quoteDivestiture(company.deal) alone, which priced
+        //  off the EBIT recorded on the day of the purchase - a number
+        //  advanceDeal never touches. So a subsidiary the player grew for
+        //  fifty years sold for exactly what it would have on day one.
+        //
+        //  The second argument is what makes the exit follow the valuation
+        //  they have been managing. A caller that drops it silently goes
+        //  back to the frozen price, so this checks it is passed.
+        // ------------------------------------------------------------
+        expect(attempt).toMatch(/quoteDivestiture\(\s*company\.deal,\s*company\.valuation\s*\)/);
         expect(attempt).toMatch(/if \(quote\?\.locked\)/);
         // And it pays the NET, not the asking price.
         expect(attempt).toMatch(/askingPrice \* \(1 - commission\)/);
@@ -228,7 +240,8 @@ describe('the wiring', () => {
 
     it('and the screen prices off the same quote rather than off what you paid', () => {
         const src = read('components', 'MyCompany', 'Actions', 'SellCompanyModal.tsx');
-        expect(src).toMatch(/quoteDivestiture\(company\.deal\)/);
+        // Same call, same reason. See the note above.
+        expect(src).toMatch(/quoteDivestiture\(\s*company\.deal,\s*company\.valuation\s*\)/);
         expect(src).not.toMatch(/setAskingPrice\(company\.valuation\)/);
         expect(src).toMatch(/const netProceeds = Math\.max\(0, askingPrice \* \(1 - commission\)\)/);
     });

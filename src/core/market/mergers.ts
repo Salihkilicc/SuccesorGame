@@ -571,14 +571,41 @@ export interface DivestitureQuote {
     quartersLeft: number;
 }
 
-export const quoteDivestiture = (deal: AcquisitionDeal): DivestitureQuote => {
+export const quoteDivestiture = (
+    deal: AcquisitionDeal,
+    /**
+     * What the subsidiary is worth TODAY.
+     *
+     * ----------------------------------------------------------------------
+     *  THE NUMBER THE PLAYER HAS BEEN MOVING ALL GAME
+     * ----------------------------------------------------------------------
+     *  Reported as an acquired company selling for the same price forever,
+     *  "trilyon dolar da olsa". It did: this priced off `targetAnnualEbit`,
+     *  which is recorded on the day of the purchase and which `advanceDeal`
+     *  never touches - it moves the quarter counter, the goodwill and the
+     *  impairment flag and nothing else.
+     *
+     *  Meanwhile `Subsidiary.valuation` moves EVERY QUARTER, up or down, on
+     *  the marketing, R&D, production and workforce the player sets. So the
+     *  one number they spend the game managing had no effect on what the
+     *  thing sold for. Measured: 115M paid, 75.6M quoted at quarter 2 and
+     *  75.6M still at quarter 200, with only the commission moving.
+     *
+     *  Optional, so every existing caller keeps working. Absent, it falls
+     *  back to the old estimate - which is also the honest answer for a
+     *  holding that has no live valuation to read.
+     * ----------------------------------------------------------------------
+     */
+    currentValuation?: number,
+): DivestitureQuote => {
+    const live = Number.isFinite(currentValuation) ? Number(currentValuation) : 0;
     // Bugunku deger: hedefin kendi kazancina gore. Kazandiriyorsa
     // deger korunmus, yakiyorsa erimis olur.
     const impliedValue =
         deal.targetAnnualEbit > 0
             ? deal.targetAnnualEbit * 18
             : deal.fairValue * 0.4;
-    const currentFairValue = Math.max(0, impliedValue);
+    const currentFairValue = live > 0 ? live : Math.max(0, impliedValue);
     const held = deal.quartersSinceClose || 0;
     const { locked, quartersLeft } = divestitureLock(held);
     const discount = divestitureDiscount(held);

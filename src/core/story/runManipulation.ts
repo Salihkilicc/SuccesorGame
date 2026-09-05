@@ -43,6 +43,14 @@ export interface WatchContext {
     priceNow: number;
     ownershipBefore: number;
     ownershipAfter: number;
+    /**
+     * Of that rise, how much was the share count SHRINKING.
+     *
+     * A treasury buyback retires shares and lifts the percentage without a
+     * purchase. Subtracted before the ledger is written, or the way the game
+     * offers to take your own company is also the way it convicts you.
+     */
+    ownershipFromBuyback?: number;
     /** The player's own money. Lawyers are not a company expense. */
     personalWealth: number;
 }
@@ -136,7 +144,8 @@ export const runManipulationWatch = (ctx: WatchContext): Judgement | null => {
         price: ctx.priceAtBuy,
         reference: ctx.referenceAtBuy,
         ownershipBefore: ctx.ownershipBefore,
-        ownershipAfter: ctx.ownershipAfter,
+        ownershipAfter: ctx.ownershipAfter
+            - Math.max(0, ctx.ownershipFromBuyback || 0),
     });
     if (fresh) ledger.push(fresh);
 

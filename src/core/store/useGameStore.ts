@@ -2172,8 +2172,28 @@ export const useGameStore = create<GameStore>()(
           priceNow: newSharePrice,
           ownershipBefore: stats.companyOwnership ?? ownership,
           ownershipAfter: ownership,
+          // ------------------------------------------------------------
+          //  WHAT THE DENOMINATOR DID, AS OPPOSED TO WHAT YOU BOUGHT
+          // ------------------------------------------------------------
+          //  A treasury buyback retires shares, so the player's percentage
+          //  rises without a single share changing hands. The watch reads
+          //  ownership going up while the price is down and cannot tell
+          //  the two apart - which is the whole pattern it exists to catch.
+          //
+          //  So taking your own company the way the game offers opened a
+          //  criminal file on you. Reported as being barred at a hundred
+          //  per cent having done nothing illegal. Personal purchases are
+          //  untouched and still count.
+          // ------------------------------------------------------------
+          ownershipFromBuyback:
+            require('../../features/shareholders/stores/useShareholderStore')
+              .useShareholderStore.getState().buybackOwnershipGain || 0,
           personalWealth: newPlayerCash,
         });
+
+        // Counted, so it starts again from zero next quarter.
+        require('../../features/shareholders/stores/useShareholderStore')
+          .useShareholderStore.setState({ buybackOwnershipGain: 0 });
 
         useStatsStore.getState().update({
           // Written every quarter rather than only the negative ones, because

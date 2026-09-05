@@ -202,6 +202,14 @@ interface ShareholderState {
     totalShares: number; // Total shares in company (e.g., 10,000,000)
     playerShareCount: number; // Absolute share count owned by player (e.g., 6,500,000)
     /**
+     * Percentage points the player gained this quarter from RETIRING shares.
+     *
+     * A treasury buyback raises the player's percentage without buying them a
+     * share. The manipulation watch cannot tell that from accumulating stock,
+     * so this is subtracted before it judges. Reset each quarter.
+     */
+    buybackOwnershipGain?: number;
+    /**
      * Kurulun BASKIN HUYU (hisse agirlikli). Bu bir "hava" degil, kurulun
      * karakteri: cogunlugu Conservative olan bir kurul farkli sey ister.
      */
@@ -581,6 +589,13 @@ export const useShareholderStore = create<ShareholderState>()(
             // ========================================================================
             // STATE
             // ========================================================================
+            /**
+             * Percentage points gained this quarter by RETIRING shares.
+             *
+             * Reset by the quarterly tick once the manipulation watch has
+             * subtracted it. See the note where it is written.
+             */
+            buybackOwnershipGain: 0,
             members: [] as BoardMember[],
             totalShares: TOTAL_SHARES,
             // Derived, so this and `initializeGame` cannot drift apart - and
@@ -1696,6 +1711,30 @@ export const useShareholderStore = create<ShareholderState>()(
                         ? {
                             members: updatedMembers,
                             totalShares: Math.max(1, state.totalShares - actualBuyAmount),
+                            // ----------------------------------------------
+                            //  HOW MUCH OF THE RISE WAS THE DENOMINATOR
+                            // ----------------------------------------------
+                            //  A treasury buyback raises the player's
+                            //  percentage without buying them a share, and the
+                            //  manipulation watch cannot tell that from
+                            //  accumulating stock: it only sees ownership go
+                            //  up while the price is down, which is the
+                            //  pattern it exists to catch.
+                            //
+                            //  So a player who took their own company the way
+                            //  the game offers - buy the board out with the
+                            //  treasury - opened a criminal file on themselves.
+                            //  Reported as being barred at a hundred per cent
+                            //  having done nothing illegal.
+                            //
+                            //  Recorded here, subtracted by the watch, reset
+                            //  each quarter. Personal purchases are untouched
+                            //  and still count.
+                            // ----------------------------------------------
+                            buybackOwnershipGain:
+                                (state.buybackOwnershipGain || 0)
+                                + (state.playerShareCount / Math.max(1, state.totalShares - actualBuyAmount)) * 100
+                                - (state.playerShareCount / Math.max(1, state.totalShares)) * 100,
                         }
                         : {
                             members: updatedMembers,

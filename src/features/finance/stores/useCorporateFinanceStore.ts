@@ -1235,7 +1235,9 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 if (!subsidiary) return;
 
                 const { companyCapital, setCompanyCapital } = useStatsStore.getState();
-                const quote = subsidiary.deal ? quoteDivestiture(subsidiary.deal) : undefined;
+                const quote = subsidiary.deal
+                    ? quoteDivestiture(subsidiary.deal, subsidiary.valuation)
+                    : undefined;
 
                 // ----------------------------------------------------------
                 //  IT CANNOT BE SOLD IN THE FIRST TWO QUARTERS
@@ -1468,7 +1470,9 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 //  function every other exit asks.
                 //  See core/market/mergers.ts.
                 // ----------------------------------------------------------
-                const quote = company.deal ? quoteDivestiture(company.deal) : undefined;
+                const quote = company.deal
+                    ? quoteDivestiture(company.deal, company.valuation)
+                    : undefined;
 
                 if (quote?.locked) {
                     return {

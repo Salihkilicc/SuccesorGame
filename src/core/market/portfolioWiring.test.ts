@@ -111,7 +111,10 @@ describe('the money that arrives is the money the letter promised', () => {
         // comparison this test is about.
         age('tech_skynet');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
-        const quote = quoteDivestiture(sub.deal);
+        // The same call the store makes. It takes the LIVE valuation now,
+        // and a test that quotes the frozen price is comparing the store
+        // against a number nothing uses.
+        const quote = quoteDivestiture(sub.deal, sub.valuation);
         const before = useStatsStore.getState().companyCapital ?? 0;
 
         gameSink().divest('tech_skynet', VULTURE_MULTIPLE);
@@ -127,7 +130,10 @@ describe('the money that arrives is the money the letter promised', () => {
         buy('tech_streamify', 'Streamify', 1_240_000_000, 'Medium');
         age('tech_streamify');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
-        const quote = quoteDivestiture(sub.deal);
+        // The same call the store makes. It takes the LIVE valuation now,
+        // and a test that quotes the frozen price is comparing the store
+        // against a number nothing uses.
+        const quote = quoteDivestiture(sub.deal, sub.valuation);
         const before = useStatsStore.getState().companyCapital ?? 0;
 
         gameSink().divest('tech_streamify', PEAR_MULTIPLE);
@@ -144,7 +150,10 @@ describe('the money that arrives is the money the letter promised', () => {
         buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
         age('tech_skynet');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
-        const quote = quoteDivestiture(sub.deal);
+        // The same call the store makes. It takes the LIVE valuation now,
+        // and a test that quotes the frozen price is comparing the store
+        // against a number nothing uses.
+        const quote = quoteDivestiture(sub.deal, sub.valuation);
         const before = useStatsStore.getState().companyCapital ?? 0;
 
         useCorporateFinanceStore.getState().sellSubsidiary('tech_skynet');

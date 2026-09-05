@@ -30,7 +30,11 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     //
     //  Both now read `quoteDivestiture`. See core/market/mergers.ts.
     // ----------------------------------------------------------------------
-    const quote = company?.deal ? quoteDivestiture(company.deal) : undefined;
+    // The live valuation, so the screen quotes what the player has been
+    // growing rather than what the target earned on the day it was bought.
+    const quote = company?.deal
+        ? quoteDivestiture(company.deal, company.valuation)
+        : undefined;
     const fairValue = quote ? quote.currentFairValue : (company?.valuation ?? 0);
     const commission = quote ? quote.discount : DIVESTITURE_DISCOUNT_MAX;
     const locked = !!quote?.locked;

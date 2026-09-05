@@ -148,3 +148,71 @@ describe('owning the whole company is not a confession', () => {
         expect(['barred', 'prison']).toContain(j.verdict);
     });
 });
+
+// ============================================================================
+//  AND THE WAY THE GAME OFFERS TO TAKE YOUR OWN COMPANY
+// ============================================================================
+//
+//  A treasury buyback RETIRES the shares. The player's count does not change
+//  and their percentage rises anyway, because the denominator shrank. The
+//  watch reads ownership going up while the price is down and cannot tell
+//  that from accumulating stock - which is exactly the pattern it exists to
+//  catch.
+//
+//  Measured on the real store: 35% to 100% in five buyouts, 69.4M of an 80M
+//  treasury spent, and the share price falling from $10 to $2.06 as the cash
+//  left. Rising ownership, falling price. The file opens on itself.
+// ============================================================================
+
+describe('a buyback is not an accumulation', () => {
+    const { recordSuspicion } = require('./manipulation');
+    const { runManipulationWatch } = require('./runManipulation');
+    const { useStoryStore } = require('../store/useStoryStore');
+
+    it('the ledger ignores the points the denominator gave you', () => {
+        // Ten points of ownership, all of it from retiring shares.
+        useStoryStore.setState({
+            manipulationLedger: [], manipulationVerdict: null, ending: null,
+        } as never);
+        runManipulationWatch({
+            quarter: 10, priceAtBuy: 30, referenceAtBuy: 100, priceNow: 30,
+            ownershipBefore: 40, ownershipAfter: 50,
+            ownershipFromBuyback: 10,
+            personalWealth: 1_000_000,
+        });
+        expect(useStoryStore.getState().manipulationLedger).toEqual([]);
+    });
+
+    it('but a purchase alongside one still counts', () => {
+        // Fifteen points, ten from the buyback and five actually bought.
+        useStoryStore.setState({
+            manipulationLedger: [], manipulationVerdict: null, ending: null,
+        } as never);
+        runManipulationWatch({
+            quarter: 10, priceAtBuy: 30, referenceAtBuy: 100, priceNow: 30,
+            ownershipBefore: 40, ownershipAfter: 55,
+            ownershipFromBuyback: 10,
+            personalWealth: 1_000_000,
+        });
+        expect(useStoryStore.getState().manipulationLedger).toHaveLength(1);
+    });
+
+    it('and a plain purchase is untouched', () => {
+        useStoryStore.setState({
+            manipulationLedger: [], manipulationVerdict: null, ending: null,
+        } as never);
+        runManipulationWatch({
+            quarter: 10, priceAtBuy: 30, referenceAtBuy: 100, priceNow: 30,
+            ownershipBefore: 40, ownershipAfter: 55,
+            personalWealth: 1_000_000,
+        });
+        expect(useStoryStore.getState().manipulationLedger).toHaveLength(1);
+    });
+
+    it('and the rule itself is unchanged when nothing is subtracted', () => {
+        expect(recordSuspicion({
+            quarter: 1, price: 30, reference: 100,
+            ownershipBefore: 40, ownershipAfter: 50,
+        })).not.toBeNull();
+    });
+});
