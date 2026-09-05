@@ -156,6 +156,14 @@ export interface CorporateFinanceState {
     advanceDistress: () => DistressState;
     /** Ask for a rise. See core/market/ceoPay.ts for every rule this obeys. */
     requestCeoPay: (amount: number) => { ok: boolean; message: string; granted: number };
+    /**
+     * Book debt raised to pay for a deal, as a real loan.
+     *
+     * Separate from `takeLoan` because the deal has already passed its own
+     * board gate and the cash has already been spent. This only makes the
+     * borrowing exist.
+     */
+    bookAcquisitionDebt: (amount: number, label?: string) => void;
     takeLoan: (
         amount: number,
         valuation: number,
@@ -736,6 +744,57 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 };
             },
 
+            // ------------------------------------------------------------------
+            //  DEBT RAISED TO BUY SOMETHING, BOOKED SO THAT IT EXISTS
+            // ------------------------------------------------------------------
+            //  Reported as "sirketi dusmanca devralmada borcla alinca o borcu
+            //  odemiyorsun", and it was worse than not paying it. Both the
+            //  acquisition and the hostile buyout added `debtRaised` straight
+            //  onto `companyDebtTotal` and created NO loan record.
+            //
+            //  serviceDebtQuarter runs every quarter, sums the LOANS, and
+            //  writes that sum back over companyDebtTotal. So the borrowing
+            //  was not merely unserviced - it was ERASED on the next tick.
+            //  Measured: borrow 400M, next quarter the debt is 0, with zero
+            //  interest and zero principal ever charged.
+            //
+            //  This books it as a real loan so it is serviced like any other.
+            //  It does NOT re-run the borrowing gates - credit rating,
+            //  collateral headroom, the board vote - because the DEAL has
+            //  already been approved by its own gate, and asking twice would
+            //  let a player who was told yes be told no immediately after.
+            //  The money is not paid out here either; the deal already spent
+            //  it.
+            // ------------------------------------------------------------------
+            bookAcquisitionDebt: (amount, label) => {
+                const principal = Math.max(0, Number.isFinite(amount) ? amount : 0);
+                if (principal <= 0) return;
+
+                const a = get().getAssessment();
+                // The riskiest ordinary product, because this is money raised
+                // against a deal rather than against the balance sheet.
+                const product =
+                    [...LOAN_PRODUCTS, ...EXTENDED_LOAN_PRODUCTS]
+                        .find(pr => pr.kind === 'secured') ?? LOAN_PRODUCTS[1];
+
+                const loan: LoanRecord = {
+                    id: `LOAN_ACQ_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                    kind: product.kind,
+                    name: label || 'Acquisition debt',
+                    principal,
+                    balance: principal,
+                    rate: productRate(product, a),
+                    quartersRemaining: product.termQuarters,
+                    termQuarters: product.termQuarters,
+                    prepaymentPenalty: product.prepaymentPenalty,
+                    delinquent: false,
+                };
+
+                const newTotal = get().totalDebt + principal;
+                set({ loans: [...get().loans, loan], totalDebt: newTotal });
+                useStatsStore.getState().update({ companyDebtTotal: newTotal });
+            },
+
             repayLoan: (id, amount, spendCashFn) => {
                 const { loans, totalDebt } = get();
                 const loan = loans.find(l => l.id === id);
@@ -987,9 +1046,9 @@ export const useCorporateFinanceStore = create<CorporateFinanceState>()(
                 if (fin.method === 'cash') {
                     useStatsStore.getState().setCompanyCapital((stats.companyCapital || 0) - price);
                 } else if (fin.method === 'debt') {
-                    useStatsStore.getState().update({
-                        companyDebtTotal: (stats.companyDebtTotal || 0) + fin.debtRaised,
-                    });
+                    // A real loan, not a number added to a total that the next
+                    // quarter overwrites. See bookAcquisitionDebt.
+                    get().bookAcquisitionDebt(fin.debtRaised, `Acquisition: ${target.name}`);
                 } else {
                     shStore.setState((st: any) => ({ totalShares: st.totalShares + fin.sharesIssued }));
                 }

@@ -18,6 +18,7 @@
 // ============================================================================
 
 import { useShareholderStore } from './useShareholderStore';
+import { useCorporateFinanceStore } from '../../finance/stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 
 const SHARES = 10_000_000;
@@ -51,6 +52,24 @@ const setup = (opts: {
         companyValue: SHARES * PRICE_PER_SHARE,
         companyDebtTotal: 0,
     } as any);
+
+    // ----------------------------------------------------------------------
+    //  AND THE LOANS, WHICH ARE WHERE THE DEBT ACTUALLY LIVES
+    // ----------------------------------------------------------------------
+    //  This reset `companyDebtTotal` and left the finance store's `loans`
+    //  alone, so one test's borrowing leaked into the next. It was invisible
+    //  while the buyout added to the stats NUMBER: the number was reset and
+    //  the stale loan never spoke up.
+    //
+    //  It speaks up now, because leveraged buyouts book a real loan - they
+    //  had to, since serviceDebtQuarter sums the loans and writes that over
+    //  companyDebtTotal, which meant debt raised without one was erased on
+    //  the next tick. The second leveraged test read 340M for a 170M ask.
+    //
+    //  The loans are the truth. A fixture that resets only the total is
+    //  resetting the shadow.
+    // ----------------------------------------------------------------------
+    useCorporateFinanceStore.setState({ loans: [], totalDebt: 0 } as any);
 
     useShareholderStore.setState({
         members: [{ ...SIBLING }],

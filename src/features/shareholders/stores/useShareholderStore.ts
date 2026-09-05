@@ -1648,9 +1648,14 @@ export const useShareholderStore = create<ShareholderState>()(
                     );
                 }
                 if (quote.debtRaised > 0) {
-                    useStatsStore.getState().update({
-                        companyDebtTotal: (statsAll.companyDebtTotal || 0) + quote.debtRaised,
-                    });
+                    // A real loan, or the next quarter erases it. serviceDebtQuarter
+                    // sums the LOANS and writes that sum back over
+                    // companyDebtTotal, so borrowing that opens no loan is not
+                    // merely unserviced - it disappears. Measured at 400M gone
+                    // in one tick, with no interest ever charged.
+                    require('../../finance/stores/useCorporateFinanceStore')
+                        .useCorporateFinanceStore.getState()
+                        .bookAcquisitionDebt(quote.debtRaised, 'Leveraged buyout');
                 }
 
                 // ------------------------------------------------------------
