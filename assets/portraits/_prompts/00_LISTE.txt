@@ -2,62 +2,90 @@
 
 # Hepsi warm.
 
-   id                 kim                        K/E 
---------------------------------------------------------
-OK player_male        You (male)                 E
-OK player_female      You (female)               K
-OK heir_m_01          Successor, boy 1           E
-OK heir_m_02          Successor, boy 2           E
-OK heir_m_03          Successor, boy 3           E
-OK heir_m_04          Successor, boy 4           E
-   heir_m_05          Successor, boy 5           E
-   heir_m_06          Successor, boy 6           E
-   heir_m_07          Successor, boy 7           E
-   heir_m_08          Successor, boy 8           E
-   heir_m_09          Successor, boy 9           E
-   heir_m_10          Successor, boy 10          E
-   heir_f_01          Successor, girl 1          K
-   heir_f_02          Successor, girl 2          K
-   heir_f_03          Successor, girl 3          K
-   heir_f_04          Successor, girl 4          K
-   heir_f_05          Successor, girl 5          K
-   heir_f_06          Successor, girl 6          K
-   heir_f_07          Successor, girl 7          K
-   heir_f_08          Successor, girl 8          K
-   heir_f_09          Successor, girl 9          K
-   heir_f_10          Successor, girl 10         K
-   npc-marcus-wolf    Marcus 'The Wolf'          E
-   npc-elena-vance    Elena Vance                K
-   npc-victor-k       Victor K.                  E
-   npc-sarah-jen      Sarah Jen                  K
-   board_m_01         Director, man 1            E
-   board_m_02         Director, man 2            E
-   board_m_03         Director, man 3            E
-   board_m_04         Director, man 4            E
-   board_m_05         Director, man 5            E
-   board_m_06         Director, man 6            E
-   board_m_07         Director, man 7            E
-   board_m_08         Director, man 8            E
-   board_m_09         Director, man 9            E
-   board_m_10         Director, man 10           E
-   board_f_01         Director, woman 1          K
-   board_f_02         Director, woman 2          K
-   board_f_03         Director, woman 3          K
-   board_f_04         Director, woman 4          K
-   board_f_05         Director, woman 5          K
-   board_f_06         Director, woman 6          K
-   board_f_07         Director, woman 7          K
-   board_f_08         Director, woman 8          K
-   board_f_09         Director, woman 9          K
-   board_f_10         Director, woman 10         K
-OK father             Your Father                E
-OK brother            Julian Hale                E
-OK cfo                Arthur Vance               E
-OK coo                Dana Whitfield             K
-OK cto                Priya Raman                K
-   friend             Marco Alvarez              E
-OK pear               Nathan Vogel               E
-OK edison             Hal Brennerman             E
-   openai             Wen Zhao-Lindqvist         K
-   swanson            Dr. Eleanor Ratliff        K
-   hacker             Cipher                     E
+   id                     kim                        K/E 
+------------------------------------------------------------
+OK player_male            You (male)                 E
+OK player_female          You (female)               K
+OK heir_m_01              Successor, boy 1           E
+OK heir_m_02              Successor, boy 2           E
+OK heir_m_03              Successor, boy 3           E
+OK heir_m_04              Successor, boy 4           E
+OK heir_m_05              Successor, boy 5           E
+OK heir_m_06              Successor, boy 6           E
+OK heir_m_07              Successor, boy 7           E
+OK heir_m_08              Successor, boy 8           E
+OK heir_m_09              Successor, boy 9           E
+OK heir_m_10              Successor, boy 10          E
+OK heir_f_01              Successor, girl 1          K
+OK heir_f_02              Successor, girl 2          K
+OK heir_f_03              Successor, girl 3          K
+OK heir_f_04              Successor, girl 4          K
+OK heir_f_05              Successor, girl 5          K
+OK heir_f_06              Successor, girl 6          K
+OK heir_f_07              Successor, girl 7          K
+OK heir_f_08              Successor, girl 8          K
+OK heir_f_09              Successor, girl 9          K
+OK heir_f_10              Successor, girl 10         K
+OK npc-marcus-wolf        Marcus 'The Wolf'          E
+OK npc-elena-vance        Elena Vance                K
+OK npc-victor-k           Victor K.                  E
+OK npc-sarah-jen          Sarah Jen                  K
+   face_young_m_01        Face, young m 1            E
+   face_young_m_02        Face, young m 2            E
+   face_young_m_03        Face, young m 3            E
+   face_young_m_04        Face, young m 4            E
+   face_young_m_05        Face, young m 5            E
+   face_young_m_06        Face, young m 6            E
+   face_young_m_07        Face, young m 7            E
+   face_young_m_08        Face, young m 8            E
+   face_young_f_01        Face, young f 1            K
+   face_young_f_02        Face, young f 2            K
+   face_young_f_03        Face, young f 3            K
+   face_young_f_04        Face, young f 4            K
+   face_young_f_05        Face, young f 5            K
+   face_young_f_06        Face, young f 6            K
+   face_young_f_07        Face, young f 7            K
+   face_young_f_08        Face, young f 8            K
+   face_mid_m_01          Face, mid m 1              E
+   face_mid_m_02          Face, mid m 2              E
+   face_mid_m_03          Face, mid m 3              E
+   face_mid_m_04          Face, mid m 4              E
+   face_mid_m_05          Face, mid m 5              E
+   face_mid_m_06          Face, mid m 6              E
+   face_mid_m_07          Face, mid m 7              E
+   face_mid_m_08          Face, mid m 8              E
+   face_mid_f_01          Face, mid f 1              K
+   face_mid_f_02          Face, mid f 2              K
+   face_mid_f_03          Face, mid f 3              K
+   face_mid_f_04          Face, mid f 4              K
+   face_mid_f_05          Face, mid f 5              K
+   face_mid_f_06          Face, mid f 6              K
+   face_mid_f_07          Face, mid f 7              K
+   face_mid_f_08          Face, mid f 8              K
+   face_old_m_01          Face, old m 1              E
+   face_old_m_02          Face, old m 2              E
+   face_old_m_03          Face, old m 3              E
+   face_old_m_04          Face, old m 4              E
+   face_old_m_05          Face, old m 5              E
+   face_old_m_06          Face, old m 6              E
+   face_old_m_07          Face, old m 7              E
+   face_old_m_08          Face, old m 8              E
+   face_old_f_01          Face, old f 1              K
+   face_old_f_02          Face, old f 2              K
+   face_old_f_03          Face, old f 3              K
+   face_old_f_04          Face, old f 4              K
+   face_old_f_05          Face, old f 5              K
+   face_old_f_06          Face, old f 6              K
+   face_old_f_07          Face, old f 7              K
+   face_old_f_08          Face, old f 8              K
+OK father                 Your Father                E
+OK brother                Julian Hale                E
+OK cfo                    Arthur Vance               E
+OK coo                    Dana Whitfield             K
+OK cto                    Priya Raman                K
+OK friend                 Marco Alvarez              E
+OK pear                   Nathan Vogel               E
+OK edison                 Hal Brennerman             E
+OK openai                 Wen Zhao-Lindqvist         K
+OK swanson                Dr. Eleanor Ratliff        K
+OK hacker                 Cipher                     E

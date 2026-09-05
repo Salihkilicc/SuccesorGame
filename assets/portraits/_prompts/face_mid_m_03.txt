@@ -1,0 +1,19 @@
+# Face, mid m 3
+# negatif : 00_NEGATIF_erkek.txt
+# kaydet  : assets/portraits/face_mid_m_03.png
+
+(a man:1.3) in their forties, broad heavy jaw, side parted hair, clean shaven, thin rectangular glasses, open collar shirt,
+
+flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
+(no gradient:1.3), 2 tone shading, posterized, limited palette,
+cut paper look, poster art, screen print, clean geometric shapes,
+
+(close up portrait:1.4), (head fills the frame:1.4), tight crop,
+head and top of shoulders only, chin and top of hair inside the frame,
+centered,
+
+(head turned to the right:1.5), (three-quarter profile view:1.4),
+(looking to the side:1.3), one ear visible,
+
+calm neutral expression, plain solid background,
+sharp edges, crisp vector lines

@@ -666,7 +666,80 @@ def heir_look(cid: str, female: bool) -> str:
 #  before a face repeats has bigger things to notice.
 # ---------------------------------------------------------------------------
 
-BOARD_POOL_COUNT = 10
+# ---------------------------------------------------------------------------
+#  ONE POOL, THREE AGE BANDS, USED BY EVERYTHING PROCEDURAL
+# ---------------------------------------------------------------------------
+#  Replaces the board-only pool. Board successors are not the only unbounded
+#  people in this game: partners are generated at runtime from 66,040 name
+#  combinations, and there is no fixed list of anybody. A separate pool per
+#  system would be the same faces drawn twice.
+#
+#  AGE BANDS, because one mixed pool puts a sixty year old on a card that
+#  says 22. Measured off the generator: partners are 18 to 45, directors are
+#  40 and up. So:
+#
+#      young  18-30   partners, students
+#      mid    30-50   partners, directors, executives
+#      old    50+     directors, elders
+#
+#  The age being PRINTED on a dating card makes this worse rather than
+#  better: a wrong face beside a written number is a contradiction, where a
+#  wrong face on its own is just a face.
+#
+#  Eight per band. Same-screen repeats are prevented by drawing without
+#  replacement in the app, not by pool size - measured, a pool big enough to
+#  stop repeats across a whole run does not exist at any sane cost. Eight is
+#  comfortably more than the four seats or three candidates ever shown at
+#  once.
+# ---------------------------------------------------------------------------
+
+FACE_BAND_COUNT = 8
+
+AGE_BANDS = {
+    'young': ['in their late teens', 'in their early twenties',
+              'in their mid twenties', 'in their late twenties'],
+    'mid': ['in their thirties', 'in their late thirties',
+            'in their forties', 'in their late forties'],
+    'old': ['in their fifties', 'in their sixties', 'elderly',
+            'in their seventies'],
+}
+
+#  Ordinary clothes, not board clothes: this pool dresses a date as often as
+#  a director, so the suit belongs on the named cast and not here.
+ATTIRE_FACE = [
+    'open collar shirt', 'crew neck sweater', 'blazer over a plain shirt',
+    'turtleneck sweater', 'plain work shirt', 'collared shirt',
+    'high collared coat', 'dark suit and tie',
+]
+
+
+def face_look(cid: str, female: bool, band: str) -> str:
+    lead = ('(a woman:1.4), (female:1.3) ' if female else '(a man:1.3) ')
+    parts = [
+        lead + pick(AGE_BANDS[band], cid, 'age'),
+        pick(BUILD, cid, 'build'),
+        pick(HAIR_F if female else HAIR, cid, 'hair'),
+    ]
+    # No beards on a woman, and none on a teenager either.
+    if not female and band != 'young':
+        parts.append(pick(FACE_HAIR, cid, 'face_hair'))
+    parts += [pick(GLASSES, cid, 'glasses'), pick(ATTIRE_FACE, cid, 'attire')]
+    return ', '.join(parts)
+
+
+FACE_POOL = {
+    f'face_{band}_{g}_{i:02d}': f'Face, {band} {g} {i}'
+    for band in ('young', 'mid', 'old')
+    for g in ('m', 'f')
+    for i in range(1, FACE_BAND_COUNT + 1)
+}
+
+
+#  SHELVED: the board-only pool. Superseded by FACE_POOL above, which serves
+#  the board AND partners AND anything else procedural from one set of
+#  files. Kept because the reasoning about directors succeeding every
+#  generation is still why the pool exists at all.
+BOARD_POOL_COUNT = 0
 
 #  Directors, not executives: older, heavier, dressed for a boardroom. Kept
 #  clear of the named four so a successor never looks like the parent's twin.
@@ -715,12 +788,12 @@ for _i in range(1, HEIR_COUNT + 1):
     CAST_LOOKS[f'heir_m_{_i:02d}'] = heir_look(f'heir_m_{_i:02d}', False)
     CAST_LOOKS[f'heir_f_{_i:02d}'] = heir_look(f'heir_f_{_i:02d}', True)
 
-for _i in range(1, BOARD_POOL_COUNT + 1):
-    CAST_LOOKS[f'board_m_{_i:02d}'] = board_look(f'board_m_{_i:02d}', False)
-    CAST_LOOKS[f'board_f_{_i:02d}'] = board_look(f'board_f_{_i:02d}', True)
-    RAMP_BY_ID[f'board_m_{_i:02d}'] = 'warm'
-    RAMP_BY_ID[f'board_f_{_i:02d}'] = 'warm'
-    CAST_FEMALE.add(f'board_f_{_i:02d}')
+for _cid in FACE_POOL:
+    _band, _g = _cid.split('_')[1], _cid.split('_')[2]
+    CAST_LOOKS[_cid] = face_look(_cid, _g == 'f', _band)
+    RAMP_BY_ID[_cid] = 'warm'
+    if _g == 'f':
+        CAST_FEMALE.add(_cid)
 
 # ---------------------------------------------------------------------------
 #  THE BOARD, WHICH IS FIXED AND WAS NOT ON THE LIST
@@ -760,7 +833,7 @@ def read_cast() -> dict:
         if nm:
             out[key] = nm.group(1).replace("\\'", "'")
     out.pop('heir', None)
-    return {**PLAYER, **HEIR_SPLIT, **BOARD, **BOARD_POOL, **out}
+    return {**PLAYER, **HEIR_SPLIT, **BOARD, **FACE_POOL, **out}
 
 
 # ---------------------------------------------------------------------------

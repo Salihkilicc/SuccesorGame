@@ -1,0 +1,19 @@
+# Face, old f 8
+# negatif : 00_NEGATIF_kadin.txt
+# kaydet  : assets/portraits/face_old_f_08.png
+
+(a woman:1.4), (female:1.3) in their sixties, angular sharp cheekbones, hair tied back in a bun, heavy black frames, crew neck sweater,
+
+flat vector portrait, (bold thick outlines:1.3), (flat color:1.4),
+(no gradient:1.3), 2 tone shading, posterized, limited palette,
+cut paper look, poster art, screen print, clean geometric shapes,
+
+(close up portrait:1.4), (head fills the frame:1.4), tight crop,
+head and top of shoulders only, chin and top of hair inside the frame,
+centered,
+
+(head turned to the right:1.5), (three-quarter profile view:1.4),
+(looking to the side:1.3), one ear visible,
+
+calm neutral expression, plain solid background,
+sharp edges, crisp vector lines
