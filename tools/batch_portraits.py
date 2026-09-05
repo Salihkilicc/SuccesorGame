@@ -49,7 +49,21 @@ import portrait_prompts as PP           # noqa: E402
 import palette_map as PM                # noqa: E402
 
 OUT_DIR = os.path.join(HERE, '..', 'assets', 'portraits')
-RAW_DIR = os.path.join(OUT_DIR, '_ham')
+#  ---------------------------------------------------------------------
+#  THE STAGING FOLDER IS GONE, AND ITS ABSENCE IS THE POINT
+#  ---------------------------------------------------------------------
+#  _ham existed to hold the unmapped master a portrait could be recoloured
+#  from. Once ComfyUI started applying the ramp itself there was no unmapped
+#  master any more: _ham held a second copy of the SAME finished file.
+#
+#  Two copies of one thing, one of them ignored by git, is how 297 portraits
+#  ended up inside the staging folder and none in the folder the app reads.
+#  Nothing failed and nothing warned; the batch reported 0 failed while the
+#  output directory sat empty.
+#
+#  So there is one place a portrait lives now.
+#  ---------------------------------------------------------------------
+RAW_DIR = OUT_DIR
 SERVER = '127.0.0.1:8188'
 
 # ---------------------------------------------------------------------------

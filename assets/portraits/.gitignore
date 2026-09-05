@@ -1,6 +1,7 @@
 # Raw generator output. The kept portraits live one level up, named by
 # character id; this is the staging area they are picked out of.
-_ham/
+# _ham is gone: a portrait has one home now, see batch_portraits.
+#_ham/
 
 # The batch writes this. Regenerated on every run, not worth carrying.
 _contact_sheet.png
