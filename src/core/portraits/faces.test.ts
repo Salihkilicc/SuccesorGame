@@ -17,7 +17,8 @@
 // ============================================================================
 
 import {
-    BAND_MID_FROM, BAND_OLD_FROM, bandForAge, faceFor, faceHash, facesFor,
+    BAND_MID_FROM, BAND_OLD_FROM, BAND_TEEN_FROM, BAND_YOUNG_FROM,
+    bandForAge, faceFor, faceHash, facesFor,
     poolSize, type Person,
 } from './faces';
 import { PORTRAITS } from './registry';
@@ -27,23 +28,49 @@ const nameOf = (src: unknown): string =>
     Object.keys(PORTRAITS).find(k => PORTRAITS[k] === src) ?? String(src);
 
 describe('the pool is the size the batch built', () => {
-    it('three bands, two genders, eight each', () => {
+    it('three adult bands, two genders, eight each', () => {
         for (const band of ['young', 'mid', 'old'] as const) {
             for (const female of [true, false]) {
                 expect(poolSize(band, female)).toBe(8);
             }
         }
     });
+
+    it('and ten heirs of each, which nothing read until now', () => {
+        expect(poolSize('teen', true)).toBe(10);
+        expect(poolSize('teen', false)).toBe(10);
+    });
+
+    it('and nothing at all under thirteen, deliberately', () => {
+        // No child was ever drawn. The nearest face is a seventeen year old,
+        // and a teenager beside the number 8 is worse than initials, which
+        // say nothing rather than something false.
+        expect(poolSize('child', true)).toBe(0);
+        expect(poolSize('child', false)).toBe(0);
+    });
 });
 
 describe('the band follows the age that will be printed', () => {
     it('at the boundaries, stated as numbers', () => {
-        expect(bandForAge(18)).toBe('young');
+        expect(bandForAge(0)).toBe('child');
+        expect(bandForAge(BAND_TEEN_FROM - 1)).toBe('child');
+        expect(bandForAge(BAND_TEEN_FROM)).toBe('teen');
+        expect(bandForAge(BAND_YOUNG_FROM - 1)).toBe('teen');
+        expect(bandForAge(BAND_YOUNG_FROM)).toBe('young');
         expect(bandForAge(BAND_MID_FROM - 1)).toBe('young');
         expect(bandForAge(BAND_MID_FROM)).toBe('mid');
         expect(bandForAge(BAND_OLD_FROM - 1)).toBe('mid');
         expect(bandForAge(BAND_OLD_FROM)).toBe('old');
         expect(bandForAge(81)).toBe('old');
+    });
+
+    it('and a child born in game gets no face until they are a teenager', () => {
+        // Children start at 0, 3, 8 and 16 and gain a year every year, so a
+        // family list spans infants and adults at the same time.
+        for (let age = 0; age < BAND_TEEN_FROM; age++) {
+            expect(faceFor({ id: `kid-${age}`, female: true, age })).toBeNull();
+        }
+        expect(faceFor({ id: 'kid-13', female: true, age: 13 })).not.toBeNull();
     });
 
     it('and a missing age does not throw or land at either extreme', () => {
@@ -57,11 +84,17 @@ describe('the band follows the age that will be printed', () => {
 
     it('and the face a person gets is in their own band', () => {
         // The whole point: the number is printed next to the picture.
-        for (let age = 18; age <= 80; age++) {
+        for (let age = 13; age <= 80; age++) {
             for (const female of [true, false]) {
                 const src = faceFor({ id: `p${age}${female}`, female, age });
+                const g = female ? 'f' : 'm';
+                const band = bandForAge(age);
+                // The heirs were generated as their own job and are named
+                // heir_f_07 rather than face_teen_f_07.
                 expect(nameOf(src)).toMatch(
-                    new RegExp(`^face_${bandForAge(age)}_${female ? 'f' : 'm'}_`),
+                    band === 'teen'
+                        ? new RegExp(`^heir_${g}_`)
+                        : new RegExp(`^face_${band}_${g}_`),
                 );
             }
         }

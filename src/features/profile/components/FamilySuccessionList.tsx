@@ -16,6 +16,8 @@ import { theme } from '../../../core/theme';
 import { Child } from '../../../core/store/useFamilyStore';
 import { t, useLocale } from '../../../core/i18n';
 import { translateEducationLevel } from '../../../data/i18n/profileLoveShopText';
+import Portrait from '../../../components/common/Portrait';
+import { facesFor } from '../../../core/portraits/faces';
 
 interface FamilySuccessionListProps {
     children: Child[];
@@ -29,6 +31,30 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
     onSelectChild,
 }) => {
     useLocale();
+
+    // ------------------------------------------------------------------
+    //  THE WHOLE LIST AT ONCE, SO NO TWO CHILDREN SHARE A FACE
+    // ------------------------------------------------------------------
+    //  Siblings are the worst case for the pool: they tend to be the same
+    //  band, and half of them the same gender, which is exactly where two
+    //  faces landing on one is the usual outcome rather than an edge. Two
+    //  identical brothers on one screen reads as a bug in a way that two
+    //  unfamiliar brothers never would.
+    //
+    //  The age is PRINTED on the same row, so the band has to be right. A
+    //  child under thirteen gets no face at all and keeps their initials -
+    //  nothing under that age was ever drawn, and a teenager beside the
+    //  number 8 is worse than saying nothing.
+    // ------------------------------------------------------------------
+    const faces = facesFor(
+        children.map(c => ({
+            id: c.id,
+            name: c.name,
+            female: c.gender === 'Female',
+            age: c.age,
+        })),
+    );
+
     return (
         <View style={styles.container}>
             <View style={styles.sectionHeaderRow}>
@@ -45,13 +71,6 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
             ) : (
                 children.map((child) => {
                     const isSuccessor = child.id === designatedSuccessorId;
-                    const initials = child.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .substring(0, 2)
-                        .toUpperCase();
-
                     const relationLabel = child.gender === 'Female' ? t('family.daughter') : t('family.son');
                     const educationLabel = translateEducationLevel(child.educationLevel);
 
@@ -65,10 +84,18 @@ export const FamilySuccessionList: React.FC<FamilySuccessionListProps> = ({
                             ]}
                             onPress={() => onSelectChild(child)}
                         >
-                            {/* Avatar Initials */}
-                            <View style={styles.avatar}>
-                                <Text style={styles.avatarText}>{initials}</Text>
-                            </View>
+                            {/* The face, or the initials circle it always was.
+                                Same 44 points, same raised fill, no ring: the
+                                row gains a picture and changes nothing else. */}
+                            <Portrait
+                                id={child.id}
+                                name={child.name}
+                                size={44}
+                                borderWidth={0}
+                                fill={theme.colors.surfaceRaised}
+                                source={faces.get(child.id) as number | null}
+                                style={styles.avatar}
+                            />
 
                             {/* Info Block */}
                             <View style={styles.infoBlock}>
@@ -146,20 +173,35 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surfaceRaised,
         transform: [{ scale: 0.99 }],
     },
+    /**
+     * Only the spacing is left here.
+     *
+     * The size, the radius and the fill moved onto the Portrait props so that
+     * one component owns what an avatar looks like everywhere. The margin
+     * stays because it is about this ROW, not about the circle.
+     */
     avatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: theme.colors.surfaceRaised,
-        alignItems: 'center',
-        justifyContent: 'center',
         marginRight: 12,
     },
-    avatarText: {
-        color: theme.colors.textPrimary,
-        fontSize: 15,
-        fontWeight: '800',
-    },
+    // SHELVED, not deleted: the circle these rows drew before there were
+    // photographs. Portrait takes the same 44 points, the same radius and the
+    // same raised fill through props now, and derives the initials size from
+    // the diameter instead of fixing it at 15.
+    //
+    // avatar: {
+    //     width: 44,
+    //     height: 44,
+    //     borderRadius: 22,
+    //     backgroundColor: theme.colors.surfaceRaised,
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     marginRight: 12,
+    // },
+    // avatarText: {
+    //     color: theme.colors.textPrimary,
+    //     fontSize: 15,
+    //     fontWeight: '800',
+    // },
     infoBlock: {
         flex: 1,
         justifyContent: 'center',

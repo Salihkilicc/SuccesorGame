@@ -47,46 +47,72 @@ import type { ImageSourcePropType } from 'react-native';
 import { PORTRAITS } from './registry';
 import { portraitForPerson } from './index';
 
-export type AgeBand = 'young' | 'mid' | 'old';
+/**
+ * The bands, including the two that are not adults.
+ *
+ * 'teen' is a real pool of its own - twenty faces generated as successors,
+ * "in her late teens" - and it exists because the heirs are shown in a list
+ * that PRINTS their age from the year they are born onward.
+ *
+ * 'child' is a band with NO pool, on purpose. Nothing under thirteen was
+ * ever drawn, and the nearest thing available is a seventeen year old. A
+ * teenager's face beside the number 8 is worse than the initials circle,
+ * which says nothing rather than something false. So it resolves to null and
+ * the caller falls back, exactly as it does for a stranger.
+ */
+export type AgeBand = 'child' | 'teen' | 'young' | 'mid' | 'old';
 
 /**
  * Where the bands split.
  *
- * Written down as the boundaries the pool was GENERATED against: young is
- * late teens to late twenties, mid is thirties and forties, old is fifties
- * and up. The prompts that made the faces used those words, so moving these
- * numbers without regenerating the pool would put a wrong face beside a
- * printed age, which is the one thing this is here to prevent.
+ * Written down as the boundaries the pools were GENERATED against: the heir
+ * prompts said "late teens", the young prompts said late teens to late
+ * twenties, mid said thirties and forties, old said fifties and up. Moving
+ * these numbers without regenerating would put a wrong face beside a printed
+ * age, which is the one thing this is here to prevent.
  */
+export const BAND_TEEN_FROM = 13;
+export const BAND_YOUNG_FROM = 18;
 export const BAND_MID_FROM = 30;
 export const BAND_OLD_FROM = 50;
 
 export const bandForAge = (age: number | undefined | null): AgeBand => {
     // A missing or nonsense age lands in 'mid' rather than throwing: it is
     // the band that covers partners, directors and executives alike, so it is
-    // the least wrong guess when there is nothing to go on.
+    // the least wrong guess when there is nothing to go on. Note this is NOT
+    // 'child' - defaulting to the empty band would silently blank every face
+    // whose caller forgot to pass an age.
     const a = typeof age === 'number' && isFinite(age) ? age : BAND_MID_FROM;
+    if (a < BAND_TEEN_FROM) return 'child';
+    if (a < BAND_YOUNG_FROM) return 'teen';
     if (a < BAND_MID_FROM) return 'young';
     if (a < BAND_OLD_FROM) return 'mid';
     return 'old';
 };
 
 /**
- * The pool, read out of the registry rather than listed here.
+ * The pools, read out of the registry rather than listed here.
  *
- * The band and the gender are in the FILE NAME - face_young_f_03 - because
- * that is how the batch wrote them. Reading them back out means a pool that
- * grows from nine faces a bucket to twelve needs no change here at all, and
- * cannot silently disagree with what is on disk.
+ * The band and the gender are in the FILE NAME - face_young_f_03, heir_m_07 -
+ * because that is how the batch wrote them. Reading them back out means a
+ * pool that grows from eight faces a bucket to twelve needs no change here,
+ * and cannot silently disagree with what is on disk.
+ *
+ * Two naming shapes because they were generated as two separate jobs: the
+ * adults carry their band in the name, the heirs are all one band and do not.
+ * Both are read, because twenty heir portraits that nothing looks at would be
+ * this project's signature failure all over again.
  */
 const POOL: Record<string, number[]> = (() => {
     const out: Record<string, number[]> = {};
-    const keys = Object.keys(PORTRAITS).sort();
-    for (const key of keys) {
-        const m = /^face_(young|mid|old)_(f|m)_(\d+)$/.exec(key);
-        if (!m) continue;
-        const bucket = `${m[1]}_${m[2]}`;
-        (out[bucket] ||= []).push(PORTRAITS[key]);
+    for (const key of Object.keys(PORTRAITS).sort()) {
+        const adult = /^face_(young|mid|old)_(f|m)_(\d+)$/.exec(key);
+        if (adult) {
+            (out[`${adult[1]}_${adult[2]}`] ||= []).push(PORTRAITS[key]);
+            continue;
+        }
+        const heir = /^heir_(f|m)_(\d+)$/.exec(key);
+        if (heir) (out[`teen_${heir[1]}`] ||= []).push(PORTRAITS[key]);
     }
     return out;
 })();

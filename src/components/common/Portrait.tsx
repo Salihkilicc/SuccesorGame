@@ -47,6 +47,15 @@ type Props = {
     /** Border width. 0 turns the ring off entirely. */
     borderWidth?: number;
     /**
+     * An explicit fill, for screens whose circle was never hue coloured.
+     *
+     * The family list and the header draw a plain raised surface behind their
+     * initials. Forcing the poker table's per person hue on them while adding
+     * photographs would be a redesign smuggled in beside a fix, so they keep
+     * exactly the circle they had and only gain the picture.
+     */
+    fill?: string;
+    /**
      * Override the portrait lookup with a source of your own.
      *
      * This is for the characters who are generated at runtime and cannot have
@@ -58,10 +67,10 @@ type Props = {
 };
 
 const Portrait = ({
-    id, name, size, borderColor, borderWidth = 2, source, style,
+    id, name, size, borderColor, borderWidth = 2, source, style, fill: fillProp,
 }: Props) => {
     const hue = avatarHue(id);
-    const fill = `hsl(${hue}, 32%, 26%)`;
+    const fill = fillProp ?? `hsl(${hue}, 32%, 26%)`;
     const ring = borderColor ?? `hsl(${hue}, 45%, 52%)`;
     // An explicitly passed source wins; undefined means "look it up for me",
     // null means "this one has no face, do not look".
