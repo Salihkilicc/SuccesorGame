@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, Image, Pressable, Dimensions } from 'react-nati
 import type { PartnerProfile } from '../../../data/relationshipTypes';
 import type { Partner, SocialTier } from '../types';
 import { theme } from '../../../core/theme';
+import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 
 type PartnerCardProps = {
   partner: PartnerProfile | Partner;
@@ -71,9 +73,27 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
 
   // Derived Info
   const name = partner.name;
-  const initial = name[0] || '?';
+  // The two shapes of partner disagree about the field: the deep persona
+  // carries 'male' | 'female' required, the stored profile carries it
+  // optional. Undefined is a real answer here and means "do not guess".
+  const gender: 'male' | 'female' | undefined = isDeepPersona
+    ? (partner as Partner).gender
+    : (partner as PartnerProfile).gender;
   const jobTitle = isDeepPersona ? translateOccupation(partner.job.title) : t('love.unemployed');
-  const age = isDeepPersona ? partner.age : 25; // Fallback if age not in PartnerProfile (assuming it is, checking types might be needed but simplistic for now)
+  /**
+   * HOW OLD THEY ACTUALLY ARE.
+   *
+   * This read `isDeepPersona ? partner.age : 25`, with a comment admitting it
+   * was assuming rather than checking. PartnerProfile does carry an age - it
+   * is on `stats` - so every stored partner was displayed as 25 whatever the
+   * generator gave them, and the demo partner printed 25 beside her own 29.
+   *
+   * Found by a test asserting that the face matches the number ON THE CARD:
+   * a fifty five year old came back with a young man's face because the card
+   * was telling everyone he was 25. The face was right about what it was
+   * told; the card was wrong.
+   */
+  const age = isDeepPersona ? partner.age : (partner as PartnerProfile).stats?.age ?? 25;
   const statusLabel = (partner as PartnerProfile).isMarried ? t('partner.married') : t('partner.dating');
   const statusColor = (partner as PartnerProfile).isMarried ? '#05A8F6' : '#FF8A8A';
 
@@ -81,10 +101,36 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
     <View style={styles.container}>
       {/* Top Half: Avatar & Overlay Info */}
       <View style={styles.imageSection}>
-        {/* Placeholder Avatar - in real app would use <Image source={{ uri: ... }} /> */}
-        <View style={styles.avatarPlaceholder}>
-          <Text style={styles.avatarText}>{initial}</Text>
-        </View>
+        {/* ------------------------------------------------------------------
+            The face, where the comment used to say "in real app would use an
+            Image".
+
+            The age is printed directly underneath in the overlay - "Sophia
+            Vance, 29" - so the band has to follow that number rather than
+            anything else about the partner.
+
+            A partner with no gender on record gets no face and keeps the
+            single large letter this card has always drawn. That is not a
+            corner case: `gender` is optional on PartnerProfile because every
+            save written before it exists without one, and the demo partner
+            has none either. Guessing would be a coin flip on a card that
+            fills half the screen.
+           ------------------------------------------------------------------ */}
+        <Portrait
+          id={partner.id}
+          name={name}
+          source={faceFor({
+            id: partner.id,
+            name,
+            female: gender === undefined ? undefined : gender === 'female',
+            age,
+          }) as number | null}
+          fill="#434B50"
+          borderWidth={0}
+          initialsSize={80}
+          singleInitial
+          style={styles.avatarPlaceholder}
+        />
 
         {/* Overlay Details */}
         <View style={styles.overlay}>
@@ -204,15 +250,24 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#434B50', // Fallback color
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  avatarText: {
-    fontSize: 80,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
+  // SHELVED, not deleted: what this box was before it could hold a face.
+  // The fill and the 80 point letter are passed to Portrait as props now, so
+  // the card looks identical for a partner who has no portrait. Centring
+  // moved into Portrait itself, which centres whatever it is showing.
+  //
+  // avatarPlaceholder: {
+  //     width: '100%',
+  //     height: '100%',
+  //     backgroundColor: '#434B50', // Fallback color
+  //     alignItems: 'center',
+  //     justifyContent: 'center',
+  // },
+  // avatarText: {
+  //     fontSize: 80,
+  //     fontWeight: 'bold',
+  //     color: '#FFFFFF',
+  // },
   overlay: {
     position: 'absolute',
     bottom: 0,

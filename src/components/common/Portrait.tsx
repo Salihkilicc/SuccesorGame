@@ -37,8 +37,16 @@ type Props = {
     id: string;
     /** Their name, for the initials when there is no portrait. */
     name: string;
-    /** Diameter in points. The border radius follows it, so this stays a circle. */
-    size: number;
+    /**
+     * Diameter in points. The border radius follows it, so this stays a circle.
+     *
+     * Omit it to let `style` set the box instead. That is for the one surface
+     * that is not a circle at all: the partner card, whose face fills the top
+     * half of the card as a rectangle. It is the same lookup, the same
+     * fallback and the same initials, so it belongs in this component rather
+     * than in a second one that would drift from it.
+     */
+    size?: number;
     /**
      * An explicit border colour, for the states a screen already owns - whose
      * turn it is at the table, who won. Omitted, the person's own hue is used.
@@ -56,6 +64,16 @@ type Props = {
      */
     fill?: string;
     /**
+     * Initials point size, when `size` is not the thing that should set it.
+     *
+     * The partner card drew a single 80 point letter across the top of the
+     * card; scaling that off a diameter that does not exist would shrink it
+     * to nothing.
+     */
+    initialsSize?: number;
+    /** Show only the first letter, as the partner card always has. */
+    singleInitial?: boolean;
+    /**
      * Override the portrait lookup with a source of your own.
      *
      * This is for the characters who are generated at runtime and cannot have
@@ -68,10 +86,16 @@ type Props = {
 
 const Portrait = ({
     id, name, size, borderColor, borderWidth = 2, source, style, fill: fillProp,
+    initialsSize, singleInitial,
 }: Props) => {
     const hue = avatarHue(id);
     const fill = fillProp ?? `hsl(${hue}, 32%, 26%)`;
     const ring = borderColor ?? `hsl(${hue}, 45%, 52%)`;
+    // Scaled off the circle rather than a table of sizes, so a 46 point seat
+    // and a 96 point profile header read the same. 0.36 is what fits two
+    // capitals at 46.
+    const letters = initialsSize ?? Math.round((size ?? 44) * 0.36);
+    const text = singleInitial ? (name?.[0] || '?').toUpperCase() : initialsOf(name);
     // An explicitly passed source wins; undefined means "look it up for me",
     // null means "this one has no face, do not look".
     const src = source === undefined ? portraitForPerson(id, name) : source;
@@ -80,14 +104,15 @@ const Portrait = ({
         <View
             style={[
                 styles.wrap,
-                {
+                // Only when a diameter was given. Without one the caller's
+                // style owns the box, which is how the partner card gets a
+                // rectangle out of the same component.
+                size !== undefined && {
                     width: size,
                     height: size,
                     borderRadius: size / 2,
-                    backgroundColor: fill,
-                    borderColor: ring,
-                    borderWidth,
                 },
+                { backgroundColor: fill, borderColor: ring, borderWidth },
                 style,
             ]}
         >
@@ -105,17 +130,8 @@ const Portrait = ({
                     fadeDuration={0}
                 />
             ) : (
-                <Text
-                    style={[
-                        styles.initials,
-                        // Scaled off the circle rather than a table of sizes,
-                        // so a 46 point seat and a 96 point profile header read
-                        // the same. 0.36 is what fits two capitals at 46.
-                        { fontSize: Math.round(size * 0.36) },
-                    ]}
-                    numberOfLines={1}
-                >
-                    {initialsOf(name)}
+                <Text style={[styles.initials, { fontSize: letters }]} numberOfLines={1}>
+                    {text}
                 </Text>
             )}
         </View>
