@@ -34,6 +34,9 @@ export const ProfileScreen: React.FC = () => {
     useLocale();
     const {
         ceoFullName,
+        ceoGender,
+        ceoId,
+        ceoAge,
         companyName,
         currentQuarter,
         finances,
@@ -87,6 +90,9 @@ export const ProfileScreen: React.FC = () => {
                     <CeoStatusHeader
                         ceoFullName={ceoFullName}
                         companyName={companyName}
+                        gender={ceoGender}
+                        ceoId={ceoId}
+                        ceoAge={ceoAge}
                     />
 
                     {/* Middle: Romance & Partner Subheader & Row */}

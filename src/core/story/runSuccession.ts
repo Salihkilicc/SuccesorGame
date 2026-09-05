@@ -210,6 +210,15 @@ export const runSuccession = (): SuccessionPlan | null => {
     useIdentityStore.setState({
         firstName: plan.ceo.firstName,
         gender: plan.ceo.gender,
+        //  WHICH child, not just what they are called.
+        //
+        //  planSuccession has always returned `plan.ceo.id` and this call has
+        //  always dropped it, so nothing downstream could tell one heir from
+        //  another - two daughters of the same age were the same person to
+        //  every screen. The profile header needs it to keep showing the face
+        //  of the heir the player watched grow up rather than falling back to
+        //  the founder's portrait for somebody else.
+        ceoId: plan.ceo.id,
     });
     useGameStore.setState({ age: plan.ceo.age } as never);
 

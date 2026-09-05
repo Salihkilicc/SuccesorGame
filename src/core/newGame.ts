@@ -378,6 +378,18 @@ const applyReturningPlayer = ({ skipOpening }: NewGameOptions) => {
         useIdentityStore.setState({ firstName: player.ownFirstName });
         console.log('[newGame] Restored the player\'s own name.');
     }
+    //  And the FACE, for the same reason and in the same breath.
+    //
+    //  `ceoId` names the heir who took the chair. It is undefined for a
+    //  founder, so leaving the last run's value behind would open a brand new
+    //  game with the previous run's grandchild looking out of the profile
+    //  header - the same bug as the name, one field along. Cleared here
+    //  rather than beside the name because it must go even when the name
+    //  happens to match.
+    if (player.ceoId !== undefined) {
+        useIdentityStore.setState({ ceoId: undefined });
+        console.log('[newGame] Cleared the inherited chair holder.');
+    }
 
     // ------------------------------------------------------------------
     //  THE TUTORIAL DOES NOT COME BACK

@@ -115,6 +115,31 @@ describe('starting again, having been through it once', () => {
         expect(story().getState().locks.disabled).toBe(true);
     });
 
+    it('and you are yourself again, face as well as name', async () => {
+        // ------------------------------------------------------------------
+        //  THE FACE HAD THE SAME BUG THE NAME ALREADY HAD
+        // ------------------------------------------------------------------
+        //  A succession writes the heir's first name into identity, and this
+        //  store survives a new game on purpose, so the next run used to open
+        //  as Elena. That was found and fixed with `ownFirstName`.
+        //
+        //  `ceoId` is the same field one along: it names the child who took
+        //  the chair, and left behind it would open a brand new game with the
+        //  previous run's grandchild looking out of the profile header.
+        //
+        //  Written because the clearing code passed with nothing testing it:
+        //  probed by deleting the whole block from newGame and all 43 tests
+        //  here stayed green.
+        // ------------------------------------------------------------------
+        returning(true);
+        player().setState({
+            firstName: 'Elena', ownFirstName: 'Salih', ceoId: 'child-elena',
+        });
+        await startNewGame();
+        expect(player().getState().firstName).toBe('Salih');
+        expect(player().getState().ceoId).toBeUndefined();
+    });
+
     it('but still teaches a first-time player', async () => {
         returning(false);
         await startNewGame();

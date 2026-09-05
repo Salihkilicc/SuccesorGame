@@ -279,6 +279,14 @@ export const useProfileLogic = () => {
     return {
         // State
         ceoFullName,
+        // Who is in the chair, for the header's portrait. `ceoGender` is the
+        // heir's after a succession because runSuccession overwrites it, so
+        // the two always describe the same person.
+        ceoGender: identity.gender,
+        ceoId: identity.ceoId,
+        // playerAge is already read reactively above. getState() here would
+        // give the header a value that never updates as the years pass.
+        ceoAge: playerAge,
         companyName,
         currentQuarter,
         finances,

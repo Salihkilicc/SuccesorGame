@@ -33,6 +33,21 @@ export type IdentityState = {
     firstName: string;
     lastName: string;
     gender: Gender;
+    /**
+     * WHO IS IN THE CHAIR, when it is no longer the person who started.
+     *
+     * Undefined for the founder, and a child's id after a succession. It is
+     * what lets the profile header show the heir you watched grow up rather
+     * than reusing the founder's portrait for a different person, and
+     * `planSuccession` was already computing it - `plan.ceo.id` - and
+     * throwing it away here.
+     *
+     * OPTIONAL by migration decision, the same as `gender` on a partner:
+     * every save written before this field has none, and the founder legitimately
+     * has none either. Absent means the founder, which is the right answer
+     * for both.
+     */
+    ceoId?: string;
     /** Has the player been through onboarding at least once? */
     created: boolean;
     /**
@@ -150,6 +165,9 @@ export const initialIdentityState: IdentityState = {
     firstName: '',
     lastName: '',
     gender: 'male',
+    // Undefined, not a string: the founder has no separate id, they are the
+    // player. See the note on the field.
+    ceoId: undefined,
     created: false,
     tutorialCompleted: false,
     openingSeen: false,
@@ -177,6 +195,11 @@ export const useIdentityStore = create<IdentityStore>()(
                     ownFirstName: tidy(firstName),
                     lastName: tidy(lastName),
                     gender,
+                    // A new identity is a new founder, so any chair holder
+                    // left over from a previous run is cleared. Without this
+                    // a second playthrough would open showing the last run's
+                    // heir in the header.
+                    ceoId: undefined,
                     created: true,
                 });
                 return { ok: true };
@@ -197,6 +220,7 @@ export const useIdentityStore = create<IdentityStore>()(
                 firstName: state.firstName,
                 lastName: state.lastName,
                 gender: state.gender,
+                ceoId: state.ceoId,
                 created: state.created,
                 tutorialCompleted: state.tutorialCompleted,
                 // Persisted, and NOT reset by newGame - this store is not in
