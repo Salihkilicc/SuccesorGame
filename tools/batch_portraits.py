@@ -312,6 +312,23 @@ def main() -> int:
     # ------------------------------------------------------------------
     ap.add_argument('--region', default='',
                     help='only these regions, comma separated (implies --redo)')
+    # ------------------------------------------------------------------
+    #  OR NAME THE EIGHT YOU ARE FIXING
+    # ------------------------------------------------------------------
+    #  --region only reaches the strangers; the pool faces and the named
+    #  cast have no region, so there was no way to redraw part of --cast.
+    #  Reviewing the contact sheet always ends the same way: eight of them
+    #  are wrong. This is how you redraw exactly those eight.
+    #
+    #    --cast --only face_old_f      the whole old female band, 8, ~6 min
+    #    --cast --only face_old_f_03,heir_f_07
+    #
+    #  PREFIX MATCH, so an id or a family of them both work. Implies
+    #  --redo: naming something is asking for it to be drawn again.
+    # ------------------------------------------------------------------
+    ap.add_argument('--only', default='',
+                    help='only ids starting with these, comma separated '
+                         '(implies --redo)')
     args = ap.parse_args()
 
     rows = roster(args.cast)
@@ -330,6 +347,15 @@ def main() -> int:
             raise SystemExit(f'unknown region(s): {sorted(unknown)}\n'
                              f'have: {sorted(known)}')
         rows = [r for r in rows if len(r) > 4 and r[4].lower() in want]
+        args.redo = True
+
+    if args.only:
+        want = tuple(w.strip() for w in args.only.split(',') if w.strip())
+        rows = [r for r in rows if r[0].startswith(want)]
+        if not rows:
+            raise SystemExit(f'--only {args.only!r} matched nothing.\n'
+                             'Ids look like face_old_f_01, heir_m_03, cfo, '
+                             'adrian_voss. Did you mean --cast as well?')
         args.redo = True
 
     todo = [r for r in rows

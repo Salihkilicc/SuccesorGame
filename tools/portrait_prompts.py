@@ -451,6 +451,45 @@ def prompt_for(name: str, cast_id: str = '', region: str = '') -> str:
     return f'{who},\n\n{BASE}'
 
 
+# ===========================================================================
+#  THE OLD WOMEN CAME BACK THIRTY
+# ===========================================================================
+#
+#  Reviewed off the contact sheet: face_old_m_01..08 read fifty to seventy at
+#  46 pixels and face_old_f_01..08 read about thirty. Same band, same prompt
+#  skeleton, same "elderly" in the positive.
+#
+#  TWO CAUSES, and both are in this file rather than in the model.
+#
+#  1. `wrinkles` IS IN THE SHARED NEGATIVE. It went in against the model's
+#     habit of etching skin texture into a flat vector style, and it is the
+#     right call for six of the eight bands. In the old band it is the game
+#     arguing with itself: the positive asks for elderly and the negative
+#     forbids the one mark that says so.
+#
+#  2. THE MEN HAD A SECOND ROUTE TO OLD AND THE WOMEN HAD NONE. A man in this
+#     vocabulary gets `receding hairline` and a full beard, both of which
+#     survive a two-tone posterisation. The female negative BANS `receding
+#     hairline, bald` - correctly, it is not the look - so nothing carried the
+#     age except skin, and skin was banned.
+#
+#  So the old band gets its own negative and its own positive cues, and the
+#  cues are chosen for what is legible at 46 pixels in one colour: SILVER
+#  HAIR is a value change and reads; a crease is a line and reads; anything
+#  else is texture and does not.
+#
+#  Only `old`. Touching `mid` would age the forty year olds too, which is a
+#  different complaint nobody has made.
+# ===========================================================================
+
+#  Words the old band must NOT have taken away from it.
+AGE_MARKS_KEPT = ('wrinkles',)
+
+#  And what it is given instead, in the positive.
+OLD_WOMAN_CUES = ('grey at the temples, deep smile lines, lined face, '
+                  'softened jawline, visibly aged, mature woman')
+
+
 def negative_for(name: str, cast_id: str = '') -> str:
     """
     The shared negative, plus the push away from the wrong gender.
@@ -458,9 +497,17 @@ def negative_for(name: str, cast_id: str = '') -> str:
     This has to live in the negative as well as the positive. Asking for a
     woman and getting a long haired man is the model reaching for what it
     saw most of; naming that outcome is what stops it.
+
+    THE OLD BAND GETS ITS AGE MARKS BACK. See the note above: the shared
+    negative bans `wrinkles`, which is right everywhere except on the eight
+    portraits whose whole job is to look sixty.
     """
+    base = NEGATIVE
+    if cast_id.startswith('face_old_'):
+        for mark in AGE_MARKS_KEPT:
+            base = base.replace(f', {mark},', ',').replace(f'{mark}, ', '')
     if is_female(name, cast_id):
-        return NEGATIVE + (
+        return base + (
             '\n\n(man:1.4), (male:1.3), masculine face, beard, moustache,\n'
             'stubble, necktie, receding hairline, bald,\n\n'
             'bare shoulders, strapless, evening gown, glamour, fashion model,\n'
@@ -472,7 +519,7 @@ def negative_for(name: str, cast_id: str = '') -> str:
             'big round glasses, loose flowing hair, windswept hair,\n'
             'ink splatter, paint splatter, busy background, comic cover'
         )
-    return NEGATIVE + '\n\n(woman:1.3), (female:1.2), long flowing hair'
+    return base + '\n\n(woman:1.3), (female:1.2), long flowing hair'
 
 
 def ramp_for(cast_id: str) -> str:
@@ -811,7 +858,17 @@ def face_look(cid: str, female: bool, band: str) -> str:
     lead = ('(a woman:1.4), (female:1.3) ' if female else '(a man:1.3) ')
     origin = FACE_ORIGINS[(int(cid[-2:]) - 1) % len(FACE_ORIGINS)]
     parts = [
-        lead + pick(AGE_BANDS[band], cid, 'age'),
+        # Weighted for the old band only. The bare word was losing to a
+        # style that flattens every face it draws.
+        lead + (f'({pick(AGE_BANDS[band], cid, "age")}:1.35)'
+                if band == 'old' else pick(AGE_BANDS[band], cid, 'age')),
+    ]
+    # Beside the age word, not after the hairstyle: "silver hair" three items
+    # later reads as a second opinion about the hair and argues with a
+    # headscarf. "grey at the temples" layers onto any of them.
+    if female and band == 'old':
+        parts.append(OLD_WOMAN_CUES)
+    parts += [
         origin,
         pick(BUILD, cid, 'build'),
         pick(hair_pool('westAfrica' if 'African' in origin
@@ -821,6 +878,21 @@ def face_look(cid: str, female: bool, band: str) -> str:
     # No beards on a woman, and none on a teenager either.
     if not female and band != 'young':
         parts.append(pick(FACE_HAIR, cid, 'face_hair'))
+    # ------------------------------------------------------------------
+    #  AND A WOMAN IN THE OLD BAND NEEDS SAYING TWICE
+    # ------------------------------------------------------------------
+    #  A man in this vocabulary arrives old for free: the beard above and
+    #  `receding hairline` in his pool are both age marks that survive a
+    #  two-tone posterisation. A woman has neither - the female negative
+    #  bans the hairline, correctly - so `elderly` on its own was the only
+    #  age signal she had, and it lost. Measured: eight old men read fifty
+    #  to seventy at 46 pixels, eight old women read thirty.
+    #
+    #  These are chosen for what SURVIVES the ramp. Silver hair is a value
+    #  change and reads at 46; a crease is a line and reads; skin tone and
+    #  texture are thrown away by the palette map and would be wasted words.
+    #  See negative_for, which stops banning `wrinkles` for this band.
+    # ------------------------------------------------------------------
     parts += [pick(GLASSES, cid, 'glasses'), pick(ATTIRE_FACE, cid, 'attire')]
     return ', '.join(parts)
 
