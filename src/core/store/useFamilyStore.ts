@@ -23,6 +23,13 @@ import {
     BREAKUP_REASONS,
 } from '../../data/relationshipTypes';
 import { useStatsStore } from './useStatsStore';
+import {
+    SURROGACY_COST,
+    SURROGACY_QUARTERS,
+    advanceBooking,
+    canConceiveTogether,
+    type PendingBirth,
+} from '../story/surrogacy';
 
 // Re-export relationship types for ease of import
 export type { PartnerProfile, ExPartnerProfile, PartnerStats, SocialClass, Ethnicity };
@@ -113,6 +120,19 @@ export interface FamilyState {
     courtshipCooldown: Partial<Record<string, number>>;
     exPartners: ExPartnerProfile[];
     children: Child[];
+    /**
+     * A child that has been paid for and is on the way.
+     *
+     * The second route to an heir, for a couple who cannot have one between
+     * them - see core/story/surrogacy.ts for why it exists and what it costs.
+     * PERSISTED, because nine months is three quarters and a save in the
+     * middle of them would otherwise lose the money and the child.
+     *
+     * The name and gender are chosen at booking rather than on arrival, so
+     * the quarter that delivers does not have to open a modal from inside a
+     * tick. One at a time.
+     */
+    pendingBirth: PendingBirth | null;
     designatedSuccessorId: string | null;
     familyReputation: number;       // 0-100 Dynasty prestige
     /**
@@ -171,6 +191,24 @@ export interface FamilyActions {
     designateSuccessor: (id: string | null) => void;
     adjustChildRelationship: (id: string, delta: number) => void;
     setChildAllowance: (id: string, amount: number) => void;
+
+    // --- The second route to an heir ---
+    /**
+     * Pay for a child and start the nine months.
+     *
+     * Returns false and changes nothing if they could simply have one, if
+     * they are not married, if the money is not there, or if a booking is
+     * already running. The screen asks `surrogacyOffer` what to draw; this
+     * checks again anyway, because a button is not a permission.
+     */
+    bookSurrogacy: (name: string, gender: 'Male' | 'Female') => boolean;
+    /**
+     * One quarter of the wait. Adds the child on the quarter it runs out.
+     *
+     * Returns the child's name on the quarter they arrive, so the tick has
+     * something to put in the news, and null on every other quarter.
+     */
+    advancePendingBirth: () => string | null;
 
     // --- Lifecycle Simulation ---
     ageUpFamily: () => void;
@@ -388,6 +426,7 @@ export const initialFamilyState: FamilyState = {
     courtshipCooldown: {},
     exPartners: [],
     children: [],
+    pendingBirth: null,
     designatedSuccessorId: null,
     generation: 1,
     survivingParent: null,
@@ -565,6 +604,87 @@ export const useFamilyStore = create<FamilyStore>()(
                 });
 
                 return exPartnerRecord;
+            },
+
+            // ------------------------------------------------------------
+            //  THE SECOND ROUTE TO AN HEIR
+            // ------------------------------------------------------------
+            //  See core/story/surrogacy.ts. Two actions and both of them are
+            //  thin: the rule is over there, the money is in useStatsStore,
+            //  and the child goes in through `addChild` like any other, so
+            //  nothing downstream can tell the difference and nothing has to.
+            // ------------------------------------------------------------
+            bookSurrogacy: (name, gender) => {
+                const state = get();
+                if (state.pendingBirth) return false;
+                const partner = state.partner;
+                if (!partner || !partner.isMarried) return false;
+
+                // Read here rather than passed in: three call sites would be
+                // three chances to hand it the wrong gender.
+                let playerGender: 'male' | 'female' | undefined;
+                try {
+                    const g = require('./useIdentityStore').useIdentityStore.getState().gender;
+                    if (g === 'male' || g === 'female') playerGender = g;
+                } catch { /* identity store not ready */ }
+
+                // A couple who can have a child between them do not buy one.
+                if (canConceiveTogether(playerGender, partner.gender)) return false;
+
+                const stats = useStatsStore.getState();
+                if ((stats.money || 0) < SURROGACY_COST) return false;
+
+                // PAID BEFORE THE BOOKING IS RECORDED. The other order lets a
+                // failed charge leave a child on the way that nobody paid for.
+                stats.setField('money', (stats.money || 0) - SURROGACY_COST);
+                set({
+                    pendingBirth: {
+                        name: (name || '').trim() || FALLBACK_CHILD_NAME,
+                        gender,
+                        quartersLeft: SURROGACY_QUARTERS,
+                    },
+                });
+                return true;
+            },
+
+            advancePendingBirth: () => {
+                const pending = get().pendingBirth;
+                if (!pending) return null;
+
+                const next = advanceBooking(pending);
+                if (next) {
+                    set({ pendingBirth: next });
+                    return null;
+                }
+
+                // ARRIVED. Cleared first, so a throw inside addChild cannot
+                // leave a booking that delivers again next quarter.
+                set({ pendingBirth: null });
+                get().addChild({
+                    name: pending.name,
+                    gender: pending.gender,
+                    age: 0,
+                    birthYear: 2026,
+                    birthQuarter: 1,
+                    educationLevel: 'None',
+                    role: 'Infant',
+                    // The same rolls a birth uses. A child who arrived this
+                    // way is not a lesser heir and must not read as one.
+                    stats: {
+                        intellect: 75 + Math.floor(Math.random() * 20),
+                        charm: 75 + Math.floor(Math.random() * 20),
+                        businessAcumen: 65 + Math.floor(Math.random() * 25),
+                        loyalty: 95,
+                        ambition: 65 + Math.floor(Math.random() * 25),
+                        health: 95 + Math.floor(Math.random() * 5),
+                        creativity: 75 + Math.floor(Math.random() * 20),
+                    },
+                    relationshipWithPlayer: 100,
+                    isSuccessorCandidate: false,
+                    traits: ['Newborn Successor'],
+                    allowance: 0,
+                });
+                return pending.name;
             },
 
             // --- Succession Children Actions ---
@@ -748,6 +868,7 @@ export const useFamilyStore = create<FamilyStore>()(
                 partner: state.partner,
                 exPartners: state.exPartners,
                 children: state.children,
+                pendingBirth: state.pendingBirth,
                 designatedSuccessorId: state.designatedSuccessorId,
                 familyReputation: state.familyReputation,
                 courtshipCooldown: state.courtshipCooldown,

@@ -38,6 +38,8 @@ import {
 } from '../../../logic/relationshipEvents';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import BabyNamingModal from '../../love/components/BabyNamingModal';
+import { useIdentityStore } from '../../../core/store/useIdentityStore';
+import { surrogacyOffer } from '../../../core/story/surrogacy';
 import ProposalWizardView from '../../love/components/ProposalWizardView';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { t, useLocale } from '../../../core/i18n';
@@ -108,6 +110,8 @@ export const FamilyMemberScreen: React.FC = () => {
 
     // Baby Naming State
     const [isBabyNamingVisible, setIsBabyNamingVisible] = useState(false);
+    /** The same modal, on the paid route. Kept apart so the two confirms are. */
+    const [isSurrogacyNaming, setIsSurrogacyNaming] = useState(false);
     const [pendingBabyGender, setPendingBabyGender] = useState<'Male' | 'Female'>('Male');
     const [babyName, setBabyName] = useState('');
 
@@ -238,11 +242,53 @@ export const FamilyMemberScreen: React.FC = () => {
         navigation.navigate('Shopping');
     };
 
+    // ------------------------------------------------------------------
+    //  WHICH OF THE TWO DOORS THIS COUPLE HAS
+    // ------------------------------------------------------------------
+    //  Asked of core/story/surrogacy.ts rather than worked out here. A card
+    //  that decides for itself who can have a child is a card that will
+    //  disagree with the store, and the store is the one that spends the
+    //  money.
+    // ------------------------------------------------------------------
+    const offer = surrogacyOffer({
+        playerGender: useIdentityStore(s => s.gender) as 'male' | 'female' | undefined,
+        partnerGender: partner?.gender,
+        isMarried: partner?.isMarried,
+        money: useStatsStore(s => s.money),
+        pending: family.pendingBirth,
+    });
+
     const handleStartBaby = () => {
         const randomGender: 'Male' | 'Female' = Math.random() > 0.5 ? 'Male' : 'Female';
         setPendingBabyGender(randomGender);
         setBabyName('');
         setIsBabyNamingVisible(true);
+    };
+
+    /**
+     * The paid route. Same naming modal, different confirm.
+     *
+     * The name is chosen NOW rather than on arrival, so the quarter that
+     * delivers does not have to open a modal from inside the tick.
+     */
+    const handleStartSurrogacy = () => {
+        const randomGender: 'Male' | 'Female' = Math.random() > 0.5 ? 'Male' : 'Female';
+        setPendingBabyGender(randomGender);
+        setBabyName('');
+        setIsSurrogacyNaming(true);
+    };
+
+    const handleConfirmSurrogacy = () => {
+        if (!babyName.trim()) return;
+        const chosen = babyName.trim();
+        const booked = family.bookSurrogacy(chosen, pendingBabyGender);
+        setIsSurrogacyNaming(false);
+        setBabyName('');
+        if (!booked) {
+            Alert.alert(t('surrogacy.failedTitle'), t('surrogacy.failedBody'));
+            return;
+        }
+        Alert.alert(t('surrogacy.bookedTitle'), t('surrogacy.bookedBody', { name: chosen }));
     };
 
     const handleConfirmBaby = () => {
@@ -502,7 +548,23 @@ export const FamilyMemberScreen: React.FC = () => {
                                     </Pressable>
                                 )}
 
-                                {partner.isMarried && (
+                                {/* --------------------------------------------------
+                                    TWO DOORS TO AN HEIR, AND ONLY EVER ONE OF THEM
+
+                                    This button used to have a single condition,
+                                    `isMarried`, so a couple of the same gender
+                                    pressed it and a biological child appeared.
+
+                                    Closing it and stopping there would have been
+                                    worse than leaving it: a founder who dies with
+                                    no children ends the run, so a blocked button
+                                    would quietly make marrying somebody of the
+                                    same gender a decision to end the dynasty -
+                                    without ever saying so.
+
+                                    So `offer` decides. See core/story/surrogacy.ts.
+                                   -------------------------------------------------- */}
+                                {partner.isMarried && offer.kind === 'notNeeded' && (
                                     <Pressable
                                         style={({ pressed }) => [
                                             styles.actionButton,
@@ -517,9 +579,51 @@ export const FamilyMemberScreen: React.FC = () => {
                                             color="#05A8F6"
                                         />
                                         <Text style={styles.btnSurfaceText}>
-                                            Have a Baby / Dynasty Successor
+                                            {t('family.haveABaby')}
                                         </Text>
                                     </Pressable>
+                                )}
+
+                                {offer.kind === 'offered' && (
+                                    <Pressable
+                                        style={({ pressed }) => [
+                                            styles.actionButton,
+                                            styles.btnSurface,
+                                            pressed && styles.btnPressed,
+                                            !offer.affordable && styles.btnDisabled,
+                                        ]}
+                                        onPress={handleStartSurrogacy}
+                                        disabled={!offer.affordable}
+                                    >
+                                        <MaterialCommunityIcons
+                                            name="baby-carriage"
+                                            size={18}
+                                            color="#05A8F6"
+                                        />
+                                        {/* THE PRICE AND THE WAIT BEFORE THE PRESS,
+                                            not in an alert after it. */}
+                                        <Text style={styles.btnSurfaceText}>
+                                            {t('surrogacy.book', {
+                                                cost: `$${offer.cost.toLocaleString()}`,
+                                                quarters: String(offer.quarters),
+                                            })}
+                                        </Text>
+                                    </Pressable>
+                                )}
+
+                                {offer.kind === 'waiting' && (
+                                    <View style={[styles.actionButton, styles.btnSurface]}>
+                                        <MaterialCommunityIcons
+                                            name="baby-carriage"
+                                            size={18}
+                                            color={theme.colors.textMuted}
+                                        />
+                                        <Text style={styles.btnMutedText}>
+                                            {t('surrogacy.waiting', {
+                                                quarters: String(offer.quartersLeft),
+                                            })}
+                                        </Text>
+                                    </View>
                                 )}
 
                                 <Pressable
@@ -648,6 +752,18 @@ export const FamilyMemberScreen: React.FC = () => {
                 onChangeName={setBabyName}
                 onConfirm={handleConfirmBaby}
                 onSkip={() => setIsBabyNamingVisible(false)}
+            />
+
+            {/* The same modal on the paid route. The name is chosen at
+                booking, so the quarter that delivers does not have to open
+                one from inside a tick. */}
+            <BabyNamingModal
+                visible={isSurrogacyNaming}
+                pendingChildGender={pendingBabyGender}
+                childName={babyName}
+                onChangeName={setBabyName}
+                onConfirm={handleConfirmSurrogacy}
+                onSkip={() => setIsSurrogacyNaming(false)}
             />
 
             {/* Proposal Wizard Modal */}
@@ -944,6 +1060,21 @@ const styles = StyleSheet.create({
     },
     btnSurfaceText: {
         color: '#FFFFFF',
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    /** Priced out. Dimmed as a whole rather than recoloured as a warning. */
+    btnDisabled: {
+        opacity: 0.45,
+    },
+    /**
+     * A booking that is running is a STATE, not a control.
+     *
+     * Same row, same fill, quieter text and no press. Turning it into a
+     * disabled button would invite the tap that does nothing.
+     */
+    btnMutedText: {
+        color: theme.colors.textMuted,
         fontSize: 13,
         fontWeight: '700',
     },

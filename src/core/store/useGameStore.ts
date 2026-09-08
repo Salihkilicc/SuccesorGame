@@ -2746,6 +2746,39 @@ export const useGameStore = create<GameStore>()(
             console.warn('[story] neglect could not run', e);
           }
 
+          // ------------------------------------------------------------------
+          //  A CHILD WHO WAS PAID FOR ARRIVES
+          // ------------------------------------------------------------------
+          //  Nine months is three of these. See core/story/surrogacy.ts for
+          //  why the second route exists at all: the dating pool leans away
+          //  from the player now, so a couple of the same gender is an
+          //  ordinary outcome, and the only door to an heir used to be a
+          //  button whose one condition was `isMarried`.
+          //
+          //  HERE RATHER THAN IN THE ANNUAL BLOCK below. The family lifecycle
+          //  runs once a year, and a wait measured in quarters that is only
+          //  ever decremented in January is not a wait of three quarters.
+          //
+          //  Outside the `FEATURES.love` gate on purpose: a booking that has
+          //  been paid for must land whatever a flag says afterwards.
+          // ------------------------------------------------------------------
+          try {
+            const born = require('./useFamilyStore')
+              .useFamilyStore.getState().advancePendingBirth();
+            if (born) {
+              // The same announcement a birth makes. Through the same door,
+              // so an heir who arrived this way is news in the same way.
+              try {
+                const pending = require('./useFamilyStore')
+                  .useFamilyStore.getState().children.slice(-1)[0];
+                require('../../logic/relationshipEvents')
+                  .handleChildBirth?.(born, pending?.gender ?? 'Male');
+              } catch { /* the news is optional; the child is not */ }
+            }
+          } catch (e) {
+            console.warn('[Family] pending birth could not advance', e);
+          }
+
           // NPC HOOK: çeyrek sıfırla (madeLoveThisQuarter → false)
           if (FEATURES.love) {
             if (isEnabled('love')) {

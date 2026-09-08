@@ -53,21 +53,53 @@ const existing = (over: Record<string, unknown> = {}): PartnerProfile => ({
     ...over,
 } as PartnerProfile);
 
-/**
- * Force the swipe to land. The formula is
- * (random * 100) + charm * 0.8 >= difficulty, and charm at 100 clears every
- * difficulty the generator produces, so the coin flip is taken out of a test
- * that is not about the coin flip.
- */
+// ============================================================================
+//  CHARM 100 DID NOT CLEAR EVERY DIFFICULTY, AND THIS FILE WENT RED 1 RUN IN 18
+// ============================================================================
+//
+//  The line below used to be charm alone, with a comment saying that charm at
+//  100 clears every difficulty the generator produces. It does not.
+//
+//    match  <=>  random * 100 + charm * 0.8 >= difficulty
+//    charm 100 gives 80, and `generateCandidate` caps difficulty at 100
+//
+//  So a candidate at 81 or above needs the die as well, and the hardest jobs
+//  sit at 50 with a 0 to 50 roll on top. MEASURED over two million swipes:
+//  ONE SWIPE FAILS 1.13 PER CENT of the time, this file makes five of them,
+//  and that is a red run every eighteen.
+//
+//  Which is worse than a flaky test: it is a test that agrees with the code
+//  most of the time and lies occasionally, in a suite whose whole job is to
+//  be believed. It was found by a full run going red once and green the next
+//  time, on a change that touches none of this.
+//
+//  So the die is held as well as the charm. Nothing here is about the coin
+//  flip - `swipeRight` deciding whether a match happens is tested by the
+//  numbers above, not by hoping.
+// ============================================================================
+
+/** Force the swipe to land: the charm AND the die it is added to. */
 const alwaysMatch = () => {
     usePlayerStore.setState({ attributes: { charm: 100 } } as never);
 };
 
+/** The real one, put back after every test so nothing else inherits this. */
+const realRandom = Math.random;
+
 beforeEach(() => {
     alwaysMatch();
+    // 0.99 rather than 1: it has to be a value Math.random can really return,
+    // or a rule written as `< 1` somewhere downstream would behave differently
+    // here than it does in the game. It also fixes `generateCandidate`, which
+    // rolls the difficulty from the same source - and 0.99 there gives the
+    // HARDEST candidate the generator can make, so these tests run against the
+    // worst case rather than an average one.
+    Math.random = () => 0.99;
     useFamilyStore.setState({ partner: null, exPartners: [] } as never);
     useStatsStore.setState({ money: 10_000_000 } as never);
 });
+
+afterEach(() => { Math.random = realRandom; });
 
 describe('matching on the swipe app', () => {
     it('leaves somebody on the profile afterwards', () => {
