@@ -153,13 +153,36 @@ const settleTheEstate = () => {
 
 
 /**
+ * Why the chair changed hands.
+ *
+ * ---------------------------------------------------------------------------
+ *  A BAR IS NOT A DEATH, AND EXACTLY ONE STEP CARES
+ * ---------------------------------------------------------------------------
+ *  Everything below runs the same either way: the heir takes the name, the
+ *  cash and the stock divide, the board turns over, the calendar moves. That
+ *  is right - succession is succession.
+ *
+ *  The estate is the exception. `settleTheEstate` assesses duty on the
+ *  collection and SELLS pieces to pay it, then posts a letter from the
+ *  executors that begins "your late father". Nobody has died when a director
+ *  is barred, nothing is owed, and a solicitor writing to say otherwise would
+ *  be the loudest possible bug.
+ *
+ *  Passed in rather than read off the store, because the store does not know:
+ *  by the time this runs, `endGame` has recorded an ending id and nothing
+ *  else, and asking this file to interpret ending ids would put the story's
+ *  grammar in two places. See components/story/EndingOverlay.CONTINUABLE.
+ */
+export type SuccessionReason = 'death' | 'barred';
+
+/**
  * Hand the company to the heir, and become them.
  *
  * Returns the plan it applied, or null when there was nobody to hand it to -
  * which is not a failure. It is the `diedWithoutAnHeir` branch, and the closing
  * screen simply does not offer the button.
  */
-export const runSuccession = (): SuccessionPlan | null => {
+export const runSuccession = (reason: SuccessionReason = 'death'): SuccessionPlan | null => {
     const family = useFamilyStore.getState();
     const stats = useStatsStore.getState() as any;
 
@@ -458,10 +481,15 @@ export const runSuccession = (): SuccessionPlan | null => {
     //  posted before it, the solicitor's letter is the one thing the wipe
     //  takes. See core/story/inheritance.divideBelongings.
     // ------------------------------------------------------------------
-    try {
-        settleTheEstate();
-    } catch (e) {
-        console.warn('[succession] the estate could not be settled', e);
+    //  AND NOT AT ALL WHEN NOBODY DIED. See SuccessionReason: a bar takes
+    //  the chair and leaves the person, so there is no duty to raise and no
+    //  collection to sell to raise it.
+    if (reason === 'death') {
+        try {
+            settleTheEstate();
+        } catch (e) {
+            console.warn('[succession] the estate could not be settled', e);
+        }
     }
 
     // ------------------------------------------------------------------

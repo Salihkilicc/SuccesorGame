@@ -64,6 +64,58 @@ export const senderLabel = (from: { name: string; role: string }): string => {
     return from.role.includes(',') ? `${from.name} - ${from.role}` : from.name;
 };
 
+// ============================================================================
+//  THE ONE PERSON IN THE CAST THE GAME HAS TO LOOK UP
+// ============================================================================
+//
+//  Every other sender is written down: the CFO is Arthur Vance and has a
+//  portrait drawn for him. The heir is a placeholder - `{ name: 'Your
+//  Successor' }` - because they do not exist when the cast file is written and
+//  the player names them years later.
+//
+//  So four conversations arrived from a thread called YOUR SUCCESSOR with no
+//  face on it, sitting between Dana Whitfield and Arthur Vance who both had
+//  theirs. Reported as the child's messages looking like everybody else's.
+//
+//  Their name and their gender and their age are all already known - the
+//  family list draws their face from the same three - so this is a lookup and
+//  not a feature. HERE rather than in the cast file, because the cast file is
+//  static data and this changes every generation.
+//
+//  Returns nothing at all for the other fifteen, so their threads are
+//  untouched and keep finding their portraits by id.
+// ============================================================================
+
+const whoTheHeirActuallyIs = (
+    castId: string,
+): { name?: string; gender?: 'male' | 'female'; age?: number } => {
+    if (castId !== 'heir') return {};
+    try {
+        const { useFamilyStore } = require('../store/useFamilyStore');
+        const family = useFamilyStore.getState();
+        const kids = family.children ?? [];
+        if (kids.length === 0) return {};
+
+        // The designated one if there is one, and the eldest otherwise -
+        // which is who `successorFor` picks, so the person writing to you is
+        // the person who would take the chair. See core/story/mortality.ts.
+        const chosen = kids.find((c: { id: string }) => c.id === family.designatedSuccessorId)
+            ?? [...kids].sort((a: { age: number }, b: { age: number }) => b.age - a.age)[0];
+        if (!chosen) return {};
+
+        return {
+            name: chosen.name,
+            // The family store spells it Male/Female and the portrait pool
+            // wants male/female. One of the two has to convert and it is
+            // cheaper here than in the pool, which is read from nine places.
+            gender: chosen.gender === 'Female' ? 'female' : 'male',
+            age: chosen.age,
+        };
+    } catch {
+        return {};
+    }
+};
+
 /** Put one conversation in front of the player. */
 export const deliver = (conversationId: string): boolean => {
     const c = conversationById(conversationId);
@@ -131,7 +183,7 @@ export const deliver = (conversationId: string): boolean => {
 
     const store = useMessageStore.getState();
     store.sendFromCharacter(
-        { id: from.id, name: from.name, role: from.role },
+        { id: from.id, name: from.name, role: from.role, ...whoTheHeirActuallyIs(from.id) },
         opening?.text ?? '',
         atMonth,
     );

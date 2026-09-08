@@ -44,7 +44,7 @@ import { readRecord } from '../../core/story/readRecord';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { useFamilyStore } from '../../core/store/useFamilyStore';
 import { successorFor, heirInWaiting } from '../../core/story/mortality';
-import { runSuccession } from '../../core/story/runSuccession';
+import { runSuccession, type SuccessionReason } from '../../core/story/runSuccession';
 
 type Props = {
     ending: Ending;
@@ -53,13 +53,39 @@ type Props = {
 };
 
 /**
- * The only ending you can walk out of.
+ * The endings you can walk out of, and WHY the chair changed hands.
  *
- * `diedInOffice` and nothing else. Bankruptcy has no company to hand on, the
- * board removal has taken it from you already, and both Pear endings are the
- * player choosing to stop.
+ * ---------------------------------------------------------------------------
+ *  THE GAME ALREADY HAD A GRAMMAR AND ONE ENDING WAS ON THE WRONG SIDE OF IT
+ * ---------------------------------------------------------------------------
+ *  Ten endings. They split cleanly: LOSE THE COMPANY and the run is over -
+ *  sold, bankrupt, removed by the board, convicted. DIE and the dynasty
+ *  carries on, which is the whole game.
+ *
+ *  `barredForManipulation` was filed with the first group and belongs in the
+ *  second. Its own text says so: you keep the shares, you keep the house,
+ *  what you are not allowed to do is sit in the chair. That is losing the
+ *  JOB, not the company - and the game's answer to the job changing hands is
+ *  succession. The text even ended "Somebody else will run it now. You will
+ *  be able to watch", while `endGame` closed the run.
+ *
+ *  It also fixes the three verdicts, which were not a ladder: a fine cost
+ *  money, being barred ended the run and being convicted ended the run. Two
+ *  rungs at the same height. Now they are a fine, a generation, and prison.
+ *
+ * ---------------------------------------------------------------------------
+ *  AND THE REASON IS CARRIED, NOT ASSUMED
+ * ---------------------------------------------------------------------------
+ *  `runSuccession` was written for a death, and a death does one thing a bar
+ *  does not: it settles an estate. Duty is assessed on the collection and
+ *  pieces are SOLD to pay it. Nobody has died here, so nothing is owed and
+ *  nothing is sold. See core/story/runSuccession.ts.
  */
-const CONTINUABLE = ['diedInOffice', 'diedWithHeirTooYoung'];
+const CONTINUABLE: Record<string, SuccessionReason> = {
+    diedInOffice: 'death',
+    diedWithHeirTooYoung: 'death',
+    barredForManipulation: 'barred',
+};
 
 /**
  * Who is standing there, if anybody.
@@ -76,7 +102,7 @@ const CONTINUABLE = ['diedInOffice', 'diedWithHeirTooYoung'];
  * the last screen of the game and a thrown error here is no screen at all.
  */
 const heirWaiting = (endingId: string): { id: string; name: string } | null => {
-    if (!CONTINUABLE.includes(endingId)) return null;
+    if (!CONTINUABLE[endingId]) return null;
     try {
         const family = useFamilyStore.getState();
         const candidates = (family.children ?? []).map((c: any) => ({ id: c.id, age: c.age ?? 0 }));
@@ -125,7 +151,9 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
         // already been replaced.
         if (handingOver) return;
         setHandingOver(true);
-        runSuccession();
+        // The reason travels with the call. A bar is not a death and must not
+        // settle an estate; see the table above.
+        runSuccession(CONTINUABLE[ending.id] ?? 'death');
     };
 
     useEffect(() => {

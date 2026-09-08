@@ -104,7 +104,12 @@ describe('the quarter it does', () => {
         const src = fs.readFileSync(
             path.join(__dirname, '..', '..', 'components', 'story', 'EndingOverlay.tsx'), 'utf8',
         );
-        expect(src).toMatch(/const CONTINUABLE = \['diedInOffice', 'diedWithHeirTooYoung'\]/);
+        // The list became a TABLE when being barred joined it: the endings
+        // that continue, each with the reason the chair changed hands, since
+        // a bar must not settle an estate. Both death endings are still on
+        // it and that is what this test is about. See barredContinues.test.
+        expect(src).toMatch(/diedWithHeirTooYoung: 'death'/);
+        expect(src).toMatch(/diedInOffice: 'death'/);
         // And it asks who is waiting, not only who can take it today.
         expect(src).toMatch(/heirInWaiting\(candidates\)\?\.heir/);
     });

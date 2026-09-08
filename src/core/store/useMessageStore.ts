@@ -70,6 +70,23 @@ export type Thread = {
      * behaving exactly as it did. A thread with one opens in the runner.
      */
     conversationId?: string;
+    // ------------------------------------------------------------------
+    //  ENOUGH TO DRAW A FACE FOR SOMEBODY WHO HAS NO PHOTOGRAPH
+    // ------------------------------------------------------------------
+    //  The named cast each have a portrait on disk and are found by id. A
+    //  GENERATED person - the player's own child - does not and never will,
+    //  so they take a face from the anonymous pool, and the pool needs to be
+    //  told who it is lending to.
+    //
+    //  MessagesScreen used to carry a note saying there was "no gender or age
+    //  on the thread to draw a pool face with". These two are that note being
+    //  answered. Optional, so every thread that exists today is unchanged and
+    //  keeps its initials.
+    // ------------------------------------------------------------------
+    /** Which way they were born, for the pool. */
+    gender?: 'male' | 'female';
+    /** How old they are, for the band. */
+    age?: number;
 };
 
 export type MessageState = {
@@ -151,7 +168,14 @@ type MessageStore = MessageState & {
      * created if this is the first time they have.
      */
     sendFromCharacter: (
-        who: { id: string; name: string; role: string },
+        who: {
+            id: string;
+            name: string;
+            role: string;
+            /** Only for somebody with no portrait of their own. See Thread. */
+            gender?: 'male' | 'female';
+            age?: number;
+        },
         text: string,
         atMonth: number,
     ) => void;
@@ -378,6 +402,8 @@ export const useMessageStore = create<MessageStore>()(
                                     name: who.name,
                                     role: who.role,
                                     initials: initials(who.name),
+                                    gender: who.gender,
+                                    age: who.age,
                                     messages: [message],
                                     unread: 1,
                                 },
@@ -394,6 +420,13 @@ export const useMessageStore = create<MessageStore>()(
                         threads: [
                             {
                                 ...existing,
+                                // A thread written before this generation may
+                                // hold the previous heir's name and face. The
+                                // sender is the truth; the thread is a record.
+                                name: who.name,
+                                initials: initials(who.name),
+                                gender: who.gender ?? existing.gender,
+                                age: who.age ?? existing.age,
                                 messages: updatedMsgs.length > 50 ? updatedMsgs.slice(-50) : updatedMsgs,
                                 unread: existing.unread + 1,
                             },

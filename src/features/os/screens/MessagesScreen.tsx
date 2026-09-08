@@ -13,6 +13,7 @@ import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import Portrait from '../../../components/common/Portrait';
+import { faceFor } from '../../../core/portraits/faces';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMessageStore, type Thread } from '../../../core/store/useMessageStore';
 import { t, useLocale } from '../../../core/i18n';
@@ -74,10 +75,11 @@ const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void })
 
                 The named cast resolve straight off their thread id - the
                 chief financial officer writes as 'cfo', and cfo.png is
-                his. Everybody else keeps the letters: a courtship
-                candidate, a partner and a child all reach the inbox
-                under ids no portrait was drawn for, and this screen has
-                no gender or age on the thread to draw a pool face with.
+                his. A GENERATED person cannot: nobody drew a portrait
+                for a child the player named last year. They take one
+                from the anonymous pool, which needs a gender and an age,
+                and the thread carries both now for exactly the senders
+                who need them. See the note on the source prop below.
 
                 The circle is unchanged, badge included. It sits in a
                 wrapper now only because Portrait draws the circle and
@@ -91,6 +93,28 @@ const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void })
                     fill={theme.colors.surfaceHigh}
                     borderWidth={unread ? 1.5 : 0}
                     borderColor={unread ? theme.colors.unread : undefined}
+                    // ------------------------------------------------------
+                    //  AND NOW THERE IS, FOR THE ONE WHO NEEDED IT
+                    // ------------------------------------------------------
+                    //  The note above used to end "no gender or age on the
+                    //  thread to draw a pool face with", which was true and
+                    //  which left the player's own child as the one sender
+                    //  with a blank circle. Thread carries both now, set only
+                    //  for somebody who has no portrait of their own.
+                    //
+                    //  UNDEFINED, NOT NULL, for everybody else. Portrait
+                    //  reads undefined as "look it up for me" and null as
+                    //  "this one has no face, do not look" - so null here
+                    //  suppressed the id lookup and took the portraits off
+                    //  all eleven named senders at once. Caught by
+                    //  inboxFaces.test.tsx, which is what it is for.
+                    // ------------------------------------------------------
+                    source={thread.gender === undefined ? undefined : faceFor({
+                        id: thread.id,
+                        name: thread.name,
+                        female: thread.gender === 'female',
+                        age: thread.age,
+                    }) as number | null}
                 />
                 {unread && (
                     <View style={styles.unreadIndicatorRow}>

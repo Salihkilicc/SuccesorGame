@@ -153,10 +153,14 @@ export const ENDINGS: Record<string, Ending> = {
             'The settlement is agreed on a Thursday and announced on a Friday, '
             + 'which is how these things are announced.\n\n'
             + 'No admission, no conviction, and a bar on holding a directorship '
-            + 'that runs longer than you will want to count. You keep the shares. '
-            + 'You keep the house. What you are not allowed to do, ever again, is '
+            + 'that runs longer than you will want to count.\n\n'
+            + 'Read the second half of that, because it is the half that matters. '
+            + 'The bar is on YOU, not on the company. Nobody is taking the shares '
+            + 'and nobody is taking the house. What you may not do, ever again, is '
             + 'sit in the chair your father sat in.\n\n'
-            + 'Somebody else will run it now. You will be able to watch.',
+            + 'So the holding goes into the family name and the chair goes to your '
+            + 'child. You will be at the table on the day they sign, and you will '
+            + 'not be signing. That is the sentence.',
     },
 
     // ----------------------------------------------------------------------
