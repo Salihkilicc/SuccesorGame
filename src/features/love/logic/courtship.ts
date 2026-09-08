@@ -57,6 +57,19 @@ export const TIER_UNLOCK: Record<SocialTier, number> = {
     ARTISTIC: 50_000_000,
     CORPORATE_ELITE: 500_000_000,
     HIGH_SOCIETY: 5_000_000_000,
+    // ------------------------------------------------------------------
+    //  AND ONE ROOM ABOVE THE TOP OF THE LADDER
+    // ------------------------------------------------------------------
+    //  Five billion used to be the last gate, which meant the dating pool
+    //  stopped growing about a third of the way through a dynasty: a company
+    //  worth two trillion met the same ten people as one worth five billion,
+    //  and the money past that point bought nothing here at all.
+    //
+    //  A quarter of a trillion is fifty times the gate below it, on purpose.
+    //  It is not the next rung, it is the thing at the end - most runs never
+    //  see it, and the ones that do should feel the door open.
+    // ------------------------------------------------------------------
+    GLOBAL_ELITE: 250_000_000_000,
 };
 
 /**
@@ -82,6 +95,7 @@ export const TIER_STANDING: SocialTier[] = [
     'ARTISTIC',
     'CORPORATE_ELITE',
     'HIGH_SOCIETY',
+    'GLOBAL_ELITE',
 ];
 
 /** Which rooms are open to a company of this size, worst to best. */

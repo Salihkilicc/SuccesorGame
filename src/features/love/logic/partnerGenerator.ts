@@ -18,7 +18,7 @@
 
 import { JOBS_DATABASE } from '../data/jobsData';
 import { PERSONALITY_TRAITS } from '../data/personalitiesData';
-import { NAME_DATABASE } from '../data/nameData';
+import { NAME_DATABASE, namesFor } from '../data/nameData';
 import type {
     Ethnicity,
     JobDefinition,
@@ -35,6 +35,8 @@ import { fingerprintFor } from './psychometrics';
  * next person wiring them to something.
  */
 const STYLE_FOR_TIER: Record<SocialTier, PartnerProfile['stats']['style']> = {
+    // The room above old money dresses like it has nothing to prove.
+    GLOBAL_ELITE: 'Elegant',
     HIGH_SOCIETY: 'Luxury',
     CORPORATE_ELITE: 'Business',
     ARTISTIC: 'Bohemian',
@@ -44,6 +46,7 @@ const STYLE_FOR_TIER: Record<SocialTier, PartnerProfile['stats']['style']> = {
 };
 
 const TIER_BASE_COSTS: Record<SocialTier, number> = {
+    'GLOBAL_ELITE': 40000,
     'HIGH_SOCIETY': 10000,
     'CORPORATE_ELITE': 5000,
     'UNDERGROUND': 2000,
@@ -53,6 +56,70 @@ const TIER_BASE_COSTS: Record<SocialTier, number> = {
 };
 
 const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+// ============================================================================
+//  WHO WALKS IN, AND WHAT THEY ARE CALLED
+// ============================================================================
+//
+//  The gender was `Math.random() > 0.5` and it consulted NOBODY. So a woman
+//  playing this game was shown a woman half the time, forever, with no way to
+//  say otherwise - and the man she was shown the other half was called Emma,
+//  because the name came off a list with no men on it. See data/nameData.ts.
+//
+//  Reported as "kadinken date e basinca daha cok erkek gelmesi lazim hepsi
+//  degil ama erkekken de arada erkek gelmeli".
+//
+//  MOSTLY, NOT ONLY - that is the whole request, and it is why this is a
+//  probability rather than a rule. One in five is enough to be a real
+//  possibility and not enough to feel random.
+// ============================================================================
+
+/** How often the person who turns up is the player's own gender. */
+export const SAME_GENDER_CHANCE = 0.2;
+
+/**
+ * Which way the next candidate leans.
+ *
+ * `playerGender` undefined - an old save, a run started before the field -
+ * falls back to the coin this used to flip, because guessing wrong on every
+ * candidate is worse than not guessing at all.
+ *
+ * `roll` is injected so the split can be measured rather than asserted.
+ */
+export const partnerGenderFor = (
+    playerGender: 'male' | 'female' | undefined,
+    roll: number,
+): 'male' | 'female' => {
+    if (playerGender !== 'male' && playerGender !== 'female') {
+        return roll > 0.5 ? 'female' : 'male';
+    }
+    const same = roll < SAME_GENDER_CHANCE;
+    if (same) return playerGender;
+    return playerGender === 'female' ? 'male' : 'female';
+};
+
+/**
+ * Which way the player was drawn, or undefined if nothing knows.
+ *
+ * Read HERE rather than passed in by the four call sites, because a parameter
+ * with a default is a parameter three of them will forget - and a forgotten
+ * one looks exactly like the bug this is fixing. `require` inside the function
+ * for the same reason useSponsorshipStore.penalty does it: this module is
+ * imported by tests that have no stores.
+ */
+const playerGender = (): 'male' | 'female' | undefined => {
+    try {
+        const { useIdentityStore } = require('../../../core/store/useIdentityStore');
+        const g = useIdentityStore.getState().gender;
+        return g === 'male' || g === 'female' ? g : undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+/** The job's name as this particular person would say it. */
+export const titleOf = (job: JobDefinition, gender?: 'male' | 'female'): string =>
+    (gender && job.titleFor?.[gender]) || job.title;
 
 const generateId = (): string => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -76,10 +143,20 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
     const baseCost = TIER_BASE_COSTS[job.tier];
     const monthlyCost = Math.floor(baseCost * personality.costMultiplier);
 
-    // 4. Generate Name & Age
+    // ------------------------------------------------------------------
+    //  4. WHO THEY ARE: GENDER FIRST, BECAUSE THE NAME DEPENDS ON IT
+    // ------------------------------------------------------------------
+    //  This used to be step SIX, three quarters of the way down the function
+    //  and long after the name was decided. That ordering is the whole bug:
+    //  a name cannot be chosen for a person whose gender has not been rolled
+    //  yet, so it was chosen off the female list and the coin was flipped
+    //  afterwards over the top of it.
+    // ------------------------------------------------------------------
+    const gender = partnerGenderFor(playerGender(), Math.random());
+
     const ethnicities = Object.keys(NAME_DATABASE) as Ethnicity[];
     const ethnicity = getRandomElement(ethnicities);
-    const nameSet = NAME_DATABASE[ethnicity];
+    const nameSet = namesFor(ethnicity, gender);
     const firstName = getRandomElement(nameSet.first);
     const lastName = getRandomElement(nameSet.last);
 
@@ -107,6 +184,7 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
     // Calculate buff value based on Tier Cost (Higher tier = Better buff)
     // Range: 1 - 15
     const tierMultiplier = {
+        'GLOBAL_ELITE': 1.7,
         'HIGH_SOCIETY': 1.5,
         'CORPORATE_ELITE': 1.3,
         'UNDERGROUND': 1.2,
@@ -148,8 +226,12 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
         buffValue
     };
 
-    // 6. Random gender
-    const gender: 'male' | 'female' = Math.random() > 0.5 ? 'female' : 'male';
+    // SHELVED, not deleted: the coin this used to flip, in the place it used
+    // to be flipped. It consulted nothing, which is why a woman playing the
+    // game met a woman every other tap.
+    //
+    // // 6. Random gender
+    // const gender: 'male' | 'female' = Math.random() > 0.5 ? 'female' : 'male';
 
     return {
         id: generateId(),
@@ -159,7 +241,8 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
         stats: {
             ethnicity,
             age,
-            occupation: job.title,
+            // An Heir and an Heiress are one job. See jobsData.titleFor.
+            occupation: titleOf(job, gender),
             happiness,
             looks,
             style: STYLE_FOR_TIER[job.tier],

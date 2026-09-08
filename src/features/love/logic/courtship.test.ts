@@ -84,9 +84,14 @@ describe('money opens rooms', () => {
     });
 
     it('while a large one is in all of them', () => {
-        expect(tiersOpenTo(10_000_000_000)).toHaveLength(
+        // Was ten billion, which used to clear every gate. It does not any
+        // more and it SHOULD NOT: GLOBAL_ELITE opens at a quarter of a
+        // trillion, so ten billion is now a company with one room left to
+        // earn. That is the point of adding the room. See TIER_UNLOCK.
+        expect(tiersOpenTo(500_000_000_000)).toHaveLength(
             Object.keys(TIER_UNLOCK).length,
         );
+        expect(tiersOpenTo(10_000_000_000)).not.toContain('GLOBAL_ELITE');
     });
 
     it('and one room does not care what you are worth', () => {
@@ -250,7 +255,11 @@ describe('reaching below', () => {
     });
 
     it('while the best room in the game has nothing above it to outgrow', () => {
-        expect(reachBelow('HIGH_SOCIETY', 1e15)).toBe(0);
+        // HIGH_SOCIETY used to be that room and is not any more, which is
+        // exactly right: a player worth a quadrillion IS now reaching down
+        // when they walk into it, because GLOBAL_ELITE is above them.
+        expect(reachBelow('GLOBAL_ELITE', 1e15)).toBe(0);
+        expect(reachBelow('HIGH_SOCIETY', 1e15)).toBeGreaterThan(0);
     });
 
     it('so a billionaire is much harder to turn down in a student bar', () => {

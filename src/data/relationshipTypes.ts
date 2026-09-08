@@ -45,6 +45,20 @@ export type SocialClass =
 //  unchanged.
 // ----------------------------------------------------------------------------
 export type SocialTier =
+    // ------------------------------------------------------------------
+    //  THE ROOM ABOVE OLD MONEY
+    // ------------------------------------------------------------------
+    //  HIGH_SOCIETY opened at five billion and was the top, so a player worth
+    //  five billion and a player worth two trillion met exactly the same
+    //  people. The dynasty outgrows its own dating pool by the second
+    //  generation and then has nowhere left to climb.
+    //
+    //  GLOBAL_ELITE is the answer: a quarter of a trillion to be seen at all,
+    //  and the people in it are heads of houses rather than members of them.
+    //  See love/logic/courtship.ts TIER_UNLOCK for the gate and
+    //  love/data/jobsData.ts for who is in the room.
+    // ------------------------------------------------------------------
+    | 'GLOBAL_ELITE'
     | 'HIGH_SOCIETY'
     | 'CORPORATE_ELITE'
     | 'UNDERGROUND'
@@ -55,6 +69,14 @@ export type SocialTier =
 export interface JobDefinition {
     id: string;
     title: string;
+    /**
+     * When the job's own name is gendered.
+     *
+     * Two of them are: an Heir and an Heiress are the same job. `title` stays
+     * the default and the one every existing reader sees; this is consulted
+     * only when a gender is known. See love/logic/partnerGenerator.titleOf.
+     */
+    titleFor?: Partial<Record<'male' | 'female', string>>;
     tier: SocialTier;
     buffType?: string;
     buffValue?: number;

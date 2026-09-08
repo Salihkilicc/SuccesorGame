@@ -169,6 +169,59 @@ describe('the profile row shows a face that matches the partner', () => {
             renderer.act(() => { tree.unmount(); });
         }).not.toThrow();
     });
+
+    // ----------------------------------------------------------------------
+    //  AND IT SAYS WHICH, THE SAME WAY THE HOME SCREEN DOES
+    // ----------------------------------------------------------------------
+    //  Home has drawn a mark next to the player's name since the beginning
+    //  and this row had none, which was survivable while every candidate was
+    //  a woman and is not now that the pool leans the other way.
+    // ----------------------------------------------------------------------
+    const wordsOn = (p: PartnerProfile | null) => {
+        let tree!: renderer.ReactTestRenderer;
+        renderer.act(() => {
+            tree = renderer.create(
+                <ProfilePartnerCard partner={p} onPress={() => undefined} />,
+            );
+        });
+        const out = tree.root.findAllByType(Text)
+            .flatMap(n => (Array.isArray(n.props.children)
+                ? n.props.children : [n.props.children]))
+            .filter(c => typeof c === 'string') as string[];
+        renderer.act(() => { tree.unmount(); });
+        return out;
+    };
+
+    it('a man carries the male mark', () => {
+        const said = wordsOn(partner({ id: 'mark-m', gender: 'male' }));
+        expect(said).toContain('♂');
+        expect(said).not.toContain('♀');
+    });
+
+    it('and a woman the female one', () => {
+        const said = wordsOn(partner({ id: 'mark-f', gender: 'female' }));
+        expect(said).toContain('♀');
+        expect(said).not.toContain('♂');
+    });
+
+    it('and a partner from a save older than the field carries neither', () => {
+        const said = wordsOn(partner({ id: 'mark-none' }));
+        expect(said).not.toContain('♂');
+        expect(said).not.toContain('♀');
+        expect(said).toContain('⚪');
+    });
+
+    it('and the three glyphs are the ones the home screen uses', () => {
+        // Two screens writing their own symbol is two screens that can drift.
+        const home = fs.readFileSync(
+            path.join(SRC, 'screens', 'Home', 'HomeScreen.tsx'), 'utf8');
+        const row = fs.readFileSync(
+            path.join(SRC, 'features', 'profile', 'components', 'PartnerCard.tsx'), 'utf8');
+        for (const glyph of ['♂', '♀', '⚪']) {
+            expect({ glyph, home: home.includes(glyph) }).toEqual({ glyph, home: true });
+            expect({ glyph, row: row.includes(glyph) }).toEqual({ glyph, row: true });
+        }
+    });
 });
 
 describe('the partner card shows a face that matches what it prints', () => {

@@ -162,7 +162,14 @@ describe('a generated partner', () => {
     });
 
     it('while its occupation is a real job rather than a made-up string', () => {
-        const titles = new Set(JOBS_DATABASE.map(j => j.title));
+        // EVERY FORM OF EVERY TITLE. Two of the jobs are gendered in the word
+        // itself - an Heir and an Heiress are one job - so a set built from
+        // `title` alone would call the male form made-up. See
+        // jobsData.titleFor and partnerGenerator.titleOf.
+        const titles = new Set(JOBS_DATABASE.flatMap(j => [
+            j.title,
+            ...Object.values(j.titleFor ?? {}),
+        ]));
         for (let i = 0; i < 20; i++) {
             expect(titles.has(generatePartner().stats.occupation)).toBe(true);
         }

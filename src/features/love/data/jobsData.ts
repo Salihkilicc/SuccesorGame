@@ -2,6 +2,31 @@ import { JobDefinition } from '../types';
 
 export const JOBS_DATABASE: JobDefinition[] = [
     // ========================================================================
+    // 0. GLOBAL ELITE (a quarter of a trillion to be in the room at all)
+    // ========================================================================
+    //
+    //  HIGH_SOCIETY opened at five billion and was the ceiling, so a player
+    //  worth five billion and a player worth two trillion were introduced to
+    //  the same ten people for the rest of the dynasty. This is the room above
+    //  it: not the heir to a house, the head of one.
+    //
+    //  The difference from HIGH_SOCIETY is meant to be legible on the card
+    //  without a number. An Heiress is somebody's daughter. A reigning
+    //  sovereign, a central bank governor and the owner of a sovereign wealth
+    //  fund are not anybody's anything.
+    //
+    { id: 'sovereign_monarch', title: 'Reigning Sovereign', titleFor: { male: 'Reigning King', female: 'Reigning Queen' }, tier: 'GLOBAL_ELITE', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 25 },
+    { id: 'swf_owner', title: 'Sovereign Wealth Fund Chair', tier: 'GLOBAL_ELITE', buffType: 'BUSINESS_TRUST_BOOST', buffValue: 24 },
+    { id: 'central_bank_governor', title: 'Central Bank Governor', tier: 'GLOBAL_ELITE', buffType: 'BUSINESS_TRUST_BOOST', buffValue: 22 },
+    { id: 'oil_dynasty_head', title: 'Head of an Oil Dynasty', tier: 'GLOBAL_ELITE', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 24 },
+    { id: 'orbital_founder', title: 'Orbital Launch Company Founder', tier: 'GLOBAL_ELITE', buffType: 'INTELLECT_GAIN', buffValue: 23 },
+    { id: 'media_empire_owner', title: 'Owner of a Global Media Empire', tier: 'GLOBAL_ELITE', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 23 },
+    { id: 'shipping_dynasty', title: 'Shipping Dynasty Chair', tier: 'GLOBAL_ELITE', buffType: 'BUSINESS_TRUST_BOOST', buffValue: 21 },
+    { id: 'nobel_laureate', title: 'Nobel Laureate in Physics', tier: 'GLOBAL_ELITE', buffType: 'INTELLECT_GAIN', buffValue: 25 },
+    { id: 'grand_prix_owner', title: 'Grand Prix Constructor Owner', tier: 'GLOBAL_ELITE', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 21 },
+    { id: 'private_island_state', title: 'Sovereign of a Private State', tier: 'GLOBAL_ELITE', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 22 },
+
+    // ========================================================================
     // 1. CORPORATE ELITE (High Finance, Tech Titans, Boardrooms, Global Power)
     // ========================================================================
     { id: 'tech_ceo', title: 'Silicon Valley Tech CEO', tier: 'CORPORATE_ELITE', buffType: 'BUSINESS_TRUST_BOOST', buffValue: 16 },
@@ -21,8 +46,11 @@ export const JOBS_DATABASE: JobDefinition[] = [
     // ========================================================================
     // 2. HIGH SOCIETY (Dynasties, Old Money, Royalty, Ultra-Luxury & Diplomacy)
     // ========================================================================
-    { id: 'dynasty_heiress', title: 'Old-Money Dynasty Heiress', tier: 'HIGH_SOCIETY', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 20 },
-    { id: 'billionaire_heir', title: 'Billionaire Industrial Heir', tier: 'HIGH_SOCIETY', buffType: 'BUSINESS_TRUST_BOOST', buffValue: 18 },
+    // Two of the thirty-seven titles have a gender in the word itself, and a
+    // man kept being introduced as an Heiress. `title` is unchanged, so every
+    // reader that does not know the gender sees exactly what it saw before.
+    { id: 'dynasty_heiress', title: 'Old-Money Dynasty Heiress', titleFor: { male: 'Old-Money Dynasty Heir' }, tier: 'HIGH_SOCIETY', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 20 },
+    { id: 'billionaire_heir', title: 'Billionaire Industrial Heir', titleFor: { female: 'Billionaire Industrial Heiress' }, tier: 'HIGH_SOCIETY', buffType: 'BUSINESS_TRUST_BOOST', buffValue: 18 },
     { id: 'royal_envoy', title: 'Royal Philanthropy Ambassador', tier: 'HIGH_SOCIETY', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 19 },
     { id: 'couture_director', title: 'Haute Couture Creative Director', tier: 'HIGH_SOCIETY', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 15 },
     { id: 'sothebys_auctioneer', title: "Sotheby's Fine Art Auctioneer", tier: 'HIGH_SOCIETY', buffType: 'SOCIAL_STATUS_BOOST', buffValue: 14 },

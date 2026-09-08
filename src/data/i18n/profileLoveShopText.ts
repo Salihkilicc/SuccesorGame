@@ -41,6 +41,26 @@ export const SOCIAL_CLASS_TR: Record<string, string> = {
     'Upper Class': 'Üst Sınıf',
     'Middle Class': 'Orta Sınıf',
     'Working Class': 'İşçi Sınıfı',
+    // ------------------------------------------------------------------
+    //  THE KEYS THE PARTNER CARD ACTUALLY PASSES
+    // ------------------------------------------------------------------
+    //  Every key above is a display string with a space in it, and the thing
+    //  the card hands this function is `partner.stats.socialClass`, which is
+    //  a SocialClass: OldMoney, HighSociety, CriminalElite. None of them
+    //  matched, so the row under a partner's name read "OldMoney" in both
+    //  languages - the fallback returning the key it was given.
+    //
+    //  Same eight as relationshipTypes.SocialClass, so the lookup can no
+    //  longer miss.
+    // ------------------------------------------------------------------
+    'Underclass': 'Alt Sınıf',
+    'WorkingClass': 'İşçi Sınıfı',
+    'MiddleClass': 'Orta Sınıf',
+    'HighSociety': 'Yüksek Sosyete',
+    'OldMoney': 'Köklü Zenginlik',
+    'BillionaireHeir': 'Milyarder Varisi',
+    'Royalty': 'Kraliyet',
+    'CriminalElite': 'Suç Eliti',
 };
 
 export const TRAITS_TR: Record<string, string> = {
@@ -105,8 +125,26 @@ for (const [en, tr] of Object.entries(EDUCATION_TR)) {
 
 const REVERSE_SOCIAL_CLASS_EN: Record<string, string> = {};
 for (const [en, tr] of Object.entries(SOCIAL_CLASS_TR)) {
-    REVERSE_SOCIAL_CLASS_EN[tr] = en;
+    // FIRST KEY WINS. Two English forms now share a Turkish word - 'High
+    // Society' and 'HighSociety' are both Yüksek Sosyete - and the plain
+    // overwrite made the camelCase one the answer, so an English player
+    // reading a Turkish save got "HighSociety" back. The spaced form is the
+    // display string and comes first in the table above.
+    if (REVERSE_SOCIAL_CLASS_EN[tr] === undefined) REVERSE_SOCIAL_CLASS_EN[tr] = en;
 }
+// The English side of the same eight. The loop above only builds Turkish to
+// English, so an English player handed a SocialClass fell through to the key
+// itself and read "CriminalElite" with no space in it.
+Object.assign(REVERSE_SOCIAL_CLASS_EN, {
+    Underclass: 'Underclass',
+    WorkingClass: 'Working Class',
+    MiddleClass: 'Middle Class',
+    HighSociety: 'High Society',
+    OldMoney: 'Old Money',
+    BillionaireHeir: 'Billionaire Heir',
+    Royalty: 'Royalty',
+    CriminalElite: 'Criminal Elite',
+});
 
 const REVERSE_TRAITS_EN: Record<string, string> = {};
 for (const [en, tr] of Object.entries(TRAITS_TR)) {

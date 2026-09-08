@@ -57,6 +57,10 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
     const isMarried = partner.isMarried;
     const statusLabel = isMarried ? t('partner.married') : t('partner.dating');
     const socialClassLabel = translateSocialClass(partner.stats.socialClass);
+    // Same three glyphs as the home header, in the same order. The blank
+    // circle is for a partner met before the field existed.
+    const genderSymbol =
+        partner.gender === 'male' ? '♂' : partner.gender === 'female' ? '♀' : '⚪';
 
     return (
         <Pressable
@@ -97,9 +101,21 @@ export const PartnerCard: React.FC<PartnerCardProps> = ({
 
             {/* Name and Subtitle */}
             <View style={styles.infoBlock}>
-                <Text style={styles.partnerName} numberOfLines={1}>
-                    {partner.name}
-                </Text>
+                {/* ------------------------------------------------------------
+                    THE SAME MARK THE HOME SCREEN PUTS ON THE PLAYER.
+
+                    Home draws the player's name and then a symbol next to it,
+                    and the partner row had nothing - which mattered a great
+                    deal more once half the pool stopped being women. Same
+                    three glyphs, same order, same fallback for a save written
+                    before PartnerProfile.gender existed.
+                   ------------------------------------------------------------ */}
+                <View style={styles.nameRow}>
+                    <Text style={styles.partnerName} numberOfLines={1}>
+                        {partner.name}
+                    </Text>
+                    <Text style={styles.gender}>{genderSymbol}</Text>
+                </View>
                 <Text style={styles.partnerSub}>
                     {t('partner.partner')} • {statusLabel} • {socialClassLabel}
                 </Text>
@@ -162,10 +178,21 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
     partnerName: {
         color: theme.colors.textPrimary,
         fontSize: 16,
         fontWeight: '700',
+        flexShrink: 1,
+    },
+    /** Muted, so the mark reads as a fact and not as a signal. */
+    gender: {
+        color: theme.colors.textMuted,
+        fontSize: 13,
     },
     partnerSub: {
         color: theme.colors.textMuted,

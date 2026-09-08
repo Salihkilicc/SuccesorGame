@@ -80,6 +80,10 @@ type Fingerprint = Traits & Nudges;
  * rather than a guess at each call site.
  */
 export const CLASS_FOR_TIER: Record<SocialTier, SocialClass> = {
+    // `Royalty` was declared in relationshipTypes from the beginning and no
+    // tier ever produced one, so the class with the best bonuses in the game
+    // was unreachable. This is the room it belongs to.
+    GLOBAL_ELITE: 'Royalty',
     HIGH_SOCIETY: 'OldMoney',
     CORPORATE_ELITE: 'HighSociety',
     ARTISTIC: 'MiddleClass',
@@ -95,6 +99,9 @@ export const CLASS_FOR_TIER: Record<SocialTier, SocialClass> = {
  * they belong here. Everything else is who they are and belongs below.
  */
 const TIER_BASE: Record<SocialTier, Required<Nudges>> = {
+    // Near the top of every scale on purpose. The room exists to be the place
+    // a two-trillion-dollar dynasty finally meets somebody it cannot buy.
+    GLOBAL_ELITE: { familyWealth: 97, networkPower: 90, reputationBuff: 16 },
     HIGH_SOCIETY: { familyWealth: 85, networkPower: 55, reputationBuff: 10 },
     CORPORATE_ELITE: { familyWealth: 50, networkPower: 65, reputationBuff: 8 },
     ARTISTIC: { familyWealth: 25, networkPower: 30, reputationBuff: 4 },
