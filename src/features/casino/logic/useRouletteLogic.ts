@@ -54,6 +54,36 @@ export type PlacedBet = {
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
+/**
+ * The table with the last chip taken off one position.
+ *
+ * ---------------------------------------------------------------------------
+ *  THE LAST ONE, WHICH IS THE WHOLE DESIGN
+ * ---------------------------------------------------------------------------
+ *  Chips of different sizes stack on one number, and the newest is the one
+ *  the player is looking at when they decide it was a mistake. Lifting the
+ *  OLDEST would still empty the position eventually and would take back the
+ *  wrong amount on the way, which is worse than doing nothing.
+ *
+ *  Removing one chip rather than the stack makes the long press the exact
+ *  inverse of the tap: three taps and three long presses leave the table as
+ *  they found it. That property is what makes the gesture learnable, and it
+ *  is tested.
+ *
+ *  Out here rather than inside the hook so it can be measured without
+ *  mounting anything, and EXPORTED so the test uses the real thing. A copy
+ *  in the test file would agree with itself while the hook did something
+ *  else, which is how tests in this codebase have stayed green through bugs.
+ *
+ *  Returns the array UNCHANGED when there is nothing to lift, so React skips
+ *  the render.
+ */
+export const withoutLastChip = (bets: PlacedBet[], type: BetType): PlacedBet[] => {
+    const at = bets.map(b => b.type).lastIndexOf(type);
+    if (at < 0) return bets;
+    return [...bets.slice(0, at), ...bets.slice(at + 1)];
+};
+
 /** Get the color of a roulette number. See core/casino/roulette.ts. */
 export const getNumberColor = colourOf;
 
@@ -152,6 +182,30 @@ export const useRouletteLogic = (initialChip?: number) => {
     }
 
     setBets(prev => [...prev, { type, amount: selectedChip }]);
+    setResultPopup(null);
+    setSpinResult(null);
+  };
+
+  // ------------------------------------------------------------------
+  //  TAKING ONE CHIP BACK OFF ONE NUMBER
+  // ------------------------------------------------------------------
+  //  The only way to change your mind was CLEAR, which takes the whole
+  //  table down. So a player who laid nine chips carefully and put the
+  //  tenth on the wrong number had to start again - and at a real table
+  //  you just pick the chip up.
+  //
+  //  Asked for as a long press on the position, which is why this removes
+  //  ONE chip rather than the whole stack: the gesture is the opposite of
+  //  the tap that placed it, so three taps and three long presses leave
+  //  the table exactly as they found it.
+  //
+  //  The LAST chip placed there is the one lifted. Chips of different
+  //  sizes stack on one number, and the newest is the one the player is
+  //  looking at when they decide it was a mistake.
+  // ------------------------------------------------------------------
+  const removeBet = (type: BetType) => {
+    if (isSpinning) return;
+    setBets(prev => withoutLastChip(prev, type));
     setResultPopup(null);
     setSpinResult(null);
   };
@@ -257,6 +311,7 @@ export const useRouletteLogic = (initialChip?: number) => {
     },
     actions: {
       placeBet,
+      removeBet,
       clearBets,
       selectChip,
       handleSpin,

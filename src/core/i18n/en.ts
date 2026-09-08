@@ -2321,6 +2321,7 @@ export const en: Record<string, string> = {
     'casino.tapWheel': 'TAP THE WHEEL TO SPIN',
     'casino.placeChipsFirst': 'PLACE YOUR CHIPS',
     'casino.clear': 'CLEAR',
+    'casino.liftChip': 'Hold a bet to take the chip back',
     'casino.pot': 'POT',
     'casino.last': 'LAST:',
     'casino.bets': 'bets',

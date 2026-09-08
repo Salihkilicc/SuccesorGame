@@ -222,6 +222,7 @@ const RouletteGameScreen = () => {
         <View style={[styles.tableContainer, { borderColor: currentLocation.theme.secondary }]}>
           <RouletteTable
             onPlaceBet={actions.placeBet}
+            onRemoveBet={actions.removeBet}
             getBetOnPosition={actions.getBetOnPosition}
             gameTheme={currentLocation.theme}
             disabled={isSpinning}
@@ -263,6 +264,18 @@ const RouletteGameScreen = () => {
                 <Text style={styles.betValueText}>${totalBetAmount.toLocaleString()}</Text>
                 {bets.length > 0 && (
                   <Text style={styles.betCount}>{bets.length} {bets.length > 1 ? t('casino.bets') : t('casino.bet')}</Text>
+                )}
+                {/* ------------------------------------------------------
+                    A GESTURE NOBODY TRIES UNLESS THEY ARE TOLD
+
+                    A long press takes one chip back off one position, and
+                    it is invisible: there is nothing on a number to
+                    suggest holding it does anything. So the line appears
+                    the moment there is a chip to lift and goes away when
+                    there is not, which is the only time it is true.
+                   ------------------------------------------------------ */}
+                {bets.length > 0 && !isSpinning && (
+                  <Text style={styles.liftHint}>{t('casino.liftChip')}</Text>
                 )}
               </View>
 
@@ -476,6 +489,17 @@ const styles = StyleSheet.create({
   betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
   betValueText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
   betCount: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600' },
+  /**
+   * The token, not a fainter hand-mixed white.
+   *
+   * Written first as rgba(255,255,255,0.28) to sit under the bet count beside
+   * it, and the palette audit failed it on the spot: `betCount` at 0.30 is
+   * ALREADY below the readable floor, so matching it was copying a defect.
+   * theme.colors.textMuted is the quietest text this game has that can still
+   * be read, and an instruction the player has not been given yet is the last
+   * thing that should be hard to read.
+   */
+  liftHint: { color: theme.colors.textMuted, fontSize: 10, marginTop: 3 },
 
   clearBtn: {
     paddingHorizontal: 12,

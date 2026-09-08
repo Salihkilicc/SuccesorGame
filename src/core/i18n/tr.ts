@@ -2304,6 +2304,7 @@ export const tr: Record<string, string> = {
     'casino.tapWheel': 'ÇEVİRMEK İÇİN ÇARKA DOKUN',
     'casino.placeChipsFirst': 'FİŞLERİNİ KOY',
     'casino.clear': 'TEMİZLE',
+    'casino.liftChip': 'Fişi geri almak için basılı tut',
     'casino.pot': 'ORTA',
     'casino.last': 'SON:',
     'casino.bets': 'bahis',

@@ -9,6 +9,14 @@ import { feltColour } from '../../../core/casino/roulette';
 
 interface RouletteTableProps {
   onPlaceBet: (type: BetType) => void;
+  /**
+   * Take the last chip back off one position.
+   *
+   * A LONG PRESS, and the only way to change one bet without clearing the
+   * whole table. See logic/useRouletteLogic.removeBet for why it lifts one
+   * chip rather than the stack.
+   */
+  onRemoveBet: (type: BetType) => void;
   getBetOnPosition: (type: BetType) => number;
   gameTheme: CasinoTheme;
   disabled?: boolean;
@@ -31,6 +39,15 @@ for (let i = 0; i <= 36; i++) {
   NUMBER_COLORS[i] = feltColour(i);
 }
 
+/**
+ * How long a press has to be held before it takes a chip back.
+ *
+ * React Native's default is 500ms, which is long enough that a player who
+ * meant to lay a second chip and paused gets a removal instead. 300 is past
+ * a deliberate tap and short enough to feel like picking the chip up.
+ */
+const LIFT_CHIP_MS = 300;
+
 const formatChipAmount = (val: number): string => {
   if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(val % 1_000_000_000 === 0 ? 0 : 1)}B`;
   if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(val % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -42,12 +59,14 @@ const NumberCell = ({
   number,
   betAmount,
   onPress,
+  onLongPress,
   disabled,
   chipColor,
 }: {
   number: number;
   betAmount: number;
   onPress: () => void;
+  onLongPress: () => void;
   disabled?: boolean;
   /** The room's chip colour. It was one hardcoded gold for every city. */
   chipColor: string;
@@ -58,6 +77,8 @@ const NumberCell = ({
   return (
     <Pressable
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={LIFT_CHIP_MS}
       disabled={disabled}
       style={({ pressed }) => [
         styles.numberCell,
@@ -82,6 +103,7 @@ const AreaBetButton = ({
   betType,
   betAmount,
   onPress,
+  onLongPress,
   color,
   customBg,
   disabled,
@@ -91,6 +113,7 @@ const AreaBetButton = ({
   betType: BetType;
   betAmount: number;
   onPress: () => void;
+  onLongPress: () => void;
   color?: string;
   customBg?: string;
   disabled?: boolean;
@@ -98,6 +121,8 @@ const AreaBetButton = ({
 }) => (
   <Pressable
     onPress={onPress}
+    onLongPress={onLongPress}
+    delayLongPress={LIFT_CHIP_MS}
     disabled={disabled}
     style={({ pressed }) => [
       styles.areaBetBtn,
@@ -119,7 +144,7 @@ const AreaBetButton = ({
   </Pressable>
 );
 
-const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: RouletteTableProps) => {
+const RouletteTable = ({ onPlaceBet, onRemoveBet, getBetOnPosition, gameTheme, disabled }: RouletteTableProps) => {
   useLocale();
   // ONE GOLD FOR EVERY CITY was what the chip markers used. The room already
   // has a chip colour and every other surface in the casino uses it.
@@ -131,6 +156,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
         number={0}
         betAmount={getBetOnPosition('S0')}
         onPress={() => onPlaceBet('S0')}
+        onLongPress={() => onRemoveBet('S0')}
         disabled={disabled}
         chipColor={chip}
       />
@@ -157,6 +183,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
                 number={num}
                 betAmount={getBetOnPosition(`S${num}` as BetType)}
                 onPress={() => onPlaceBet(`S${num}` as BetType)}
+                onLongPress={() => onRemoveBet(`S${num}` as BetType)}
                 disabled={disabled}
                 chipColor={chip}
               />
@@ -172,6 +199,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="1ST12"
           betAmount={getBetOnPosition('1ST12')}
           onPress={() => onPlaceBet('1ST12')}
+          onLongPress={() => onRemoveBet('1ST12')}
           disabled={disabled}
           chipColor={chip}
         />
@@ -180,6 +208,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="2ND12"
           betAmount={getBetOnPosition('2ND12')}
           onPress={() => onPlaceBet('2ND12')}
+          onLongPress={() => onRemoveBet('2ND12')}
           disabled={disabled}
           chipColor={chip}
         />
@@ -188,6 +217,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="3RD12"
           betAmount={getBetOnPosition('3RD12')}
           onPress={() => onPlaceBet('3RD12')}
+          onLongPress={() => onRemoveBet('3RD12')}
           disabled={disabled}
           chipColor={chip}
         />
@@ -200,6 +230,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="LOW"
           betAmount={getBetOnPosition('LOW')}
           onPress={() => onPlaceBet('LOW')}
+          onLongPress={() => onRemoveBet('LOW')}
           disabled={disabled}
           chipColor={chip}
         />
@@ -208,6 +239,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="EVEN"
           betAmount={getBetOnPosition('EVEN')}
           onPress={() => onPlaceBet('EVEN')}
+          onLongPress={() => onRemoveBet('EVEN')}
           disabled={disabled}
           chipColor={chip}
         />
@@ -216,6 +248,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="RED"
           betAmount={getBetOnPosition('RED')}
           onPress={() => onPlaceBet('RED')}
+          onLongPress={() => onRemoveBet('RED')}
           color="#FF6B6B"
           customBg="#881337"
           disabled={disabled}
@@ -226,6 +259,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="BLACK"
           betAmount={getBetOnPosition('BLACK')}
           onPress={() => onPlaceBet('BLACK')}
+          onLongPress={() => onRemoveBet('BLACK')}
           color="#E2E8F0"
           customBg="#0F172A"
           disabled={disabled}
@@ -236,6 +270,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="ODD"
           betAmount={getBetOnPosition('ODD')}
           onPress={() => onPlaceBet('ODD')}
+          onLongPress={() => onRemoveBet('ODD')}
           disabled={disabled}
           chipColor={chip}
         />
@@ -244,6 +279,7 @@ const RouletteTable = ({ onPlaceBet, getBetOnPosition, gameTheme, disabled }: Ro
           betType="HIGH"
           betAmount={getBetOnPosition('HIGH')}
           onPress={() => onPlaceBet('HIGH')}
+          onLongPress={() => onRemoveBet('HIGH')}
           disabled={disabled}
           chipColor={chip}
         />

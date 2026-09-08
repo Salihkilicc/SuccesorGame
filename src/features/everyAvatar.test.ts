@@ -77,6 +77,21 @@ const NOT_PEOPLE = [
     path.join('features', 'life', 'components', 'Education', 'tabs', 'EducationClubView.tsx'),
     // The component itself. It is what everything else imports.
     path.join('components', 'common', 'Portrait.tsx'),
+    // ------------------------------------------------------------------
+    //  A PRODUCT IS NOT A PERSON
+    // ------------------------------------------------------------------
+    //  This draws the badge on a phone, a drone and a fusion reactor. It
+    //  matches only because it reads `theme.colors.avatarTints` - the
+    //  game's CATEGORICAL palette, which is named for the first place it
+    //  was used and not for the only one. See ProductIcon.tsx: the eight
+    //  category colours were hand-picked hexes and one of them was
+    //  theme.colors.success, so a Bio-Tech badge drew the profit signal.
+    //
+    //  The tell is a word, so it will keep finding things like this. That
+    //  is the trade: a sweep loose enough to catch a real avatar nobody
+    //  named `avatar` will also catch a palette that is.
+    // ------------------------------------------------------------------
+    path.join('features', 'products', 'components', 'ProductIcon.tsx'),
 ];
 
 describe('every avatar in the game goes through one component', () => {

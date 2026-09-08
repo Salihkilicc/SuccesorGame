@@ -1,18 +1,73 @@
+// src/features/products/components/ProductIcon.tsx
+//
+// ============================================================================
+//  THE CATEGORY KEEPS ITS SYMBOL AND GETS THE GAME'S OWN COLOURS
+// ============================================================================
+//
+//  Asked for as the category colours coming out of the game's palette. The
+//  eight here were hand-picked hexes that appear nowhere else in the app, and
+//  one of them was a rule break rather than a mismatch:
+//
+//      Bio-Tech      #4ADE80      which is theme.colors.success
+//
+//  Green and red in this game mean profit and loss and nothing else, and they
+//  are TEXT colours - never a fill or a border. So every Bio-Tech badge was
+//  drawing the profit signal around a product that had not earned or lost
+//  anything. Measured: 1 of 8 was a signal colour, 0 of 8 were in the palette.
+//
+//  `avatarTints` is the right set and it already exists for exactly this. It
+//  is the game's CATEGORICAL palette: eight hues that differ from each other,
+//  carry no good or bad, and are documented in core/theme.ts as the answer to
+//  "this is a kind of thing, not a score". The mail app and the encounter
+//  card already use it for sender and social class.
+//
+//  THE SYMBOLS ARE UNTOUCHED. Every icon name below is the one it was.
+// ============================================================================
+
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ProductCategory } from '../data/unlockableProductsData';
+import { theme } from '../../../core/theme';
 
+const TINTS = theme.colors.avatarTints;
+
+/**
+ * Which tint each category wears.
+ *
+ * Fixed rather than hashed. There are eight of these and they must not change
+ * colour between two saves - see avatarTintFor in core/theme.ts, which hashes
+ * because names are unbounded and these are not.
+ *
+ * Indices chosen so that no two categories a player sees side by side are
+ * neighbours on the ramp: sky, teal, lilac, sage.
+ */
 export const CATEGORY_COLORS: Record<string, string> = {
-    'Consumer': '#60A5FA',
-    'Robotics': '#38BDF8',
-    'Bio-Tech': '#4ADE80',
-    'Deep Tech': '#C084FC',
-    'phone': '#60A5FA',
-    'computer': '#38BDF8',
-    'watch': '#FBBF24',
-    'other': '#A78BFA',
+    'Consumer': TINTS[5],    // sky
+    'Robotics': TINTS[3],    // teal
+    'Bio-Tech': TINTS[7],    // sage, and NOT theme.colors.success
+    'Deep Tech': TINTS[6],   // lilac
+    // The lowercase four are the older product `type` values. Same table
+    // rather than a second one, which is how the two came to disagree.
+    'phone': TINTS[5],
+    'computer': TINTS[3],
+    'watch': TINTS[4],       // wheat
+    'other': TINTS[6],
 };
+
+// SHELVED, not deleted: the eight hand-picked hexes this table held. Kept so
+// the change is legible and so nobody re-derives them by accident.
+//
+// export const CATEGORY_COLORS: Record<string, string> = {
+//     'Consumer': '#60A5FA',
+//     'Robotics': '#38BDF8',
+//     'Bio-Tech': '#4ADE80',
+//     'Deep Tech': '#C084FC',
+//     'phone': '#60A5FA',
+//     'computer': '#38BDF8',
+//     'watch': '#FBBF24',
+//     'other': '#A78BFA',
+// };
 
 export const CATEGORY_ICONS: Record<string, string> = {
     'Consumer': 'cellphone-sound',
@@ -78,7 +133,10 @@ export const getCategoryColor = (category?: string): string => {
     if (category && CATEGORY_COLORS[category]) {
         return CATEGORY_COLORS[category];
     }
-    return '#60A5FA';
+    // An unknown category is still a category. The fallback comes out of the
+    // same palette as the eight above, so a product whose category has not
+    // been added here does not arrive in a colour from nowhere.
+    return TINTS[5];
 };
 
 export const getCategoryIconName = (category: string): string => {
