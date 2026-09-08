@@ -14,6 +14,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { t } from '../../../core/i18n';
 import { useSettingsLogic } from '../logic/useSettingsLogic';
+import { FEATURES } from '../../../core/featureFlags';
 
 // ─── Settings Row Component ──────────────────────────────────────────────────
 
@@ -302,6 +303,41 @@ const SettingsScreen: React.FC = () => {
                             isDestructive
                         />
                     </View>
+
+                    {/* ──────────────────────────────────────────────────────
+                        ADMIN
+
+                        There has been a GodModeModal in this codebase for a
+                        long time and NOTHING COULD REACH IT: its only door is
+                        the Underworld screen, and `underworld` has been false
+                        in featureFlags the whole time. A cheat nobody can
+                        press is not a cheat, it is dead weight.
+
+                        Here instead, because Settings is the one screen that
+                        is always reachable and is where a player looks for a
+                        switch.
+
+                        BEHIND `FEATURES.godMode`, which is `__DEV__`. The
+                        section does not exist in a release build - not
+                        disabled, not hidden: not rendered. See
+                        core/featureFlags.ts.
+                       ────────────────────────────────────────────────────── */}
+                    {FEATURES.godMode && (
+                        <>
+                            <Text style={styles.sectionTitle}>{t('os.admin').toUpperCase()}</Text>
+                            <View style={styles.group}>
+                                <SettingsRow
+                                    icon="flash"
+                                    label={t('os.adminUnlock')}
+                                    description={t('os.adminUnlockSub')}
+                                    onPress={actions.handleAdminUnlock}
+                                    isFirst
+                                    isLast
+                                    iconColor={theme.colors.warning}
+                                />
+                            </View>
+                        </>
+                    )}
 
                     {/* ── Footer ── */}
                     <View style={styles.footer}>

@@ -329,6 +329,24 @@ def main() -> int:
     ap.add_argument('--only', default='',
                     help='only ids starting with these, comma separated '
                          '(implies --redo)')
+    # ------------------------------------------------------------------
+    #  AND A WAY TO ASK FOR A DIFFERENT ONE
+    # ------------------------------------------------------------------
+    #  The seed is derived from the name so that re-running the whole set
+    #  never reshuffles the cast, which is right and which also means a
+    #  REJECTED portrait comes back identical however many times you run
+    #  it. Found the hard way: face_old_f_01 came back with a frame drawn
+    #  round it, was redrawn, and came back with the same frame.
+    #
+    #    --only face_old_f_01 --reseed 2
+    #
+    #  Any integer. Same number gives the same face again, so a good one
+    #  can be reproduced; a different number is a different person with
+    #  the same prompt.
+    # ------------------------------------------------------------------
+    ap.add_argument('--reseed', type=int, default=0,
+                    help='shift the seed, to redraw a rejected portrait '
+                         'as somebody else')
     args = ap.parse_args()
 
     rows = roster(args.cast)
@@ -379,8 +397,9 @@ def main() -> int:
     for i, (cid, nm, ramp, fem, region) in enumerate(todo, 1):
         pos = PP.prompt_for(nm, cid if args.cast else '', region)
         neg = PP.negative_for(nm, cid if args.cast else '')
-        # Seeded from the name, so a rerun of one person is the same person.
-        seed = PP.wide_hash(nm) % (2 ** 31)
+        # Seeded from the name, so a rerun of one person is the same person -
+        # unless --reseed asks for a different draw of the same prompt.
+        seed = (PP.wide_hash(nm) + args.reseed * 7919) % (2 ** 31)
         try:
             raw = run_one(ckpt, pos, neg, seed, ramp)
         except Exception as e:                      # noqa: BLE001

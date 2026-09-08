@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSettingsStore } from '../../../core/store/useSettingsStore';
 import { useLocale, useLocaleStore, LOCALES, t } from '../../../core/i18n';
 import { startNewGameAsking, confirmNewGame } from '../../../core/newGamePrompt';
+import { applyAdminMode } from '../../../core/adminMode';
 
 if (
     Platform.OS === 'android' &&
@@ -32,6 +33,8 @@ export interface SettingsLogicReturn {
         toggleHaptics: () => void;
         handleUnavailable: (docName?: string) => void;
         handleNewGame: () => void;
+        /** Development only. See core/adminMode.ts. */
+        handleAdminUnlock: () => void;
         handleBack: () => void;
     };
 }
@@ -102,6 +105,28 @@ export const useSettingsLogic = (): SettingsLogicReturn => {
         }
     }, [navigation]);
 
+    // ------------------------------------------------------------------
+    //  ONE PRESS, AND IT SAYS WHAT IT DID
+    // ------------------------------------------------------------------
+    //  The report is not decoration. A god mode button that claims five
+    //  things and quietly does three is the worst kind of tool, because the
+    //  two it missed look like bugs in the GAME afterwards. Reading the
+    //  counts back is how you find out on the spot.
+    // ------------------------------------------------------------------
+    const handleAdminUnlock = useCallback(() => {
+        const r = applyAdminMode();
+        Alert.alert(
+            t('os.adminDone'),
+            t('os.adminDoneBody', {
+                money: `$${r.money.toLocaleString()}`,
+                rp: r.researchPoints.toLocaleString(),
+                rep: String(r.casinoReputation),
+                products: String(r.productsUnlocked),
+                assets: String(r.assetsOwned),
+            }),
+        );
+    }, []);
+
     const handleBack = useCallback(() => {
         navigation.goBack();
     }, [navigation]);
@@ -125,6 +150,7 @@ export const useSettingsLogic = (): SettingsLogicReturn => {
             toggleHaptics,
             handleUnavailable,
             handleNewGame,
+            handleAdminUnlock,
             handleBack,
         },
     };
