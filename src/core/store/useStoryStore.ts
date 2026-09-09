@@ -112,6 +112,15 @@ export type StoryState = {
      */
     manipulationLedger: SuspiciousBuy[];
     /**
+     * Which warnings about that ledger have already gone out.
+     *
+     * Two in a whole run: one when the file is opened, one when it becomes a
+     * real case. Kept because a letter that arrives every quarter for four
+     * years is wallpaper, and because the point of them is that they are
+     * rare. See core/story/manipulationNotice.ts.
+     */
+    manipulationNoticesSent: string[];
+    /**
      * The verdict once a case has been brought, so the screen can show it and
      * so it is only ever brought once.
      */
@@ -217,6 +226,7 @@ export const initialStoryState: StoryState = {
     seenScenes: [],
     ending: null,
     manipulationLedger: [],
+    manipulationNoticesSent: [],
     manipulationVerdict: null,
     sceneProgress: {},
     _hasHydrated: false,
@@ -326,6 +336,7 @@ export const useStoryStore = create<StoryStore>()(
                 ending: null,
                 // A new chief executive is not on trial for the last one.
                 manipulationLedger: [],
+                manipulationNoticesSent: [],
                 manipulationVerdict: null,
                 // A new company plays the same scenes again from the top.
                 sceneProgress: {},
@@ -340,6 +351,7 @@ export const useStoryStore = create<StoryStore>()(
                 locks: state.locks, eventHistory: state.eventHistory,
                 seenScenes: state.seenScenes, ending: state.ending,
                 manipulationLedger: state.manipulationLedger,
+                manipulationNoticesSent: state.manipulationNoticesSent,
                 manipulationVerdict: state.manipulationVerdict,
                 sceneProgress: state.sceneProgress,
             }),
@@ -368,6 +380,8 @@ export const useStoryStore = create<StoryStore>()(
                     // Saves written before the ledger existed have none, and
                     // `undefined.filter` on the first tick would throw.
                     manipulationLedger: p.manipulationLedger ?? [],
+                    // Absent in every save written before the letters existed.
+                    manipulationNoticesSent: p.manipulationNoticesSent ?? [],
                     manipulationVerdict: p.manipulationVerdict ?? null,
                 };
             },

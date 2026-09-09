@@ -70,6 +70,15 @@ export const SENDER_NAMES_TR: Record<string, string> = {
 // ----------------------------------------------------------------------------
 
 export const SUBJECTS_TR: Record<string, string> = {
+    // ------------------------------------------------------------------
+    //  THE TWO LETTERS THAT SAY THE FILE EXISTS
+    // ------------------------------------------------------------------
+    //  See core/story/manipulationNotice.ts. A warning that only arrives in
+    //  English is not a warning here, and these two are the only thing
+    //  standing between a player and a verdict out of nowhere.
+    // ------------------------------------------------------------------
+    'Retention of records: trading in own securities': 'Kayitlarin saklanmasi: kendi hisselerinde islem',
+    'Notice of formal enquiry': 'Resmi inceleme bildirimi',
     'Parking bay 1, reallocation': '1 numaralı park yeri, yeniden tahsis',
     'Initiating coverage, HALE': 'Kapsama alma bildirimi, HALE',
     'You have 5 new connections waiting': 'Bekleyen 5 yeni bağlantı isteğiniz var',
@@ -88,6 +97,12 @@ export const SUBJECTS_TR: Record<string, string> = {
 // ----------------------------------------------------------------------------
 
 export const TEXT_TR: Record<string, string> = {
+    // The pair from the Field Office. Same voice in Turkish: process, never
+    // accusation, and no penalty named.
+    'This office is conducting a routine review of trading in the securities of Hale Industries.\n\nYou are asked to retain, in their original form, all records relating to acquisitions of the undertaking\u2019s own stock made by you or on your behalf. This includes instructions, timings and any correspondence bearing on them.\n\nNo response is required at this stage. This notice does not imply a finding.':
+        'Bu ofis, Hale Industries hisselerindeki islemlere iliskin rutin bir inceleme yurutmektedir.\n\nSirketin kendi hisselerinin sizin tarafinizdan veya sizin adiniza alinmasina iliskin tum kayitlari asli halleriyle saklamaniz istenmektedir. Talimatlar, zaman bilgileri ve konuya iliskin yazismalar buna dahildir.\n\nBu asamada yanit gerekmemektedir. Bu bildirim bir tespit anlamina gelmez.',
+    'The review referred to in our earlier notice has been placed on a formal footing.\n\nThe matter under examination is whether acquisitions of the undertaking\u2019s own stock were made at prices that did not reflect its condition at the time.\n\nYou may wish to instruct counsel. Any expenditure on your defence is a matter for you personally and not for the undertaking.\n\nThe file remains open.':
+        'Onceki bildirimimizde belirtilen inceleme resmi bir nitelik kazanmistir.\n\nInceleme konusu, sirketin kendi hisselerinin o gunku durumunu yansitmayan fiyatlardan alinip alinmadigidir.\n\nBir avukat gorevlendirmeyi dusunebilirsiniz. Savunmaniza iliskin her turlu harcama sirketi degil sahsinizi ilgilendirir.\n\nDosya acik kalmaktadir.',
     // --- Seed Mail ---
     'Good morning,\n\nBay 1 has been reassigned to your name with immediate effect. The fob is at reception.\n\nWe have left the old plate in the store room rather than dispose of it. Let us know either way when you have a moment.\n\nFacilities':
         'Günaydın,\n\n1 numaralı park yeri derhal geçerli olmak üzere adınıza tahsis edilmiştir. Giriş kartı danışmadadır.\n\nEski plakayı atmak yerine depoya kaldırdık. Müsait olduğunuzda ne yapmamızı istediğinizi bildiriniz.\n\nTesis Yönetimi',
