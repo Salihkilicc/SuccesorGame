@@ -27,6 +27,7 @@ import { useGameStore } from '../store/useGameStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { CAST } from '../../data/story/cast';
 import { conversationById, OPENING_CONVERSATIONS, STORY_BEATS } from '../../data/story';
+import { castNow } from './castNow';
 import { emailOf } from './cast';
 import { drain, QUIET_QUARTER_CHANCE, type Pending } from './inbox';
 import { testAll, firstFailing } from './conditions';
@@ -120,7 +121,9 @@ const whoTheHeirActuallyIs = (
 export const deliver = (conversationId: string): boolean => {
     const c = conversationById(conversationId);
     if (!c) return false;
-    const from = CAST[c.from];
+    // Who is in that seat NOW, which after a succession is not who the cast
+    // file names. See core/story/castNow.ts.
+    const from = castNow(c.from);
     if (!from) return false;
 
     const atMonth = useGameStore.getState().currentMonth;
@@ -168,6 +171,10 @@ export const deliver = (conversationId: string): boolean => {
             // The label is for the player; the id is for the lookup.
             fromId: from.id,
             fromName: senderLabel(from),
+            // Only set after generation one, and only for a seat that has
+            // changed hands. See core/story/castNow.ts.
+            fromGender: from.gender,
+            fromAge: from.age,
             fromEmail: emailOf(from) ?? '',
             subject: c.subject ?? '(no subject)',
             // The opening card doubles as the preview. A separate summary
@@ -183,7 +190,16 @@ export const deliver = (conversationId: string): boolean => {
 
     const store = useMessageStore.getState();
     store.sendFromCharacter(
-        { id: from.id, name: from.name, role: from.role, ...whoTheHeirActuallyIs(from.id) },
+        {
+            id: from.id,
+            name: from.name,
+            role: from.role,
+            // A seat holder after generation one has no portrait of their own
+            // and takes a pool face, exactly as the heir does.
+            gender: from.gender,
+            age: from.age,
+            ...whoTheHeirActuallyIs(from.id),
+        },
         opening?.text ?? '',
         atMonth,
     );

@@ -163,6 +163,29 @@ export const faceFor = (p: Person): ImageSourcePropType | null => {
     const own = portraitForPerson(p.id, p.name);
     if (own) return own;
 
+    return poolFace(p);
+};
+
+// ============================================================================
+//  AND WHEN THE ID IS A SEAT RATHER THAN A PERSON
+// ============================================================================
+//
+//  `faceFor` looks the id up first, which is right for everybody it was
+//  written for: a director keeps their own photograph. It is WRONG when the
+//  id names a job.
+//
+//  'cfo' resolves to cfo.png, which is Arthur Vance. He held that seat in the
+//  founder's game and nobody after him does - see core/story/castNow.ts - so
+//  the fourth generation's chief financial officer was writing to the player
+//  wearing a dead man's face while carrying her own name. Found by a test
+//  that expected a pool file and got the string "cfo".
+//
+//  So a caller who KNOWS the person has no portrait of their own says so, by
+//  calling this instead. It is the second half of faceFor and nothing more.
+// ============================================================================
+
+/** A face from the anonymous pool, without asking whether they own one. */
+export const poolFace = (p: Person): ImageSourcePropType | null => {
     if (p.female === undefined) return null;
     const band = p.band ?? bandForAge(p.age);
     const bucket = POOL[`${band}_${p.female ? 'f' : 'm'}`];

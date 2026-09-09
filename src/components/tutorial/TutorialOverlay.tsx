@@ -36,6 +36,7 @@ import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { readWorld } from '../../core/story/world';
 import { useTutorialTargets } from './targets';
 import { CAST } from '../../data/story/cast';
+import { castNow } from '../../core/story/castNow';
 import { useLocale } from '../../core/i18n';
 import { line, lockKey } from '../../data/i18n/storyText';
 
@@ -266,7 +267,7 @@ const TutorialOverlay = () => {
                     too, and now says so.
                    ------------------------------------------------------ */}
                 <Text style={styles.speaker}>
-                    {(CAST[lock.speaker ?? 'father']?.name ?? '').toUpperCase()}
+                    {(castNow(lock.speaker ?? 'father')?.name ?? '').toUpperCase()}
                 </Text>
                 <Text style={styles.instruction}>
                     {line(lockKey(lock.id), lock.instruction)}

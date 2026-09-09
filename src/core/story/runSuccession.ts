@@ -37,6 +37,7 @@ import { currentQuarter } from './world';
 import { useMailStore } from '../store/useMailStore';
 import { SUCCESSION_CONVERSATIONS } from '../../data/story/firstQuarter';
 import { CAST } from '../../data/story/cast';
+import { castNow } from './castNow';
 import { planSuccession, type SuccessionPlan } from './succession';
 import { divideBelongings } from './inheritance';
 
@@ -74,7 +75,25 @@ const postFirstLetter = (plan: SuccessionPlan) => {
 
     const from = (sibling && plan.yearsHeld === 0)
         ? { id: sibling.id, name: sibling.name, role: 'Your family' }
-        : { id: 'cfo', name: CAST.cfo?.name ?? 'The CFO', role: CAST.cfo?.role ?? 'CFO' };
+        : (() => {
+            // The chief financial officer of the generation TAKING OVER, not
+            // the founder's. This letter is the first thing the new Hale
+            // reads and it would have been signed by a man who retired two
+            // generations ago. See core/story/castNow.ts.
+            //
+            //  plan.generation is already the INCOMING one - planSuccession
+            //  returns input.generation + 1 - so it is read off the plan
+            //  rather than off the store, which has not been written yet at
+            //  this point in the sequence.
+            const now = castNow('cfo', plan.generation);
+            return {
+                id: 'cfo',
+                name: now?.name ?? 'The CFO',
+                role: now?.role ?? 'CFO',
+                gender: now?.gender,
+                age: now?.age,
+            };
+        })();
 
     const opening = conversation.nodes.find(n => n.id === conversation.start);
     const month = useGameStore.getState().currentMonth;

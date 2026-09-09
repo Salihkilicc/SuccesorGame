@@ -7,6 +7,7 @@ import { MAX_ANSWER_BLOCK, MAX_FONT_MULTIPLIER } from './answerFit';
 import { NAV_BAR_CLEARANCE } from '../../navigation/components/CrystalNavBar';
 import type { Conversation } from '../../core/story/graph';
 import { CAST } from '../../data/story/cast';
+import { castNow } from '../../core/story/castNow';
 import type { Said } from '../../core/store/useStoryStore';
 import { useConversationRunnerLogic } from './logic/useConversationRunnerLogic';
 import { getChoiceBadges } from './effectBadges';
@@ -103,7 +104,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                             ]}>
                             {variant === 'mail' && (
                                 <Text style={[styles.letterFrom, said.from === 'player' && styles.letterFromMine]}>
-                                    {said.from === 'player' ? 'You replied' : (CAST[conversation.from]?.name ?? conversation.from)}
+                                    {said.from === 'player' ? 'You replied' : (castNow(conversation.from)?.name ?? conversation.from)}
                                 </Text>
                             )}
                             <Text style={[styles.said, said.from === 'player' && (variant === 'message' ? styles.saidMine : styles.saidLetterMine)]}>

@@ -178,12 +178,17 @@ describe('and the screen reads what the thread carries', () => {
         //  inboxFaces.test.tsx caught it, which is exactly what that file is
         //  for. This line is here so it cannot come back quietly.
         // ------------------------------------------------------------------
-        expect(screen).toContain('thread.gender === undefined ? undefined : faceFor({');
+        // `poolFace`, not `faceFor`. faceFor looks the id up first, which is
+        // right for a person who owns a portrait and wrong when the id names
+        // a SEAT: 'cfo' finds Arthur Vance and the fourth generation's chief
+        // financial officer wore his face. See core/portraits/faces.poolFace.
+        expect(screen).toContain('thread.gender === undefined ? undefined : poolFace({');
         expect(screen).not.toContain('thread.gender === undefined ? null');
+        expect(screen).not.toContain('undefined : faceFor(');
     });
 
     it('and it passes the age, or every child is the same band', () => {
-        const call = /faceFor\(\{[\s\S]*?\}\)/.exec(screen)?.[0] ?? '';
+        const call = /poolFace\(\{[\s\S]*?\}\)/.exec(screen)?.[0] ?? '';
         expect(call).toContain('age: thread.age');
         expect(call).toContain("female: thread.gender === 'female'");
     });

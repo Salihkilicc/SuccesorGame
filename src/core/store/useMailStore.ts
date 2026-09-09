@@ -28,6 +28,20 @@ export type Mail = {
      */
     fromId?: string;
     fromName: string;
+    // ------------------------------------------------------------------
+    //  AND WHO THEY ARE, WHEN THE ID IS NOT ENOUGH
+    // ------------------------------------------------------------------
+    //  The row draws a portrait from `fromId`, which is right for the cast
+    //  as written and WRONG the moment a seat changes hands: the second
+    //  generation's chief financial officer writes as 'cfo' and would wear
+    //  Arthur Vance's photograph.
+    //
+    //  Same two fields, same reason, same shape as Thread. Absent for
+    //  generation one and for everybody with a portrait of their own, so
+    //  the id lookup stays exactly as it was. See core/story/castNow.ts.
+    // ------------------------------------------------------------------
+    fromGender?: 'male' | 'female';
+    fromAge?: number;
     fromEmail: string;
     subject: string;
     body: string;

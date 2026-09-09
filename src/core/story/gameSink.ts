@@ -22,6 +22,7 @@ import { fineAmount } from './fines';
 import { quotedDelta } from './prices';
 import type { EffectSink } from './effects';
 import { CAST } from '../../data/story/cast';
+import { castNow } from './castNow';
 import { CONVERSATIONS } from '../../data/story';
 import { currentQuarter } from './world';
 import { BROTHER_ID, nudgeBrotherLoyalty, syncBrotherDial } from './brother';
@@ -187,20 +188,22 @@ export const gameSink = (): EffectSink => ({
     // have caught it, and if it did not, the loud failure is the next best
     // thing to a silent one.
     message: (who, text) => {
-        const m = CAST[who];
+        const m = castNow(who);
         if (!m) throw new Error(`story: no cast member "${who}"`);
         useMessageStore.getState().sendFromCharacter(
-            { id: m.id, name: m.name, role: m.role },
+            { id: m.id, name: m.name, role: m.role, gender: m.gender, age: m.age },
             text,
             useGameStore.getState().currentMonth,
         );
     },
     mail: (m) => {
-        const from = CAST[m.from];
+        const from = castNow(m.from);
         if (!from) throw new Error(`story: no cast member "${m.from}"`);
         useMailStore.getState().receiveMail({
             fromId: from.id,
             fromName: from.name,
+            fromGender: from.gender,
+            fromAge: from.age,
             fromEmail: emailOf(from) ?? '',
             subject: m.subject,
             body: m.body,

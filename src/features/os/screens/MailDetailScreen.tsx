@@ -14,6 +14,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { theme, avatarTintFor } from '../../../core/theme';
 import Portrait from '../../../components/common/Portrait';
 import { portraitFor } from '../../../core/portraits';
+import { poolFace } from '../../../core/portraits/faces';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
@@ -295,7 +296,23 @@ const MailDetailScreen = () => {
                             borderWidth={0}
                             fill={avatarTintFor(mail.fromName)}
                             initialsColour={theme.colors.onLight}
-                            source={mail.fromId ? portraitFor(mail.fromId) as number | null : null}
+                            // ------------------------------------------------------
+                    //  THE ID IS THE SEAT, NOT ALWAYS THE PERSON
+                    // ------------------------------------------------------
+                    //  'cfo' finds Arthur Vance's photograph, which is right
+                    //  for the founder's game and wrong the moment the seat
+                    //  changes hands. When the letter carries a gender the
+                    //  writer is somebody with no portrait of their own and
+                    //  takes one from the pool, exactly as a thread does.
+                    // ------------------------------------------------------
+                    source={mail.fromGender !== undefined
+                        ? poolFace({
+                            id: mail.fromId || mail.fromName,
+                            name: mail.fromName,
+                            female: mail.fromGender === 'female',
+                            age: mail.fromAge,
+                        }) as number | null
+                        : (mail.fromId ? portraitFor(mail.fromId) as number | null : null)}
                             style={styles.avatar}
                         />
                         <View style={styles.senderInfo}>

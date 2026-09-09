@@ -931,7 +931,16 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
             // It is not a Conversation because it has no branches - somebody
             // writing to you again is not a decision you make - and it lives
             // here because it is writing, and writing lives with the writing.
-            && f !== 'neglect.ts';
+            && f !== 'neglect.ts'
+            // ------------------------------------------------------------
+            //  AND THE ROSTER, WHICH IS A CAST AND NOT A SCENE
+            // ------------------------------------------------------------
+            //  Who holds each seat in each generation. It sits beside
+            //  cast.ts because it is the same kind of thing - the people,
+            //  not what they say - and cast.ts is excluded above for
+            //  exactly this reason. See core/story/castNow.ts.
+            // ------------------------------------------------------------
+            && f !== 'castGenerations.ts';
 
         const dataFiles = fs.readdirSync(dir).filter(isSceneFile);
 

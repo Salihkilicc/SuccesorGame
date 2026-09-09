@@ -19,6 +19,7 @@ import { useMailStore } from '../store/useMailStore';
 import { useGameStore } from '../store/useGameStore';
 import { useStoryStore } from '../store/useStoryStore';
 import { CAST } from '../../data/story/cast';
+import { castNow } from './castNow';
 import { CONVERSATIONS } from '../../data/story';
 import { emailOf } from './cast';
 import { NEGLECT_LINES } from '../../data/story/neglect';
@@ -143,7 +144,10 @@ export const runNeglect = (): string[] => {
 
     for (const id of ignored) {
         const line = NEGLECT_LINES[id];
-        const who = CAST[id];
+        // The person in that seat now. The address lookup above stays on the
+        // raw table on purpose: an email is a property of the SEAT and does
+        // not change when the holder does. a.vance@hale.co outlives Vance.
+        const who = castNow(id);
         if (!who) continue;
 
         // ------------------------------------------------------------------
