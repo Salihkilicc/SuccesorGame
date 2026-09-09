@@ -83,17 +83,24 @@ describe('being turned down', () => {
         const cooling = useFamilyStore.getState().courtshipCooldown;
         expect(Object.keys(cooling)).toHaveLength(1);
 
-        // The next attempt cannot land in the room that just said no.
-        const second = runCourtship(() => 0);
-        if (second.kind === 'candidate') {
-            expect(second.tier).not.toBe('HIGH_SOCIETY');
-        }
+        // ------------------------------------------------------------------
+        //  AND THE NEXT ATTEMPT IS NOBODY, NOT A POORER ROOM
+        // ------------------------------------------------------------------
+        //  This used to allow a candidate from a lower tier, which is what
+        //  the demotion bug was: being turned down by old money handed the
+        //  player an artist, then a shift manager, then a student. Eight taps
+        //  from the top of the ladder to the bottom, company untouched.
+        // ------------------------------------------------------------------
+        expect(runCourtship(() => 0).kind).toBe('nobody');
     });
 
-    it('while every room cooling off means nobody, rather than a dead card', () => {
+    it('while the room being shut means nobody, rather than a dead card', () => {
+        // One refusal is enough now. It used to take six, because each one
+        // only shut the rung the player was standing on and dropped them to
+        // the next.
         world(4_500_000, 5);
-        for (let i = 0; i < 6; i++) runCourtship(() => 1);
-        expect(availableTiers()).toEqual([]);
+        expect(runCourtship(() => 1).kind).toBe('refused');
+        expect(availableTiers()).not.toContain('BLUE_COLLAR');
         expect(runCourtship(() => 0).kind).toBe('nobody');
     });
 });

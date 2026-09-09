@@ -46,6 +46,43 @@ export const availableTiers = (): SocialTier[] => {
     return tiersOpenTo(value).filter(t => (cooldown[t] ?? 0) <= now);
 };
 
+// ============================================================================
+//  A REFUSAL COST THE PLAYER A RUNG, AND THEN ANOTHER
+// ============================================================================
+//
+//  Reported as the partners not getting richer as the company does. The rule
+//  looked right and the arithmetic was right: `tiersOpenTo` tracks the money
+//  exactly, and one tap in a clean quarter always produced the best room.
+//
+//  The DEMOTION was in the search. It took the best room NOT COOLING OFF, and
+//  a refusal shuts a room - so the second tap after a no got the next room
+//  down, and the third got the one below that. Measured over one quarter of
+//  ordinary tapping at a billion dollars:
+//
+//      refused -> ARTISTIC -> ARTISTIC -> ARTISTIC -> refused
+//              -> BLUE_COLLAR -> refused -> STUDENT_LIFE
+//
+//  Eight taps from old money to a student bar, with the company untouched.
+//  From the seat that is indistinguishable from the wealth doing nothing,
+//  because the FIRST card is the one that sets the expectation and every one
+//  after it is worse.
+//
+//  It also explains something that never made sense: UNDERGROUND is bottom of
+//  TIER_STANDING and is therefore never the best room at ANY wealth, so the
+//  cascade was the only way anybody ever reached it. A fallback that can only
+//  be found by being turned down twice is not a design, it is a leak.
+//
+//  So the room you have EARNED is the room you get. If it is shut, the answer
+//  is nobody and you come back next quarter, which is what the cooldown was
+//  written to mean: "tapping again is not a re-roll".
+// ============================================================================
+
+/** The best room this company can walk into, cooling off or not. */
+export const earnedTier = (): SocialTier | null => {
+    const open = tiersOpenTo(useStatsStore.getState().companyValue || 0);
+    return open.length > 0 ? open[open.length - 1] : null;
+};
+
 /**
  * Look for somebody.
  *
@@ -53,12 +90,15 @@ export const availableTiers = (): SocialTier[] => {
  * passes nothing.
  */
 export const runCourtship = (roll: () => number = Math.random): CourtshipResult => {
-    const open = availableTiers();
-    if (open.length === 0) return { kind: 'nobody' };
+    // THE ROOM THEY EARNED, not the best one that happens to be open. See
+    // the note above: taking the best OPEN room turned every refusal into a
+    // demotion, and a billion dollar company reached students in eight taps.
+    const tier = earnedTier();
+    if (!tier) return { kind: 'nobody' };
 
-    // The best room open to them. A player who can reach old money is not
-    // introduced to students - that is what the money was for.
-    const tier = open[open.length - 1];
+    // Shut means shut. Being turned down by old money on Tuesday does not
+    // make anybody want to be introduced to a student on Wednesday.
+    if (!availableTiers().includes(tier)) return { kind: 'nobody' };
     const candidate = generatePartner(tier);
 
     const { accepted } = courtshipFor(candidate, {
