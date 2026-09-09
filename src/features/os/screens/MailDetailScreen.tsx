@@ -14,7 +14,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { theme, avatarTintFor } from '../../../core/theme';
 import Portrait from '../../../components/common/Portrait';
 import { portraitFor } from '../../../core/portraits';
-import { poolFace } from '../../../core/portraits/faces';
+import { seatFace } from '../../../core/portraits/faces';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMailStore, type Mail } from '../../../core/store/useMailStore';
@@ -306,11 +306,12 @@ const MailDetailScreen = () => {
                     //  takes one from the pool, exactly as a thread does.
                     // ------------------------------------------------------
                     source={mail.fromGender !== undefined
-                        ? poolFace({
+                        ? seatFace({
                             id: mail.fromId || mail.fromName,
                             name: mail.fromName,
                             female: mail.fromGender === 'female',
                             age: mail.fromAge,
+                            portraitId: mail.fromPortraitId,
                         }) as number | null
                         : (mail.fromId ? portraitFor(mail.fromId) as number | null : null)}
                             style={styles.avatar}

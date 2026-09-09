@@ -24,7 +24,7 @@ import { deliver } from './deliver';
 import { castNow } from './castNow';
 import { CAST } from '../../data/story/cast';
 import { CONVERSATIONS } from '../../data/story';
-import { faceFor, poolFace } from '../portraits/faces';
+import { faceFor, seatFace } from '../portraits/faces';
 import { PORTRAITS } from '../portraits/registry';
 
 const fileOf = (src: unknown) =>
@@ -111,9 +111,10 @@ describe('and a message in the fourth is from the fourth', () => {
         //  came back wearing Arthur Vance's face under her own name. The
         //  screens ask `poolFace` now, which does not look.
         // ------------------------------------------------------------------
-        const face = fileOf(poolFace({
+        const face = fileOf(seatFace({
             id: thread.id, name: thread.name,
             female: thread.gender === 'female', age: thread.age,
+            portraitId: thread.portraitId,
         }));
         expect(face).toMatch(/^face_(mid|old|young)_/);
     });
@@ -180,10 +181,14 @@ describe('and every reader was moved, not just the two that were noticed', () =>
             const text = src('features', 'os', 'screens', screen);
             expect({ screen, reads: text.includes('mail.fromGender !== undefined') })
                 .toEqual({ screen, reads: true });
-            // POOL, not faceFor: the id is a seat and faceFor would find the
-            // previous holder's photograph. See core/portraits/faces.poolFace.
-            expect({ screen, pool: text.includes('poolFace({') })
+            // seatFace, not faceFor: the id is a seat and faceFor would find
+            // the previous holder's photograph. See core/portraits/faces.
+            expect({ screen, pool: text.includes('seatFace({') })
                 .toEqual({ screen, pool: true });
+            // And it must be handed the holder's own id, or the pool picks by
+            // seat and two of them come out identical.
+            expect({ screen, own: text.includes('portraitId: mail.fromPortraitId') })
+                .toEqual({ screen, own: true });
             expect({ screen, looksUp: text.includes('faceFor({') })
                 .toEqual({ screen, looksUp: false });
             // And still falls back to the id, or generation one loses its faces.

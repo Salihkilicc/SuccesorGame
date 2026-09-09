@@ -13,7 +13,7 @@ import { theme } from '../../../core/theme';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import SwipeToDelete from '../../../components/common/SwipeToDelete';
 import Portrait from '../../../components/common/Portrait';
-import { poolFace } from '../../../core/portraits/faces';
+import { seatFace } from '../../../core/portraits/faces';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { useMessageStore, type Thread } from '../../../core/store/useMessageStore';
 import { t, useLocale } from '../../../core/i18n';
@@ -109,11 +109,12 @@ const ThreadRow = ({ thread, onPress }: { thread: Thread; onPress: () => void })
                     //  all eleven named senders at once. Caught by
                     //  inboxFaces.test.tsx, which is what it is for.
                     // ------------------------------------------------------
-                    source={thread.gender === undefined ? undefined : poolFace({
+                    source={thread.gender === undefined ? undefined : seatFace({
                         id: thread.id,
                         name: thread.name,
                         female: thread.gender === 'female',
                         age: thread.age,
+                        portraitId: thread.portraitId,
                     }) as number | null}
                 />
                 {unread && (

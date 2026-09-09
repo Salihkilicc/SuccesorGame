@@ -30,6 +30,7 @@ import type { CastMember } from './cast';
 import {
     CAST_GENERATIONS,
     GENERATIONS_WRITTEN,
+    seatPortraitId,
     type SeatHolder,
 } from '../../data/story/castGenerations';
 
@@ -44,6 +45,15 @@ import {
 export type SeatedMember = CastMember & {
     gender?: 'male' | 'female';
     age?: number;
+    /**
+     * Where THIS person's portrait is filed, which is not where the seat's is.
+     *
+     * `id` stays the seat - the threads, the scenes and the conversation
+     * attachments are all keyed on it and must not move. This is the second
+     * id, used only to find a face, and it is what stopped the second and
+     * fourth holder of a seat being the same photograph.
+     */
+    portraitId?: string;
 };
 
 /**
@@ -94,7 +104,13 @@ export const castNow = (id: string, generation?: number): SeatedMember | undefin
     // leaves them finding their portrait by id like they always have.
     if (holder.name === base.name) return base;
 
-    return { ...base, name: holder.name, gender: holder.gender, age: holder.age };
+    return {
+        ...base,
+        name: holder.name,
+        gender: holder.gender,
+        age: holder.age,
+        portraitId: seatPortraitId(id, generation ?? currentGeneration()),
+    };
 };
 
 /** The same, never undefined, for callers that only want to print a name. */

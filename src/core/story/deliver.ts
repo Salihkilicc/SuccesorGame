@@ -175,6 +175,7 @@ export const deliver = (conversationId: string): boolean => {
             // changed hands. See core/story/castNow.ts.
             fromGender: from.gender,
             fromAge: from.age,
+            fromPortraitId: from.portraitId,
             fromEmail: emailOf(from) ?? '',
             subject: c.subject ?? '(no subject)',
             // The opening card doubles as the preview. A separate summary
@@ -198,6 +199,7 @@ export const deliver = (conversationId: string): boolean => {
             // and takes a pool face, exactly as the heir does.
             gender: from.gender,
             age: from.age,
+            portraitId: from.portraitId,
             ...whoTheHeirActuallyIs(from.id),
         },
         opening?.text ?? '',

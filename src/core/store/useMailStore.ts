@@ -42,6 +42,8 @@ export type Mail = {
     // ------------------------------------------------------------------
     fromGender?: 'male' | 'female';
     fromAge?: number;
+    /** Where a portrait for this person is filed. See Thread.portraitId. */
+    fromPortraitId?: string;
     fromEmail: string;
     subject: string;
     body: string;

@@ -57,11 +57,33 @@
 /** One person, in one generation, in one seat. */
 export type SeatHolder = {
     name: string;
-    /** For the portrait pool, which is all anybody after generation one gets. */
+    /** Which way they were drawn, and which pool they fall back to. */
     gender: 'male' | 'female';
     /** How old they read. Executives are not thirty. */
     age: number;
 };
+
+/**
+ * The id a portrait for this person is filed under.
+ *
+ * ---------------------------------------------------------------------------
+ *  THE SEAT IS NOT THE PERSON, AND THE POOL COULD NOT TELL
+ * ---------------------------------------------------------------------------
+ *  The pool picks a face by hashing an id, and the id being passed was the
+ *  THREAD id - 'cfo' - which is the same for every holder of that seat. So
+ *  the hash was the same, and the only thing separating one holder from
+ *  another was whether they happened to be a different sex or age band.
+ *
+ *  MEASURED: thirteen collisions across the eight seats. Ingrid Sollberg and
+ *  Mariela Fontana, the second and fourth chief financial officers, were the
+ *  same photograph.
+ *
+ *  So every holder gets an id of their own. It doubles as the filename when
+ *  a portrait is drawn for them - `cfo_g2.png` - which is how the thirty two
+ *  stop being pool faces at all.
+ */
+export const seatPortraitId = (seat: string, generation: number): string =>
+    `${seat}_g${Math.max(1, Math.floor(generation || 1))}`;
 
 /**
  * Five deep, then it comes round again.

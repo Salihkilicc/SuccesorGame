@@ -241,8 +241,24 @@ def roster(cast_only: bool):
     """[(id, name, ramp, female)] for whichever set was asked for."""
     if cast_only:
         cast = PP.read_cast()
-        return [(cid, nm, SOURCE_RAMP, PP.is_female(nm, cid), '')
+        rows = [(cid, nm, SOURCE_RAMP, PP.is_female(nm, cid), '')
                 for cid, nm in cast.items() if cid not in PP.FACELESS]
+        # ------------------------------------------------------------------
+        #  AND THE THIRTY TWO WHO HOLD THOSE SEATS AFTER THE FOUNDER
+        # ------------------------------------------------------------------
+        #  data/story/castGenerations.ts turns eight seats over five times.
+        #  Without these they take anonymous pool faces, and two of them took
+        #  the SAME one, because the pool picks by seat.
+        #
+        #  Ids are `cfo_g2`, which is exactly what the app looks a drawn
+        #  portrait up under, so a file landing here is live with no wiring.
+        #
+        #    --cast --only cfo_g,coo_g,cto_g      twelve of them
+        #    --cast --only _g                     all thirty two, ~24 min
+        # ------------------------------------------------------------------
+        for cid, (nm, female, _age) in PP.read_generations().items():
+            rows.append((cid, nm, SOURCE_RAMP, female, ''))
+        return rows
     out = []
     groups = {**PP.read_names(), **PP.read_rivals()}
     for region, names in groups.items():
@@ -344,12 +360,30 @@ def main() -> int:
     #  can be reproduced; a different number is a different person with
     #  the same prompt.
     # ------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    #  THE THIRTY TWO WHO TAKE OVER THE SEATS
+    # ------------------------------------------------------------------
+    #  --only is a PREFIX match, so there is no one pattern that catches
+    #  cfo_g2 and swanson_g5 without also catching the founder's cfo. This
+    #  is that set by name.
+    #
+    #      python3 tools/batch_portraits.py --seats
+    #
+    #  Thirty two portraits, about twenty four minutes.
+    # ------------------------------------------------------------------
+    ap.add_argument('--seats', action='store_true',
+                    help='only the generational seat holders (implies --cast)')
     ap.add_argument('--reseed', type=int, default=0,
                     help='shift the seed, to redraw a rejected portrait '
                          'as somebody else')
     args = ap.parse_args()
 
+    if args.seats:
+        args.cast = True
     rows = roster(args.cast)
+    if args.seats:
+        holders = set(PP.read_generations())
+        rows = [r for r in rows if r[0] in holders]
     os.makedirs(OUT_DIR, exist_ok=True)
     os.makedirs(RAW_DIR, exist_ok=True)
 

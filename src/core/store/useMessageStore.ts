@@ -87,6 +87,14 @@ export type Thread = {
     gender?: 'male' | 'female';
     /** How old they are, for the band. */
     age?: number;
+    /**
+     * Where a portrait for THIS person would be filed.
+     *
+     * `id` is the seat and is shared by everybody who has ever held it, so
+     * hashing it into the pool gave two holders one face. See
+     * data/story/castGenerations.seatPortraitId.
+     */
+    portraitId?: string;
 };
 
 export type MessageState = {
@@ -175,6 +183,7 @@ type MessageStore = MessageState & {
             /** Only for somebody with no portrait of their own. See Thread. */
             gender?: 'male' | 'female';
             age?: number;
+            portraitId?: string;
         },
         text: string,
         atMonth: number,
@@ -404,6 +413,7 @@ export const useMessageStore = create<MessageStore>()(
                                     initials: initials(who.name),
                                     gender: who.gender,
                                     age: who.age,
+                                    portraitId: who.portraitId,
                                     messages: [message],
                                     unread: 1,
                                 },
@@ -427,6 +437,7 @@ export const useMessageStore = create<MessageStore>()(
                                 initials: initials(who.name),
                                 gender: who.gender ?? existing.gender,
                                 age: who.age ?? existing.age,
+                                portraitId: who.portraitId ?? existing.portraitId,
                                 messages: updatedMsgs.length > 50 ? updatedMsgs.slice(-50) : updatedMsgs,
                                 unread: existing.unread + 1,
                             },

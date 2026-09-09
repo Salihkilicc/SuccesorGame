@@ -182,13 +182,16 @@ describe('and the screen reads what the thread carries', () => {
         // right for a person who owns a portrait and wrong when the id names
         // a SEAT: 'cfo' finds Arthur Vance and the fourth generation's chief
         // financial officer wore his face. See core/portraits/faces.poolFace.
-        expect(screen).toContain('thread.gender === undefined ? undefined : poolFace({');
+        // `seatFace`, which tries a DRAWN file for this person first and
+        // falls back to the pool. Not `faceFor`, which looks the THREAD id
+        // up - and the thread id is a seat, so 'cfo' finds Arthur Vance.
+        expect(screen).toContain('thread.gender === undefined ? undefined : seatFace({');
         expect(screen).not.toContain('thread.gender === undefined ? null');
         expect(screen).not.toContain('undefined : faceFor(');
     });
 
     it('and it passes the age, or every child is the same band', () => {
-        const call = /poolFace\(\{[\s\S]*?\}\)/.exec(screen)?.[0] ?? '';
+        const call = /seatFace\(\{[\s\S]*?\}\)/.exec(screen)?.[0] ?? '';
         expect(call).toContain('age: thread.age');
         expect(call).toContain("female: thread.gender === 'female'");
     });

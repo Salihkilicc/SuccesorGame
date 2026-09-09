@@ -191,7 +191,7 @@ export const gameSink = (): EffectSink => ({
         const m = castNow(who);
         if (!m) throw new Error(`story: no cast member "${who}"`);
         useMessageStore.getState().sendFromCharacter(
-            { id: m.id, name: m.name, role: m.role, gender: m.gender, age: m.age },
+            { id: m.id, name: m.name, role: m.role, gender: m.gender, age: m.age, portraitId: m.portraitId },
             text,
             useGameStore.getState().currentMonth,
         );
@@ -204,6 +204,7 @@ export const gameSink = (): EffectSink => ({
             fromName: from.name,
             fromGender: from.gender,
             fromAge: from.age,
+            fromPortraitId: from.portraitId,
             fromEmail: emailOf(from) ?? '',
             subject: m.subject,
             body: m.body,

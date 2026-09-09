@@ -184,6 +184,31 @@ export const faceFor = (p: Person): ImageSourcePropType | null => {
 //  calling this instead. It is the second half of faceFor and nothing more.
 // ============================================================================
 
+/**
+ * The face for somebody whose thread id is a SEAT rather than a person.
+ *
+ * ---------------------------------------------------------------------------
+ *  THE POOL WAS PICKING BY SEAT, SO TWO HOLDERS SHARED A FACE
+ * ---------------------------------------------------------------------------
+ *  `poolFace` hashes `p.id`, and the id being passed was the thread's - 'cfo'
+ *  - which every chief financial officer in the dynasty shares. Same hash,
+ *  same slot. MEASURED: thirteen collisions across eight seats, including
+ *  Ingrid Sollberg and Mariela Fontana, the second and fourth to hold that
+ *  job, coming out as the same photograph.
+ *
+ *  `portraitId` is theirs alone. It is tried as a DRAWN file first, so the
+ *  moment a portrait exists at cfo_g2.png they stop taking a pool face at
+ *  all; until then it is what the pool hashes, which is enough to tell two
+ *  people apart.
+ */
+export const seatFace = (
+    p: Person & { portraitId?: string },
+): ImageSourcePropType | null => {
+    const own = p.portraitId ? portraitForPerson(p.portraitId, undefined) : null;
+    if (own) return own;
+    return poolFace({ ...p, id: p.portraitId || p.id });
+};
+
 /** A face from the anonymous pool, without asking whether they own one. */
 export const poolFace = (p: Person): ImageSourcePropType | null => {
     if (p.female === undefined) return null;

@@ -253,7 +253,31 @@ ATTIRE_F = [
 
 
 def is_female(name: str, cast_id: str = '') -> bool:
+    # ------------------------------------------------------------------
+    #  THE ROSTER SEXES ITSELF
+    # ------------------------------------------------------------------
+    #  Everybody else here is sexed by the hand written FEMALE set, which is
+    #  a SECOND list and can therefore disagree with the first. The eight
+    #  seats carry `gender` in the data, so a name added to the game cannot
+    #  be drawn as the wrong sex and nobody has to remember to add it here.
+    # ------------------------------------------------------------------
+    seats = read_generations()
+    if cast_id in seats:
+        return seats[cast_id][1]
     return (cast_id in CAST_FEMALE) or (name in FEMALE)
+
+
+def age_phrase(years: int) -> str:
+    """A number turned into the words the prompt actually wants."""
+    if years >= 65:
+        return 'elderly'
+    if years >= 55:
+        return 'in their late fifties'
+    if years >= 45:
+        return 'in their late forties'
+    if years >= 35:
+        return 'in their late thirties'
+    return 'in their early thirties'
 
 
 # ===========================================================================
@@ -439,6 +463,12 @@ def prompt_for(name: str, cast_id: str = '', region: str = '') -> str:
         who = CAST_LOOKS[cast_id]
     else:
         a = appearance(name, female, region)
+        # A seat holder has a real age in the roster rather than a hashed
+        # one. An executive drawn as twenty six would be the same failure
+        # the old female band had, in the other direction.
+        seats = read_generations()
+        if cast_id in seats:
+            a['age'] = age_phrase(seats[cast_id][2])
         # WEIGHTED, because the plain word is not enough. "a woman" alone
         # still came back as a man often enough to matter; the emphasis and
         # the second term together hold it.
@@ -987,6 +1017,47 @@ BOARD = {
     'npc-victor-k': 'Victor K.',
     'npc-sarah-jen': 'Sarah Jen',
 }
+
+
+# ---------------------------------------------------------------------------
+#  AND THE PEOPLE WHO HOLD THOSE SEATS AFTER THE FOUNDER
+# ---------------------------------------------------------------------------
+#  data/story/castGenerations.ts turns eight seats over every generation: the
+#  three executives, the friend and the four rival heads, five deep. That is
+#  thirty two people who did not exist when the portraits were drawn, and who
+#  were taking anonymous pool faces - two of them literally the same face,
+#  because the pool picks by SEAT and every chief financial officer shares one.
+#
+#  READ OUT OF THE APP, like every other roster in this file, and the GENDER
+#  COMES WITH THEM. Everybody else in here is sexed by the hand written FEMALE
+#  set above, which is a second list that can disagree with the first; these
+#  carry their own, so a name added to the game cannot be drawn as the wrong
+#  sex. The age comes too, which the face pools have never had for the cast.
+#
+#  Ids are `seat_gN` - cfo_g2 - which is exactly what the app looks a drawn
+#  portrait up under. See data/story/castGenerations.seatPortraitId.
+# ---------------------------------------------------------------------------
+
+def read_generations() -> dict:
+    """{id: (name, is_female, age)} for every seat holder after the founder."""
+    path = os.path.join(HERE, '..', 'src', 'data', 'story', 'castGenerations.ts')
+    try:
+        src = open(path, encoding='utf8').read()
+    except OSError:
+        return {}
+
+    out = {}
+    # Each seat is `name: [ {...}, {...} ],` inside CAST_GENERATIONS.
+    body = re.search(r'CAST_GENERATIONS[^=]*=\s*\{(.*)\n\};', src, re.S)
+    if not body:
+        return {}
+    for seat, rows in re.findall(r'\n    (\w+): \[(.*?)\n    \],', body.group(1), re.S):
+        holders = re.findall(
+            r"\{ name: '([^']+)', gender: '(male|female)', age: (\d+) \}", rows)
+        # Generation one is drawn already, under the seat's own id.
+        for i, (name, gender, age) in enumerate(holders[1:], start=2):
+            out[f'{seat}_g{i}'] = (name, gender == 'female', int(age))
+    return out
 
 
 def read_cast() -> dict:
