@@ -20,6 +20,7 @@ import { fatherQ1Invoice } from './fatherQ1Invoice';
 import { fatherMorale } from './fatherMorale';
 import { fatherMarketing } from './fatherMarketing';
 import { ctoResearch } from './ctoResearch';
+import { cooProduction } from './cooProduction';
 import { FLOOR_HINTS, FLOOR_HINT_IDS } from './floorHints';
 import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
@@ -156,6 +157,7 @@ export const CONVERSATIONS: Conversation[] = [
     // research lock when the player opens the laboratory - see
     // data/tutorial/sequence.ts.
     ctoResearch,
+    cooProduction,
     pearOffer,
     // The same letter to the next one, whenever the chair changes hands.
     pearOfferHeir,

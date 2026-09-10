@@ -200,9 +200,35 @@ describe('a new game', () => {
         expect(lock?.highlight).toBe('products');
     });
 
-    it('then points at the budget row, once the sheet has been opened', () => {
+    it('then explains the production row, which is the top of that sheet', () => {
+        // ------------------------------------------------------------------
+        //  THIS USED TO GO STRAIGHT TO THE BUDGET, AND THAT SKIPPED A NUMBER
+        // ------------------------------------------------------------------
+        //  The product sheet has two controls on it. The tutorial could reach
+        //  one, so the first thing the game taught about a product was how to
+        //  advertise it, with the figure that decides whether the quarter is
+        //  profitable sitting unmentioned directly above.
+        //
+        //  Asked for as "aciklamayi rp icin yaptigin gibi urunleri de
+        //  anlatmani istiyorum", and built to the same shape - see
+        //  `q1-production` in data/tutorial/sequence.ts.
+        //
+        //  In the screen's own reading order: build it, then tell people
+        //  about it.
+        // ------------------------------------------------------------------
         const after = opening({ flags: { tutorialProductOpened: true } });
         const lock = activeLock(TUTORIAL_SEQUENCE, emptyLockState(), after);
+        expect(lock?.id).toBe('q1-production');
+        expect(lock?.highlight).toBe('production');
+        // Read and tapped away rather than done: there is a right answer and
+        // it depends on a number that moves every quarter.
+        expect(lock?.acknowledge).toBe(true);
+    });
+
+    it('and points at the budget row once that card has been read', () => {
+        const after = opening({ flags: { tutorialProductOpened: true } });
+        const read: LockState = { ...emptyLockState(), completed: ['q1-production'] };
+        const lock = activeLock(TUTORIAL_SEQUENCE, read, after);
         expect(lock?.id).toBe('q1-marketing');
         expect(lock?.highlight).toBe('marketing');
     });
@@ -216,6 +242,12 @@ describe('a new game', () => {
 
 describe('after the player buys some attention', () => {
     const afterwards = opening({ flags: { tutorialProductOpened: true, tutorialMarketingSet: true } });
+
+    // The production card is an `acknowledge` step, so it is cleared by a tap
+    // and recorded in LockState rather than in the world. A scenario that is
+    // past the product sheet has to say so here; without it every assertion
+    // below finds that card still waiting, correctly.
+    const sheetRead: LockState = { ...emptyLockState(), completed: ['q1-production'] };
 
     it('it points at research, which nothing used to do', () => {
         // ------------------------------------------------------------------
@@ -232,7 +264,7 @@ describe('after the player buys some attention', () => {
         //  was the returning-player check disabling every lock; this is the
         //  half that was missing even with the locks on.
         // ------------------------------------------------------------------
-        expect(showing(afterwards)).toBe('q1-research');
+        expect(showing(afterwards, sheetRead)).toBe('q1-research');
     });
 
     it('and it stops once they have opened it', () => {
@@ -242,7 +274,7 @@ describe('after the player buys some attention', () => {
                 tutorialMarketingSet: true,
                 rndOpened: true,
             },
-        }))).toBe('rnd-lab');
+        }), sheetRead)).toBe('rnd-lab');
     });
 
     it('and morale is not next until morale has actually settled', () => {
@@ -252,7 +284,7 @@ describe('after the player buys some attention', () => {
         expect(showing(opening({
             flags: { tutorialProductOpened: true, tutorialMarketingSet: true },
             morale: 72,
-        }))).toBe('morale-bonus');
+        }), sheetRead)).toBe('morale-bonus');
     });
 
     it('and there is no third step, because its lesson moved to the first', () => {
@@ -266,7 +298,9 @@ describe('after the player buys some attention', () => {
             // point is - which can only be taught once one exists. See the
             // note on `rnd-points` in data/tutorial/sequence.ts.
             'rnd-lab', 'rnd-hire', 'rnd-points',
-            'q1-open-product', 'q1-marketing', 'morale-bonus',
+            // The sheet, top to bottom: get in, understand the number at the
+            // top, then set the one below it.
+            'q1-open-product', 'q1-production', 'q1-marketing', 'morale-bonus',
             // Last, and behind morale on purpose: morale is on a clock and
             // research is on none, so the timed lesson goes first.
             'q1-research',
@@ -281,7 +315,7 @@ describe('after the player buys some attention', () => {
                 tutorialBonusPaid: true,
             },
             quarter: 3, morale: 75,
-        }))).toBe('q1-research');
+        }), sheetRead)).toBe('q1-research');
 
         expect(showing(opening({
             flags: {
@@ -293,19 +327,54 @@ describe('after the player buys some attention', () => {
                 rndHired: true,
             },
             quarter: 3, morale: 75,
-        }), { ...emptyLockState(), completed: ['rnd-points'] })).toBeUndefined();
+        }), { ...emptyLockState(), completed: ['rnd-points', 'q1-production'] })).toBeUndefined();
     });
 });
 
 describe('the year ends', () => {
-    it('nothing is taught once the father is dead', () => {
-        // Every lock carries `noFlag fatherDead`. A tutorial that reappears
-        // in year three is a bug, and this is the one line that prevents it.
-        expect(showing(opening({ flags: { fatherDead: true } }))).toBeUndefined();
-        expect(showing(opening({
-            flags: { fatherDead: true, tutorialProductOpened: true, tutorialMarketingSet: true },
+    it('nothing the FATHER teaches is taught once he is dead', () => {
+        // ------------------------------------------------------------------
+        //  THE CLAIM USED TO BE "EVERY LOCK", AND IT WAS ALREADY UNTRUE
+        // ------------------------------------------------------------------
+        //  It read "every lock carries `noFlag fatherDead`" and passed only
+        //  because the exceptions needed a second flag the test never set.
+        //  The research chain has never been gated on him, on purpose: it is
+        //  triggered by the player rather than by the calendar and can fire
+        //  in year four. `q1-production` is the same, for the same reason.
+        //
+        //  So the guarantee is narrower than the old sentence and is the one
+        //  that actually matters: a lesson in HIS voice does not come back
+        //  after he is gone. A tutorial where a dead man gives instructions
+        //  is the bug this was written against.
+        // ------------------------------------------------------------------
+        const dead = { fatherDead: true } as const;
+        expect(showing(opening({ flags: dead }))).toBeUndefined();
+
+        const gone = showing(opening({
+            flags: { ...dead, tutorialProductOpened: true, tutorialMarketingSet: true },
             quarter: 3,
-        }))).toBeUndefined();
+        }));
+        // Whatever is left, it is not his.
+        const speaker = TUTORIAL_SEQUENCE.find(l => l.id === gone)?.speaker ?? 'father';
+        expect([gone, speaker]).not.toEqual([gone, 'father']);
+
+        // And once the sheet's card has been read there is nothing at all.
+        expect(showing(opening({
+            flags: { ...dead, tutorialProductOpened: true, tutorialMarketingSet: true },
+            quarter: 3,
+        }), { ...emptyLockState(), completed: ['q1-production'] })).toBeUndefined();
+    });
+
+    it('and every step still in the father\'s voice is gated on him being alive', () => {
+        // The rule the test above checks one instance of, checked for all of
+        // them. If somebody writes a new father lock and forgets the gate,
+        // this is what catches it rather than a playthrough in year three.
+        const ungated = TUTORIAL_SEQUENCE
+            .filter(l => (l.speaker ?? 'father') === 'father')
+            .filter(l => !(l.canEngage ?? [])
+                .some(c => c.kind === 'noFlag' && c.flag === 'fatherDead'))
+            .map(l => l.id);
+        expect(ungated).toEqual([]);
     });
 
     it('a skipped step does not come back', () => {

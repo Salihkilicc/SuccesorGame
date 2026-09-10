@@ -782,7 +782,23 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             Soyut yuzde yerine GERCEK adet ve pazarin istedigi
                             adet yan yana. Oyuncu "az mi cok mu uretiyorum"
                             sorusunu tek bakista cevaplasin. */}
-                        <View style={styles.controlGroup}>
+                        {/* ------------------------------------------------
+                            AND THE OTHER HALF OF THE FIRST LESSON
+
+                            The marketing row below has been a tutorial
+                            target since the opening act was written. This
+                            row was not, so the first thing the game teaches
+                            about a product was how to advertise it - and
+                            the number that decides whether the quarter is
+                            profitable sat above it, unmentioned.
+
+                            Same reason the RP counter got its own step:
+                            a control the player will get wrong is worth a
+                            card, and the ceiling on this slider is not a
+                            target. See `q1-production` in
+                            data/tutorial/sequence.ts.
+                           ------------------------------------------------ */}
+                        <TutorialTarget tutorialKey="production" style={styles.controlGroup}>
                             <View style={styles.controlHeader}>
                                 <Text style={styles.controlTitle}>{t('product.production')}</Text>
                                 <InfoDot
@@ -977,7 +993,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 retooling notice and the quality cap. All
                                 three are standing conditions rather than
                                 feedback on the slider you are holding. */}
-                        </View>
+                        </TutorialTarget>
 
                         {/* ══ BU URUN NEDEN BU KADAR KAZANIYOR ══
                             Oyuncunun en cok sordugu sey: "Smart Speaker 200

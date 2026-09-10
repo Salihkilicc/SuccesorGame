@@ -98,6 +98,33 @@ describe('the dictionary', () => {
         expect(c.total).toBe(allStoryKeys().length);
         expect(c.translated + c.missing.length).toBe(c.total);
     });
+
+    it('and there is nothing left, so a new scene cannot arrive untranslated', () => {
+        // ------------------------------------------------------------------
+        //  THE HEADER SAYS COVERAGE IS DELIBERATELY NOT ASSERTED. IT WAS.
+        // ------------------------------------------------------------------
+        //  The reasoning was good and it was about a different moment: "the
+        //  translation is done in batches and a test that fails until every
+        //  one of eleven hundred lines is in would be switched off on day
+        //  one". True while hundreds were outstanding.
+        //
+        //  There are none outstanding. All 1,414 are in, so this stops being
+        //  a test that fails for a year and becomes a RATCHET: it holds where
+        //  the work already got to, and the only way to break it is to add a
+        //  new English line and not translate it.
+        //
+        //  Which is exactly what nearly shipped. Dana's production scene went
+        //  in with thirteen English cards and a fourteenth on the tutorial
+        //  card, every suite stayed green, and they were found by running the
+        //  coverage function by hand. That is the same failure as the
+        //  laboratory names one file over, and it is the third time this
+        //  class of thing has been reported.
+        //
+        //  A failure here is not a bug. It is a to-do list: the message names
+        //  every key that needs a line in STORY_TR.
+        // ------------------------------------------------------------------
+        expect(coverage(allStoryKeys(), 'tr').missing).toEqual([]);
+    });
 });
 
 describe('lookup', () => {
