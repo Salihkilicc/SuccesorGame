@@ -18,6 +18,9 @@ import {
     DIM_HEAVY,
 } from './locks';
 import { CAST } from '../../data/story/cast';
+import fs from 'fs';
+import path from 'path';
+
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
 import { INITIAL_DIALS } from '../story/state';
 import type { World } from '../story/conditions';
@@ -288,7 +291,7 @@ describe('somebody is saying it', () => {
         //  `rnd-lab`. Priya argues for the laboratory once; the two steps
         //  after it are the doing, not a second argument.
         expect(TUTORIAL_SEQUENCE.filter(l => !l.conversation).map(l => l.id))
-            .toEqual(['rnd-hire', 'rnd-points', 'q1-open-product', 'q1-marketing']);
+            .toEqual(['rnd-hire', 'rnd-points', 'q1-open-product', 'q1-marketing', 'q1-research']);
     });
 
     it('the instruction stays short enough to sit on a dimmed screen', () => {
@@ -325,7 +328,10 @@ describe('a lock points at a control that exists', () => {
     //  `rndPoints` is the RP counter in the laboratory header. It arrived
     //  when the research lesson was split in two: the price lands on the hire
     //  button and what a point IS lands on the number itself, once one exists.
-    const REGISTERED = ['products', 'marketing', 'teamMorale', 'rndLab', 'rndHire', 'rndPoints'];
+    const REGISTERED = ['products', 'marketing', 'teamMorale', 'rndLab', 'rndHire', 'rndPoints',
+        //  And the department tile that opens the whole chain. Everything
+        //  above it was gated on the player having already found research.
+        'rndDepartment'];
 
     it('every highlight key is one a screen actually registers', () => {
         // A key nothing registers is a lock that can now never appear at all,
@@ -337,10 +343,41 @@ describe('a lock points at a control that exists', () => {
         expect(unknown).toEqual([]);
     });
 
+    it('and every key on that list is one a screen really registers', () => {
+        // ------------------------------------------------------------------
+        //  THE LIST WAS A PROMISE RATHER THAN A MEASUREMENT
+        // ------------------------------------------------------------------
+        //  REGISTERED is hand-written, so it said a key was registered because
+        //  somebody typed it here. Probed by deleting the <TutorialTarget>
+        //  around the research tile: every test stayed green while the step
+        //  pointed at a control that had stopped existing, which is the exact
+        //  failure the list was added to catch.
+        //
+        //  So it reads the screens. A key nobody wraps anything in makes the
+        //  lock invisible - the overlay returns early when the rect is
+        //  missing - and invisible is how this bug looks from the sofa.
+        // ------------------------------------------------------------------
+        const walk = (dir: string, out: string[] = []): string[] => {
+            for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+                const full = path.join(dir, e.name);
+                if (e.isDirectory()) { walk(full, out); continue; }
+                if (/\.tsx$/.test(e.name)) out.push(full);
+            }
+            return out;
+        };
+        const src = walk(path.join(__dirname, '..', '..'))
+            .map(f => fs.readFileSync(f, 'utf8'))
+            .join('\n');
+        const missing = REGISTERED.filter(
+            key => !src.includes(`tutorialKey="${key}"`));
+        expect(missing).toEqual([]);
+    });
+
     it('and the keys it can point at are few enough to list', () => {
         // If this grows, the list above is stale and the check is weaker than
-        // it reads. Kept small on purpose.
-        expect(REGISTERED.length).toBeLessThanOrEqual(6);
+        // it reads. Kept small on purpose. Seven since the research chain got
+        // a door into it - `rndDepartment` - which is the tile that starts it.
+        expect(REGISTERED.length).toBeLessThanOrEqual(7);
     });
 
     it('the opening lesson is two steps, and they light different things', () => {

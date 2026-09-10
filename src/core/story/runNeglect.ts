@@ -26,6 +26,17 @@ import { NEGLECT_LINES } from '../../data/story/neglect';
 import { whoWasIgnored, NEGLECT_STEP, type Neglectable } from './neglect';
 
 /**
+ * How many people may complain in one quarter.
+ *
+ * One, and it is the same number and the same reasoning as
+ * `inbox.DELIVERIES_PER_QUARTER`: a chase is a message from a person, and
+ * four of them in one morning is the inbox shouting rather than the cast
+ * speaking. Nothing is lost - anybody held back is still owed a reply next
+ * quarter and gets found again.
+ */
+export const CHASES_PER_QUARTER = 1;
+
+/**
  * Has this conversation actually been answered?
  *
  * `finish()` records a null node and nothing else does, so a null is the one
@@ -86,6 +97,32 @@ const owedAReply = (): Neglectable[] => {
             // the chase lands in the thread; mail needed it saying out loud.
             const isUnanswered = !!mail.conversationId && !answered(mail.conversationId);
 
+            // ----------------------------------------------------------
+            //  A LETTER THAT ASKS NOTHING CANNOT BE IGNORED
+            // ----------------------------------------------------------
+            //  `unread` used to be set from `mail.isRead` alone, and that is
+            //  what produced "durduk yere ilgili yazismamis hakkinda mail
+            //  geliyor fazlaca". The loop:
+            //
+            //    an unopened letter makes its sender chaseable
+            //      -> the chase arrives, as another letter
+            //        -> the chase is unopened too, and carries NO
+            //           conversation, so it asks nothing
+            //          -> and it made them chaseable again
+            //
+            //  Every three months, forever, from anybody whose post the
+            //  player left unopened - including people the player has never
+            //  had a single exchange with, because the chase letter itself
+            //  was enough to qualify them.
+            //
+            //  `answered()` at the top of this file already says the right
+            //  thing about these: "a plain letter asks nothing". This is that
+            //  sentence applied to the other half of the test. Somebody is
+            //  owed a reply when they ASKED SOMETHING, and a letter with no
+            //  conversation on it did not.
+            // ----------------------------------------------------------
+            const owes = !mail.isRead && isUnanswered;
+
             const existing = byCast.get(who);
             if (existing) {
                 existing.messages = [
@@ -96,7 +133,7 @@ const owedAReply = (): Neglectable[] => {
             } else {
                 byCast.set(who, {
                     id: who,
-                    unread: mail.isRead ? 0 : 1,
+                    unread: owes ? 1 : 0,
                     messages: [{ from: 'them', atMonth: mail.atMonth }],
                     unanswered: isUnanswered,
                 });
@@ -140,7 +177,44 @@ export const runNeglect = (): string[] => {
         // correct outcome: a mechanic that fires without any writing behind it
         // is a notification, and this exists precisely because a notification
         // was the wrong answer.
-        .filter(id => !!NEGLECT_LINES[id]);
+        .filter(id => !!NEGLECT_LINES[id])
+        // ------------------------------------------------------------------
+        //  AND NOBODY WRITES TO YOU FROM BEYOND THE GRAVE
+        // ------------------------------------------------------------------
+        //  `sendFromCharacter` CREATES a thread when none exists. So a chase
+        //  aimed at somebody whose thread was deliberately removed does not
+        //  fail quietly - it rebuilds the thread and puts them back at the top
+        //  of the messages screen.
+        //
+        //  Which is how the father came back. `closeThread` is on both answers
+        //  to the death scene and it works; this then undid it, and the player
+        //  could open his thread and type into it. Reported as "babamiz
+        //  olduktan sonra mesajlasabiliyoruz".
+        //
+        //  Asked as a QUESTION OF THE STORE rather than a list of dead people:
+        //  the thread being gone is the fact that matters, whatever removed
+        //  it, and a hand-kept list of the deceased is a list somebody forgets
+        //  to add to. Mail-only senders have no thread by design and are let
+        //  through on their channel instead.
+        // ------------------------------------------------------------------
+        .filter(id => {
+            const who = castNow(id);
+            if (!who) return false;
+            if (who.channels === 'mail') return true;
+            return (store.threads ?? []).some(t => t.id === id);
+        })
+        // ------------------------------------------------------------------
+        //  ONE A QUARTER, LIKE EVERYTHING ELSE THAT ARRIVES
+        // ------------------------------------------------------------------
+        //  There was no cap at all, so a quarter in which four people were
+        //  owed replies produced four complaints in one morning. The inbox
+        //  has had `DELIVERIES_PER_QUARTER = 1` since it was written, and a
+        //  chase is a message from a human being exactly as a scene is.
+        //
+        //  Nothing is lost by holding the rest back: they are still owed a
+        //  reply next quarter and `whoWasIgnored` will find them again.
+        // ------------------------------------------------------------------
+        .slice(0, CHASES_PER_QUARTER);
 
     for (const id of ignored) {
         const line = NEGLECT_LINES[id];

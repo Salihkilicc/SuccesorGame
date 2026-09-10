@@ -107,13 +107,48 @@ describe('starting again, having been through it once', () => {
     const returning = (completed: boolean) =>
         player().setState({ tutorialCompleted: completed, created: true });
 
-    it('does not teach a player who has already been taught', async () => {
-        // It used to, with a "Skip the whole tutorial" button on it - a dimmed
-        // screen, a card and a tap to reach the state they were always going
-        // to choose.
+    it('teaches a returning player who asked to be taught', async () => {
+        // ------------------------------------------------------------------
+        //  THIS ASSERTED THE OPPOSITE, AND IT WAS ANSWERING THE WRONG QUESTION
+        // ------------------------------------------------------------------
+        //  It read "does not teach a player who has already been taught" and
+        //  pinned `locks.disabled` after a plain `startNewGame()`. The
+        //  reasoning was sound on its own terms - a dimmed screen and a card
+        //  to reach the state they were always going to choose.
+        //
+        //  But `startNewGameAsking` ASKS a returning player which they want,
+        //  and this ran regardless of the answer. So a player who was asked
+        //  "play the opening act or skip it", chose to play it, and then went
+        //  looking for the laboratory lesson found nothing: the opening act
+        //  arrived correctly and every teaching lock had been switched off
+        //  behind it by a line about a different decision.
+        //
+        //  Reported as the tutorial not appearing at all. The prompt is the
+        //  better signal: it is what this player wants THIS TIME, where the
+        //  flag is what they did once.
+        // ------------------------------------------------------------------
         returning(true);
         await startNewGame();
+        expect(story().getState().locks.disabled).toBe(false);
+    });
+
+    it('and does not teach one who asked to skip', async () => {
+        // The other half, and the half that was always right. Skipping the
+        // act means skipping the lessons inside it - that is what the button
+        // is for.
+        returning(true);
+        await startNewGame({ skipOpening: true });
         expect(story().getState().locks.disabled).toBe(true);
+    });
+
+    it('and a first time player is never silenced, whatever the flag says', () => {
+        // `startNewGameAsking` does not ask somebody who has not seen the
+        // opening, so they always take the `!skipOpening` path. Pinned by
+        // reading the door rather than the state, because the state is the
+        // same either way at this point.
+        const src = require('fs').readFileSync(
+            require('path').join(__dirname, 'newGamePrompt.ts'), 'utf8');
+        expect(src).toMatch(/if \(!hasSeenTheOpening\(\)\) \{\s*\n\s*void go\(\{\}\);/);
     });
 
     it('and you are yourself again, face as well as name', async () => {

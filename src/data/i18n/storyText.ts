@@ -84,6 +84,7 @@ export const STORY_TR: StoryDictionary = {
     '@lock/rnd-hire': 'Bir araştırmacı işe al. Ucuz değiller ve maaş hiç durmuyor.',
     '@lock/rnd-points': 'Bu sayı para değil ve satın alarak geçemezsin. Puanlar, insanların çalıştığı her çeyrek birikir; bu şirketin ne üretebileceğini değiştiren tek şey de onlar.',
     '@lock/rnd-lab': 'Laboratuvarı aç.',
+    '@lock/q1-research': 'Araştırmayı aç. Ben geldiğimde bu şirketin sattığı hiçbir şey yeni değildi.',
     'cfo-board-room/goodTrade': 'O halde öyle yaparız.\n\nVe... teşekkür ederim. Babanız bu anlaşmaya hiçbir zaman evet dememişti. Sadece ona anlattıklarıma göre hareket etmeye başlardı; ben de bunu rıza olarak kabul etmeyi seçerdim.',
     'cfo-board-room/goodTrade#0': 'Ben evet diyorum.',
     'cfo-board-room/halfAThing': 'Anlaşıldı.\n\nO halde şirket sekreteri olarak görevim gereği gündem yayımlandığında size iletirim.',

@@ -421,18 +421,43 @@ const applyReturningPlayer = ({ skipOpening }: NewGameOptions) => {
     }
 
     // ------------------------------------------------------------------
-    //  THE TUTORIAL DOES NOT COME BACK
+    //  THE TUTORIAL DOES NOT COME BACK, UNLESS THEY ASKED FOR IT
     // ------------------------------------------------------------------
-    //  It used to, with a "Skip the whole tutorial" button on it for anybody
-    //  who had finished it before - which is a dimmed screen, a card and a tap
+    //  It used to come back with a "Skip the whole tutorial" button on it for
+    //  anybody who had finished it before - a dimmed screen, a card and a tap
     //  to arrive at the state they were always going to choose. Somebody who
-    //  has been taught the game is not asked again.
+    //  has been taught the game is not asked again, and that reasoning holds.
+    //
+    //  ------------------------------------------------------------------
+    //   BUT IT WAS ANSWERING A QUESTION THE PLAYER HAD ALREADY ANSWERED
+    //  ------------------------------------------------------------------
+    //  This sat ABOVE the `skipOpening` return, so it ran on every new game a
+    //  returning player started - including the ones where they had just been
+    //  asked "play the opening act or skip it" and said PLAY IT.
+    //
+    //  So the prompt was real, the answer was read, the opening act arrived
+    //  correctly, and every teaching lock was silently switched off behind it.
+    //  Reported as the laboratory lesson never appearing: it was disabled
+    //  before the player reached the laboratory, by a line about a different
+    //  decision.
+    //
+    //  `startNewGameAsking` only asks somebody who has seen the opening, and
+    //  `hasSeenTheOpening` is the same population `tutorialCompleted`
+    //  describes. So the answer is the better signal: it is what this player
+    //  wants THIS TIME, where the flag is what they did once.
+    //
+    //  Moved below the return. A skipped act still means no locks - that is
+    //  the whole point of skipping - and it now means it because the player
+    //  said so rather than because they finished the tutorial in 2024.
     // ------------------------------------------------------------------
-    if (player.tutorialCompleted) {
-        useStoryStore.setState(s => ({ locks: { ...s.locks, disabled: true } }));
+    if (!skipOpening) {
+        if (__DEV__ && player.tutorialCompleted) {
+            console.log('[newGame] Opening act requested; the tutorial locks stay on.');
+        }
+        return;
     }
 
-    if (!skipOpening) return;
+    useStoryStore.setState(s => ({ locks: { ...s.locks, disabled: true } }));
 
     // ------------------------------------------------------------------
     //  AND THE FIRST YEAR IS ALREADY BEHIND THEM

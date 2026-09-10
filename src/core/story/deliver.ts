@@ -29,6 +29,8 @@ import { CAST } from '../../data/story/cast';
 import { conversationById, OPENING_CONVERSATIONS, STORY_BEATS } from '../../data/story';
 import { castNow } from './castNow';
 import { emailOf } from './cast';
+import { line, nodeKey, subjectKey } from '../../data/i18n/storyText';
+import type { Conversation } from './graph';
 import { drain, QUIET_QUARTER_CHANCE, type Pending } from './inbox';
 import { testAll, firstFailing } from './conditions';
 import { readWorld, currentQuarter } from './world';
@@ -118,6 +120,30 @@ const whoTheHeirActuallyIs = (
 };
 
 /** Put one conversation in front of the player. */
+// ---------------------------------------------------------------------------
+//  THE PREVIEW AND THE MESSAGE WERE IN DIFFERENT LANGUAGES
+// ---------------------------------------------------------------------------
+//  Reported as "mesajlarin onizlemesi ile icindekiler tiklayinca ayni
+//  olmuyor, senkronize degil", and the two halves really were reading two
+//  different strings:
+//
+//    the LIST stored `opening.text` - the source, which is English, because
+//    every line in this game is authored in English and translated in
+//    data/i18n/storyText.ts;
+//
+//    and TAPPING IN runs useConversationRunnerLogic, which renders every node
+//    through `line(nodeKey(...))` and therefore shows the Turkish.
+//
+//  So the row said one thing and the screen behind it said another, in a
+//  different language, which reads as a bug in the data rather than as a
+//  missing call. One function, used by both, and they cannot drift again.
+// ---------------------------------------------------------------------------
+/** The opening card as the player will actually read it. */
+const openingLine = (c: Conversation): string => {
+    const opening = c.nodes.find(n => n.id === c.start);
+    return opening ? line(nodeKey(c.id, opening.id), opening.text) : '';
+};
+
 export const deliver = (conversationId: string): boolean => {
     const c = conversationById(conversationId);
     if (!c) return false;
@@ -177,11 +203,13 @@ export const deliver = (conversationId: string): boolean => {
             fromAge: from.age,
             fromPortraitId: from.portraitId,
             fromEmail: emailOf(from) ?? '',
-            subject: c.subject ?? '(no subject)',
+            // Same argument as the body: the row shows this and the
+            // reader translates it, so it must be translated here too.
+            subject: c.subject ? line(subjectKey(c.id), c.subject) : '(no subject)',
             // The opening card doubles as the preview. A separate summary
             // field would be a second copy of the same words, and the two
             // would drift the first time anybody edited one of them.
-            body: opening?.text ?? '',
+            body: openingLine(c),
             atMonth,
             category: 'Primary',
             conversationId: c.id,
@@ -202,7 +230,7 @@ export const deliver = (conversationId: string): boolean => {
             portraitId: from.portraitId,
             ...whoTheHeirActuallyIs(from.id),
         },
-        opening?.text ?? '',
+        openingLine(c),
         atMonth,
     );
     // sendFromCharacter creates or reuses the thread; attaching the

@@ -383,4 +383,49 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
     //          { kind: 'capitalAtLeast', amount: 500_000 },
     //      ],
     //  },
+    {
+        // ------------------------------------------------------------------
+        //  AND SOMEBODY HAS TO SAY THE WORD RESEARCH FIRST
+        // ------------------------------------------------------------------
+        //  THE WHOLE RESEARCH LESSON COULD ONLY START IF THE PLAYER HAD
+        //  ALREADY FOUND IT. `rnd-lab` is gated on `rndOpened`, which
+        //  ResearchScreen raises when it mounts - so the chain waited for
+        //  somebody who already knew where to go, and a player who never
+        //  wandered in was never told that research existed.
+        //
+        //  Reported as the laboratory lesson not appearing. The other half of
+        //  that was the returning-player check disabling every lock (see
+        //  core/newGame.ts); this is the half that was missing even when the
+        //  locks were on.
+        //
+        //  LAST IN THE ARRAY, and gated on marketing being set, so it is the
+        //  last thing the first year teaches. The first two lessons are about
+        //  the thing the company already sells and this is the first about
+        //  what it might sell next, which is the right order to meet them in.
+        //
+        //  BEHIND THE MORALE STEP specifically, and that is why it is last
+        //  rather than merely after marketing. Morale is on a clock: it
+        //  crosses the threshold in the second or third quarter and the lesson
+        //  is about that moment. Research is on no clock at all - it is as
+        //  true in quarter nine as in quarter three - so when both are
+        //  available the timed one goes first and this waits.
+        //
+        //  It is HIS, unlike the three steps it leads into. He is alive here
+        //  and it is his company; Priya takes over the moment the laboratory
+        //  is open, which is where she has been waiting - see
+        //  data/story/ctoResearch.ts.
+        //
+        //  No `canEngage` on money. Opening a page costs nothing, and a
+        //  company with no cash is the one that most needs to know what the
+        //  laboratory is for.
+        // ------------------------------------------------------------------
+        id: 'q1-research',
+        highlight: 'rndDepartment',
+        instruction: 'Open research. Nothing this company sells was new when I arrived.',
+        satisfied: [{ kind: 'flag', flag: 'rndOpened' }],
+        canEngage: [
+            { kind: 'noFlag', flag: 'fatherDead' },
+            { kind: 'flag', flag: 'tutorialMarketingSet' },
+        ],
+    },
 ];

@@ -320,18 +320,33 @@ const MyCompanyScreen = () => {
               />
             </TutorialTarget>
 
-            <DepartmentCard
-              icon="flask-outline"
-              iconColor="#A78BFA"
-              title={t('company.rDInvestment')}
-              subtitle={`${formatRP(totalRP)} RP`}
-              onPress={() => navigation.navigate('Research')}
-              info={{
-                title: t('tactic.rdTitle'),
-                text: t('tactic.rdText'),
-                detail: t('tactic.rdDetail'),
-              }}
-            />
+            {/* --------------------------------------------------------
+                THE DOOR INTO THE WHOLE RESEARCH LESSON.
+
+                The lesson was a chain that could only start once the
+                player had ALREADY found this screen: `rnd-lab` is gated on
+                `rndOpened`, which ResearchScreen raises when it mounts. So
+                the tutorial waited for somebody who already knew where to
+                go, and a player who never wandered in was never taught
+                that research exists at all.
+
+                Nothing in the first year pointed at it. This is the tile
+                that does. See data/tutorial/sequence.ts, `q1-research`.
+               -------------------------------------------------------- */}
+            <TutorialTarget tutorialKey="rndDepartment" style={styles.deptTargetWrap}>
+              <DepartmentCard
+                icon="flask-outline"
+                iconColor="#A78BFA"
+                title={t('company.rDInvestment')}
+                subtitle={`${formatRP(totalRP)} RP`}
+                onPress={() => navigation.navigate('Research')}
+                info={{
+                  title: t('tactic.rdTitle'),
+                  text: t('tactic.rdText'),
+                  detail: t('tactic.rdDetail'),
+                }}
+              />
+            </TutorialTarget>
 
             <DepartmentCard
               icon="chart-timeline-variant-shimmer"

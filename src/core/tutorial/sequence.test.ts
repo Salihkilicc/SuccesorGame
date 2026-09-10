@@ -217,10 +217,32 @@ describe('a new game', () => {
 describe('after the player buys some attention', () => {
     const afterwards = opening({ flags: { tutorialProductOpened: true, tutorialMarketingSet: true } });
 
-    it('the tutorial goes quiet, and that is correct', () => {
-        // THE ANSWER TO "why is nothing highlighted on Products". Nothing is
-        // wrong. There is no step to show until morale settles.
-        expect(showing(afterwards)).toBeUndefined();
+    it('it points at research, which nothing used to do', () => {
+        // ------------------------------------------------------------------
+        //  THIS USED TO ASSERT SILENCE, AND THE SILENCE WAS THE BUG
+        // ------------------------------------------------------------------
+        //  It read "the tutorial goes quiet, and that is correct" - nothing to
+        //  show until morale settles. That was true and it left a hole: the
+        //  whole research chain is gated on `rndOpened`, which only the
+        //  Research screen raises, so the lesson waited for a player who had
+        //  already found it on their own. Nothing in the first year ever said
+        //  the word.
+        //
+        //  Reported as the laboratory lesson never appearing. The other half
+        //  was the returning-player check disabling every lock; this is the
+        //  half that was missing even with the locks on.
+        // ------------------------------------------------------------------
+        expect(showing(afterwards)).toBe('q1-research');
+    });
+
+    it('and it stops once they have opened it', () => {
+        expect(showing(opening({
+            flags: {
+                tutorialProductOpened: true,
+                tutorialMarketingSet: true,
+                rndOpened: true,
+            },
+        }))).toBe('rnd-lab');
     });
 
     it('and morale is not next until morale has actually settled', () => {
@@ -245,7 +267,13 @@ describe('after the player buys some attention', () => {
             // note on `rnd-points` in data/tutorial/sequence.ts.
             'rnd-lab', 'rnd-hire', 'rnd-points',
             'q1-open-product', 'q1-marketing', 'morale-bonus',
+            // Last, and behind morale on purpose: morale is on a clock and
+            // research is on none, so the timed lesson goes first.
+            'q1-research',
         ]);
+        // And with the bonus paid the year has one thing left to say, which
+        // is where research is. It goes quiet only once that is done too -
+        // see the note on `q1-research` about why it waits behind morale.
         expect(showing(opening({
             flags: {
                 tutorialProductOpened: true,
@@ -253,7 +281,19 @@ describe('after the player buys some attention', () => {
                 tutorialBonusPaid: true,
             },
             quarter: 3, morale: 75,
-        }))).toBeUndefined();
+        }))).toBe('q1-research');
+
+        expect(showing(opening({
+            flags: {
+                tutorialProductOpened: true,
+                tutorialMarketingSet: true,
+                tutorialBonusPaid: true,
+                rndOpened: true,
+                rndLabOpened: true,
+                rndHired: true,
+            },
+            quarter: 3, morale: 75,
+        }), { ...emptyLockState(), completed: ['rnd-points'] })).toBeUndefined();
     });
 });
 
