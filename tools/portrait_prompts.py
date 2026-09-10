@@ -264,7 +264,51 @@ def is_female(name: str, cast_id: str = '') -> bool:
     seats = read_generations()
     if cast_id in seats:
         return seats[cast_id][1]
+    # ------------------------------------------------------------------
+    #  AND THE SIXTY ONE NAMED PLAYERS SEX THEMSELVES TOO, NOW
+    # ------------------------------------------------------------------
+    #  The forty magnates and twenty one rival chief executives used to fall
+    #  through to the hand written FEMALE set below, which meant the app had
+    #  no idea what sex any of them were and this file was the only place
+    #  that did. The moment the app needed one - a partner card off the poker
+    #  table - the choice was to guess or to copy the set.
+    #
+    #  So `female` went onto Magnate and CEO_FEMALE next to CEO_NAMES, in
+    #  src/core/casino/pokerTable.ts, and this reads it. Same argument as
+    #  read_generations directly above: a roster that carries the answer
+    #  cannot be drawn as the wrong sex, and nobody has to remember a list.
+    #
+    #  The values written into the app are the ones this set was already
+    #  producing, so no drawn face changes.
+    # ------------------------------------------------------------------
+    table = read_seat_genders()
+    if cast_id in table:
+        return table[cast_id]
     return (cast_id in CAST_FEMALE) or (name in FEMALE)
+
+
+_SEAT_GENDERS = None
+
+
+def read_seat_genders() -> dict:
+    """{seat id: is_female} out of src/core/casino/pokerTable.ts."""
+    global _SEAT_GENDERS
+    if _SEAT_GENDERS is not None:
+        return _SEAT_GENDERS
+    out = {}
+    try:
+        src = open(POKER_TABLE, encoding='utf8').read()
+    except OSError:
+        _SEAT_GENDERS = out
+        return out
+    for cid, fem in re.findall(r"\{ id: '(mg_[a-z_]+)',[^}]*female: (true|false) \}", src):
+        out[cid] = fem == 'true'
+    block = re.search(r'CEO_FEMALE[^=]*=\s*\{(.*?)\n\};', src, re.S)
+    if block:
+        for sid, fem in re.findall(r'(\w+): (true|false),', block.group(1)):
+            out[sid] = fem == 'true'
+    _SEAT_GENDERS = out
+    return out
 
 
 def age_phrase(years: int) -> str:

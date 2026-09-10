@@ -29,6 +29,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../../core/theme';
 import { avatarHue, type SeatKind } from '../../../core/casino/pokerTable';
+import { translateOccupation } from '../../../data/i18n/profileLoveShopText';
 import Portrait from '../../../components/common/Portrait';
 import type { Action } from '../../../core/casino/pokerBots';
 import type { Card } from '../../../core/casino/blackjack';
@@ -148,7 +149,20 @@ const PokerSeat = ({
                     ]}
                     numberOfLines={1}
                 >
-                    {company || KIND_LABEL[kind]}
+                    {/* ------------------------------------------------
+                        A MAGNATE'S LINE WAS IN ENGLISH ON EVERY SEAT.
+
+                        `Magnate.of` - "Shipping, fourth generation" - has
+                        been printed here since the table was built, and
+                        scripts/untranslated.js cannot see it: it reads .tsx
+                        and looks at Text CHILDREN and naming props, and this
+                        arrives through a variable out of a .ts data file.
+
+                        A rival's company is a brand name and stays as it is;
+                        the registry returns anything it does not know
+                        unchanged, so both cases go through one call.
+                       ------------------------------------------------ */}
+                    {translateOccupation(company || '') || KIND_LABEL[kind]}
                 </Text>
             )}
             <Text style={styles.stack}>{money(stack)}</Text>

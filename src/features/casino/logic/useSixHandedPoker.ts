@@ -382,9 +382,35 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean, roomBuyIn?: 
         roundRef.current = null;
         setField('money', Math.max(0, useStatsStore.getState().money + back));
         setStatus(result >= 0 ? 'You leave ahead.' : 'You leave light.');
+
+        // ------------------------------------------------------------------
+        //  AND SOMETIMES SOMEBODY AT THAT TABLE WRITES TO YOU
+        // ------------------------------------------------------------------
+        //  Here rather than at the seat, because that is the shape the message
+        //  is meant to have: the night ends, you stand up, and later one of
+        //  them says something. A button under a face while a hand is live
+        //  would be a menu.
+        //
+        //  On `leave` rather than on the unmount cleanup below, deliberately.
+        //  The cleanup runs when the screen goes away for ANY reason - a
+        //  navigation event, a back press from three screens up - and a
+        //  message that arrives because the app changed screens is a message
+        //  the player cannot connect to anything they did.
+        //
+        //  It sends nothing by itself; see features/casino/logic/
+        //  tableInterest.ts for who is eligible and love/logic/runCourtship
+        //  for what happens when the player acts on it.
+        // ------------------------------------------------------------------
+        try {
+            require('./tableSuitor').offerTableSuitor(opponents);
+        } catch (e) {
+            // A message is a nicety. It must never cost the player their
+            // chips, which have already moved two lines above this.
+            console.warn('[casino] nobody could write after the table', e);
+        }
         return back;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setField]);
+    }, [setField, opponents]);
 
     /**
      * And leaving the screen cashes you out.

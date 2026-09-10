@@ -17,7 +17,7 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { currentQuarter, readStanding } from '../../../core/story/world';
-import { generatePartner } from './partnerGenerator';
+import { generatePartner, partnerFromKnownPerson } from './partnerGenerator';
 import { refusalLine, VOICE_FOR_PERSONALITY } from '../data/strainLines';
 import {
     tiersOpenTo, courtshipFor, REFUSAL_COOLDOWN_QUARTERS,
@@ -90,6 +90,49 @@ export const earnedTier = (): SocialTier | null => {
  * passes nothing.
  */
 export const runCourtship = (roll: () => number = Math.random): CourtshipResult => {
+    // ------------------------------------------------------------------
+    //  SOMEBODY WHO ALREADY WROTE COMES FIRST
+    // ------------------------------------------------------------------
+    //  A magnate the player sat across from at a poker table said they were
+    //  interested, and that message is held on the family store until the
+    //  player does something about it. When they do, it is HER standing
+    //  there rather than a stranger off the generator.
+    //
+    //  Ahead of the tier check on purpose, and it is the one place in this
+    //  file that jumps the queue. The rooms and the cooldown exist to stop a
+    //  player re-rolling the pool; a named person who has already declared
+    //  an interest is not a roll, and telling them the room is cool on them
+    //  would be answering a question nobody asked.
+    //
+    //  THEY CAN STILL SAY NO. `courtshipFor` runs below exactly as it does
+    //  for anybody else, against THEIR tier - so a small company that beat
+    //  Cornelius Ashworth at cards can be turned down by him afterwards, and
+    //  `reachAbove` is what makes that likely. The message is an opening,
+    //  not a result.
+    //
+    //  Cleared either way. An interest that survives being acted on would
+    //  let one message be spent over and over.
+    // ------------------------------------------------------------------
+    const waiting = useFamilyStore.getState().pendingSuitor;
+    if (waiting) {
+        useFamilyStore.getState().clearSuitor();
+        const known = partnerFromKnownPerson({
+            id: waiting.id,
+            name: waiting.name,
+            gender: waiting.gender,
+            tier: waiting.tier as SocialTier,
+            known: waiting.company,
+        });
+        const asked = courtshipFor(known, {
+            publicReputation: readStanding(),
+            companyValue: useStatsStore.getState().companyValue || 0,
+        }, waiting.tier as SocialTier, roll);
+        if (asked.accepted) {
+            return { kind: 'candidate', candidate: known, tier: waiting.tier as SocialTier };
+        }
+        return refuse(known, waiting.tier as SocialTier, roll);
+    }
+
     // THE ROOM THEY EARNED, not the best one that happens to be open. See
     // the note above: taking the best OPEN room turned every refusal into a
     // demotion, and a billion dollar company reached students in eight taps.
@@ -110,16 +153,27 @@ export const runCourtship = (roll: () => number = Math.random): CourtshipResult 
     }, tier, roll);
 
     if (accepted) return { kind: 'candidate', candidate, tier };
+    return refuse(candidate, tier, roll);
+};
 
-    // ------------------------------------------------------------------
-    //  A REFUSAL ARRIVES FROM THE PERSON
-    // ------------------------------------------------------------------
-    //  Rather than a card quietly not coming back. It costs a thread on the
-    //  phone for somebody the player has not met properly, and it buys the
-    //  thing silence cannot: they find out they were turned down, from the
-    //  person who turned them down, in the app where everything else in this
-    //  game happens.
-    // ------------------------------------------------------------------
+// ------------------------------------------------------------------
+//  A REFUSAL ARRIVES FROM THE PERSON
+// ------------------------------------------------------------------
+//  Rather than a card quietly not coming back. It costs a thread on the phone
+//  for somebody the player has not met properly, and it buys the thing silence
+//  cannot: they find out they were turned down, from the person who turned
+//  them down, in the app where everything else in this game happens.
+//
+//  Lifted out of `runCourtship` when the pending suitor was added, because
+//  there are two ways to be turned down now and a second copy of this is how
+//  one of them would quietly stop shutting the room. It was a paragraph inside
+//  a function; it is the same paragraph, once.
+// ------------------------------------------------------------------
+const refuse = (
+    candidate: PartnerProfile,
+    tier: SocialTier,
+    roll: () => number,
+): CourtshipResult => {
     const voice = VOICE_FOR_PERSONALITY[candidate.personality?.id ?? ''] ?? 'measured';
     useMessageStore.getState().sendFromCharacter(
         { id: `courtship-${candidate.id}`, name: candidate.name, role: candidate.stats.occupation },

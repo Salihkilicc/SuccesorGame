@@ -119,6 +119,35 @@ export interface FamilyState {
      */
     courtshipCooldown: Partial<Record<string, number>>;
     /**
+     * SOMEBODY FROM THE POKER TABLE WHO WROTE TO YOU.
+     *
+     * -----------------------------------------------------------------------
+     *  WHY IT IS STORED RATHER THAN ACTED ON WHERE IT HAPPENS
+     * -----------------------------------------------------------------------
+     *  The player leaves a table and a magnate writes. That message is not a
+     *  card and must not be: the whole point of the shape is that the interest
+     *  arrives on the phone and the player decides whether to do anything
+     *  about it, possibly next quarter, possibly never.
+     *
+     *  So the interest is HELD, and the door the player already uses to go and
+     *  find somebody delivers them instead of a stranger. One door, and the
+     *  encounter card - background, family wealth, upkeep - is the payoff.
+     *  See features/casino/logic/tableInterest.ts and love/logic/runCourtship.
+     *
+     *  ONE AT A TIME, deliberately. A queue would let a player farm the noir
+     *  room for a stack of named people and work through them, which turns
+     *  sixty one written characters into a list. A newer message replaces an
+     *  older one: the last person who was interested is the one still waiting.
+     * -----------------------------------------------------------------------
+     */
+    pendingSuitor: {
+        id: string;
+        name: string;
+        gender: 'male' | 'female';
+        company?: string;
+        tier: string;
+    } | null;
+    /**
      * Which gesture was offered to whom, and in which quarter.
      *
      * The same shape and the same module the board uses, so a compliment and
@@ -275,6 +304,10 @@ export interface FamilyActions {
     loadDemoFamily: () => void;
     /** A room has said no. See `courtshipCooldown`. */
     noteRefusal: (tier: string, untilQuarter: number) => void;
+    /** Somebody from a poker table wrote. See `pendingSuitor`. */
+    noteSuitor: (suitor: FamilyState['pendingSuitor']) => void;
+    /** They have been met, or the interest has been used up either way. */
+    clearSuitor: () => void;
 }
 
 export type FamilyStore = FamilyState & FamilyActions;
@@ -480,6 +513,7 @@ export const DEMO_CHILDREN: Child[] = [
 export const initialFamilyState: FamilyState = {
     partner: null,
     courtshipCooldown: {},
+    pendingSuitor: null,
     gestureLedger: {},
     exPartners: [],
     children: [],
@@ -888,6 +922,10 @@ export const useFamilyStore = create<FamilyStore>()(
                     };
                 }),
 
+            noteSuitor: (suitor) => set({ pendingSuitor: suitor }),
+
+            clearSuitor: () => set({ pendingSuitor: null }),
+
             noteRefusal: (tier, untilQuarter) =>
                 set(state => ({
                     courtshipCooldown: { ...state.courtshipCooldown, [tier]: untilQuarter },
@@ -929,6 +967,9 @@ export const useFamilyStore = create<FamilyStore>()(
                 designatedSuccessorId: state.designatedSuccessorId,
                 familyReputation: state.familyReputation,
                 courtshipCooldown: state.courtshipCooldown,
+                // Held between sessions on purpose: somebody wrote to you
+                // last night and closing the app does not un-write it.
+                pendingSuitor: state.pendingSuitor,
                 // Persisted, or a player could offer the same compliment
                 // again by closing the app. `partialize` is a list, and a
                 // field left off it is a field that does not survive - which

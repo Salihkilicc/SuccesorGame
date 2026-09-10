@@ -2556,4 +2556,9 @@ export const en: Record<string, string> = {
     'wealth.0': 'Came from nothing',
     'love.wouldHelp': 'Could put up {amount} if you were short',
     'love.wouldNotHelp': 'Shares their money with nobody',
+
+    'casino.suitor0': 'I asked for your name on the way out. Tell me when you play again.',
+    'casino.suitor1': 'You play well. I had forgotten how much I dislike losing. Let me buy you a coffee.',
+    'casino.suitor2': 'I am in this city another week. We could talk without the cards.',
+    'casino.suitor3': 'I got your number from the dealer. Do not be cross. You know where I am if you want to use it.',
 };

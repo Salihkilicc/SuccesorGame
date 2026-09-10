@@ -290,6 +290,124 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
     };
 };
 
+// ============================================================================
+//  AND A PARTNER WHO ALREADY EXISTED BEFORE THEY WERE A PARTNER
+// ============================================================================
+//
+//  `generatePartner` invents a person: a name off a list, a job, a personality,
+//  and fifteen numbers. That is right for the dating pool, where nobody has met
+//  the candidate before and nobody will meet them again.
+//
+//  It is wrong for somebody who is ALREADY IN THE GAME. A magnate at the poker
+//  table has a name that was written by hand, a face on disk, a line about
+//  where their money is, and a history of taking the player's chips. Running
+//  them through the generator would throw all of that away and hand back a
+//  stranger wearing their name.
+//
+//  ---------------------------------------------------------------------------
+//  EVERYTHING IS DERIVED FROM THEIR ID, AND THAT IS THE WHOLE POINT
+//  ---------------------------------------------------------------------------
+//  Sylvie Valmorel has to be the same person in March and in December, and the
+//  same person in this save and in the next one. So there is no `Math.random`
+//  in here at all: the personality, the age, the looks and the psychometric
+//  jitter all come out of a hash of their seat id.
+//
+//  If she were rolled, the player would meet a High Maintenance Sylvie one
+//  night and a Loyal Confidante Sylvie the next, and the fact that these are
+//  written characters rather than generated ones would be worth nothing.
+// ============================================================================
+
+/** FNV-1a over the id and a field name, so the seven draws are independent. */
+const seedFor = (id: string, field: string): number => {
+    let h = 2166136261;
+    const s = `${id}:${field}`;
+    for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0) / 4294967296;
+};
+
+export type KnownPerson = {
+    /** Their seat id. Their face is filed under it and so is their past. */
+    id: string;
+    name: string;
+    gender: 'male' | 'female';
+    /** Which room they belong to. THEIRS, not the player's. */
+    tier: SocialTier;
+    /**
+     * What they are known for, in their own words.
+     *
+     * The magnate's `of` line - "Shipping, fourth generation" - or a rival's
+     * company. It goes in as the occupation because it is what the poker seat
+     * already prints under their name, and the card contradicting the table
+     * would be worse than either.
+     */
+    known?: string;
+};
+
+/**
+ * The partner card for somebody the player has already sat across from.
+ *
+ * Same shape as `generatePartner` and the same upkeep ladder, so every screen,
+ * store and buff reads them identically. What differs is that nothing is
+ * rolled.
+ */
+export const partnerFromKnownPerson = (who: KnownPerson): PartnerProfile => {
+    const pick = <T>(list: readonly T[], field: string): T =>
+        list[Math.floor(seedFor(who.id, field) * list.length) % list.length];
+
+    const personality = pick(PERSONALITY_TRAITS, 'personality');
+    const ethnicity = pick(Object.keys(NAME_DATABASE) as Ethnicity[], 'ethnicity');
+
+    // ------------------------------------------------------------------
+    //  THIRTY FIVE TO FIFTY FIVE, WHICH IS OLDER THAN THE POOL
+    // ------------------------------------------------------------------
+    //  `generatePartner` runs 18 to 45. These people run shipping lines and
+    //  listed companies, and a twenty two year old head of an oil dynasty is
+    //  a contradiction the card would print beside their own face. The band
+    //  also decides which portraits they can borrow if they have none of
+    //  their own - see core/portraits/faces.bandForAge.
+    // ------------------------------------------------------------------
+    const age = 35 + Math.floor(seedFor(who.id, 'age') * 21);
+
+    const job = {
+        id: who.id,
+        title: who.known || '',
+        tier: who.tier,
+    };
+
+    return {
+        id: who.id,
+        photo: null,
+        name: who.name,
+        gender: who.gender,
+        stats: {
+            ethnicity,
+            age,
+            background: backgroundKeyFor(who.tier, who.id),
+            occupation: who.known || '',
+            happiness: 50 + Math.floor(seedFor(who.id, 'happiness') * 41),
+            looks: 45 + Math.floor(seedFor(who.id, 'looks') * 56),
+            style: STYLE_FOR_TIER[who.tier],
+            // The jitter is seeded too, or two Power Brokers with the same
+            // personality would still differ between one look and the next.
+            ...fingerprintFor(who.tier, personality, () => seedFor(who.id, 'fingerprint')),
+        },
+        job,
+        personality,
+        finances: {
+            monthlyCost: upkeepFor(who.tier, personality),
+        },
+        // Lower than the pool's 30-50 on purpose. They have written to you
+        // once; that is interest, not a relationship.
+        love: 25 + Math.floor(seedFor(who.id, 'love') * 16),
+        relationYears: 0,
+        isMarried: false,
+        hasPrenup: false,
+    };
+};
+
 /**
  * Generates a list of potential partners (candidates).
  */

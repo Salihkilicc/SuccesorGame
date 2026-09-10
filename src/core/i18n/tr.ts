@@ -2540,4 +2540,9 @@ export const tr: Record<string, string> = {
     'wealth.0': 'Sıfırdan geliyor',
     'love.wouldHelp': 'Sıkışırsan {amount} kadarını verebilir',
     'love.wouldNotHelp': 'Parasını kimseyle paylaşmaz',
+
+    'casino.suitor0': 'Masadan kalkarken adını sordum. Bir daha oynarsak haber ver.',
+    'casino.suitor1': 'İyi oynuyorsun. Kaybetmeyi bu kadar sevmediğimi unutmuşum. Bir kahve ısmarlarım.',
+    'casino.suitor2': 'Bu şehirde bir hafta daha varım. Kartlar olmadan da konuşabiliriz.',
+    'casino.suitor3': 'Numaranı krupiyeden aldım. Kızma. Aramak istersen biliyorsun nerede olduğumu.',
 };

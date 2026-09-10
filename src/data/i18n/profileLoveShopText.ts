@@ -205,6 +205,64 @@ export const OCCUPATIONS_TR: Record<string, string> = {
     // 6. STUDENT & PROMISING PRODIGIES
     'Stanford MBA Candidate': 'Stanford MBA Öğrencisi',
     'MIT Quantum Physics Fellow': 'MIT Kuantum Fiziği Araştırmacısı',
+
+    // ------------------------------------------------------------------
+    //  7. THE FORTY MAGNATES, WHOSE LINE WAS ALREADY ON SCREEN IN ENGLISH
+    // ------------------------------------------------------------------
+    //  `Magnate.of` is printed under the name on every poker seat and has
+    //  been since the table was built. Forty English phrases, in front of a
+    //  Turkish player, for months.
+    //
+    //  scripts/untranslated.js could never have found them for the same
+    //  reason it could not find the job titles: it reads .tsx and looks at
+    //  Text children and naming props, and this arrives through a variable
+    //  from a .ts data file. Found by needing them for the partner card.
+    //
+    //  Here rather than in a new table because that is exactly what this
+    //  function is for: what somebody is known for. See the note at the top
+    //  of features/love/logic/partnerText.ts about the second table that was
+    //  written and backed out.
+    // ------------------------------------------------------------------
+    'Shipping, fourth generation': 'Denizcilik, dördüncü kuşak',
+    'Private bank, Geneva': 'Özel banka, Cenevre',
+    'Ports and rail': 'Limanlar ve demiryolu',
+    'Copper and lithium': 'Bakır ve lityum',
+    'Timber and paper': 'Kereste ve kağıt',
+    'Refining': 'Rafineri',
+    'Department stores': 'Büyük mağazalar',
+    'Vineyards and hotels': 'Bağlar ve oteller',
+    'Cement, half a continent': 'Çimento, yarım kıta',
+    'Couture, sold it twice': 'Moda evi, iki kere sattı',
+    'Insurance, inherited': 'Sigorta, miras',
+    'Shipbuilding': 'Gemi inşa',
+    'Cattle and grain': 'Sığır ve tahıl',
+    'Diamonds, wholesale': 'Elmas, toptan',
+    'Telecoms, private': 'Telekom, halka kapalı',
+    'Racehorses and land': 'Yarış atları ve arazi',
+    'Pistachios and pipelines': 'Antep fıstığı ve boru hatları',
+    'Hedge fund, closed to new money': 'Hedge fon, yeni paraya kapalı',
+    'Iron ore': 'Demir cevheri',
+    'Airports': 'Havalimanları',
+    'Fertiliser': 'Gübre',
+    'Gold concessions': 'Altın imtiyazları',
+    'Publishing, what is left of it': 'Yayıncılık, kalanı kadarıyla',
+    'Olive oil, absurdly': 'Zeytinyağı, akıl almaz biçimde',
+    'Machine tools': 'Takım tezgahları',
+    'Auction house': 'Müzayede evi',
+    'Sugar and logistics': 'Şeker ve lojistik',
+    'Never worked a day': 'Hayatında bir gün çalışmadı',
+    'Desalination': 'Deniz suyu arıtma',
+    'Salmon': 'Somon',
+    'Toll roads': 'Paralı yollar',
+    'Rubber': 'Kauçuk',
+    'Cold storage': 'Soğuk hava deposu',
+    'Distilling': 'Damıtma',
+    'Cocoa': 'Kakao',
+    'Tankers': 'Tankerler',
+    'Trusts, three of them': 'Vakıflar, üç tane',
+    'Construction': 'İnşaat',
+    'Perfume houses': 'Parfüm evleri',
+    'Silver, since 1890': 'Gümüş, 1890 dan beri',
 };
 
 export const RARITIES_TR: Record<string, string> = {

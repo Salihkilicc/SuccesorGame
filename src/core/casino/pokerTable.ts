@@ -82,6 +82,57 @@ export const CEO_NAMES: Readonly<Record<string, string>> = {
 };
 
 /**
+ * And which way each of the twenty one was drawn.
+ *
+ * Keyed on the same stock id as CEO_NAMES, so the two cannot drift into
+ * different lengths without the test below noticing. Same reasoning as
+ * `Magnate.female` above: the answer belongs in the app, and the Python that
+ * draws their faces reads it from here.
+ */
+export const CEO_FEMALE: Readonly<Record<string, boolean>> = {
+    tech_pear: false,
+    tech_micro: true,
+    tech_face: false,
+    tech_intel: false,
+    tech_spot: true,
+    tech_start: true,
+    tech_chat: false,
+    tech_chip: false,
+    tech_gpt: true,
+    ind_cat: false,
+    ind_edison: false,
+    ind_gm: true,
+    ind_lmt: true,
+    ind_solar: false,
+    ind_spacey: false,
+    ind_spce: true,
+    health_bio: true,
+    health_cure: true,
+    health_jnj: false,
+    health_med: true,
+    health_pfiz: false,
+};
+
+/**
+ * Which way a named player at the table was drawn, from their seat id.
+ *
+ * ONE DOOR for the two rosters. A rival chief executive is keyed by their
+ * stock id and a magnate by their own, and every caller that needs a gender
+ * asks here rather than knowing which of the two tables to look in.
+ *
+ * `undefined` for a stranger, and that is a real answer rather than a gap:
+ * the stranger pool is 153 first names with no sex recorded anywhere, and
+ * guessing one is how a man ended up being called Emma. See
+ * love/logic/partnerGenerator.ts for that bug and what it cost.
+ */
+export const seatGender = (id: string): 'male' | 'female' | undefined => {
+    if (id in CEO_FEMALE) return CEO_FEMALE[id] ? 'female' : 'male';
+    const magnate = MAGNATES.find(m => m.id === id);
+    if (magnate) return magnate.female ? 'female' : 'male';
+    return undefined;
+};
+
+/**
  * The people who are simply in a casino.
  *
  * Deliberately unremarkable and deliberately from everywhere: the cities are
@@ -260,49 +311,72 @@ export interface Magnate {
     name: string;
     /** Shown under the name, where a CEO's company sits. */
     of: string;
+    /**
+     * Which way they were born.
+     *
+     * ------------------------------------------------------------------
+     *  IT WAS ONLY EVER IN THE PYTHON, WHICH IS A SECOND LIST
+     * ------------------------------------------------------------------
+     *  tools/portrait_prompts.py sexes the roster from a hand written
+     *  `FEMALE` set so it can draw the right face. The APP knew nothing, so
+     *  the moment anything here needed a gender - a partner card, a pronoun,
+     *  a pool face - it would have had to guess or to copy that set.
+     *
+     *  A copy is the failure this codebase produces most often: one fact in
+     *  two places, found one at a time, on the day they disagree. So the
+     *  answer lives HERE, in the app's own roster, and the Python reads it
+     *  back out - which is what that file already does for the names, and
+     *  says so at the top: "the name pools are READ OUT of the app, not
+     *  copied".
+     *
+     *  The values are the ones the tool was already using, so not one drawn
+     *  face changes.
+     * ------------------------------------------------------------------
+     */
+    female: boolean;
 }
 
 export const MAGNATES: readonly Magnate[] = [
-    { id: 'mg_ashworth', name: 'Cornelius Ashworth', of: 'Shipping, fourth generation' },
-    { id: 'mg_valmorel', name: 'Sylvie Valmorel', of: 'Private bank, Geneva' },
-    { id: 'mg_okonjo', name: 'Adaora Okonjo', of: 'Ports and rail' },
-    { id: 'mg_sandoval', name: 'Rafael Sandoval', of: 'Copper and lithium' },
-    { id: 'mg_lindqvist', name: 'Britta Lindqvist', of: 'Timber and paper' },
-    { id: 'mg_al_najjar', name: 'Hisham al Najjar', of: 'Refining' },
-    { id: 'mg_takahara', name: 'Reiko Takahara', of: 'Department stores' },
-    { id: 'mg_beaumont', name: 'Hugo Beaumont', of: 'Vineyards and hotels' },
-    { id: 'mg_deshmukh', name: 'Vikram Deshmukh', of: 'Cement, half a continent' },
-    { id: 'mg_moretti', name: 'Giulia Moretti', of: 'Couture, sold it twice' },
-    { id: 'mg_castellan', name: 'Auguste Castellan', of: 'Insurance, inherited' },
-    { id: 'mg_park', name: 'Park Seung ho', of: 'Shipbuilding' },
-    { id: 'mg_ferreyra', name: 'Marisol Ferreyra', of: 'Cattle and grain' },
-    { id: 'mg_vandervelde', name: 'Joost Vandervelde', of: 'Diamonds, wholesale' },
-    { id: 'mg_okoye', name: 'Chinedu Okoye', of: 'Telecoms, private' },
-    { id: 'mg_st_clair', name: 'Rosalind St Clair', of: 'Racehorses and land' },
-    { id: 'mg_haddadi', name: 'Nasrin Haddadi', of: 'Pistachios and pipelines' },
-    { id: 'mg_wren', name: 'Marcus Wren', of: 'Hedge fund, closed to new money' },
-    { id: 'mg_bergqvist', name: 'Astrid Bergqvist', of: 'Iron ore' },
-    { id: 'mg_montoya', name: 'Ignacio Montoya', of: 'Airports' },
-    { id: 'mg_kirilenko', name: 'Yelena Kirilenko', of: 'Fertiliser' },
-    { id: 'mg_amadou', name: 'Ibrahim Amadou', of: 'Gold concessions' },
-    { id: 'mg_whitcombe', name: 'Eleanor Whitcombe', of: 'Publishing, what is left of it' },
-    { id: 'mg_serrano', name: 'Tomas Serrano', of: 'Olive oil, absurdly' },
-    { id: 'mg_nakamura', name: 'Hideo Nakamura', of: 'Machine tools' },
-    { id: 'mg_dubois', name: 'Camille Dubois', of: 'Auction house' },
-    { id: 'mg_pillay', name: 'Anand Pillay', of: 'Sugar and logistics' },
-    { id: 'mg_thornbury', name: 'Gerald Thornbury', of: 'Never worked a day' },
-    { id: 'mg_farsi', name: 'Layla Farsi', of: 'Desalination' },
-    { id: 'mg_bjornstad', name: 'Even Bjornstad', of: 'Salmon' },
-    { id: 'mg_calderon', name: 'Beatriz Calderon', of: 'Toll roads' },
-    { id: 'mg_ruangsri', name: 'Kittipong Ruangsri', of: 'Rubber' },
-    { id: 'mg_kowalczyk', name: 'Zofia Kowalczyk', of: 'Cold storage' },
-    { id: 'mg_hennessey', name: 'Declan Hennessey', of: 'Distilling' },
-    { id: 'mg_oyelaran', name: 'Folake Oyelaran', of: 'Cocoa' },
-    { id: 'mg_stavros', name: 'Nikolas Stavros', of: 'Tankers' },
-    { id: 'mg_wexley', name: 'Priscilla Wexley', of: 'Trusts, three of them' },
-    { id: 'mg_barut', name: 'Cem Barut', of: 'Construction' },
-    { id: 'mg_delacroix', name: 'Odile Delacroix', of: 'Perfume houses' },
-    { id: 'mg_arriaga', name: 'Salvador Arriaga', of: 'Silver, since 1890' },
+    { id: 'mg_ashworth', name: 'Cornelius Ashworth', of: 'Shipping, fourth generation', female: false },
+    { id: 'mg_valmorel', name: 'Sylvie Valmorel', of: 'Private bank, Geneva', female: true },
+    { id: 'mg_okonjo', name: 'Adaora Okonjo', of: 'Ports and rail', female: true },
+    { id: 'mg_sandoval', name: 'Rafael Sandoval', of: 'Copper and lithium', female: false },
+    { id: 'mg_lindqvist', name: 'Britta Lindqvist', of: 'Timber and paper', female: true },
+    { id: 'mg_al_najjar', name: 'Hisham al Najjar', of: 'Refining', female: false },
+    { id: 'mg_takahara', name: 'Reiko Takahara', of: 'Department stores', female: true },
+    { id: 'mg_beaumont', name: 'Hugo Beaumont', of: 'Vineyards and hotels', female: false },
+    { id: 'mg_deshmukh', name: 'Vikram Deshmukh', of: 'Cement, half a continent', female: false },
+    { id: 'mg_moretti', name: 'Giulia Moretti', of: 'Couture, sold it twice', female: true },
+    { id: 'mg_castellan', name: 'Auguste Castellan', of: 'Insurance, inherited', female: false },
+    { id: 'mg_park', name: 'Park Seung ho', of: 'Shipbuilding', female: false },
+    { id: 'mg_ferreyra', name: 'Marisol Ferreyra', of: 'Cattle and grain', female: true },
+    { id: 'mg_vandervelde', name: 'Joost Vandervelde', of: 'Diamonds, wholesale', female: false },
+    { id: 'mg_okoye', name: 'Chinedu Okoye', of: 'Telecoms, private', female: false },
+    { id: 'mg_st_clair', name: 'Rosalind St Clair', of: 'Racehorses and land', female: true },
+    { id: 'mg_haddadi', name: 'Nasrin Haddadi', of: 'Pistachios and pipelines', female: true },
+    { id: 'mg_wren', name: 'Marcus Wren', of: 'Hedge fund, closed to new money', female: false },
+    { id: 'mg_bergqvist', name: 'Astrid Bergqvist', of: 'Iron ore', female: true },
+    { id: 'mg_montoya', name: 'Ignacio Montoya', of: 'Airports', female: false },
+    { id: 'mg_kirilenko', name: 'Yelena Kirilenko', of: 'Fertiliser', female: true },
+    { id: 'mg_amadou', name: 'Ibrahim Amadou', of: 'Gold concessions', female: false },
+    { id: 'mg_whitcombe', name: 'Eleanor Whitcombe', of: 'Publishing, what is left of it', female: true },
+    { id: 'mg_serrano', name: 'Tomas Serrano', of: 'Olive oil, absurdly', female: false },
+    { id: 'mg_nakamura', name: 'Hideo Nakamura', of: 'Machine tools', female: false },
+    { id: 'mg_dubois', name: 'Camille Dubois', of: 'Auction house', female: true },
+    { id: 'mg_pillay', name: 'Anand Pillay', of: 'Sugar and logistics', female: false },
+    { id: 'mg_thornbury', name: 'Gerald Thornbury', of: 'Never worked a day', female: false },
+    { id: 'mg_farsi', name: 'Layla Farsi', of: 'Desalination', female: true },
+    { id: 'mg_bjornstad', name: 'Even Bjornstad', of: 'Salmon', female: false },
+    { id: 'mg_calderon', name: 'Beatriz Calderon', of: 'Toll roads', female: true },
+    { id: 'mg_ruangsri', name: 'Kittipong Ruangsri', of: 'Rubber', female: false },
+    { id: 'mg_kowalczyk', name: 'Zofia Kowalczyk', of: 'Cold storage', female: true },
+    { id: 'mg_hennessey', name: 'Declan Hennessey', of: 'Distilling', female: false },
+    { id: 'mg_oyelaran', name: 'Folake Oyelaran', of: 'Cocoa', female: true },
+    { id: 'mg_stavros', name: 'Nikolas Stavros', of: 'Tankers', female: false },
+    { id: 'mg_wexley', name: 'Priscilla Wexley', of: 'Trusts, three of them', female: true },
+    { id: 'mg_barut', name: 'Cem Barut', of: 'Construction', female: false },
+    { id: 'mg_delacroix', name: 'Odile Delacroix', of: 'Perfume houses', female: true },
+    { id: 'mg_arriaga', name: 'Salvador Arriaga', of: 'Silver, since 1890', female: false },
 ];
 
 /** The magnates as seatable opponents. */
