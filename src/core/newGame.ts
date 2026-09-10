@@ -42,6 +42,7 @@ import { useIdentityStore } from './store/useIdentityStore';
 import { useFamilyStore } from './store/useFamilyStore';
 import { useLuxoNetStore } from './store/useLuxoNetStore';
 import { OPENING_ACT, SKIPPED_ACT_FLAGS } from '../data/story/openingAct';
+import { FLOOR_HINT_IDS } from '../data/story/floorHints';
 
 /**
  * EVERY game key in AsyncStorage.
@@ -446,7 +447,24 @@ const applyReturningPlayer = ({ skipOpening }: NewGameOptions) => {
     //  leave a dead man at the top of the messages list.
     // ------------------------------------------------------------------
     useStoryStore.setState(s => ({
-        seenScenes: Array.from(new Set([...s.seenScenes, ...OPENING_ACT])),
+        // ------------------------------------------------------------
+        //  AND THE HINTS GO WITH IT, FOR A DIFFERENT REASON
+        // ------------------------------------------------------------
+        //  A SECOND list rather than more entries in OPENING_ACT, because
+        //  the two say different things and that file says what it means:
+        //  the act is the father's year, and these fire after he is dead.
+        //  Folding them in would make its own test wrong - it checks that
+        //  nothing gated on the first eight quarters was left out, and the
+        //  hints are not.
+        //
+        //  Asked for directly: "Skip Opening Act isaretlenirse bu
+        //  mesajlarin hicbiri gonderilmeyecek". Somebody skipping the
+        //  opening has played this before and does not need the floor
+        //  explaining itself.
+        // ------------------------------------------------------------
+        seenScenes: Array.from(new Set([
+            ...s.seenScenes, ...OPENING_ACT, ...FLOOR_HINT_IDS,
+        ])),
         flags: {
             ...s.flags,
             ...Object.fromEntries(SKIPPED_ACT_FLAGS.map(f => [f, true])),

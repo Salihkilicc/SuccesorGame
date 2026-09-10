@@ -79,7 +79,10 @@ export const STORY_TR: StoryDictionary = {
     '@lock/morale-bonus': 'Prim öde. Piyasa rayicinde alıyorlar ve piyasa standartlarında iş çıkarıyorlar.',
     '@lock/q1-marketing': 'Pazarlamayı artır, sonra kaydet.',
     '@lock/q1-open-product': 'Ürünü aç.',
-    '@lock/rnd-hire': 'Araştırmacılar her çeyrek puan üretir; puanlar yeni ürünlerin kilidini açar ve mevcutları geliştirir. Masraflıdırlar, ama üretebileceklerinizi değiştiren tek şey de onlardır.',
+    // Bolundu: fiyat butonun uzerinde, puanin ne oldugu ise sayacin
+    // uzerinde ve ancak biri ise alindiktan sonra. Bkz. data/tutorial/sequence.ts
+    '@lock/rnd-hire': 'Bir araştırmacı işe al. Ucuz değiller ve maaş hiç durmuyor.',
+    '@lock/rnd-points': 'Bu sayı para değil ve satın alarak geçemezsin. Puanlar, insanların çalıştığı her çeyrek birikir; bu şirketin ne üretebileceğini değiştiren tek şey de onlar.',
     '@lock/rnd-lab': 'Laboratuvarı aç.',
     'cfo-board-room/goodTrade': 'O halde öyle yaparız.\n\nVe... teşekkür ederim. Babanız bu anlaşmaya hiçbir zaman evet dememişti. Sadece ona anlattıklarıma göre hareket etmeye başlardı; ben de bunu rıza olarak kabul etmeyi seçerdim.',
     'cfo-board-room/goodTrade#0': 'Ben evet diyorum.',
@@ -1467,6 +1470,18 @@ export const STORY_TR: StoryDictionary = {
     'succession-sibling/reasonable': 'Doğru davranıyorum. Aynı şey değildir ama senin için daha faydalıdır.\n\nHissedarlara gönderdiğin her şeyi okuyacağım. Hem de hakkıyla okuyacağım; o sicildeki diğer herkesin yapacağından çok daha fazlası bu. Ve eğer iyiyse, önemli olan yerlerde bunu yüksek sesle söyleyeceğim.',
     'succession-sibling/reasonable#0': 'Ya iyi değilse?',
     'succession-sibling/reasonable#1': 'Beklediğimden fazlası bu.',
+
+    // ------------------------------------------------------------------
+    //  YEDI IPUCU: sahadaki insanlar, ne yaptigini soyluyor
+    //  Bkz. data/story/floorHints.ts
+    // ------------------------------------------------------------------
+    'hint-demand/open': 'Pazarlama çalışıyor ama rafta ürün yok. Bulduğumuz müşteriyi rakibe kaptırıyoruz.',
+    'hint-stock-cost/open': 'Sadece sattığımızın değil, banttan çıkan her ürünün parasını ödüyoruz. Depoda duranlar kira yazıyor.',
+    'hint-cash-flow/open': 'Kağıt üzerinde değerliyiz ve maaşları ödeyecek nakit yok. Bunu çözmezsen bankaya açıklama yapmak zorunda kalırız.',
+    'hint-board/open': 'Kurulda kaç oyun olduğuna baktın mı hiç. Bir kararı geçirmek istediğinde bana ya da diğerlerine ihtiyacın olacak, sadece soruyorum.',
+    'hint-morale/open': 'Ortalama maaş veriyoruz ve kimse şikayet etmiyor. Kimse fazladan da bir şey üretmiyor. Vasat maaş vasat iş getirir.',
+    'hint-sector-brand/open': 'Marka gücü sektörler arası taşınmıyor. Bu yeni kategoride adımız kimseye bir şey ifade etmiyor, sıfırdan başlıyoruz.',
+    'hint-skill-gate/open': 'Yeni bir endüstriye sadece parayla girilmiyor. Gereken şirket becerisini inşa etmeden o pazarın kapısı bize kapalı.',
 };
 
 const DICTIONARIES: Record<string, StoryDictionary> = {
@@ -1623,4 +1638,5 @@ export const coverage = (
     const dict = DICTIONARIES[lang] ?? {};
     const missing = keys.filter(k => !dict[k] || !dict[k].trim());
     return { total: keys.length, translated: keys.length - missing.length, missing };
+
 };

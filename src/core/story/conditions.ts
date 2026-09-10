@@ -137,6 +137,19 @@ export type Condition =
      * heavy weekend is a story nobody writes; three quarters in a row is a
      * thing a journalist can print. See core/store/useCasinoRiskStore.ts.
      */
+    // ----------------------------------------------------------------
+    //  THE FLOOR, FOR THE PEOPLE WHO WORK ON IT
+    // ----------------------------------------------------------------
+    //  `sellThroughAtLeast` is the one that reads backwards. A high number
+    //  is a SHELF THAT EMPTIED: everything went, and whoever came after it
+    //  bought from somebody else. It is the condition for "marketing is
+    //  working and there is nothing on the shelf", which is the first
+    //  thing the COO ever needs to say.
+    | { kind: 'sellThroughAtLeast'; percent: number }
+    /** And the other failure: built, never sold, paying rent. */
+    | { kind: 'inventoryAtLeast'; units: number }
+    /** How many markets the company has earned. One means only the one. */
+    | { kind: 'categoriesOpenAtLeast'; count: number }
     | { kind: 'casinoStreakAtLeast'; quarters: number }
     /** Quarters with the company's name on nothing. */
     | { kind: 'withoutSponsorAtLeast'; quarters: number }
@@ -195,6 +208,48 @@ export type World = {
     casinoStreak: number;
     /** Quarters since the company's name was last on anything. */
     quartersWithoutSponsor: number;
+
+    // ------------------------------------------------------------------
+    //  THREE FIGURES THE FLOOR ALREADY KNOWS AND THE STORY COULD NOT SEE
+    // ------------------------------------------------------------------
+    //  Added for the hints the C-levels send after the father is gone: a COO
+    //  who cannot see that the shelves emptied has nothing to say about it.
+    //
+    //  Every one comes out of `lastQuarterReport`, which the tick already
+    //  computes and `readWorld` already reads. NOT recomputed here: the
+    //  report works out sell-through and ending stock in the same pass that
+    //  charges for them, and a second implementation of either would be the
+    //  fault this project keeps undoing.
+    //
+    //  ALL THREE ARE OPTIONAL, and that is a statement about the first
+    //  quarter rather than laziness about the type. There is no report until
+    //  one has closed, and `readWorld` always supplies them afterwards. The
+    //  defaults below are the honest reading of "this company has never
+    //  traded": nothing sold, nothing left over, one market. Every hint is
+    //  written so that reading fires none of them, which is correct - a
+    //  company that has not run a quarter has made no mistakes yet.
+    // ------------------------------------------------------------------
+    /**
+     * What share of everything available actually sold, as a percent.
+     *
+     * NEAR A HUNDRED IS THE INTERESTING END, and that is worth saying because
+     * it reads backwards at first. A hundred per cent sell-through is not
+     * triumph, it is a shelf that emptied: every unit went and the demand
+     * after that walked to somebody else. See the COO's line about marketing
+     * finding customers the line cannot supply.
+     */
+    sellThrough?: number;
+    /** Units still in the warehouse when the quarter closed. */
+    endingInventory?: number;
+    /**
+     * How many categories the company has ever earned the right to sell in.
+     *
+     * EVER, not currently, and it is the store's own word: `brand.ts` records
+     * a category as cleared the moment it meets the bar, because the bar
+     * rises with the factory and a player must not lose a market they already
+     * earned. One means the company has only ever done the one thing.
+     */
+    categoriesOpen?: number;
 };
 
 const ORDER: Band[] = ['none', 'low', 'high', 'extreme'];
@@ -216,6 +271,13 @@ export const test = (c: Condition, w: World): boolean => {
         case 'marketShareAtMost': return w.marketShare <= c.percent;
         case 'staffingAtMost': return w.staffing <= c.percent;
         case 'researchersAtMost': return w.researchers <= c.count;
+        // The defaults are the "no quarter has closed" reading. See the note
+        // on these three in World above: a company that has never traded has
+        // not emptied a shelf, has nothing in the warehouse, and sells in the
+        // one market it started in.
+        case 'sellThroughAtLeast': return (w.sellThrough ?? 0) >= c.percent;
+        case 'inventoryAtLeast': return (w.endingInventory ?? 0) >= c.units;
+        case 'categoriesOpenAtLeast': return (w.categoriesOpen ?? 1) >= c.count;
         case 'owns': return (w.subsidiaries ?? []).includes(c.company);
         case 'casinoStreakAtLeast': return (w.casinoStreak ?? 0) >= c.quarters;
         case 'withoutSponsorAtLeast': return (w.quartersWithoutSponsor ?? 0) >= c.quarters;

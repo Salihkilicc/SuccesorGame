@@ -97,6 +97,7 @@ describe('the new-game audit', () => {
 // ============================================================================
 
 import { OPENING_ACT } from '../data/story/openingAct';
+import { FLOOR_HINT_IDS } from '../data/story/floorHints';
 
 describe('starting again, having been through it once', () => {
     const player = () => require('./store/useIdentityStore').useIdentityStore;
@@ -188,7 +189,15 @@ describe('starting again, having been through it once', () => {
         // one screen away from where the bug is.
         returning(true);
         await startNewGame({ skipOpening: true });
-        expect(story().getState().seenScenes.length).toBe(OPENING_ACT.length);
+        // The act AND the seven floor hints. Two lists rather than one,
+        // because they are silenced for different reasons - see the note in
+        // applyReturningPlayer. The count is asserted rather than the
+        // contents so this fails if either list stops being applied.
+        expect(story().getState().seenScenes.length)
+            .toBe(OPENING_ACT.length + FLOOR_HINT_IDS.length);
+        for (const id of FLOOR_HINT_IDS) {
+            expect(story().getState().seenScenes).toContain(id);
+        }
     });
 
     it('and seedOpening does not message when opening was skipped', async () => {

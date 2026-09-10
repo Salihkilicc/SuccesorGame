@@ -17,7 +17,8 @@
 // ============================================================================
 
 import { activeLock, emptyLockState, type LockState } from './locks';
-import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
+import { RESEARCHER_HIRE_PRICE, TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
+import { RESEARCHER_ECONOMICS } from '../../features/laboratory/data/laboratoryData';
 import { INITIAL_DIALS } from '../story/state';
 import type { World } from '../story/conditions';
 
@@ -74,15 +75,86 @@ describe('research, which the player asks for', () => {
         expect(id).not.toBe('rnd-hire');
     });
 
-    it('and it never demands a purchase to get out of it', () => {
-        // A player who correctly decides research is the wrong call this
-        // quarter must not be left standing in front of an instruction they
-        // have already understood and rejected.
+    it('now demands the hire, and cannot demand it of somebody who cannot pay', () => {
+        // ------------------------------------------------------------------
+        //  THIS TEST USED TO ASSERT THE OPPOSITE, AND IT WAS RIGHT TO
+        // ------------------------------------------------------------------
+        //  It read: "and it never demands a purchase to get out of it", and
+        //  pinned `acknowledge: true` with no `satisfied`. The reasoning was
+        //  that a player who correctly decides research is the wrong call
+        //  this quarter must not be left in front of an instruction they have
+        //  already understood and rejected. That reasoning is sound and the
+        //  trap it describes is real.
+        //
+        //  Asked for again anyway, and the counter-argument is also sound: a
+        //  player who taps past the card never sees a research point and
+        //  never learns what the number on that screen is.
+        //
+        //  What settles it is that the trap has a second door. `canEngage` is
+        //  way (1) of the three in locks.ts - a lock that cannot be cleared
+        //  is never shown - so the demand is only ever made of somebody who
+        //  can meet it. The old objection was "this step can be impossible";
+        //  a step that hides when it would be impossible cannot be.
+        //
+        //  So the shape of the test inverts and the SUBJECT does not: both
+        //  versions are about not stranding anybody.
+        // ------------------------------------------------------------------
         const hire = TUTORIAL_SEQUENCE.find(l => l.id === 'rnd-hire')!;
-        expect(hire.acknowledge).toBe(true);
-        expect(hire.satisfied).toBeUndefined();
-        // And it says the price out loud rather than selling.
-        expect(hire.instruction).toMatch(/expensive/i);
+        expect(hire.acknowledge).toBeUndefined();
+        expect(hire.satisfied).toEqual([{ kind: 'flag', flag: 'rndHired' }]);
+
+        // And the gate is the price the HIRE BUTTON charges, out of the
+        // pocket it charges. Both halves were got wrong at first and both
+        // produce the same trap:
+        //
+        //   the quarterly WAGE would let the lock engage at twenty thousand
+        //   and then have the purchase refused;
+        //
+        //   `cashAtLeast` reads the player's PERSONAL money, and
+        //   LaboratoryScreen spends `companyCapital` here.
+        const gate = (hire.canEngage ?? []).find(c => c.kind === 'capitalAtLeast');
+        expect(gate).toEqual({
+            kind: 'capitalAtLeast',
+            amount: RESEARCHER_HIRE_PRICE,
+        });
+        expect((hire.canEngage ?? []).some(c => c.kind === 'cashAtLeast')).toBe(false);
+    });
+
+    it('and a company that cannot afford one is never asked', () => {
+        // The measurement that makes the demand safe. A pound short and the
+        // lock does not exist; the player carries on with the first year.
+        const short = RESEARCHER_HIRE_PRICE - 1;
+        expect(showing(opening({
+            capital: short,
+            flags: { rndOpened: true, rndLabOpened: true },
+        }))).not.toBe('rnd-hire');
+        expect(showing(opening({
+            capital: RESEARCHER_HIRE_PRICE,
+            flags: { rndOpened: true, rndLabOpened: true },
+        }))).toBe('rnd-hire');
+    });
+
+    it('and the price it names is the price the laboratory charges', () => {
+        // THE WELD. sequence.ts may not import the laboratory - the audit's
+        // layering guard refuses it, and refusing quietly, by going blind on
+        // the whole folder. So the number is written out there and pinned
+        // here, where importing both is allowed.
+        expect(RESEARCHER_HIRE_PRICE).toBe(RESEARCHER_ECONOMICS.SALARY_PER_QUARTER);
+    });
+
+    it('and what a point IS waits until there is one to look at', () => {
+        // The lesson was one line carrying the price AND the payoff, read
+        // once, in front of a counter that still said zero. Split: the price
+        // lands on the button, this lands on the number, and only after
+        // somebody is employed.
+        const points = TUTORIAL_SEQUENCE.find(l => l.id === 'rnd-points')!;
+        expect(points.acknowledge).toBe(true);
+        expect(points.canEngage).toEqual([{ kind: 'flag', flag: 'rndHired' }]);
+        expect(points.highlight).toBe('rndPoints');
+
+        expect(showing(opening({
+            flags: { rndOpened: true, rndLabOpened: true, rndHired: true },
+        }))).toBe('rnd-points');
     });
 
     it('and once it is over the first year picks up where it left off', () => {
@@ -168,7 +240,10 @@ describe('after the player buys some attention', () => {
         expect(TUTORIAL_SEQUENCE.map(l => l.id)).toEqual([
             // Research first in the ARRAY, invisible until triggered - see
             // the note at the top of data/tutorial/sequence.ts.
-            'rnd-lab', 'rnd-hire',
+            // Three research steps now: open it, hire, and then what a
+            // point is - which can only be taught once one exists. See the
+            // note on `rnd-points` in data/tutorial/sequence.ts.
+            'rnd-lab', 'rnd-hire', 'rnd-points',
             'q1-open-product', 'q1-marketing', 'morale-bonus',
         ]);
         expect(showing(opening({

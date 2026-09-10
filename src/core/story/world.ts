@@ -163,6 +163,23 @@ export const readWorld = (): World => {
                 return [];
             }
         })(),
+        // ------------------------------------------------------------------
+        //  THE FLOOR'S OWN THREE NUMBERS, STRAIGHT OFF THE REPORT
+        // ------------------------------------------------------------------
+        //  The tick works all three out in the pass that charges for them.
+        //  Recomputing any of them here would be a second answer to a
+        //  question the report has already answered correctly.
+        //
+        //  The defaults are the honest reading of "no quarter has closed
+        //  yet": nothing sold, nothing left over, and one market - which is
+        //  what a company that has never traded looks like, and which fires
+        //  none of the hints.
+        // ------------------------------------------------------------------
+        sellThrough: report?.sellThrough ?? 0,
+        endingInventory: report?.endingInventory ?? 0,
+        categoriesOpen: Object.values(
+            useStatsStore.getState().gateClearedByCategory || {},
+        ).filter(Boolean).length || 1,
         casinoStreak: (() => {
             try {
                 return require('../store/useCasinoRiskStore')

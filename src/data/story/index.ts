@@ -20,6 +20,7 @@ import { fatherQ1Invoice } from './fatherQ1Invoice';
 import { fatherMorale } from './fatherMorale';
 import { fatherMarketing } from './fatherMarketing';
 import { ctoResearch } from './ctoResearch';
+import { FLOOR_HINTS, FLOOR_HINT_IDS } from './floorHints';
 import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
@@ -117,6 +118,16 @@ import {
 import { PAYOFF_CONVERSATIONS } from '../events/payoffs';
 
 export const CONVERSATIONS: Conversation[] = [
+    // ------------------------------------------------------------------
+    //  THE SEVEN HINTS FROM THE PEOPLE WHO WORK HERE
+    // ------------------------------------------------------------------
+    //  Spread rather than listed one by one, and that is the point: the list
+    //  lives in floorHints.ts and three things walk it - this registry, the
+    //  beat list below, and the returning player's skip. Three hand-kept
+    //  copies of one set is how one of them ends up missing an entry in the
+    //  direction nobody tests.
+    // ------------------------------------------------------------------
+    ...FLOOR_HINTS,
     // ------------------------------------------------------------------
     //  THE CHILDREN. Registered here so the audit validates them and the
     //  translator gets keys, but they have NO `when` and no STORY_BEAT: the
@@ -305,6 +316,20 @@ export interface StoryBeat {
 }
 
 export const STORY_BEATS: StoryBeat[] = [
+    // ------------------------------------------------------------------
+    //  THE HINTS, AND THEY ARE THE ONE GROUP THAT IS NOT URGENT
+    // ------------------------------------------------------------------
+    //  `urgent` bypasses the per-quarter allowance, and every beat above the
+    //  hints has it because every one of them is the spine. These must not:
+    //  a bad quarter trips three at once - the shelf emptied, the warehouse
+    //  is full, capital is thin - and three lectures in one inbox is how a
+    //  player learns to stop reading them.
+    //
+    //  DELIVERIES_PER_QUARTER is 1, so queueing is the whole pacing rule and
+    //  it already exists. Nothing is lost: `drain` keeps what it cannot send
+    //  and tries again next quarter.
+    // ------------------------------------------------------------------
+    ...FLOOR_HINT_IDS.map(conversation => ({ conversation })),
     // ------------------------------------------------------------------
     //  THE FIRST YEAR OF FATHER: Q2 Morale, Q3 Marketing, Q4 Year 1 Close
     // ------------------------------------------------------------------

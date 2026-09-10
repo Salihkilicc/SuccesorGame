@@ -154,9 +154,23 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                             text={t('tactic.rdText')}
                             detail={t('tactic.rdDetail')}
                         />
-                        <View style={styles.rpBadge}>
-                            <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
-                        </View>
+                        {/* ------------------------------------------------
+                            THE NUMBER THE LESSON IS ABOUT.
+
+                            The research lesson used to point at the hire
+                            button and explain both the price AND what points
+                            do, in one sentence, while this counter still read
+                            zero. Split in two: the price lands on the button
+                            at the moment of paying it, and the second half
+                            lands HERE, once somebody is employed and this has
+                            started to move. See data/tutorial/sequence.ts,
+                            `rnd-points`.
+                           ------------------------------------------------ */}
+                        <TutorialTarget tutorialKey="rndPoints">
+                            <View style={styles.rpBadge}>
+                                <Text style={styles.rpBadgeText}>{formatRP(totalRP)}</Text>
+                            </View>
+                        </TutorialTarget>
                     </View>
                 }
             />

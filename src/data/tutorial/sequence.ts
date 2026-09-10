@@ -21,6 +21,31 @@
 import { DIM_HEAVY, type TutorialLock } from '../../core/tutorial/locks';
 
 // ============================================================================
+//  WHAT A RESEARCHER COSTS TO HIRE, WRITTEN OUT RATHER THAN IMPORTED
+// ============================================================================
+//
+//  It WAS imported, from features/laboratory/data/laboratoryData, and the
+//  reachability audit refused the file: story and tutorial data may not reach
+//  outside core/story and data/story. That guard is not incidental, its own
+//  comment says what it is for - "the start of dragging zustand and
+//  AsyncStorage into an audit script" - and the laboratory module reaches
+//  workforce.ts and from there into the stores.
+//
+//  The cost of the import was quiet and would have been missed: the audit does
+//  not fail on it, it DEGRADES. `data/tutorial could not be checked` and the
+//  whole folder stops being validated, so a broken lock would have sailed
+//  through afterwards. Found because the unreachable count moved 123 -> 124.
+//
+//  So the number is here, and the copy cannot drift: sequence.test.ts asserts
+//  this equals RESEARCHER_ECONOMICS.SALARY_PER_QUARTER, which a test may
+//  import because a test is not the audit. A boundary that forbids the import,
+//  welded shut by a test, is the established shape for this.
+// ============================================================================
+
+/** Flat, up front, out of COMPANY CAPITAL. See useLaboratoryStore. */
+export const RESEARCHER_HIRE_PRICE = 30_000;
+
+// ============================================================================
 //  WHY THE MORALE THRESHOLD IS NOT 70
 // ============================================================================
 //
@@ -103,29 +128,91 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
 
     {
         // ------------------------------------------------------------------
-        //  AND THEN IT EXPLAINS AND GETS OUT OF THE WAY
+        //  HIRING IS THE STEP AGAIN, AND THE TRAP IS CLOSED A DIFFERENT WAY
         // ------------------------------------------------------------------
-        //  This asked the player to hire somebody, and that was the wrong
-        //  shape for it. Hiring is expensive and may be the wrong call this
-        //  quarter; a tutorial has no business insisting on a purchase, and a
-        //  player who correctly decides not to buy was then left in front of
-        //  an instruction they had already understood and rejected.
+        //  THE HISTORY, because this is a decision being reversed rather than
+        //  a gap being filled, and the reasoning that reversed it the first
+        //  time was correct.
         //
-        //  What the step actually needed to do was point at the control and
-        //  say what it buys. So it is an `acknowledge` step: read, tapped
-        //  away, done. No flag, no purchase, no waiting.
+        //  It began as "hire a researcher". That was taken out because hiring
+        //  is expensive and may be the wrong call this quarter: a tutorial has
+        //  no business insisting on a purchase, and a player who correctly
+        //  decided not to buy was left in front of an instruction they had
+        //  already understood and rejected. So it became an `acknowledge`
+        //  step - read it, tap it away.
         //
-        //  It says the price out loud as well. The reason a player hesitates
-        //  here is that the salary is real and permanent, and a lesson that
-        //  skips past that is selling rather than teaching.
+        //  Asked for again, on the grounds that a player who reads past this
+        //  never sees a research point and therefore never learns what the
+        //  number on that screen is for. That is true, and it is the failure
+        //  the acknowledge version trades away.
+        //
+        //  What makes the demand safe now is `canEngage`, which is way (1) of
+        //  the three in core/tutorial/locks.ts: THE LOCK NEVER ENGAGES FOR A
+        //  PLAYER WHO CANNOT AFFORD TO CLEAR IT. The old objection was that
+        //  the step could be impossible; a step that does not appear when it
+        //  would be impossible cannot be.
+        //
+        //  WHICH PRICE, and it matters. There are two numbers for what a
+        //  researcher costs and both are live:
+        //
+        //      useLaboratoryStore.hireResearchers   flat 30,000, up front
+        //      workforce.researcherWage             14,400 at tier 1, scaling
+        //
+        //  The gate has to use the FIRST, because that is the one the hire
+        //  button will refuse the player on. Gating on the wage would let the
+        //  lock engage at twenty thousand and then have the purchase fail,
+        //  which is the trap arriving by a different door. Imported rather
+        //  than typed so the day somebody reconciles the two, this follows.
+        //
+        //  AND WHICH POCKET, which was got wrong first time and caught by the
+        //  test below. `cashAtLeast` reads the player's PERSONAL money, and
+        //  LaboratoryScreen pays for this out of `companyCapital` with
+        //  `deductCapital`. Gated on cash, a player with a rich company and an
+        //  empty wallet would never be taught the lesson, and one with a fat
+        //  wallet and a broke company would be taught it and then refused -
+        //  the same trap through a third door.
+        //
+        //  What is still given up: a player who CAN afford one and has
+        //  sensibly decided not to is pushed anyway. That is a real cost and
+        //  it was weighed rather than missed.
         // ------------------------------------------------------------------
         id: 'rnd-hire',
         highlight: 'rndHire',
         speaker: 'cto',
-        acknowledge: true,
-        instruction: 'Researchers make points every quarter, and points open new products and improve the ones you have. They are expensive, and they are the only thing that changes what you can build.',
+        instruction: 'Hire a researcher. They are not cheap and the salary does not stop.',
+        satisfied: [{ kind: 'flag', flag: 'rndHired' }],
         canEngage: [
             { kind: 'flag', flag: 'rndLabOpened' },
+            { kind: 'capitalAtLeast', amount: RESEARCHER_HIRE_PRICE },
+        ],
+    },
+
+    {
+        // ------------------------------------------------------------------
+        //  AND THE POINT ITSELF, THE QUARTER IT SHOWS UP
+        // ------------------------------------------------------------------
+        //  The lesson used to be one line carrying both halves: what a
+        //  researcher costs AND what the points do. Two things in one
+        //  sentence, read once, in front of a number that was still zero.
+        //
+        //  Split, each half arrives when it can be seen. The price lands at
+        //  the moment of paying it, above. This one waits until somebody is
+        //  employed, which means the counter on that screen has moved, which
+        //  is the only moment the sentence "points open products" has
+        //  anything to point at.
+        //
+        //  `acknowledge`, and here that IS the right shape: there is nothing
+        //  to do with a research point yet, and demanding a spend the quarter
+        //  after demanding a hire would be the tutorial taking two purchases
+        //  in a row.
+        // ------------------------------------------------------------------
+        id: 'rnd-points',
+        highlight: 'rndPoints',
+        speaker: 'cto',
+        acknowledge: true,
+        instruction: 'That number is not money and you cannot buy your way past it. Points arrive every quarter your people are working, and they are the only thing that changes what this company is able to build.',
+        canEngage: [
+            { kind: 'flag', flag: 'rndHired' },
         ],
     },
 

@@ -282,8 +282,13 @@ describe('somebody is saying it', () => {
         // conversation two delivery routes - deliver.ts would dedupe it, but
         // relying on a dedupe to cover a design with two sources is how the
         // second source eventually wins.
+        //  `rnd-points` joins the list without a scene of its own, and for
+        //  the same reason `rnd-hire` is on it: they are the second and third
+        //  cards of ONE lesson whose scene is `cto-research`, attached to
+        //  `rnd-lab`. Priya argues for the laboratory once; the two steps
+        //  after it are the doing, not a second argument.
         expect(TUTORIAL_SEQUENCE.filter(l => !l.conversation).map(l => l.id))
-            .toEqual(['rnd-hire', 'q1-open-product', 'q1-marketing']);
+            .toEqual(['rnd-hire', 'rnd-points', 'q1-open-product', 'q1-marketing']);
     });
 
     it('the instruction stays short enough to sit on a dimmed screen', () => {
@@ -317,7 +322,10 @@ describe('somebody is saying it', () => {
 //  lifecycle is in TutorialTarget.tsx.
 // ============================================================================
 describe('a lock points at a control that exists', () => {
-    const REGISTERED = ['products', 'marketing', 'teamMorale', 'rndLab', 'rndHire'];
+    //  `rndPoints` is the RP counter in the laboratory header. It arrived
+    //  when the research lesson was split in two: the price lands on the hire
+    //  button and what a point IS lands on the number itself, once one exists.
+    const REGISTERED = ['products', 'marketing', 'teamMorale', 'rndLab', 'rndHire', 'rndPoints'];
 
     it('every highlight key is one a screen actually registers', () => {
         // A key nothing registers is a lock that can now never appear at all,
