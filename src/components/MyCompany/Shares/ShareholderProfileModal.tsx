@@ -23,6 +23,7 @@ import type { BoardMember } from '../../../features/shareholders/stores/useShare
 import { formatMoney, formatNumber, formatPrice } from '../../../core/utils';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
+import { offerLook, trustLook } from './logic/trustLook';
 import ConfirmPanel, { type ConfirmLine } from '../../common/ConfirmPanel';
 import { getTraitVisual } from './BoardRoomModal';
 
@@ -244,24 +245,39 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     // HELPERS
     // ============================================================================
 
-    const getTrustColor = (trust: number) => {
-        if (trust < 30) return '#FF8A8A'; // Red
-        if (trust < 50) return '#FF8A8A'; // Orange
-        if (trust < 70) return '#FF8A8A'; // Yellow
-        return '#CFD0D2'; // Green
-    };
-
-    const getReactionColor = () => {
-        if (offerPremium < 0) return '#FF8A8A'; // Red - Insulted
-        if (offerPremium <= 20) return '#FF8A8A'; // Yellow - Neutral
-        return '#CFD0D2'; // Green - Happy
-    };
-
-    const getReactionLabel = () => {
-        if (offerPremium < 0) return t('mem.insulted');
-        if (offerPremium <= 20) return t('mem.neutralMood');
-        return t('mem.happy');
-    };
+    // ------------------------------------------------------------------
+    //  SHELVED: FOUR BANDS, TWO COLOURS, AND FOUR COLOUR NAMES IN COMMENTS
+    // ------------------------------------------------------------------
+    //  Reported as this page looking old, and this was most of it. Red,
+    //  Orange and Yellow are all the same pink, so a director at 29 and one
+    //  at 69 were painted identically; and the one labelled "Green" is
+    //  #CFD0D2, which is the light grey out of the palette. The comments
+    //  described a design that was never built.
+    //
+    //  #FF8A8A is `negative`, and the theme says in a sentence what that
+    //  colour means: "this is costing you". A director at 65 trust is costing
+    //  the player nothing.
+    //
+    //  Two more screens answered this same question two more ways. It has one
+    //  answer now - see logic/trustLook.ts, which is MemberInteractionModal's
+    //  five bands lifted out unchanged because that one was already right.
+    //
+    //  const getTrustColor = (trust: number) => {
+    //      if (trust < 30) return '#FF8A8A'; // Red
+    //      if (trust < 50) return '#FF8A8A'; // Orange
+    //      if (trust < 70) return '#FF8A8A'; // Yellow
+    //      return '#CFD0D2'; // Green
+    //  };
+    //
+    //  const getReactionColor = () => {
+    //      if (offerPremium < 0) return '#FF8A8A'; // Red - Insulted
+    //      if (offerPremium <= 20) return '#FF8A8A'; // Yellow - Neutral
+    //      return '#CFD0D2'; // Green - Happy
+    //  };
+    // ------------------------------------------------------------------
+    const getTrustColor = (trust: number) => trustLook(trust).color;
+    const getReactionColor = () => offerLook(offerPremium).color;
+    const getReactionLabel = () => offerLook(offerPremium).label;
 
     // ----------------------------------------------------------------------
     //  AND THE ODDS COME FROM THE RULE RATHER THAN FROM A COPY OF IT
@@ -586,10 +602,36 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                 </View>
 
                                 {/* Make Offer Button */}
+                                {/* ------------------------------------------
+                                    MEASURED: #FFFFFF ON #CFD0D2 IS 1.54
+
+                                    The primary action of this whole screen,
+                                    and in buy mode you could not tell it was
+                                    a button. theme.ts states the number in
+                                    its own header: #CFD0D2 takes BLACK at
+                                    13.61 and white at 1.54.
+
+                                    EXACTLY the bug fixed on the board
+                                    member's offer button, same silver, same
+                                    white label, a different file. That fix
+                                    changed one button rather than sweeping
+                                    for the pattern, which is why this one
+                                    survived a whole prompt longer.
+
+                                    And in sell mode the fill was #FF8A8A,
+                                    the loss red, as a FILL. Selling your own
+                                    shares is a transaction, not a loss, and
+                                    the standing rule is that the signal
+                                    colours are text only and never fills.
+
+                                    One button, one colour. Which mode you
+                                    are in is decided by the toggle above it
+                                    and stated on the button itself.
+                                   ------------------------------------------ */}
                                 <TouchableOpacity
                                     style={[
                                         styles.makeOfferButton,
-                                        { backgroundColor: tradeMode === 'buy' ? '#CFD0D2' : '#FF8A8A' }
+                                        { backgroundColor: theme.colors.primary },
                                     ]}
                                     onPress={handleMakeOffer}
                                     disabled={animationState !== 'idle'}
@@ -977,9 +1019,17 @@ const styles = StyleSheet.create({
     makeOfferButtonText: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FFFFFF',
+        // The palette pairs `primary` with `onLight`, which is black. See the
+        // note on the button and rule 1 in core/theme.ts: which of the two
+        // text colours is used is decided by the fill, not by taste.
+        color: theme.colors.onLight,
         textTransform: 'uppercase',
         letterSpacing: 1.5,
+        // `alignItems: center` centres the Text ELEMENT and not the lines
+        // inside it, so a label that wraps hangs left. Same fix as
+        // ConfirmPanel: "Hisseleri sat" is short, "Satın almayı onayla" is
+        // not, and the English one-liner is what hid this.
+        textAlign: 'center',
     },
     animationOverlay: {
         position: 'absolute',

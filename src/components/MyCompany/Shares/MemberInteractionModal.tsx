@@ -35,6 +35,7 @@ import { faceFor } from '../../../core/portraits/faces';
 import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
+import { trustLook } from './logic/trustLook';
 import { giftEffect } from '../../../core/market/governance';
 import { acceptanceChance, MAX_ASK_PREMIUM } from '../../../core/market/buyout';
 import { BOARD_DINNER_COST, BOARD_GIFT_COST } from '../../../core/social/gestures';
@@ -228,15 +229,14 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
     //  and the colour was actively misleading. Same fault as the credit rating
     //  on the finance screen. Red is reserved for loss; only outright hostility
     //  keeps the caution blue, and the rest is plain white.
-    const getTrustStatus = (trust: number) => {
-        if (trust >= 80) return { label: t('equity.loyalAlly'), color: theme.colors.textPrimary };
-        if (trust >= 60) return { label: t('equity.supportive'), color: theme.colors.textPrimary };
-        if (trust >= 40) return { label: t('equity.neutral'), color: theme.colors.textSecondary };
-        if (trust >= 20) return { label: t('equity.suspiciousOfYou'), color: theme.colors.warning };
-        return { label: t('equity.hostileEnemy'), color: theme.colors.warning };
-    };
+    //  LIFTED OUT to logic/trustLook.ts, unchanged, along with the note
+    //  above it. Two other screens answered this same question two other
+    //  ways - one of them with four bands and two colours - and this was the
+    //  version that was already right. See that file for the other two.
+    //
+    //  const getTrustStatus = (trust: number) => { ... five bands ... };
 
-    const trustStatus = getTrustStatus(member.trust);
+    const trustStatus = trustLook(member.trust);
 
     const alreadyLobbied = lobbied[member.id] !== undefined;
     const owed = (promises ?? []).filter(

@@ -5,6 +5,7 @@ import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'rea
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Portrait from '../../common/Portrait';
 import { facesFor } from '../../../core/portraits/faces';
+import { trustLook } from './logic/trustLook';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 // `useStatsStore` went with the shelved default proposal.
 import { useGameStore } from '../../../core/store';
@@ -397,10 +398,12 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
                                 {members.map(m => {
                                     const weight = totalShares > 0 ? (m.shareCount / totalShares) * 100 : 0;
                                     const traitVisual = getTraitVisual(m.trait);
-                                    const trustColor =
-                                        m.trust >= 60 ? theme.colors.up
-                                            : m.trust >= 35 ? theme.colors.textSecondary
-                                                : theme.colors.down;
+                                    // Was a THIRD answer to what trust looks
+                                    // like: three bands here, five on the
+                                    // member's screen, four with two colours
+                                    // on the shareholder profile. One door
+                                    // now - see logic/trustLook.ts.
+                                    const trustColor = trustLook(m.trust).color;
 
                                     return (
                                         <Pressable
