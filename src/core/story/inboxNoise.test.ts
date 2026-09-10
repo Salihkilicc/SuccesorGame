@@ -173,3 +173,147 @@ describe('and the tutorial plays when the player says play it', () => {
         expect(src).toMatch(/choice === 'skip' \? \{ skipOpening: true \} : \{\}/);
     });
 });
+
+describe('and the father goes when the flag says he is gone', () => {
+    const messages = () => require('../store/useMessageStore').useMessageStore;
+    const story = () => require('../store/useStoryStore').useStoryStore;
+
+    const withFather = () => messages().setState({
+        threads: [
+            {
+                id: 'father', name: 'Your Father', role: 'Founder', initials: 'YF',
+                messages: [{ id: 'f-1', from: 'them', text: 'hi', atMonth: 3 }],
+                unread: 1, conversationId: 'father-q4',
+            },
+            {
+                id: 'cfo', name: 'Arthur Vance', role: 'CFO', initials: 'AV',
+                messages: [{ id: 'c-1', from: 'them', text: 'hi', atMonth: 5 }],
+                unread: 1,
+            },
+        ] as never[],
+    });
+
+    beforeEach(() => {
+        story().setState({ flags: {} });
+        withFather();
+    });
+
+    it('raising the flag closes it, whatever raised it', () => {
+        // ------------------------------------------------------------------
+        //  IT WAS HANGING OFF ONE ANSWER TO ONE QUESTION
+        // ------------------------------------------------------------------
+        //  `closeThread` is an effect on both choices of the death scene's
+        //  last card, and it works - measured, the thread goes the moment
+        //  either is picked. But an effect on a CHOICE only fires if the
+        //  player picks it, and the runner always offers a way out. Somebody
+        //  who closes the card at the last question leaves a dead man at the
+        //  top of the messages screen with a text box under him.
+        //
+        //  On the FLAG, the two are inseparable: he is dead exactly when this
+        //  is raised, by the scene, by a skipped act, or by anything written
+        //  later that has not been thought of yet.
+        // ------------------------------------------------------------------
+        story().getState().raise('fatherDead');
+        expect(messages().getState().threads.map((t: { id: string }) => t.id)).toEqual(['cfo']);
+    });
+
+    it('and it does not take anybody else with him', () => {
+        story().getState().raise('fatherDead');
+        expect(messages().getState().threads).toHaveLength(1);
+        expect(messages().getState().threads[0].id).toBe('cfo');
+    });
+
+    it('and raising it twice is not an error', () => {
+        story().getState().raise('fatherDead');
+        expect(() => story().getState().raise('fatherDead')).not.toThrow();
+        expect(messages().getState().threads.map((t: { id: string }) => t.id)).toEqual(['cfo']);
+    });
+
+    it('and a save already in the broken state is reconciled by the quarter', () => {
+        // The fix above does nothing for a save that is ALREADY carrying him,
+        // and those are the ones being played. A reconcile in the tick, one
+        // array scan a quarter, correct whatever put the thread there.
+        const tick = live('src', 'core', 'store', 'useGameStore.ts');
+        const block = tick.slice(tick.indexOf('runNeglect()'));
+        expect(block).toMatch(/if \(flags\.fatherDead\)/);
+        expect(block).toMatch(/removeThread\('father'\)/);
+    });
+
+    it('and the effect on the choices is still there, because it does more', () => {
+        // It also drops his queued scenes and his saved positions, which the
+        // flag handler does not. Belt and brace, and they are different
+        // braces.
+        const src = live('src', 'data', 'story', 'fatherDeath.ts');
+        expect((src.match(/kind: 'closeThread', who: 'father'/g) || [])).toHaveLength(2);
+        const sink = live('src', 'core', 'story', 'gameSink.ts');
+        expect(sink).toMatch(/story\.setPending\(/);
+    });
+});
+
+describe('and a subject line is what somebody typed, not a filing label', () => {
+    // ------------------------------------------------------------------
+    //  REPORTED AS "MAILIN ACIKLAMASI YAZIYOR"
+    // ------------------------------------------------------------------
+    //  A row in the inbox showed things like
+    //
+    //      OPERATIONS / Q-Review: Line throughput + automation proposal
+    //      HALE / condolence + preliminary approach, ref 4471-C
+    //
+    //  which is a department, a slash, and a summary of the contents. Nobody
+    //  writes that; a database prints it. And the sender line already carries
+    //  the affiliation - "CEO, Pear", "Chief Operating Officer" - which was
+    //  added precisely so the subject would not have to.
+    //
+    //  A pattern rather than a list of ten, because the next one somebody
+    //  writes is the one nobody would have added to a list.
+    // ------------------------------------------------------------------
+    const { CONVERSATIONS } = require('../../data/story');
+    const { STORY_TR, subjectKey } = require('../../data/i18n/storyText');
+
+    const subjects = () => CONVERSATIONS
+        .filter((c: { subject?: string }) => !!c.subject)
+        .map((c: { id: string; subject: string }) => ({
+            id: c.id,
+            en: c.subject,
+            tr: STORY_TR[subjectKey(c.id)] ?? '',
+        }));
+
+    it('no ALL CAPS department followed by a slash', () => {
+        const bad = subjects()
+            .filter((s: { en: string }) => /^[A-Z][A-Z &]{3,}\s*\//.test(s.en))
+            .map((s: { id: string; en: string }) => `${s.id}  ${s.en}`);
+        expect(bad).toEqual([]);
+    });
+
+    it('and none of them lists its own contents with a plus sign', () => {
+        // "condolence + preliminary approach" is an agenda, not a subject.
+        const bad = subjects()
+            .filter((s: { en: string }) => / \+ /.test(s.en))
+            .map((s: { id: string; en: string }) => `${s.id}  ${s.en}`);
+        expect(bad).toEqual([]);
+    });
+
+    it('and the Turkish did not keep the shape the English dropped', () => {
+        const bad = subjects()
+            .filter((s: { tr: string }) => /^[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ &]{3,}\s*\//.test(s.tr) || / \+ /.test(s.tr))
+            .map((s: { id: string; tr: string }) => `${s.id}  ${s.tr}`);
+        expect(bad).toEqual([]);
+    });
+
+    it('and no subject uses a dash, in either language', () => {
+        // The standing rule, and the Turkish Pear subject was breaking it
+        // with an em dash while the English used a comma.
+        const bad = subjects()
+            .filter((s: { en: string; tr: string }) =>
+                /[–—]|\s-\s/.test(s.en) || /[–—]|\s-\s/.test(s.tr))
+            .map((s: { id: string }) => s.id);
+        expect(bad).toEqual([]);
+    });
+
+    it('and a formal reference is still allowed, because some senders use them', () => {
+        // The regulator and the field office really do write like this, and
+        // the rule above must not have quietly banned them.
+        const refs = subjects().filter((s: { en: string }) => /ref|File|s\.14/i.test(s.en));
+        expect(refs.length).toBeGreaterThan(2);
+    });
+});

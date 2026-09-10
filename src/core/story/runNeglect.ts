@@ -136,7 +136,10 @@ const owedAReply = (): Neglectable[] => {
                     unread: owes ? 1 : 0,
                     messages: [{ from: 'them', atMonth: mail.atMonth }],
                     unanswered: isUnanswered,
-                });
+                    // What they are owed a reply ON, so the chase can be
+                    // limited to once per thing rather than once per quarter.
+                    conversationId: mail.conversationId,
+                } as Neglectable);
             }
         }
     } catch { /* mail store not ready */ }
@@ -170,8 +173,22 @@ const owedAReply = (): Neglectable[] => {
 export const runNeglect = (): string[] => {
     const month = useGameStore.getState().currentMonth;
     const store = useMessageStore.getState();
+    const owed = owedAReply();
+    const alreadyChased = useStoryStore.getState().chased ?? [];
 
-    const ignored = whoWasIgnored(owedAReply(), month)
+    /**
+     * What this chase is ABOUT.
+     *
+     * The conversation where there is one, and the person where there is not.
+     * A plain thread with nothing to answer can still be ignored - it has
+     * unread messages - and that is worth exactly one complaint too.
+     */
+    const chaseKey = (id: string): string => {
+        const entry = owed.find(o => o.id === id);
+        return entry?.conversationId ? `${id}:${entry.conversationId}` : id;
+    };
+
+    const ignored = whoWasIgnored(owed, month)
         // Only the people who have something written for it. A thread from
         // somebody with no line stays unread and costs nothing, which is the
         // correct outcome: a mechanic that fires without any writing behind it
@@ -203,6 +220,23 @@ export const runNeglect = (): string[] => {
             if (who.channels === 'mail') return true;
             return (store.threads ?? []).some(t => t.id === id);
         })
+        // ------------------------------------------------------------------
+        //  AND ONCE PER SILENCE, NOT ONCE PER QUARTER FOREVER
+        // ------------------------------------------------------------------
+        //  `chasedAtMonth` on the thread only ever bought three months: the
+        //  chase lands in the thread, resets the clock the rule measures
+        //  from, and the same unanswered letter qualifies again. So one
+        //  ignored letter produced a complaint every three months for the
+        //  rest of the run.
+        //
+        //  Keyed on the CONVERSATION they are owed a reply on rather than on
+        //  the person, so somebody who writes again in year six and is
+        //  ignored again may still say so. It is one chase per thing
+        //  ignored, which is what a person does.
+        //
+        //  See useStoryStore.chased.
+        // ------------------------------------------------------------------
+        .filter(id => !alreadyChased.includes(chaseKey(id)))
         // ------------------------------------------------------------------
         //  ONE A QUARTER, LIKE EVERYTHING ELSE THAT ARRIVES
         // ------------------------------------------------------------------
@@ -255,6 +289,8 @@ export const runNeglect = (): string[] => {
             );
             store.markChased(id, month);
         }
+
+        useStoryStore.getState().markChasedOnce(chaseKey(id));
 
         if (line.dial) {
             useStoryStore.getState().nudge(

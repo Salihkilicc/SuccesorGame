@@ -79,18 +79,48 @@ describe('when the quarter turns on an unanswered message', () => {
     });
 });
 
-describe('and it keeps costing, which is the cumulative part', () => {
-    it('once a quarter, for as long as the player keeps not answering', () => {
+describe('and it costs once, which is what a person does', () => {
+    it('they say it, and then they let it go', () => {
+        // ------------------------------------------------------------------
+        //  THIS ASSERTED FIVE COMPLAINTS AND THE DESIGN WAS THE BUG
+        // ------------------------------------------------------------------
+        //  It read "once a quarter, for as long as the player keeps not
+        //  answering", and the note under it called that cumulative damage
+        //  with a person as the source. The arithmetic worked exactly as
+        //  written: five quarters of silence, five steps, five messages.
+        //
+        //  Reported from the sofa as "hala ardarda ilgili yazismamiz hakkinda
+        //  maili geliyor, bir kere gelsin bitsin". Which is the same mechanic
+        //  described by somebody living with it: one letter left unopened
+        //  produced a complaint every three months for the rest of the run,
+        //  and the complaint is the same complaint.
+        //
+        //  Cumulative damage from a repeated source reads as a system with a
+        //  grudge rather than as a colleague. So: once per thing ignored. The
+        //  step is unchanged and it lands once; a person who is ignored again
+        //  years later, on something else, may still say so - the record is
+        //  keyed on the conversation. See useStoryStore.chased.
+        // ------------------------------------------------------------------
         ignoredCfo();
         const start = useStoryStore.getState().dials.cfoTrust;
         for (let m = 6; m <= 18; m += 3) {
             useGameStore.setState({ currentMonth: m } as never);
             runNeglect();
         }
-        // Five quarters of silence, five steps, and every one of them arrived
-        // as a message the player could have opened.
-        expect(useStoryStore.getState().dials.cfoTrust).toBe(start - NEGLECT_STEP * 5);
-        expect(useMessageStore.getState().threads[0].messages.length).toBe(6);
+        expect(useStoryStore.getState().dials.cfoTrust).toBe(start - NEGLECT_STEP);
+        // The thread they wrote in, plus one complaint. Not six.
+        expect(useMessageStore.getState().threads[0].messages.length).toBe(2);
+    });
+
+    it('and the record says what it was about, not merely who', () => {
+        // Keyed on the conversation, so being ignored on a DIFFERENT letter
+        // years later is a different silence and may still be said out loud.
+        ignoredCfo();
+        useGameStore.setState({ currentMonth: 6 } as never);
+        expect(runNeglect()).toEqual(['cfo']);
+        const marks = useStoryStore.getState().chased;
+        expect(marks).toHaveLength(1);
+        expect(marks[0]).toContain('cfo');
     });
 });
 

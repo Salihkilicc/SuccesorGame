@@ -86,7 +86,7 @@ export const pearOffer: Conversation = {
     from: 'pear',
     when: WHEN,
     // The subject is an internal workflow with the player's family in it.
-    subject: 'HALE / condolence + preliminary approach, ref 4471-C',
+    subject: 'Hale, and a proposal',
     start: 'open',
     nodes: [
         {

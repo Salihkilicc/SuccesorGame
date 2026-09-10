@@ -2819,6 +2819,35 @@ export const useGameStore = create<GameStore>()(
           }
 
           // ------------------------------------------------------------------
+          //  AND THE DEAD ARE STILL DEAD, IN EVERY SAVE THAT ALREADY EXISTS
+          // ------------------------------------------------------------------
+          //  `raise('fatherDead')` closes his thread now, so no NEW run can
+          //  end up with him at the top of the messages screen. That does
+          //  nothing for a save which is already in that state, and those are
+          //  the ones being played.
+          //
+          //  A reconcile rather than a migration: it costs one array scan a
+          //  quarter and it is correct whatever put the thread there - the
+          //  effect never firing, a version before it existed, or something
+          //  written later that rebuilds a thread without asking whether its
+          //  owner is alive.
+          // ------------------------------------------------------------------
+          try {
+            // Lazily required, like every other store this file reaches:
+            // pulling them in at module load drags AsyncStorage behind them.
+            const flags = require('./useStoryStore').useStoryStore.getState().flags;
+            if (flags.fatherDead) {
+              const messages = require('./useMessageStore').useMessageStore;
+              if (messages.getState().threads.some((t: { id: string }) => t.id === 'father')) {
+                messages.getState().removeThread('father');
+                console.log('[story] closed a father thread that outlived him');
+              }
+            }
+          } catch (e) {
+            console.warn('[story] could not reconcile the closed threads', e);
+          }
+
+          // ------------------------------------------------------------------
           //  A CHILD WHO WAS PAID FOR ARRIVES
           // ------------------------------------------------------------------
           //  Nine months is three of these. See core/story/surrogacy.ts for

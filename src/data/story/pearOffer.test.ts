@@ -129,8 +129,30 @@ describe('the letter is dictated, not written', () => {
     });
 
     it('the subject line is a workflow with your family in it', () => {
-        expect(pearOffer.subject).toContain('ref');
-        expect(pearOffer.subject).toContain('condolence');
+        // ------------------------------------------------------------------
+        //  THE CLAIM SURVIVED A REWORDING, AND IT SHOULD
+        // ------------------------------------------------------------------
+        //  This used to pin the literal words: 'ref' and 'condolence', from
+        //  "HALE / condolence + preliminary approach, ref 4471-C". Reported
+        //  as the subject reading like the mail's own description rather than
+        //  like something a person types, and that is fair - it was a filing
+        //  label, and every screen row in the game had one.
+        //
+        //  But the TEST is right about what it is for. Vogel putting a death
+        //  and a deal in one subject line is the most characterisation any
+        //  four words in this game do, and deleting it to tidy the inbox
+        //  would have thrown that away to fix a formatting complaint.
+        //
+        //  So the words changed and the crime did not: the family name and
+        //  the business, in one line, with no condolence anywhere in it. The
+        //  sympathy is in the body, where he had somebody type it.
+        // ------------------------------------------------------------------
+        expect(pearOffer.subject).toContain('Hale');
+        expect(pearOffer.subject).toMatch(/proposal|offer|approach/i);
+        // And no comfort in the subject. That is the whole joke.
+        expect(pearOffer.subject).not.toMatch(/condolence|sympathy|sorry/i);
+        // Nor a department code, which is what it read like.
+        expect(pearOffer.subject).not.toMatch(/\bref\b|\//);
     });
 
     it('is addressed to the dead man', () => {

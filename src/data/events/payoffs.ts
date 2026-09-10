@@ -55,7 +55,7 @@ export const opsAutomationPayoff: Conversation = {
     id: 'event-payoff-automation',
     channel: 'mail',
     from: 'coo',
-    subject: 'OPERATIONS / Twelve month review: line automation',
+    subject: 'A year of the new line',
     start: 'open',
     nodes: [
         {
@@ -82,7 +82,7 @@ export const opsLogisticsPayoff: Conversation = {
     id: 'event-payoff-logistics',
     channel: 'mail',
     from: 'coo',
-    subject: 'OPERATIONS / Carrier contract: year one variance',
+    subject: 'The carrier contract, a year on',
     start: 'open',
     nodes: [
         {

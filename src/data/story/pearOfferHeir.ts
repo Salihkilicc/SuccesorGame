@@ -42,7 +42,7 @@ export const pearOfferHeir: Conversation = {
     from: 'pear',
     // The same reference series as every other letter he has ever sent this
     // family. One filing system, three generations.
-    subject: 'HALE / transition, renewed approach, ref 4471-C',
+    subject: 'Hale, and the same proposal',
     when: [
         { kind: 'flag', flag: 'succeeded' },
         // He cannot write to you about buying a company you own.

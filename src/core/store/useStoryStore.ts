@@ -93,6 +93,31 @@ export type StoryState = {
      */
     seenScenes: string[];
     /**
+     * WHAT SOMEBODY HAS ALREADY BEEN CHASED ABOUT, ONCE AND FOR ALL.
+     *
+     * Keyed by the conversation they are owed a reply on, or by their own id
+     * when there is no conversation. Same shape and same meaning as
+     * `seenScenes`: we have done this, do not do it again.
+     *
+     * -----------------------------------------------------------------------
+     *  BECAUSE `chasedAtMonth` ONLY EVER BOUGHT THREE MONTHS OF QUIET
+     * -----------------------------------------------------------------------
+     *  That field lives on the thread and its guard is
+     *  `currentMonth - chasedAtMonth < NEGLECT_MONTHS`, so it stops a second
+     *  chase inside a quarter and nothing more. The chase then lands in the
+     *  thread, resets the clock the rule measures from, and three months later
+     *  the same unanswered letter qualifies again.
+     *
+     *  Which is a complaint about one silence, repeated for the rest of the
+     *  run. Reported as exactly that: "hala ardarda ilgili yazismamiz hakkinda
+     *  maili geliyor, bir kere gelsin bitsin".
+     *
+     *  So: once. A person who is ignored says so, and then lets it go, which
+     *  is also what a person does.
+     * -----------------------------------------------------------------------
+     */
+    chased: string[];
+    /**
      * The ending that has been reached, if any. An id from data/story/endings.
      *
      * Persisted: a player who closes the app on the last screen should not
@@ -194,6 +219,8 @@ type StoryStore = StoryState & {
 
     /** Remember that a scene has been shown, so it is not shown twice. */
     markSceneSeen: (conversationId: string) => void;
+    /** They have complained about this once. See `chased`. */
+    markChasedOnce: (key: string) => void;
 
     /** Stop the game. See data/story/endings.ts for the ids. */
     endGame: (endingId: string) => void;
@@ -229,6 +256,7 @@ export const initialStoryState: StoryState = {
     locks: emptyLockState(),
     eventHistory: emptyHistory(),
     seenScenes: [],
+    chased: [],
     ending: null,
     manipulationLedger: [],
     manipulationNoticesSent: [],
@@ -275,6 +303,36 @@ export const useStoryStore = create<StoryStore>()(
                     } catch (e) {
                         console.warn('[story] could not record the opening as seen', e);
                     }
+                    // ------------------------------------------------------
+                    //  AND HIS THREAD GOES WITH HIM, WHOEVER RAISED THIS
+                    // ------------------------------------------------------
+                    //  It already went, from a `closeThread` effect on both
+                    //  answers to the death scene, and that effect works -
+                    //  measured, the thread is gone the moment either answer
+                    //  is picked.
+                    //
+                    //  It was still reported as not happening, and the reason
+                    //  it can not happen is that an EFFECT ON A CHOICE only
+                    //  fires if the player picks that choice. The runner
+                    //  always offers a way out, so a player who closes the
+                    //  card at the last question leaves a dead man at the top
+                    //  of the messages screen with a text box under him. So
+                    //  does a save made before the effect existed.
+                    //
+                    //  Hanging it on the FLAG rather than on the answer makes
+                    //  the two inseparable: he is dead exactly when this is
+                    //  raised, by the scene, by a skipped act, or by anything
+                    //  written later. The effect on the choices stays - it
+                    //  also clears his queued scenes, which this does not -
+                    //  and `removeThread` is idempotent, so running twice
+                    //  costs nothing.
+                    // ------------------------------------------------------
+                    try {
+                        require('./useMessageStore').useMessageStore
+                            .getState().removeThread('father');
+                    } catch (e) {
+                        console.warn('[story] could not close the father thread', e);
+                    }
                 }
                 set(state => (state.flags[flag] ? state : { flags: { ...state.flags, [flag]: true } }));
             },
@@ -317,6 +375,11 @@ export const useStoryStore = create<StoryStore>()(
                     seenScenes: [...state.seenScenes, id],
                 })),
 
+            markChasedOnce: (key) =>
+                set(state => (state.chased.includes(key) ? state : {
+                    chased: [...state.chased, key],
+                })),
+
             completeLock: (id) =>
                 set(state => (state.locks.completed.includes(id) ? state : {
                     locks: { ...state.locks, completed: [...state.locks.completed, id] },
@@ -338,6 +401,7 @@ export const useStoryStore = create<StoryStore>()(
                 // from the first, and a new company would have a quiet decade.
                 eventHistory: emptyHistory(),
                 seenScenes: [],
+                chased: [],
                 ending: null,
                 // A new chief executive is not on trial for the last one.
                 manipulationLedger: [],
@@ -354,7 +418,8 @@ export const useStoryStore = create<StoryStore>()(
             partialize: state => ({
                 dials: state.dials, flags: state.flags, pending: state.pending,
                 locks: state.locks, eventHistory: state.eventHistory,
-                seenScenes: state.seenScenes, ending: state.ending,
+                seenScenes: state.seenScenes, chased: state.chased,
+                ending: state.ending,
                 manipulationLedger: state.manipulationLedger,
                 manipulationNoticesSent: state.manipulationNoticesSent,
                 manipulationVerdict: state.manipulationVerdict,
@@ -381,6 +446,10 @@ export const useStoryStore = create<StoryStore>()(
                     // on the first tick after an update.
                     eventHistory: p.eventHistory ?? emptyHistory(),
                     seenScenes: p.seenScenes ?? [],
+                    // Absent in every save written before the chase was
+                    // limited to once. An undefined here would throw on the
+                    // first `.includes` of the next tick.
+                    chased: p.chased ?? [],
                     ending: p.ending ?? null,
                     // Saves written before the ledger existed have none, and
                     // `undefined.filter` on the first tick would throw.

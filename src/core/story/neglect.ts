@@ -43,6 +43,15 @@ export type Neglectable = {
     /** The month they were last chased, so nobody is chased twice for one silence. */
     chasedAtMonth?: number;
     /**
+     * What they are owed a reply ON, where there is one.
+     *
+     * Not read by the rule below - it decides WHETHER somebody was ignored,
+     * and that is about silence rather than about which letter. `runNeglect`
+     * reads it to key the once-only record, so a person who is ignored again
+     * years later on something else may still say so. See useStoryStore.chased.
+     */
+    conversationId?: string;
+    /**
      * They asked you something and you never picked an answer.
      *
      * ---------------------------------------------------------------------

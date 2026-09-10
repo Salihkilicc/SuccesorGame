@@ -29,7 +29,7 @@ export const opsPlantEfficiency: Conversation = {
     id: 'event-ops-plant-efficiency',
     channel: 'mail',
     from: 'coo',
-    subject: 'OPERATIONS / Q-Review: Line throughput + automation proposal',
+    subject: 'The line, and what it would take',
     when: GROWN,
     start: 'open',
     nodes: [
@@ -85,7 +85,7 @@ export const opsSupplyChain: Conversation = {
     id: 'event-ops-supply-chain',
     channel: 'mail',
     from: 'coo',
-    subject: 'SUPPLY CHAIN / Freight contract renegotiation window',
+    subject: 'The freight contract is open again',
     when: GROWN,
     start: 'open',
     nodes: [
@@ -195,7 +195,7 @@ export const techCloudScaling: Conversation = {
     id: 'event-tech-cloud-scaling',
     channel: 'mail',
     from: 'cto',
-    subject: 'INFRASTRUCTURE / Telemetry load & distributed cluster upgrade',
+    subject: 'The cluster will not hold much longer',
     when: GROWN,
     start: 'open',
     nodes: [
@@ -244,7 +244,7 @@ export const cfoTreasuryYield: Conversation = {
     id: 'event-cfo-treasury-yield',
     channel: 'mail',
     from: 'cfo',
-    subject: 'TREASURY / Corporate cash yield and asset allocation report',
+    subject: 'What the cash is doing while it sits there',
     when: GROWN,
     start: 'open',
     nodes: [
@@ -296,7 +296,7 @@ export const cfoInstitutionalInvestor: Conversation = {
     id: 'event-cfo-institutional-investor',
     channel: 'mail',
     from: 'cfo',
-    subject: 'INVESTOR RELATIONS / Tier-1 Sovereign & Growth fund interest',
+    subject: 'Two funds have been asking',
     when: GROWN,
     start: 'open',
     nodes: [
@@ -344,7 +344,7 @@ export const boardEsgMilestone: Conversation = {
     id: 'event-board-esg-milestone',
     channel: 'mail',
     from: 'cfo',
-    subject: 'BOARD NOTICE / Corporate governance & sustainability rating update',
+    subject: 'The rating people have written to us',
     when: GROWN,
     start: 'open',
     nodes: [
