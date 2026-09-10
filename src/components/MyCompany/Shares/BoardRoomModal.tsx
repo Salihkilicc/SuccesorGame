@@ -1,10 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Portrait from '../../common/Portrait';
-import { faceFor } from '../../../core/portraits/faces';
+import { facesFor } from '../../../core/portraits/faces';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 // `useStatsStore` went with the shelved default proposal.
 import { useGameStore } from '../../../core/store';
@@ -146,6 +146,31 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
     const navigation = useNavigation<any>();
     const openMember = (memberId: string) =>
         navigation.navigate('BoardMember', { memberId });
+
+    // ------------------------------------------------------------------
+    //  ONE FACE EACH, DECIDED FOR THE WHOLE LIST AT ONCE
+    // ------------------------------------------------------------------
+    //  This drew each director with `faceFor` inside the map, which asks the
+    //  pool one person at a time and therefore cannot know that the director
+    //  above already took that face. `facesFor` exists for exactly this and
+    //  was being used by the succession list and by nothing else.
+    //
+    //  It looked fine because the pool was eight and the four ids happened
+    //  not to collide. Widening the partner bands to eighteen reshuffled
+    //  which ids land where, and generationFaces.test.ts went red at
+    //  generation two with three faces on a board of four - a test that had
+    //  been passing on luck rather than on a guarantee.
+    //
+    //  Order is the caller's and this is the order the rows are drawn in, so
+    //  a director keeps their face as long as the people above them do not
+    //  change. See core/portraits/faces.ts.
+    // ------------------------------------------------------------------
+    const boardFaces = useMemo(() => facesFor(members.map(m => ({
+        id: m.id,
+        name: m.name,
+        female: m.gender === undefined ? undefined : m.gender === 'female',
+        age: m.age,
+    }))), [members]);
 
     const ownership = getPlayerOwnershipPercent();
     const hasControl = ownership >= CONTROL_THRESHOLD;
@@ -408,14 +433,9 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
                                                     borderWidth={1}
                                                     borderColor={`${traitVisual.color}35`}
                                                     fill={`${traitVisual.color}15`}
-                                                    source={faceFor({
-                                                        id: m.id,
-                                                        name: m.name,
-                                                        female: m.gender === undefined
-                                                            ? undefined
-                                                            : m.gender === 'female',
-                                                        age: m.age,
-                                                    }) as number | null}
+                                                    source={
+                                                        (boardFaces.get(m.id) ?? null) as number | null
+                                                    }
                                                 />
                                                 <View style={{ flex: 1, marginLeft: 10 }}>
                                                     <Text style={styles.memberName}>{m.name}</Text>

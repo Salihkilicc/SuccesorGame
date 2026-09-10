@@ -18,12 +18,15 @@
 //  This file is the measurement, kept.
 // ============================================================================
 
+import fs from 'fs';
+import path from 'path';
+
 import {
     SUCCESSOR_FIRST_NAMES, SUCCESSOR_NAMES,
     heirGenderFor, heirNameFor, succeedBoard,
 } from './boardSuccession';
 import { portraitFor, portraitForPerson } from '../portraits';
-import { faceFor, bandForAge } from '../portraits/faces';
+import { faceFor, facesFor, bandForAge } from '../portraits/faces';
 import { PORTRAITS } from '../portraits/registry';
 
 const nameOf = (src: unknown): string =>
@@ -76,11 +79,51 @@ describe('the board keeps its faces down the generations', () => {
     });
 
     it('and no two directors on one board wear the same one', () => {
+        // ------------------------------------------------------------------
+        //  THIS WAS PASSING ON LUCK, AND WIDENING THE POOL SAID SO
+        // ------------------------------------------------------------------
+        //  It asked `faceFor` once per director, which is what BoardRoomModal
+        //  did, and `faceFor` answers one person at a time - it cannot know
+        //  that the director above already took that face. With eight faces
+        //  in a bucket and four directors, a collision is roughly a coin
+        //  flip; these four ids happened not to collide, so the test was
+        //  green and the guarantee did not exist.
+        //
+        //  Adding forty portraits reshuffled which ids land where, and
+        //  generation two came back with THREE faces on a board of four. Not
+        //  a regression from the portraits: the portraits uncovered it.
+        //
+        //  `facesFor` is the function that actually guarantees this, and
+        //  BoardRoomModal calls it now. So does this, because a test of a
+        //  screen has to ask the screen's question.
+        // ------------------------------------------------------------------
         let board = FOUNDING;
         for (let g = 2; g <= 6; g++) {
             board = succeedBoard(board, g);
-            expect(new Set(board.map(faceOf)).size).toBe(4);
+            const drawn = facesFor(board.map((m: any) => ({
+                id: m.id,
+                name: m.name,
+                female: m.gender === undefined ? undefined : m.gender === 'female',
+                age: m.age,
+            })));
+            const faces = [...drawn.values()].map(nameOf);
+            expect(faces).toHaveLength(4);
+            expect(faces.filter(f => f === 'NONE')).toEqual([]);
+            expect(new Set(faces).size).toBe(4);
         }
+    });
+
+    it('and the board screen is the one that asks for the whole list at once', () => {
+        // The wiring half. A screen that goes back to asking one at a time
+        // loses the guarantee above silently, and the symptom is two
+        // directors in one photograph rather than an error.
+        const src = fs.readFileSync(
+            path.join(__dirname, '..', '..', 'components', 'MyCompany', 'Shares', 'BoardRoomModal.tsx'),
+            'utf8',
+        );
+        expect(src).toMatch(/facesFor\(members\.map/);
+        expect(src).toMatch(/boardFaces\.get\(m\.id\)/);
+        expect(src).not.toMatch(/source=\{faceFor\(/);
     });
 
     it('and the face changes when the person does', () => {

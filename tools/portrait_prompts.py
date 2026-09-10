@@ -849,9 +849,44 @@ def heir_look(cid: str, female: bool) -> str:
 #  stop repeats across a whole run does not exist at any sane cost. Eight is
 #  comfortably more than the four seats or three candidates ever shown at
 #  once.
+#
+#  ---------------------------------------------------------------------------
+#  AND THEN THE PARTNER BANDS WERE ASKED TO CARRY MORE
+#  ---------------------------------------------------------------------------
+#  Eight is enough to stop a repeat ON A SCREEN and it is not enough to stop
+#  a repeat ACROSS A RUN, and the two are different problems. A director is
+#  looked at once a generation; a partner is met, refused, met again, and the
+#  card is the whole screen with the face at the top of it. Eight faces means
+#  a player who dates through one dynasty sees each of them several times.
+#
+#  So the count is per band now, and the two bands partners are drawn from
+#  go to eighteen. The old band stays at eight: nobody over fifty is offered
+#  as a date - `generatePartner` runs 18 to 45 - so that band serves
+#  directors and elders alone, who are looked at rarely.
+#
+#      young  18-30   8 -> 18     partners, students
+#      mid    30-50   8 -> 18     partners, directors, executives
+#      old    50+     8           directors, elders
+#
+#  Forty new files, twenty of each gender, which is the number that was
+#  asked for. The ids the extra ones take are face_{band}_{m,f}_09 through
+#  _18, and until they are drawn the app simply does not see them: POOL in
+#  core/portraits/faces.ts is built from the generated registry, which is
+#  built from what is on disk.
 # ---------------------------------------------------------------------------
 
 FACE_BAND_COUNT = 8
+
+#  A band with no entry here keeps FACE_BAND_COUNT.
+FACE_BAND_COUNTS = {
+    'young': 18,
+    'mid': 18,
+    'old': FACE_BAND_COUNT,
+}
+
+
+def band_count(band: str) -> int:
+    return FACE_BAND_COUNTS.get(band, FACE_BAND_COUNT)
 
 AGE_BANDS = {
     'young': ['in their late teens', 'in their early twenties',
@@ -931,7 +966,7 @@ FACE_POOL = {
     f'face_{band}_{g}_{i:02d}': f'Face, {band} {g} {i}'
     for band in ('young', 'mid', 'old')
     for g in ('m', 'f')
-    for i in range(1, FACE_BAND_COUNT + 1)
+    for i in range(1, band_count(band) + 1)
 }
 
 

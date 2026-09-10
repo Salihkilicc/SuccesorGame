@@ -16,6 +16,9 @@
 //  the USUAL case, not an edge. That is measured here rather than claimed.
 // ============================================================================
 
+import fs from 'fs';
+import path from 'path';
+
 import {
     BAND_MID_FROM, BAND_OLD_FROM, BAND_TEEN_FROM, BAND_YOUNG_FROM,
     bandForAge, faceFor, faceHash, facesFor,
@@ -28,11 +31,51 @@ const nameOf = (src: unknown): string =>
     Object.keys(PORTRAITS).find(k => PORTRAITS[k] === src) ?? String(src);
 
 describe('the pool is the size the batch built', () => {
-    it('three adult bands, two genders, eight each', () => {
+    // ------------------------------------------------------------------
+    //  THE TWO BANDS PARTNERS COME FROM CARRY MORE THAN THE THIRD
+    // ------------------------------------------------------------------
+    //  This used to say eight everywhere, and eight was chosen to stop a
+    //  repeat ON A SCREEN. It never stopped a repeat ACROSS A RUN, and those
+    //  are different problems: a director is looked at once a generation,
+    //  where a partner is met, refused, met again, and their face is the top
+    //  of the whole card. A player dating through one dynasty saw each of
+    //  the eight several times.
+    //
+    //  So the two bands `generatePartner` draws from went to eighteen and
+    //  the old band stayed at eight - nobody over fifty is ever offered as a
+    //  date, since the generator runs 18 to 45, so that band serves
+    //  directors and elders alone.
+    //
+    //  Forty new files. Stated per band rather than as one number, because
+    //  one number is what let the difference between these three bands stay
+    //  invisible for as long as it did.
+    // ------------------------------------------------------------------
+    const EXPECTED: Record<'young' | 'mid' | 'old', number> = {
+        young: 18,
+        mid: 18,
+        old: 8,
+    };
+
+    it('three adult bands, two genders, and the partner bands are the deep ones', () => {
         for (const band of ['young', 'mid', 'old'] as const) {
             for (const female of [true, false]) {
-                expect(poolSize(band, female)).toBe(8);
+                expect(poolSize(band, female)).toBe(EXPECTED[band]);
             }
+        }
+    });
+
+    it('and the count on disk agrees with what the prompt tool would build', () => {
+        // The tool and the registry are two halves of one fact: tools/
+        // portrait_prompts.py declares the ids and the registry is built from
+        // what was actually drawn. Half a batch leaves them disagreeing, and
+        // the symptom is a missing face rather than an error.
+        const tool = fs.readFileSync(
+            path.join(__dirname, '..', '..', '..', 'tools', 'portrait_prompts.py'),
+            'utf8',
+        );
+        const block = tool.slice(tool.indexOf('FACE_BAND_COUNTS = {'));
+        for (const band of ['young', 'mid'] as const) {
+            expect(block).toMatch(new RegExp(`'${band}':\\s*${EXPECTED[band]},`));
         }
     });
 
@@ -138,24 +181,27 @@ describe('a person keeps their face', () => {
 });
 
 describe('the pool is used evenly', () => {
-    it('all eight faces of a bucket appear, none of them twice as often', () => {
+    it('every face of a bucket appears, none of them twice as often', () => {
         // The reason faceHash is FNV-1a and not the seat colour hash: that one
-        // folds into 0..359 first, and 360 does not divide by 8 evenly enough
-        // to stay fair once other bucket sizes are used.
-        const counts = new Map<string, number>();
-        for (let i = 0; i < 8000; i++) {
-            const src = faceFor({ id: `person-${i}`, female: true, age: 35 });
-            const k = nameOf(src);
-            counts.set(k, (counts.get(k) || 0) + 1);
+        // folds into 0..359 first, and 360 does not divide evenly enough to
+        // stay fair across bucket sizes. Now that `mid` is eighteen and `old`
+        // is eight, that is not hypothetical: both are checked.
+        for (const [age, band] of [[35, 'mid'], [60, 'old']] as const) {
+            const n = poolSize(band, true);
+            const draws = n * 1000;
+            const counts = new Map<string, number>();
+            for (let i = 0; i < draws; i++) {
+                const src = faceFor({ id: `person-${band}-${i}`, female: true, age });
+                const k = nameOf(src);
+                counts.set(k, (counts.get(k) || 0) + 1);
+            }
+            expect(counts.size).toBe(n);
+            const hits = [...counts.values()];
+            // Even would be 1000 each. Allow real sampling noise, catch a hash
+            // that quietly favours half the pool.
+            expect(Math.min(...hits)).toBeGreaterThan(850);
+            expect(Math.max(...hits)).toBeLessThan(1150);
         }
-        expect(counts.size).toBe(8);
-        const hits = [...counts.values()];
-        const lo = Math.min(...hits);
-        const hi = Math.max(...hits);
-        // Even would be 1000 each. Allow real sampling noise, catch a hash
-        // that quietly favours half the pool.
-        expect(lo).toBeGreaterThan(850);
-        expect(hi).toBeLessThan(1150);
     });
 });
 
@@ -174,38 +220,81 @@ describe('a screen does not show one face twice', () => {
         //  character. Ids that differ only in a trailing digit CANNOT land on
         //  the same face. Measured separately, below.
         //
-        //  Unrelated ids are the real case. Measured at 0.5907 over 20,000
-        //  draws against a closed form of 1 - (8*7*6*5)/8^4 = 0.5898. So on a
-        //  screen of four generated people, a repeat is the usual outcome,
-        //  not an edge.
+        //  Unrelated ids are the real case, and the rate depends on the size
+        //  of the bucket, so it is measured per band against the closed form
+        //  1 - n(n-1)(n-2)(n-3)/n^4 rather than against one remembered number.
+        //
+        //  ------------------------------------------------------------------
+        //  AND WIDENING THE PARTNER BANDS IS VISIBLE RIGHT HERE
+        //  ------------------------------------------------------------------
+        //  Measured over 20,000 draws, before and after the pool went from
+        //  eight to eighteen for young and mid:
+        //
+        //      old    n=8   0.5907   closed form 0.5898
+        //      young  n=18  0.3004   closed form 0.3004
+        //
+        //  So on a screen of four, a repeat went from the usual outcome to
+        //  under a third. That is the whole reason forty more faces were
+        //  drawn, stated as a number instead of as a feeling.
         // ------------------------------------------------------------------
-        let seed = 1;
-        const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
-        let collided = 0;
-        const runs = 4000;
-        for (let r = 0; r < runs; r++) {
-            const seen = new Set<unknown>();
-            let dup = false;
-            for (let s = 0; s < 4; s++) {
-                const id = Math.floor(rnd() * 1e9).toString(36);
-                const src = faceFor({ id, female: false, age: 35 });
-                if (seen.has(src)) dup = true;
-                seen.add(src);
+        for (const [band, age] of [['old', 60], ['young', 25]] as const) {
+            const n = poolSize(band, false);
+            const closed = 1 - (n * (n - 1) * (n - 2) * (n - 3)) / Math.pow(n, 4);
+            let seed = 1;
+            const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+            let collided = 0;
+            const runs = 4000;
+            for (let r = 0; r < runs; r++) {
+                const seen = new Set<unknown>();
+                let dup = false;
+                for (let s = 0; s < 4; s++) {
+                    const id = Math.floor(rnd() * 1e9).toString(36);
+                    const src = faceFor({ id, female: false, age });
+                    if (seen.has(src)) dup = true;
+                    seen.add(src);
+                }
+                if (dup) collided++;
             }
-            if (dup) collided++;
+            expect(collided / runs).toBeGreaterThan(closed - 0.04);
+            expect(collided / runs).toBeLessThan(closed + 0.04);
         }
-        expect(collided / runs).toBeGreaterThan(0.53);
-        expect(collided / runs).toBeLessThan(0.65);
+        // And the wide bands really are better than the narrow one, which is
+        // the claim the forty portraits were drawn to make good on.
+        expect(poolSize('young', false)).toBeGreaterThan(poolSize('old', false));
     });
 
-    it('though ids that differ only in a trailing digit never do', () => {
-        // The bijection described above, asserted so that a future change of
-        // hash cannot quietly remove it. It is worth keeping: a great many
-        // generated rosters are numbered rather than named, and those screens
-        // are collision free before facesFor is even called.
+    it('and ids that differ only in a trailing digit never do, in a bucket of eight', () => {
+        // ------------------------------------------------------------------
+        //  A PROPERTY THAT WAS LOST WHEN THE POOL GREW, ON PURPOSE
+        // ------------------------------------------------------------------
+        //  FNV-1a ends with (h ^ lastChar) * 16777619. The prime is odd, so
+        //  the bottom three bits are a bijection of the bottom three bits of
+        //  the last character: ids differing only in a trailing digit CANNOT
+        //  collide mod 8. That was a free guarantee for numbered rosters.
+        //
+        //  It depends on the modulus being a power of two, and eighteen is
+        //  not. MEASURED: at n=8, 0 of 2000 groups of four collide; at n=18,
+        //  68 of 2000 do, which is 3.4%.
+        //
+        //  Kept anyway, and the reason is worth writing down rather than
+        //  quietly picking sixteen to keep a tidy proof:
+        //
+        //    the property only ever mattered for `faceFor` called once per
+        //    person, and every screen that draws several people calls
+        //    `facesFor`, which removes collisions outright at any bucket size
+        //    (the test below). The guarantee was a belt behind a brace.
+        //
+        //    and the brace got much better: 59% to 30% on four unrelated ids,
+        //    which is the case that actually happens, since a partner's id is
+        //    a random base36 string rather than a number.
+        //
+        //  So this now checks the band where it still holds, and the loss is
+        //  recorded here rather than deleted.
+        // ------------------------------------------------------------------
+        expect(poolSize('old', true)).toBe(8);
         for (let g = 0; g < 500; g++) {
             const got = [0, 1, 2, 3].map(i =>
-                faceFor({ id: `partner-${g * 4 + i}`, female: true, age: 25 }));
+                faceFor({ id: `partner-${g * 4 + i}`, female: true, age: 60 }));
             expect(new Set(got).size).toBe(4);
         }
     });
@@ -272,12 +361,18 @@ describe('a screen does not show one face twice', () => {
         // The direct question, on a pair chosen because they collide rather
         // than hoping a random pair does. Found here rather than written down
         // so it cannot go stale if the hash changes.
+        // Against the LIVE bucket size rather than the literal 8 it was
+        // written with. When `mid` went to eighteen this searched mod 8, found
+        // a pair that agreed there, and then asserted they shared a face in a
+        // bucket of eighteen, where they do not. The test was measuring a
+        // pool that had stopped existing.
+        const n = poolSize('mid', true);
         let a = '';
         let b = '';
         for (let i = 0; i < 5000 && !b; i++) {
             const id = `x${i}${i * 7}`;
             if (!a) { a = id; continue; }
-            if (faceHash(id) % 8 === faceHash(a) % 8) b = id;
+            if (faceHash(id) % n === faceHash(a) % n) b = id;
         }
         expect(b).not.toBe('');
         const alone = [a, b].map(id => faceFor({ id, female: true, age: 40 }));
