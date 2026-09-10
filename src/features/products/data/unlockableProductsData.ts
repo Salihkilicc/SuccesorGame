@@ -199,7 +199,11 @@ export const UNLOCKABLE_PRODUCTS: UnlockableProduct[] = [
     },
     {
         id: 'flying_car',
-        name: 'eVTOL SkyCar',
+        // A plain string among fourteen getters, so it was the one product in
+        // the tech tree a Turkish player read in English. Nothing flagged it:
+        // scripts/untranslated.js reads JSX, and this arrives on that screen
+        // through a variable.
+        get name() { return t('product.evtolSkyCar'); },
         get description() { return t('product.trafficIsForTheGround'); },
         baseSellingPrice: 2500000,
         baseUnitCost: 1200000,

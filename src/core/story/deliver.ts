@@ -355,8 +355,30 @@ export const runStoryBeats = (): void => {
  * and nothing anywhere explained it, so the teaching layer sounded like a
  * tooltip rather than a person.
  *
- * Called each quarter. Idempotent per lock: the conversation is queued once,
- * recorded in the same flag set as everything else.
+ * Idempotent per lock: the conversation goes out once, recorded in the same
+ * flag set as everything else.
+ *
+ * ---------------------------------------------------------------------------
+ *  IT DELIVERS RATHER THAN QUEUES, AND IT IS CALLED FROM TWO PLACES
+ * ---------------------------------------------------------------------------
+ *  This used to `schedule` with `urgent: true` and a comment saying the
+ *  explanation must not queue behind a random event. The intent was right and
+ *  the mechanism did not carry it: a scheduled scene, urgent or not, is
+ *  delivered by `runInbox`, and `runInbox` runs on the quarterly tick.
+ *
+ *  Which is fine for the first-year locks, because the calendar is what
+ *  brings them. It is wrong for the only lock that is triggered by the PLAYER:
+ *  somebody taps into research in the middle of a quarter, the screen dims,
+ *  Priya's name is on the card, and the letter that explains what she is
+ *  talking about arrives up to three months later. Reported as "bunu girdigim
+ *  an anlatilmasi lazim".
+ *
+ *  So it delivers. On the tick that is no change at all - `runTutorialScenes`
+ *  is called immediately before `runInbox` drains, and `urgent` already
+ *  bypassed the allowance, so the scene went out in the same tick either way.
+ *  What it buys is the other caller: TutorialOverlay calls this the moment a
+ *  lock goes live, and now the words arrive with the dim.
+ * ---------------------------------------------------------------------------
  */
 export const runTutorialScenes = (): void => {
     const world = readWorld();
@@ -368,17 +390,11 @@ export const runTutorialScenes = (): void => {
         || story.seenScenes.includes(lock.conversation);
     if (already) return;
 
-    const now = currentQuarter();
-    useStoryStore.getState().schedule({
-        conversationId: lock.conversation,
-        dueQuarter: now,
-        queuedAtQuarter: now,
-        // The lock is already on screen. Its explanation does not queue behind
-        // a random event, or the player stares at a dimmed screen being told
-        // to do something by nobody.
-        urgent: true,
-    });
+    // Marked BEFORE delivering, not after. This is now called from a render
+    // effect, and an effect can run twice for one lock; marking first makes
+    // the second call a no-op instead of a second copy of the letter.
     useStoryStore.getState().markSceneSeen(lock.conversation);
+    deliver(lock.conversation);
 };
 
 /**

@@ -33,6 +33,8 @@ import { ESCAPE_AFTER_MS, DIM_DEFAULT, activeLock, isSatisfied, mustRelease, isC
 import { TUTORIAL_SEQUENCE } from '../../data/tutorial/sequence';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
+import { useStatsStore } from '../../core/store/useStatsStore';
+import { useGameStore } from '../../core/store/useGameStore';
 import { readWorld } from '../../core/story/world';
 import { useTutorialTargets } from './targets';
 import { CAST } from '../../data/story/cast';
@@ -54,38 +56,42 @@ const CARD_TOP = 132;
 
 const TutorialOverlay = () => {
     // ------------------------------------------------------------------
-    //  SHELVED, AND NOW IT SAYS SO
+    //  AND IT IS BACK ON. THE HISTORY, BECAUSE IT COST THREE REPORTS
     // ------------------------------------------------------------------
-    //  This was a bare `return null;` with an eslint-disable under it and
-    //  no explanation, in a file whose own header describes a working
-    //  overlay in four paragraphs. Somebody turned the tutorial off and
-    //  left the room; the next person to read this file has no way to tell
-    //  whether that was a decision or an accident.
+    //  This function used to open with `return null;` and an eslint-disable
+    //  under it. The paragraph beside it was honest - somebody had shelved
+    //  the overlay in a bulk commit and the next reader could not tell
+    //  whether that was a decision or an accident - and it drew exactly the
+    //  wrong conclusion: that switching it back on was a design decision for
+    //  later.
     //
-    //  IT IS NOT A CRASH. The reachability audit lists it under "hooks
-    //  called after an early return", which is the rule that produces
-    //  "Rendered more hooks than during the previous render". That rule
-    //  bites when the return is CONDITIONAL and the hook count changes
-    //  between renders. This return is unconditional, so the hooks below
-    //  never run at all and React never sees a count that moves.
+    //  It was not a decision. It was the whole tutorial, off, for months.
     //
-    //  The cost of leaving it like this is not a crash, it is noise: the
-    //  dead body below is what produces twelve of the project's forty five
-    //  TypeScript errors, all of them `'lock' is possibly undefined` on
-    //  code that cannot execute.
+    //  WHAT MADE IT INVISIBLE is worth more than the fix. Everything around
+    //  this component was correct and tested. locks.test.ts validated the
+    //  sequence. targets.test.ts checked every highlight key had a screen.
+    //  TutorialTarget.test.tsx checked the coordinates were published and
+    //  withdrawn. deliver.ts queued the right conversation. Green, all of
+    //  it, while nothing appeared on the phone - the house signature, one
+    //  more time: CORRECT DATA THAT NOTHING READS.
     //
-    //  WHETHER THE TUTORIAL SHOULD BE BACK ON IS A DESIGN DECISION and it
-    //  is not this pass's to make. `core/tutorial/locks.ts` and the whole
-    //  TUTORIAL_SEQUENCE are alive and tested; turning this line into a
-    //  real condition is all it would take.
+    //  Three separate reports were spent on it, each one landing on a
+    //  different innocent part: the lab lesson, then the tutorial messages,
+    //  then the returning-player check. Each investigation found a real bug
+    //  and fixed it, and none of them fixed this, because the last step in
+    //  the chain was the one step no test covered.
     //
-    //  Both mount points stay: RootNavigator.tsx:690 and
-    //  ProductModals.tsx:1535. Rendering null from a mounted component
-    //  costs nothing, and removing them would make switching it back on a
-    //  three file change instead of a one line one.
+    //  TutorialOverlay.test.tsx now covers it. It renders this component
+    //  with a lock that should be up and asserts there is something on the
+    //  screen, which is the only question the other four files were not
+    //  asking.
+    //
+    //  The twelve `'lock' is possibly undefined` TypeScript errors that the
+    //  old comment blamed on "the dead body below" were the dead body's
+    //  fault in a way it did not spot: control-flow narrowing does not run
+    //  in unreachable code, so `if (!lock) return null;` narrowed nothing.
+    //  They go away with the return.
     // ------------------------------------------------------------------
-    return null;
-    // eslint-disable-next-line no-unreachable
     const locks = useStoryStore(s => s.locks);
     const completeLock = useStoryStore(s => s.completeLock);
     const skipLock = useStoryStore(s => s.skipLock);
@@ -93,6 +99,36 @@ const TutorialOverlay = () => {
     const seenBefore = useIdentityStore(s => s.tutorialCompleted);
     const markDone = useIdentityStore(s => s.markTutorialCompleted);
     const rects = useTutorialTargets(s => s.rects);
+
+    // ------------------------------------------------------------------
+    //  SUBSCRIPTIONS, NOT READS. `readWorld` IS STILL THE ONLY READER
+    // ------------------------------------------------------------------
+    //  Nothing below uses these four values. They are here so that React
+    //  schedules a render when one of them moves, and that is the entire
+    //  job - the world is still built one line down by `readWorld`, which
+    //  stays the single place that knows how.
+    //
+    //  Without them this component watched `locks` and `rects` and built
+    //  its World out of four stores it was not watching. Every condition
+    //  in TUTORIAL_SEQUENCE is a flag, a pot of money or the morale
+    //  number, so a lock cleared when the player did the thing - and the
+    //  component did not re-render to notice, so it never called
+    //  `completeLock` and the card stayed up on a screen the player had
+    //  already finished with.
+    //
+    //  It appeared to work for exactly one step, by luck through an
+    //  unrelated store: pressing the laboratory tile navigates away, the
+    //  target withdraws its rect, and THAT is what forced the render.
+    //
+    //  Four scalars and one flags object, all of which change a handful of
+    //  times a quarter. The cost is a render nobody sees; the thing it
+    //  buys is both of the first two ways out in core/tutorial/locks.ts,
+    //  neither of which can happen without one.
+    // ------------------------------------------------------------------
+    useStoryStore(s => s.flags);
+    useStatsStore(s => s.companyCapital);
+    useStatsStore(s => s.money);
+    useGameStore(s => s.employeeMorale);
 
     const world = readWorld();
     const lock = activeLock(TUTORIAL_SEQUENCE, locks, world);
@@ -106,6 +142,32 @@ const TutorialOverlay = () => {
         if (!lock) return;
         const id = setTimeout(() => setEscapeVisible(true), ESCAPE_AFTER_MS);
         return () => clearTimeout(id);
+    }, [lock?.id]);
+
+    // ------------------------------------------------------------------
+    //  THE WORDS ARRIVE WITH THE DIM
+    // ------------------------------------------------------------------
+    //  The quarterly tick already queues the scene belonging to whichever
+    //  lock is live, which is the right moment for every step the CALENDAR
+    //  brings. The research steps are brought by the player instead: they
+    //  fire the instant somebody taps into research, at any point in any
+    //  quarter, and the explanation was arriving at the next tick - up to
+    //  three months after the screen dimmed.
+    //
+    //  Called from here because this is the only place that knows a lock
+    //  has just gone live. `runTutorialScenes` is idempotent per lock and
+    //  marks the scene seen before it sends, so an effect that runs twice
+    //  does not post the letter twice.
+    // ------------------------------------------------------------------
+    useEffect(() => {
+        if (!lock?.conversation) return;
+        try {
+            require('../../core/story/deliver').runTutorialScenes();
+        } catch (e) {
+            // The teaching is on screen either way. A missing letter is a
+            // thinner lesson; a throw here would take the whole navigator.
+            console.warn('[tutorial] scene could not be delivered', e);
+        }
     }, [lock?.id]);
 
     // WAY OUT TWO. The world can move while a lock is up - a quarter closes,

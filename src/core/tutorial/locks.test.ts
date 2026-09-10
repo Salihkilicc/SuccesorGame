@@ -261,6 +261,26 @@ describe('somebody is saying it', () => {
         expect(byWho['rnd-hire']).toBe('cto');
     });
 
+    it('and every word about research is hers, including the one that points at it', () => {
+        // ---------------------------------------------------------------
+        //  A REVERSED DECISION, PINNED SO IT DOES NOT REVERSE BACK
+        // ---------------------------------------------------------------
+        //  `q1-research` was the father's, on the reasoning that he is
+        //  alive at that point and it is his company. The effect on the
+        //  phone was a lesson delivered in two voices: he tells you to go
+        //  and look, and a stranger explains what you are looking at.
+        //
+        //  Reported as "babamiz tarafindan degil normal bir sekilde
+        //  anlatilmali". All four research steps are Priya's now, and the
+        //  father keeps the rest of the first year.
+        // ---------------------------------------------------------------
+        const research = ['q1-research', 'rnd-lab', 'rnd-hire', 'rnd-points'];
+        for (const id of research) {
+            const lock = TUTORIAL_SEQUENCE.find(l => l.id === id);
+            expect([id, lock?.speaker]).toEqual([id, 'cto']);
+        }
+    });
+
     it('and the research steps are the only ones the father does not gate', () => {
         // Every first-year lock carries `noFlag fatherDead`. These two must
         // not, or the lesson vanishes the moment he dies - which is most of
@@ -331,7 +351,13 @@ describe('a lock points at a control that exists', () => {
     const REGISTERED = ['products', 'marketing', 'teamMorale', 'rndLab', 'rndHire', 'rndPoints',
         //  And the department tile that opens the whole chain. Everything
         //  above it was gated on the player having already found research.
-        'rndDepartment'];
+        'rndDepartment',
+        //  The production row, which sits directly above the marketing row
+        //  and was the only one of the two the tutorial could not reach. So
+        //  the first thing the game taught about a product was how to
+        //  advertise it, with the number that decides the quarter sitting
+        //  unmentioned above.
+        'production'];
 
     it('every highlight key is one a screen actually registers', () => {
         // A key nothing registers is a lock that can now never appear at all,
@@ -375,9 +401,9 @@ describe('a lock points at a control that exists', () => {
 
     it('and the keys it can point at are few enough to list', () => {
         // If this grows, the list above is stale and the check is weaker than
-        // it reads. Kept small on purpose. Seven since the research chain got
-        // a door into it - `rndDepartment` - which is the tile that starts it.
-        expect(REGISTERED.length).toBeLessThanOrEqual(7);
+        // it reads. Kept small on purpose. Eight since the production row got
+        // its own card, which is the product sheet's other half.
+        expect(REGISTERED.length).toBeLessThanOrEqual(8);
     });
 
     it('the opening lesson is two steps, and they light different things', () => {

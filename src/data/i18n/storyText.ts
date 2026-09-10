@@ -83,8 +83,29 @@ export const STORY_TR: StoryDictionary = {
     // uzerinde ve ancak biri ise alindiktan sonra. Bkz. data/tutorial/sequence.ts
     '@lock/rnd-hire': 'Bir araştırmacı işe al. Ucuz değiller ve maaş hiç durmuyor.',
     '@lock/rnd-points': 'Bu sayı para değil ve satın alarak geçemezsin. Puanlar, insanların çalıştığı her çeyrek birikir; bu şirketin ne üretebileceğini değiştiren tek şey de onlar.',
-    '@lock/rnd-lab': 'Laboratuvarı aç.',
-    '@lock/q1-research': 'Araştırmayı aç. Ben geldiğimde bu şirketin sattığı hiçbir şey yeni değildi.',
+    // ------------------------------------------------------------------
+    //  DANA, ON THE PRODUCTION SLIDER
+    // ------------------------------------------------------------------
+    //  Her register in Turkish is the same as in English: short sentences,
+    //  concrete nouns, numbers with their units. No softeners, no metaphors,
+    //  and no exclamation marks anywhere.
+    // ------------------------------------------------------------------
+    'coo-production/open': 'Üretim ekranı açık. O çubuğu sonuna kadar itmeden önce: sağdaki sayı hattın üretebileceği miktar, birinin satın alacağı miktar değil.\n\nBunlar iki ayrı rakam ve maaşları sadece biri ödüyor.',
+    'coo-production/open#0': 'Maksimumu üretirsem ne olur?',
+    'coo-production/open#1': 'Peki kaça ayarlayayım?',
+    'coo-production/maximum': 'Maksimumu üretirsin, kimsenin almadıkları bize geri gelir. Kiraladığımız bir binada durur, durduğu her çeyrek adet başına beş dolara mal olur ve gelecek yıl bugünkünden daha az eder.\n\nBu bir uyarı değil. Bu fatura.',
+    'coo-production/maximum#0': 'O zaman kaça ayarlayayım?',
+    'coo-production/maximum#1': 'Peki az üretirsem?',
+    'coo-production/what': 'Pazarın istediği kadar. Aynı ekranda, çubuğun altında yazıyor ve her çeyrek değişiyor.\n\nOna eşitle. O satırda bunu senin yerine yapan bir düğme var; aksini yapmak için bir sebebin olana kadar onu kullanırdım.',
+    'coo-production/what#0': 'Peki az üretirsem?',
+    'coo-production/what#1': 'Anlaşıldı.',
+    'coo-production/tooFew': 'Daha kötü, üstelik raporda zarar olarak görünmüyor. Başkasının yaptığı bir satış olarak görünüyor.\n\nBoş raf insanları rakibe gönderir ve hepsi geri dönmez. Eksik üretmek fazla üretmekten pahalıdır, sadece bedelini bakmadığın bir yerde ödersin.',
+    'coo-production/tooFew#0': 'Yani talebe eşitle.',
+    'coo-production/close': 'Talebe eşitle ve çeyrek dönünce tekrar bak. Değişiyor.\n\nBir gün hattın kapasitesinden fazlasını istersen cevabı yeni bir bina, o çubuktaki daha büyük bir sayı değil.',
+    'coo-production/close#0': 'Not aldım.',
+    '@lock/q1-production': 'O çubuğun sağındaki rakam hattın üretebileceği miktar, birinin satın alacağı miktar değil. Bunun yerine pazarın istediğine eşitle. Fazlası kiraladığın bir depoda bekler.',
+    '@lock/rnd-lab': 'Laboratuvarı aç. Bu şirketin ne üretebileceğini değiştiren tek harcama burada.',
+    '@lock/q1-research': 'Araştırmayı aç. Bu şirketin sattığı her şey, ikimiz de buraya gelmeden önce tasarlanmıştı.',
     'cfo-board-room/goodTrade': 'O halde öyle yaparız.\n\nVe... teşekkür ederim. Babanız bu anlaşmaya hiçbir zaman evet dememişti. Sadece ona anlattıklarıma göre hareket etmeye başlardı; ben de bunu rıza olarak kabul etmeyi seçerdim.',
     'cfo-board-room/goodTrade#0': 'Ben evet diyorum.',
     'cfo-board-room/halfAThing': 'Anlaşıldı.\n\nO halde şirket sekreteri olarak görevim gereği gündem yayımlandığında size iletirim.',

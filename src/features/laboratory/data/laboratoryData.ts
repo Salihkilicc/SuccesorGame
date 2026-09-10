@@ -1,5 +1,29 @@
 // Laboratory facility tiers and researcher economics
 
+// ============================================================================
+//  THE FIVE BUILDINGS SPEAK TURKISH NOW
+// ============================================================================
+//
+//  `name` and `description` were plain English strings and LaboratoryScreen
+//  renders all three of them straight - the building's name, its one-line
+//  description, and the next tier's name inside the upgrade button. Three
+//  English lines on a screen the tutorial now walks every player into.
+//
+//  Reported as "argede cevrilmeyen yazolar var", and scripts/untranslated.js
+//  cannot see them: it reads Text children and naming props out of the .tsx
+//  files, and these arrive there through a variable from a .ts one. Same
+//  blind spot that hid the magnates' lines and the one product name in
+//  unlockableProductsData.
+//
+//  GETTERS, not values, and that is the pattern the product catalogue
+//  already uses (see unlockableProductsData.ts). A value would be read once
+//  at module load, in whatever language was active then, and would not
+//  change when the player switches language in Settings. A getter is
+//  evaluated at the moment the screen paints.
+// ============================================================================
+
+import { t } from '../../../core/i18n';
+
 export interface FacilityTier {
     tier: number;
     name: string;
@@ -22,55 +46,55 @@ export interface FacilityTier {
 export const FACILITY_TIERS: FacilityTier[] = [
     {
         tier: 1,
-        name: 'Corporate Annex',
+        get name() { return t('lab.tierCorporateAnnex'); },
         icon: '🏢',
         capacity: 500,
         upgradeCost: null,
-        description: 'Basic research facility for early-stage innovation',
+        get description() { return t('lab.tierCorporateAnnexDesc'); },
     },
     {
         tier: 2,
-        name: 'Innovation Plaza',
+        get name() { return t('lab.tierInnovationPlaza'); },
         icon: '🏛️',
         capacity: 2500,
         upgradeCost: {
             cash: 50_000_000, // $50M
             rp: 357_000,
         },
-        description: 'Expanded campus with modern laboratories',
+        get description() { return t('lab.tierInnovationPlazaDesc'); },
     },
     {
         tier: 3,
-        name: 'Advanced Tech Center',
+        get name() { return t('lab.tierAdvancedTechCenter'); },
         icon: '🏗️',
         capacity: 8000,
         upgradeCost: {
             cash: 250_000_000, // $250M
             rp: 7_140_000,
         },
-        description: 'State-of-the-art research complex',
+        get description() { return t('lab.tierAdvancedTechCenterDesc'); },
     },
     {
         tier: 4,
-        name: 'Future Campus',
+        get name() { return t('lab.tierFutureCampus'); },
         icon: '🌆',
         capacity: 15000,
         upgradeCost: {
             cash: 10_000_000_000, // $10B
             rp: 22_800_000,
         },
-        description: 'Cutting-edge innovation hub',
+        get description() { return t('lab.tierFutureCampusDesc'); },
     },
     {
         tier: 5,
-        name: 'Global Silicon HQ',
+        get name() { return t('lab.tierGlobalSiliconHQ'); },
         icon: '🏙️',
         capacity: 36000,
         upgradeCost: {
             cash: 25_000_000_000, // $25B
             rp: 71_400_000,
         },
-        description: 'World-class research headquarters',
+        get description() { return t('lab.tierGlobalSiliconHQDesc'); },
     },
 ];
 

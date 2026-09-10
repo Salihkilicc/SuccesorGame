@@ -99,7 +99,34 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         id: 'rnd-lab',
         highlight: 'rndLab',
         speaker: 'cto',
-        instruction: 'Open the laboratory.',
+        // ------------------------------------------------------------------
+        //  IT POINTS AND IT SAYS WHY, WHICH IS AN EXCEPTION AND HAS A REASON
+        // ------------------------------------------------------------------
+        //  The rule on `instruction` in core/tutorial/locks.ts is what to do,
+        //  not why, because the why is the scene's job and the two must not
+        //  say the same thing twice. It is the right rule for the first-year
+        //  steps, where the father's letter is already in the inbox when the
+        //  screen dims.
+        //
+        //  This one is not on the calendar. It fires the instant somebody
+        //  taps into research, at any point in any year, and a bare "Open the
+        //  laboratory" on a screen they walked into out of curiosity explains
+        //  nothing at all. Reported exactly that way: "bunu girdigim an
+        //  anlatilmasi lazim".
+        //
+        //  So the card carries the headline and Priya's conversation carries
+        //  the mechanism - and that conversation now arrives in the same
+        //  moment rather than at the next quarter, which is the half of this
+        //  that was actually missing. See runTutorialScenes in
+        //  core/story/deliver.ts.
+        //
+        //  The first draft of this line ran to 136 characters and
+        //  locks.test.ts refused it: an instruction that is not an
+        //  `acknowledge` step sits on a screen the player is trying to USE,
+        //  and 110 is the ceiling. The rule was right and the line is
+        //  shorter for it.
+        // ------------------------------------------------------------------
+        instruction: 'Open the laboratory. This is the only money this company spends that changes what it can build.',
         conversation: 'cto-research',
         // ------------------------------------------------------------------
         //  HIRING ENDS THE WHOLE LESSON, NOT JUST THE STEP AFTER IT
@@ -276,6 +303,66 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
     },
 
     {
+        // ====================================================================
+        //  PRODUCTION — THE SAME SHAPE AS THE RESEARCH POINT, ONE SCREEN OVER
+        // ====================================================================
+        //  Asked for directly: "aciklamayi rp icin yaptigin gibi urunleri de
+        //  anlatmani istiyorum". So it is built to the same pattern rather
+        //  than to a new one, and the pattern is worth naming because it is
+        //  now the house shape for teaching a NUMBER:
+        //
+        //      a card that points and says the headline    (rnd-lab)
+        //      the doing, if there is any                  (rnd-hire)
+        //      an `acknowledge` card on the number itself  (rnd-points)
+        //      a conversation carrying the mechanism       (cto-research)
+        //
+        //  Here the doing already exists as `q1-open-product` above and the
+        //  marketing step below, so this is the third element: the card that
+        //  lands on the control and says what the number means. Its
+        //  conversation is `coo-production`.
+        //
+        //  ------------------------------------------------------------------
+        //   WHY THE CEILING IS THE THING WORTH A CARD
+        //  ------------------------------------------------------------------
+        //  Every other maximum in this game is a target. The marketing
+        //  benchmark, the facility tier, the research team - reaching them is
+        //  the whole point. This slider's maximum is the opposite: it is what
+        //  the floor can physically do, and building up to it when the market
+        //  wants half that fills a warehouse the company then pays rent on.
+        //
+        //  So the obvious action is the wrong one, and nothing on the screen
+        //  says so until the quarter closes and the storage charge arrives.
+        //  That is the definition of a lesson worth interrupting somebody for.
+        //
+        //  ------------------------------------------------------------------
+        //   AND IT IS NOT GATED ON THE FATHER, WHICH IS THE POINT
+        //  ------------------------------------------------------------------
+        //  The two steps either side of it are, because they belong to the
+        //  first year. This one is triggered by OPENING A PRODUCT SHEET, and a
+        //  player in year six who has just bought a second factory needs it
+        //  exactly as much as one in the first quarter. Same reasoning as the
+        //  research chain at the top of this file, and the same speaker rule
+        //  falls out of it: a lesson that outlives the father cannot be his.
+        //
+        //  `acknowledge`, and here that is the right shape for the reason the
+        //  type's own note gives: there is a correct answer and it depends on
+        //  a number that moves. Demanding a specific slider position would be
+        //  the tutorial insisting on a decision it cannot know is right.
+        // ====================================================================
+        id: 'q1-production',
+        highlight: 'production',
+        speaker: 'coo',
+        acknowledge: true,
+        instruction: 'The figure on the right of that slider is what the line can build, not what anyone will buy. Match what the market wants instead. Everything you build past that sits in a warehouse you are renting.',
+        conversation: 'coo-production',
+        canEngage: [
+            // The trigger, and the only one. The sheet has to be open or the
+            // control is not on screen to be lit.
+            { kind: 'flag', flag: 'tutorialProductOpened' },
+        ],
+    },
+
+    {
         // ------------------------------------------------------------------
         //  Q1, STEP TWO — PUT SOMETHING BEHIND IT
         // ------------------------------------------------------------------
@@ -410,10 +497,24 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         //  true in quarter nine as in quarter three - so when both are
         //  available the timed one goes first and this waits.
         //
-        //  It is HIS, unlike the three steps it leads into. He is alive here
-        //  and it is his company; Priya takes over the moment the laboratory
-        //  is open, which is where she has been waiting - see
-        //  data/story/ctoResearch.ts.
+        //  IT WAS HIS AND IT IS HERS NOW, WHICH REVERSES A DECISION
+        //  ---------------------------------------------------------------
+        //  The reasoning for giving it to the father was that he is alive
+        //  here and it is his company, with Priya taking over the moment the
+        //  laboratory is open. That reads well and it made the research
+        //  lesson arrive in two voices: the father tells you to go and look,
+        //  a stranger explains what you are looking at.
+        //
+        //  Reported as "babamiz tarafindan degil normal bir sekilde
+        //  anlatilmali". He is right, and the merits agree with him. Priya
+        //  has been asking for a laboratory since before the player arrived
+        //  (data/events/labPressure.ts) and she owns every other step in
+        //  this chain. The person who has been complaining about a thing is
+        //  the person who says look at it.
+        //
+        //  The father keeps the first year and loses this one step. Nothing
+        //  else about his sequence moves.
+        //  ---------------------------------------------------------------
         //
         //  No `canEngage` on money. Opening a page costs nothing, and a
         //  company with no cash is the one that most needs to know what the
@@ -421,7 +522,8 @@ export const TUTORIAL_SEQUENCE: TutorialLock[] = [
         // ------------------------------------------------------------------
         id: 'q1-research',
         highlight: 'rndDepartment',
-        instruction: 'Open research. Nothing this company sells was new when I arrived.',
+        speaker: 'cto',
+        instruction: 'Open research. Everything this company sells was designed before either of us got here.',
         satisfied: [{ kind: 'flag', flag: 'rndOpened' }],
         canEngage: [
             { kind: 'noFlag', flag: 'fatherDead' },
