@@ -17,7 +17,8 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useStoryStore } from '../../../core/store/useStoryStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { currentQuarter, readStanding } from '../../../core/story/world';
-import { generatePartner, partnerFromKnownPerson } from './partnerGenerator';
+import { generatePartner, partnerFromKnownPerson, playerGender } from './partnerGenerator';
+import { drawKnown } from './knownCandidates';
 import { refusalLine, VOICE_FOR_PERSONALITY } from '../data/strainLines';
 import {
     tiersOpenTo, courtshipFor, REFUSAL_COOLDOWN_QUARTERS,
@@ -142,7 +143,31 @@ export const runCourtship = (roll: () => number = Math.random): CourtshipResult 
     // Shut means shut. Being turned down by old money on Tuesday does not
     // make anybody want to be introduced to a student on Wednesday.
     if (!availableTiers().includes(tier)) return { kind: 'nobody' };
-    const candidate = generatePartner(tier);
+
+    // ------------------------------------------------------------------
+    //  AND SOME OF THE TIME IT IS SOMEBODY WHO ALREADY EXISTS
+    // ------------------------------------------------------------------
+    //  This line used to be `generatePartner(tier)` and nothing else, so the
+    //  Date button produced a person invented on the spot every single time
+    //  for the whole dynasty. The sixty one written characters at the poker
+    //  table were reachable through one door in a different feature, and a
+    //  player who never touched poker never met any of them.
+    //
+    //  A third of the time in the two rooms that HAVE named people - see
+    //  logic/knownCandidates.ts for that number and for why the other five
+    //  rooms always generate.
+    //
+    //  Already met, and exes, are excluded there rather than here: meeting
+    //  somebody you broke up with as a brand new candidate with no memory of
+    //  any of it is worse than never meeting them.
+    // ------------------------------------------------------------------
+    const family = useFamilyStore.getState();
+    const met = new Set<string>([
+        ...(family.partner ? [family.partner.id] : []),
+        ...(family.exPartners ?? []).map(x => x.id),
+    ]);
+    const known = drawKnown(tier, playerGender(), met, roll);
+    const candidate = known ? partnerFromKnownPerson(known) : generatePartner(tier);
 
     const { accepted } = courtshipFor(candidate, {
         // What you did PLUS what you are worth. See core/story/standing.ts:

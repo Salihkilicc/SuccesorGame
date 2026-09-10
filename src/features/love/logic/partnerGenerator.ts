@@ -127,7 +127,7 @@ export const partnerGenderFor = (
  * for the same reason useSponsorshipStore.penalty does it: this module is
  * imported by tests that have no stores.
  */
-const playerGender = (): 'male' | 'female' | undefined => {
+export const playerGender = (): 'male' | 'female' | undefined => {
     try {
         const { useIdentityStore } = require('../../../core/store/useIdentityStore');
         const g = useIdentityStore.getState().gender;
