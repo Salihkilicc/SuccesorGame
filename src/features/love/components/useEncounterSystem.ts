@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useStatsStore } from '../../../core/store';
 import { useFamilyStore } from '../../../core/store/useFamilyStore';
+import { t } from '../../../core/i18n';
 import {
     PartnerProfile,
     PartnerStats,
@@ -320,7 +321,7 @@ export const useEncounterSystem = () => {
 
         return {
             success: true,
-            message: `You started dating ${candidate.name}!`,
+            message: t('love.startedDatingYou', { name: candidate.name }),
             wasCaught,
             settlement,
             breakupOccurred: !!partner // true if we had a partner before
@@ -371,7 +372,7 @@ export const useEncounterSystem = () => {
 
         return {
             success: true,
-            message: `A night with ${candidate.name}. Nothing more was said about it.`,
+            message: t('love.oneNightWith', { name: candidate.name }),
             wasCaught,
             settlement,
             breakupOccurred: !!partner,

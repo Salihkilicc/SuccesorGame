@@ -20,6 +20,7 @@ import { useAssetStore } from '../store/useAssetStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import { t, useLocale } from '../../../core/i18n';
+import { translateItemName } from '../../../data/i18n/profileLoveShopText';
 
 interface CartModalProps {
     visible: boolean;
@@ -90,7 +91,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                 {/* Official Game Screen Header */}
                 <ScreenHeader
                     title={t('shop.cartTitle')}
-                    subtitle="ORDER REVIEW & SETTLEMENT"
+                    subtitle={t('shop.orderReviewSubtitle')}
                     category="company"
                     onBack={onClose}
                     inset={false}
@@ -107,7 +108,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                         </View>
                         <Text style={styles.emptyCartTitle}>{t('luxo.cartEmpty')}</Text>
                         <Text style={styles.emptyCartText}>
-                            Explore the LuxoNet boutique departments to reserve ultra-luxury assets.
+                            {t('shop.emptyCartDescModal')}
                         </Text>
                         <Pressable onPress={onClose} style={styles.continueButton}>
                             <Text style={styles.continueButtonText}>{t('luxo.continueShopping')}</Text>
@@ -132,13 +133,13 @@ export const CartModal: React.FC<CartModalProps> = ({
 
                                     <View style={styles.itemDetails}>
                                         <Text style={styles.itemTitle} numberOfLines={2}>
-                                            {item.name}
+                                            {translateItemName(item.name)}
                                         </Text>
                                         <Text style={styles.itemPrice}>
                                             {formatCurrency(item.price)}
                                         </Text>
                                         <Text style={styles.soldByText}>
-                                            Boutique: <Text style={styles.boldText}>{item.website || 'LuxoNet Sovereign'}</Text>
+                                            {t('shop.boutiqueLabel')}: <Text style={styles.boldText}>{item.website || t('shop.luxonetSovereign')}</Text>
                                         </Text>
                                     </View>
                                 </View>

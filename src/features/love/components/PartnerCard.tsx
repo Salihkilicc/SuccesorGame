@@ -33,7 +33,7 @@ const getTierColor = (tier: SocialTier): string => {
   }
 };
 
-import { translateSocialClass, translateOccupation } from '../../../data/i18n/profileLoveShopText';
+import { translateSocialClass, translateOccupation, translateTrait } from '../../../data/i18n/profileLoveShopText';
 
 const getTierLabel = (tier: SocialTier): string => {
   switch (tier) {
@@ -194,12 +194,12 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
         {isDeepPersona && (
           <View style={styles.metaRow}>
             <View style={styles.chip}>
-              <Text style={styles.chipText}>🧩 {partner.personality.label}</Text>
+              <Text style={styles.chipText}>🧩 {translateTrait(partner.personality.label)}</Text>
             </View>
             {partner.finances.monthlyCost > 0 && (
               <View style={[styles.chip, styles.costChip]}>
                 <Text style={[styles.chipText, styles.costText]}>
-                  -{formatCurrency(partner.finances.monthlyCost)}/mo
+                  -{formatCurrency(partner.finances.monthlyCost)}{t('shop.yearUnit') === 'yıl' ? '/ay' : '/mo'}
                 </Text>
               </View>
             )}
@@ -214,7 +214,7 @@ const PartnerCard = ({ partner, usedToday }: PartnerCardProps) => {
           ]}
         >
           <Text style={styles.actionButtonText}>
-            {usedToday ? 'Interacted' : 'Interact'}
+            {usedToday ? t('love.interacted') : t('love.interact')}
           </Text>
         </Pressable>
 

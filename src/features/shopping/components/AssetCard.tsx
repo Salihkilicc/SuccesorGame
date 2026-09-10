@@ -16,7 +16,7 @@ import { theme } from '../../../core/theme';
 import { iconForItem, shopTheme } from '../data/shopIdentity';
 import { OwnedAsset } from '../types';
 import { t, useLocale } from '../../../core/i18n';
-import { translateCategory } from '../../../data/i18n/profileLoveShopText';
+import { translateCategory, translateItemName } from '../../../data/i18n/profileLoveShopText';
 
 /**
  * The row carries two figures the store does not.
@@ -109,7 +109,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 
                 {/* Asset Name */}
                 <Text style={styles.assetName} numberOfLines={2}>
-                    {item.name}
+                    {translateItemName(item.name)}
                 </Text>
 
                 {/* Market Value */}
@@ -207,7 +207,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 
             <View style={styles.listInfoBlock}>
                 <Text style={styles.listTitle} numberOfLines={1}>
-                    {item.name}
+                    {translateItemName(item.name)}
                 </Text>
                 <Text style={styles.listSubtitle}>
                     {categoryLabel} • {formatCurrency(item.marketValue || item.price)}

@@ -9,6 +9,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { t, useLocale } from '../../../core/i18n';
+import { translateShopDescription, translateItemName } from '../../../data/i18n/profileLoveShopText';
 import { ITEMS } from '../data/shoppingRegistry';
 import { iconForItem, shopTheme } from '../data/shopIdentity';
 import { onShelf, shelfIds } from '../logic/shelfNow';
@@ -79,7 +80,7 @@ export const ShopPreviewCard = ({
                     <View style={styles.titlesWrap}>
                         <Text style={styles.shopName}>{name}</Text>
                         <Text style={styles.description} numberOfLines={1}>
-                            {description}
+                            {translateShopDescription(description)}
                         </Text>
                     </View>
                 </View>
@@ -111,7 +112,7 @@ export const ShopPreviewCard = ({
                         </View>
                         <View style={styles.itemInfo}>
                             <Text style={styles.itemName} numberOfLines={1}>
-                                {item.name}
+                                {translateItemName(item.name)}
                             </Text>
                             <Text style={styles.itemPrice}>{formatPrice(item.price)}</Text>
                         </View>

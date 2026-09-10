@@ -38,6 +38,11 @@ import { iconForItem, shopTheme } from '../data/shopIdentity';
 import { currentQuarter } from '../../../core/story/world';
 import ShopPreviewCard from '../components/ShopPreviewCard';
 import { t, useLocale } from '../../../core/i18n';
+import {
+    translateShopDescription,
+    translateItemName,
+    translateItemSpec,
+} from '../../../data/i18n/profileLoveShopText';
 
 const { width } = Dimensions.get('window');
 const GRID_CARD_WIDTH = (width - 32 - 12) / 2;
@@ -258,12 +263,13 @@ export const ShoppingScreen = () => {
     const headerSubtitle = useMemo(() => {
         if (currentView === 'SHOP_DETAIL' && selectedShopId) {
             const shop = SHOPS.find((s) => s.id === selectedShopId);
-            return shop ? shop.name.toUpperCase() : 'AUTHORIZED BOUTIQUE';
+            return shop ? shop.name.toUpperCase() : t('shop.authorizedBoutique');
         }
         if (activeIndex > 0 && TABS[activeIndex]) {
-            return `${TABS[activeIndex].name.toUpperCase()} DIRECTORATE`;
+            const tabName = getCategoryName(TABS[activeIndex].id, TABS[activeIndex].name);
+            return `${tabName.toUpperCase()} ${t('shop.directorate')}`;
         }
-        return 'SOVEREIGN LUXURY MARKETPLACE';
+        return t('shop.sovereignMarketplace');
     }, [currentView, selectedShopId, activeIndex]);
 
     // ============================================================================
@@ -363,13 +369,13 @@ export const ShoppingScreen = () => {
                                     />
                                 </View>
                                 <Text style={styles.trendingName} numberOfLines={2}>
-                                    {item.name}
+                                    {translateItemName(item.name)}
                                 </Text>
                                 <Text style={styles.trendingPrice}>
                                     {formatPrice(effectivePrice(item, SHOPS, quarter))}
                                 </Text>
                                 <Text style={styles.trendingShop}>
-                                    {shop?.name || 'Exclusive'}
+                                    {shop?.name || t('shop.exclusive')}
                                 </Text>
                             </Pressable>
                         );
@@ -402,10 +408,10 @@ export const ShoppingScreen = () => {
                     </View>
                     <View>
                         <Text style={styles.catBannerTitle}>
-                            {cat.name.toUpperCase()} HOUSES
+                            {getCategoryName(cat.id, cat.name).toUpperCase()} {t('shop.houses')}
                         </Text>
                         <Text style={styles.catBannerSub}>
-                            {filteredShops.length} Authorized Boutiques
+                            {t('shop.authorizedBoutiquesCount', { count: String(filteredShops.length) })}
                         </Text>
                     </View>
                 </View>
@@ -465,7 +471,7 @@ export const ShoppingScreen = () => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={[styles.shopName, { color: shopLook.tint }]}>{shop.name}</Text>
-                            <Text style={styles.shopDesc}>{shop.description}</Text>
+                            <Text style={styles.shopDesc}>{translateShopDescription(shop.description)}</Text>
                         </View>
                     </View>
                 </View>
@@ -512,7 +518,7 @@ export const ShoppingScreen = () => {
                                 </View>
 
                                 <Text style={styles.itemName} numberOfLines={2}>
-                                    {item.name}
+                                    {translateItemName(item.name)}
                                 </Text>
 
                                 {/* Specs */}
@@ -520,7 +526,7 @@ export const ShoppingScreen = () => {
                                     <View style={styles.specsRow}>
                                         {item.specs.slice(0, 2).map((spec: string, idx: number) => (
                                             <View key={idx} style={styles.specTag}>
-                                                <Text style={styles.specText}>{spec}</Text>
+                                                <Text style={styles.specText}>{translateItemSpec(spec)}</Text>
                                             </View>
                                         ))}
                                     </View>

@@ -30,7 +30,7 @@ import Portrait from '../../../components/common/Portrait';
 import { faceFor } from '../../../core/portraits/faces';
 import { PartnerProfile, SocialClass } from '../../../data/relationshipTypes';
 import { EncounterScenario } from '../data/encounterData';
-import { translateOccupation } from '../../../data/i18n/profileLoveShopText';
+import { translateOccupation, translateScenario } from '../../../data/i18n/profileLoveShopText';
 import {
     aidLine, backgroundLine, classLabel, jobTitle, lifestyleLabel, traitLabel,
     wealthLabel,
@@ -149,6 +149,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 
     const socialClass = candidate.stats?.socialClass || deepPartner?.job?.tier || 'HighSociety';
     const classTheme = getSocialClassTheme(socialClass);
+    const activeScenario = translateScenario(scenario);
     // ------------------------------------------------------------------
     //  THE THREE PHRASES THAT WERE ALWAYS IN ENGLISH
     // ------------------------------------------------------------------
@@ -186,7 +187,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                             <View style={styles.contextBadge}>
                                 <MaterialCommunityIcons name="crown" size={13} color="#05A8F6" style={{ marginRight: 4 }} />
                                 <Text style={styles.contextBadgeText}>
-                                    {context === 'VIP_LOUNGE' ? 'VIP LOUNGE ENCOUNTER' : 'ELITE CIRCLE ENCOUNTER'}
+                                    {context === 'VIP_LOUNGE' ? t('love.vipEncounter') : t('love.eliteEncounter')}
                                 </Text>
                             </View>
                             <TouchableOpacity style={styles.closeButton} onPress={onIgnore} activeOpacity={0.7}>
@@ -318,7 +319,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                 color="#05A8F6"
                                 style={styles.quoteIcon}
                             />
-                            <Text style={styles.scenarioText}>"{scenario.text}"</Text>
+                            <Text style={styles.scenarioText}>"{activeScenario?.text || scenario.text}"</Text>
                         </View>
 
                         {/* Action Buttons */}
@@ -334,7 +335,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                     <Text style={styles.dateButtonText}>{t('love.courtAndDate')}</Text>
                                 </View>
                                 <Text style={styles.dateSubtext} numberOfLines={1}>
-                                    "{scenario.flirt}"
+                                    "{activeScenario?.flirt || scenario.flirt}"
                                 </Text>
                             </TouchableOpacity>
 

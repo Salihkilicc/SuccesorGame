@@ -8,6 +8,10 @@ import {
     translateOccupation,
     translateRarity,
     translateCategory,
+    translateShopDescription,
+    translateItemName,
+    translateItemSpec,
+    translateScenario,
 } from './profileLoveShopText';
 
 describe('profileLoveShopText', () => {
@@ -31,6 +35,14 @@ describe('profileLoveShopText', () => {
             expect(translateOccupation('Silicon Valley Tech CEO')).toBe('Silicon Valley Tech CEO');
             expect(translateTrait('Strategic Mind')).toBe('Strategic Mind');
             expect(translateTrait('Elegant')).toBe('Elegant');
+            expect(translateShopDescription('Your palace in the clouds.')).toBe('Your palace in the clouds.');
+            expect(translateItemName('The Flying Palace (S900 Custom)')).toBe('The Flying Palace (S900 Custom)');
+            expect(translateItemSpec('Gold Plated')).toBe('Gold Plated');
+            expect(translateScenario({ id: 'vip_davos', text: 'English text', flirt: 'English flirt' })).toEqual({
+                id: 'vip_davos',
+                text: 'English text',
+                flirt: 'English flirt',
+            });
         });
 
         it('reverses Turkish terms back to English if stored in Turkish', () => {
@@ -39,6 +51,9 @@ describe('profileLoveShopText', () => {
             expect(translateTrait('Vizyoner')).toBe('Visionary');
             expect(translateOccupation('Hükümran Hükümdar')).toBe('Reigning Sovereign');
             expect(translateCategory('Uzay')).toBe('SPACE');
+            expect(translateShopDescription('Bulutlardaki sarayınız.')).toBe('Your palace in the clouds.');
+            expect(translateItemName('Uçan Saray (S900 Özel Yapım)')).toBe('The Flying Palace (S900 Custom)');
+            expect(translateItemSpec('Altın Kaplama')).toBe('Gold Plated');
         });
     });
 
@@ -83,6 +98,19 @@ describe('profileLoveShopText', () => {
             expect(translateCategory('REAL_ESTATE')).toBe('Gayrimenkul');
             expect(translateCategory('WATCH')).toBe('Saatler');
             expect(translateCategory('SPACE')).toBe('Uzay');
+        });
+
+        it('translates shop descriptions, item names, specs, and encounter scenarios', () => {
+            expect(translateShopDescription('Your palace in the clouds.')).toBe('Bulutlardaki sarayınız.');
+            expect(translateShopDescription('Buy the horizon.')).toBe('Ufku satın alın.');
+            expect(translateItemName('The Gigayacht')).toBe('Gigayat');
+            expect(translateItemName('Tokyo Spire')).toBe('Tokyo Gökdeleni');
+            expect(translateItemSpec('Double Decker')).toBe('Çift Katlı');
+            expect(translateItemSpec('Mach 0.94')).toBe('Mach 0.94 Hız');
+
+            const scenario = translateScenario({ id: 'vip_davos', text: 'Eng text', flirt: 'Eng flirt' });
+            expect(scenario?.text).toContain("Davos'taki");
+            expect(scenario?.flirt).toContain("Klosters'ta");
         });
     });
 });

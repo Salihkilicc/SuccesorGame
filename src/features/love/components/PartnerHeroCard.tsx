@@ -34,7 +34,7 @@ const PartnerHeroCard: React.FC<Props> = ({ partner, onPress }) => {
                         </View>
 
                         <View style={styles.partnerStats}>
-                            <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>Love: {partner.love}%</Text>
+                            <Text style={[styles.partnerStatLabel, { color: 'rgba(255,255,255,0.8)' }]}>{t('love.loveScore')}: {partner.love}%</Text>
                             <View style={[styles.partnerBarTrack, { backgroundColor: 'rgba(28,36,44,0.3)', borderColor: 'rgba(255,255,255,0.1)' }]}>
                                 <View style={[styles.partnerBarFill, { width: `${partner.love}%`, backgroundColor: '#434B50', shadowColor: '#1C242C', shadowOpacity: 0.8, shadowRadius: 6 }]} />
                             </View>

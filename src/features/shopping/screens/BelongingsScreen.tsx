@@ -196,8 +196,8 @@ export const BelongingsScreen = () => {
                                 onRepair={repairAsset}
                                 onPropose={() => {
                                     Alert.alert(
-                                        'Heirloom',
-                                        'You can present this ring to your partner from the partner dossier.',
+                                        t('shop.heirloomTitle'),
+                                        t('shop.heirloomDesc'),
                                     );
                                 }}
                             />
@@ -214,8 +214,7 @@ export const BelongingsScreen = () => {
                             </View>
                             <Text style={styles.emptyTitle}>{t('luxo.noAssets')}</Text>
                             <Text style={styles.emptySubtitle}>
-                                Acquire prime real estate, supercars, and haute horlogerie via the
-                                LuxoNet Store.
+                                {t('shop.noAssetsDesc')}
                             </Text>
                         </View>
                     }

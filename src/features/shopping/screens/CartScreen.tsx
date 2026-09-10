@@ -32,6 +32,7 @@ import ScreenHeader from '../../../components/common/ScreenHeader';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import PaymentProcessingModal from '../components/PaymentProcessingModal';
 import { t, useLocale } from '../../../core/i18n';
+import { translateItemName } from '../../../data/i18n/profileLoveShopText';
 
 // SHELVED: the third copy of the department icon list. A cart full of cars
 // drew one symbol six times, which is the defect the symbol pass exists for.
@@ -120,17 +121,20 @@ export const CartScreen = () => {
         setIsProcessing(false);
 
         setTimeout(() => {
-            const headlineNotice = lastHeadline ? `\n\nMedia Broadcast: "${lastHeadline}"` : '';
+            const headlineNotice = lastHeadline ? `\n\n${t('shop.mediaBroadcast')}: "${lastHeadline}"` : '';
             Alert.alert(
-                'Acquisition Complete',
-                `The luxury assets have been registered to your portfolio. Corporate Brand Surge: +${totalBrandSurge} pts.${headlineNotice}`,
+                t('shop.acquisitionComplete'),
+                t('shop.acquisitionCompleteDesc', {
+                    surge: String(totalBrandSurge),
+                    headline: headlineNotice,
+                }),
                 [
                     {
-                        text: 'VIEW INVENTORY',
+                        text: t('shop.viewInventory'),
                         onPress: () => navigation.navigate('Belongings'),
                     },
                     {
-                        text: 'OK',
+                        text: t('common.ok') || 'OK',
                         style: 'cancel',
                     },
                 ],
@@ -147,7 +151,7 @@ export const CartScreen = () => {
             {/* Screen Header with Back Arrow, Subtitle and Category Rule */}
             <ScreenHeader
                 title={t('shop.cartTitle')}
-                subtitle="ORDER REVIEW & SETTLEMENT"
+                subtitle={t('shop.orderReviewSubtitle')}
                 category="company"
             />
 
@@ -162,7 +166,7 @@ export const CartScreen = () => {
                     </View>
                     <Text style={styles.emptyCartTitle}>{t('luxo.cartEmpty')}</Text>
                     <Text style={styles.emptyCartText}>
-                        Explore the LuxoNet boutique departments to acquire and reserve ultra-luxury assets.
+                        {t('shop.emptyCartDesc')}
                     </Text>
                     <Pressable
                         onPress={() => navigation.navigate('Shopping')}
@@ -193,13 +197,13 @@ export const CartScreen = () => {
 
                                     <View style={styles.itemDetails}>
                                         <Text style={styles.itemTitle} numberOfLines={2}>
-                                            {item.name}
+                                            {translateItemName(item.name)}
                                         </Text>
                                         <Text style={styles.itemPrice}>
                                             {formatCurrency(item.price)}
                                         </Text>
                                         <Text style={styles.soldByText}>
-                                            Boutique: <Text style={styles.boldText}>{item.website || 'LuxoNet Sovereign'}</Text>
+                                            {t('shop.boutiqueLabel')}: <Text style={styles.boldText}>{item.website || t('shop.luxonetSovereign')}</Text>
                                         </Text>
                                     </View>
                                 </View>

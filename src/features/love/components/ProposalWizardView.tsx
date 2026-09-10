@@ -29,7 +29,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { PROPOSAL_LOCATIONS } from '../data/loveConstants';
-import { translateProposalLocation } from '../../../data/i18n/profileLoveShopText';
+import { translateProposalLocation, translateItemName } from '../../../data/i18n/profileLoveShopText';
 
 type OwnedRing = {
     instanceId: string;
@@ -192,9 +192,9 @@ const ProposalWizardView: React.FC<Props> = ({
                                 name="ring" size={20} color={theme.colors.textMuted}
                             />
                             <View>
-                                <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>{ring.name}</Text>
+                                <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>{translateItemName(ring.name)}</Text>
                                 <Text style={{ color: theme.colors.textSecondary, fontSize: 12, marginTop: 2 }}>
-                                    Value: ${(ring.marketValue ?? ring.price).toLocaleString()}
+                                    {t('shop.value')}: ${(ring.marketValue ?? ring.price).toLocaleString()}
                                 </Text>
                             </View>
                         </View>
@@ -278,7 +278,7 @@ const ProposalWizardView: React.FC<Props> = ({
                         />
                         <View>
                             <Text style={[styles.actionButtonText, { fontWeight: '700' }]}>
-                                {selectedRing?.name ?? t('love.ringSelected')}
+                                {selectedRing?.name ? translateItemName(selectedRing.name) : t('love.ringSelected')}
                             </Text>
                             <Text style={{ color: theme.colors.textPrimary, fontSize: 11, marginTop: 1, letterSpacing: 0.5 }}>{t('love.tapToChange')}</Text>
                         </View>

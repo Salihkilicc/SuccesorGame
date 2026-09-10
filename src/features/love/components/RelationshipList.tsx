@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
 import { theme } from '../../../core/theme';
+import { t, useLocale } from '../../../core/i18n';
 
 // Types for the different contact categories
 type FamilyMember = {
@@ -54,6 +55,15 @@ const RelationshipList: React.FC<Props> = ({
     npcData = [],
     onItemPress,
 }) => {
+    useLocale();
+
+    const translateNpcType = (npcType: string): string => {
+        if (npcType === 'Child') return t('love.npcChild');
+        if (npcType === 'Mother') return t('love.npcMother');
+        if (npcType === 'Father') return t('love.npcFather');
+        return npcType;
+    };
+
     const getNpcIconBg = (npcType: string): string => {
         if (npcType === 'Child') return 'rgba(5,168,246,0.12)';
         if (npcType === 'Mother') return 'rgba(5,168,246,0.12)';
@@ -127,7 +137,7 @@ const RelationshipList: React.FC<Props> = ({
                     <View style={styles.listContent}>
                         <View style={styles.listNameRow}>
                             <Text style={styles.listName}>{npc.name}</Text>
-                            <Text style={styles.listRole}>({npc.type}, Age {npc.age})</Text>
+                            <Text style={styles.listRole}>({translateNpcType(npc.type)}, {t('family.age', { age: String(npc.age) })})</Text>
                         </View>
                         <View style={styles.listBarTrack}>
                             <View style={[styles.listBarFill, {

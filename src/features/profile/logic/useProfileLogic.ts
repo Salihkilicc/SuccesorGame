@@ -170,7 +170,7 @@ export const useProfileLogic = () => {
             // ----------------------------------------------------------
             const outcome = encounter.triggerEncounter('VIP_LOUNGE');
             if (outcome.kind === 'refused') {
-                setActionFeedback(`${outcome.name} was not interested. She has written to you.`);
+                setActionFeedback(t('love.refusedFeedback', { name: outcome.name }));
                 setTimeout(() => setActionFeedback(null), 3500);
             } else if (outcome.kind === 'nobody') {
                 // ----------------------------------------------------------
@@ -204,7 +204,7 @@ export const useProfileLogic = () => {
         const res = encounter.handleDate();
         if (res.success && encounter.candidate) {
             family.setPartner(encounter.candidate);
-            setActionFeedback(res.message || `Started dating ${encounter.candidate.name}!`);
+            setActionFeedback(res.message || t('love.startedDating', { name: encounter.candidate.name }));
             setTimeout(() => setActionFeedback(null), 3500);
         }
     }, [encounter, family]);

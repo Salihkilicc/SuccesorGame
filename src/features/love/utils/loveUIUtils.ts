@@ -1,4 +1,5 @@
 import type { PartnerProfile } from '../../../core/types';
+import { t } from '../../../core/i18n';
 
 // Progress-bar style gradient: left side fills with purple proportional to love%
 // Uses rich multi-stop colors so the card never looks flat
@@ -41,9 +42,9 @@ export const getLoveGradient = (love: number): { colors: string[]; locations: nu
 };
 
 export const getPartnerBadge = (partner: PartnerProfile | null, love: number): string => {
-    if (partner?.isMarried) return 'Married';
-    if (love >= 90) return 'Soulmate';
-    if (love >= 70) return 'Lover';
-    if (love >= 40) return 'Dating';
-    return 'Neutral';
+    if (partner?.isMarried) return t('love.badgeMarried');
+    if (love >= 90) return t('love.badgeSoulmate');
+    if (love >= 70) return t('love.badgeLover');
+    if (love >= 40) return t('love.badgeDating');
+    return t('love.badgeNeutral');
 };
