@@ -120,20 +120,42 @@ describe('and a drawn portrait wins over the pool', () => {
     });
 
     it('and seatFace prefers the drawn file when there is one', () => {
-        // Nothing is drawn for cfo_g2 yet, so it falls to the pool. Proved
-        // against a seat that DOES have a file: handing seatFace an existing
-        // portrait id must return that file rather than a pool face.
+        // ------------------------------------------------------------------
+        //  THE ART LANDED, AND THIS TEST CHANGED SIDES
+        // ------------------------------------------------------------------
+        //  It used to assert that cfo_g2 fell through to the pool, which was
+        //  true only because nothing had been drawn for it yet. Thirty two
+        //  seat portraits are on disk now, so the fallback is no longer the
+        //  answer for these ids and asserting it would be a test agreeing
+        //  with a folder that has moved on.
+        //
+        //  What is worth holding is the ORDER: an own file beats the pool.
+        // ------------------------------------------------------------------
         const drawn = fileOf(seatFace({
             id: 'anything', name: 'Anything', female: true, age: 50,
             portraitId: 'cfo',
         }));
         expect(drawn).toBe('cfo');
 
-        const notDrawn = fileOf(seatFace({
+        // And the second holder now has one of their own, keyed on the
+        // portrait id rather than the seat. Not `cfo`, or the fourth Hale
+        // would be looking at Arthur Vance again.
+        const secondHolder = fileOf(seatFace({
             id: 'cfo', name: 'Ingrid Sollberg', female: true, age: 54,
             portraitId: 'cfo_g2',
         }));
-        expect(notDrawn).toMatch(/^face_/);
+        expect(secondHolder).toBe('cfo_g2');
+    });
+
+    it('and the pool is still there for a holder nobody has drawn', () => {
+        // The fallback has to keep working: GENERATIONS_WRITTEN can grow, or
+        // a seat can be added, faster than the art does. A missing file must
+        // produce a face rather than a blank circle.
+        const undrawn = fileOf(seatFace({
+            id: 'cfo', name: 'Somebody Later', female: true, age: 54,
+            portraitId: 'cfo_g99',
+        }));
+        expect(undrawn).toMatch(/^face_/);
     });
 });
 

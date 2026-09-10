@@ -105,6 +105,36 @@ export const ENDINGS: Record<string, Ending> = {
     },
 
     // ----------------------------------------------------------------------
+    //  NOBODY TOOK IT. YOU SOLD IT, A PIECE AT A TIME
+    // ----------------------------------------------------------------------
+    //  Asked for as "if my holding falls under ten per cent the game should
+    //  end, otherwise a lot of sharp practice becomes possible". The rule is
+    //  in core/market/controlFloor.ts and the reasoning is there.
+    //
+    //  The hard part is the tone, and it is the opposite of removedByBoard.
+    //  That one is a vote: somebody did this TO you, at 11:40, and there is a
+    //  brother to be angry at. This one has no antagonist at all. Every
+    //  dilution was signed, every sale was at a price the player accepted,
+    //  and the register simply arrived one morning reading a number that no
+    //  longer entitled anybody to the chair.
+    //
+    //  So no villain, no vote and no scene. A letter, a number, and the
+    //  building going on without you - because that is what it would be.
+    // ----------------------------------------------------------------------
+    lostTheFloor: {
+        id: 'lostTheFloor',
+        title: 'YOU NO LONGER OWN ENOUGH OF IT',
+        body:
+            'The register is published at seven. By eight the company secretary has '
+            + 'written to you, politely, about the arrangements.\n\n'
+            + 'There was no vote. There was nothing to vote about. You are a shareholder '
+            + 'like the others now, a smaller one than four of them, and the chair belongs '
+            + 'to whoever the people in that column say it does.\n\n'
+            + 'Nobody took it from you. You sold it, over years, in pieces, each one for a '
+            + 'reason that was good at the time.',
+    },
+
+    // ----------------------------------------------------------------------
     //  YOU BROKE IT SO YOU COULD BUY IT
     // ----------------------------------------------------------------------
     //  The ending the player asked for, in their words: "either close the
@@ -364,7 +394,8 @@ export const endingById = (id: string): Ending | undefined => ENDINGS[id];
  * that does not exist would end the game on a blank screen, and it would do it
  * only to a player who had just gone bankrupt.
  */
-export const ENDING_FOR_STATUS: Record<'bankrupt' | 'removed', string> = {
+export const ENDING_FOR_STATUS: Record<'bankrupt' | 'removed' | 'lostControl', string> = {
     bankrupt: 'wentBankrupt',
     removed: 'removedByBoard',
+    lostControl: 'lostTheFloor',
 };

@@ -1,3 +1,20 @@
+// @palette-source a twenty step ladder that has to read as a climb.
+//
+// ============================================================================
+//  THE TIER LADDER IS A PALETTE OF ITS OWN
+// ============================================================================
+//  Fourteen findings, all of them `getFacilityTierVisual`. Twenty levels from
+//  a workshop to an orbital plant, each with an icon and a colour, and the
+//  colour is what makes level 14 feel further along than level 6. Squeezing
+//  them into the fifteen colour palette would give four or five levels the
+//  same tone and flatten the one thing the ladder is for.
+//
+//  WORTH KNOWING, AND LEFT ALONE ON PURPOSE: level 9 uses #4ADE80, which is
+//  the profit green, and level 8 and 7 sit either side of it in the same
+//  family. That is the signal colour being spent on decoration, and it is one
+//  of a hundred and twenty three such uses across the app. Reported rather
+//  than changed: the decision was to leave the game's look alone for now.
+// ============================================================================
 // @orphan-ok-symbol maxUnitsForProduct - callers use maxUnitsPerQuarter directly
 import { t } from '../i18n';
 // src/core/market/capacity.ts

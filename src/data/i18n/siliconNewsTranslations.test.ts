@@ -88,6 +88,15 @@ describe('siliconNewsTranslations', () => {
       expect(tr).toBe("Hale CEO'su, büyük bir güç gösterisiyle Bugatti Chiron edindi!");
     });
 
+    it('translates story and event beat headlines', () => {
+      expect(translateNewsHeadline('Gerald Hale, founder, has died. He was seventy-one.'))
+        .toBe('Kurucu Gerald Hale hayatını kaybetti. Yetmiş bir yaşındaydı.');
+      expect(translateNewsHeadline('Pear passes to Hale. Vogel out by Friday.'))
+        .toBe("Pear, Hale'in yönetimine geçti. Vogel Cuma gününe kadar ayrılıyor.");
+      expect(translateNewsHeadline('Planora closes a funding round. The scheduling firm says it is now profitable.'))
+        .toBe('Planora bir yatırım turunu kapattı. Takvimleme şirketi artık kâra geçtiğini belirtiyor.');
+    });
+
     it('translates categories to Turkish', () => {
       expect(translateNewsCategory('Breaking')).toBe('Son Dakika');
       expect(translateNewsCategory('Exclusive')).toBe('Özel Haber');

@@ -31,6 +31,27 @@ import {
 }from '../../../core/market/governance';
 import { buyoutAsk, settleBuyout } from '../../../core/market/buyout';
 import { quoteBuyoutFinancing, type BuyoutRoute } from '../../../core/market/buyoutFinancing';
+/**
+ * Which quarter it is, without importing the world.
+ *
+ * `require` inside the call for the same reason every other cross store read
+ * in this file uses one: the store is imported by tests that have no clock
+ * standing, and a missing one must read as quarter zero rather than take the
+ * whole store down.
+ */
+const quarterNow = (): number => {
+    try {
+        return require('../../../core/story/world').currentQuarter() || 0;
+    } catch {
+        return 0;
+    }
+};
+
+import {
+    canOffer, noteOffered, isWorthOffering,
+    BOARD_GIFT_COST, BOARD_DINNER_COST,
+    type GestureLedger,
+} from '../../../core/social/gestures';
 // ============================================================================
 //  REACHING THE FINANCE STORE WITHOUT A CIRCLE
 // ============================================================================
@@ -144,6 +165,15 @@ export interface GestureResult {
     success: boolean;
     delta: number;
     message: string;
+    /**
+     * Why it did not happen, when it did not.
+     *
+     * `already` is a rule, `poor` is a wallet and `pointless` is fatigue, and
+     * the screen says something different for each. Without this the three
+     * arrive as one flat "no" and a player reasonably reads the button as
+     * broken - which is how this defect was reported in the first place.
+     */
+    refusal?: 'already' | 'poor' | 'pointless';
 }
 
 // Buyout negotiation result
@@ -226,7 +256,19 @@ interface ShareholderState {
     /** `force` rebuilds a played register; without it a played register is left alone. */
     initializeGame: (force?: boolean) => void;
     recalculateBoardMood: () => void;
+    // ------------------------------------------------------------------
+    //  BOTH OF THESE WERE WRITTEN AND NEITHER WAS EVER CALLED
+    // ------------------------------------------------------------------
+    //  core/market/governance.ts says so in its own header: the board was
+    //  a four option enum nothing fed, and directors were appointed from
+    //  a network nothing reached. The governance rework replaced both.
+    //  Kept because the enum is a compact statement of what a board
+    //  reacts to, and the rework agrees with it.
+    // ------------------------------------------------------------------
+    /** @orphan-ok-symbol evaluatePlayerAction - never called; see governance.ts:31 */
     evaluatePlayerAction: (actionType: 'DIVIDEND' | 'DILUTION' | 'ACQUISITION' | 'HOLD_CASH') => void;
+    /** @orphan-ok-symbol appointDirectorFromNetwork - never called; see
+     *  governance.ts:19, which says exactly that. */
     appointDirectorFromNetwork: (networkContact: NetworkContact, shareCount?: number) => { success: boolean; message: string };
     calculateBuyoutPrice: (memberId: string, currentStockPrice: number) => BuyoutResult | null;
     takeSharkLoan: (lenderId: string, amount: number, deadlineTurn: number, addCashFn: (n: number) => void) => { success: boolean; message: string };
@@ -280,7 +322,17 @@ interface ShareholderState {
      * adama yanlis jest ters teper.
      * Bkz. core/market/governance.ts -> giftEffect
      */
-    offerGesture: (memberId: string, gestureFor: Motivation, magnitude: number) => GestureResult;
+    /**
+     * A gift or an evening, and what it does to their regard.
+     *
+     * `kind` is what the LEDGER is keyed on and what decides the fee. It has
+     * a default so the older two argument callers still compile, and every
+     * live caller passes it. See core/social/gestures.ts for the rule and
+     * for the measurement that produced it.
+     */
+    offerGesture: (memberId: string, gestureFor: Motivation, magnitude: number, kind?: 'gift' | 'dinner') => GestureResult;
+    /** What has been offered to whom, by quarter. See core/social/gestures. */
+    gestureLedger: GestureLedger;
 
     // ================= KURULUN KENDI GUNDEMI =============================
     /** Kurulun senden istedigi, henuz kapanmamis seyler */
@@ -616,6 +668,10 @@ export const useShareholderStore = create<ShareholderState>()(
              */
             promises: [] as BoardPromise[],
             lobbied: {} as Record<string, number>,
+            // Not cleared each quarter on purpose: it stores WHICH quarter,
+            // so an old entry answers "not this one" by itself and there is
+            // no wipe anybody can forget to call. See core/social/gestures.
+            gestureLedger: {} as GestureLedger,
             ceoRemoved: false,
             noConfidenceLevel: 0,
             boardLog: [] as { label: string; effect: string }[],
@@ -2253,11 +2309,35 @@ export const useShareholderStore = create<ShareholderState>()(
                 });
             },
 
-            offerGesture: (memberId, gestureFor, magnitude) => {
-                const { members } = get();
+            offerGesture: (memberId, gestureFor, magnitude, kind = 'gift') => {
+                const { members, gestureLedger } = get();
                 const member = members.find(m => m.id === memberId);
                 if (!member) {
                     return { success: false, delta: 0, message: 'Member not found' };
+                }
+
+                // ------------------------------------------------------------
+                //  ONCE A QUARTER, AND IT COSTS SOMETHING
+                // ------------------------------------------------------------
+                //  Measured before this existed: ten presses in a row took a
+                //  director from 0 to 89 regard and the player's money never
+                //  moved once. The gift wrote an absolute figure computed at
+                //  render, which does nothing on a second press; the dinner
+                //  spent nothing at all and carried a `TODO` where its cost
+                //  should have been.
+                //
+                //  Both checks live HERE rather than in the two screens,
+                //  because the two screens are how it came to be free in the
+                //  first place: one of them was fixed and the other was not.
+                // ------------------------------------------------------------
+                const quarter = quarterNow();
+                if (!canOffer(gestureLedger, memberId, kind, quarter)) {
+                    return {
+                        success: false,
+                        delta: 0,
+                        refusal: 'already',
+                        message: t('social.alreadyThisQuarter', { v1: member.name }),
+                    };
                 }
 
                 const delta = giftEffect(
@@ -2273,6 +2353,36 @@ export const useShareholderStore = create<ShareholderState>()(
                     member.gestureCount ?? 0,
                 );
 
+                // ------------------------------------------------------------
+                //  A FEE FOR NOTHING IS NOT A DECISION EITHER
+                // ------------------------------------------------------------
+                //  Fatigue takes the effect to zero by the seventh press. The
+                //  screen may still offer it, but taking the money for a
+                //  guaranteed nought would be the button lying twice.
+                // ------------------------------------------------------------
+                if (!isWorthOffering(delta)) {
+                    return {
+                        success: false,
+                        delta: 0,
+                        refusal: 'pointless',
+                        message: t('social.gestureIgnored', { v1: member.name }),
+                    };
+                }
+
+                const cost = kind === 'dinner' ? BOARD_DINNER_COST : BOARD_GIFT_COST;
+                // THROUGH THE STORE, not by writing an absolute figure. The
+                // old line read `money - GIFT_COST` off a value captured at
+                // render, so a second press wrote the same number again and
+                // the fee was charged once however often it was pressed.
+                if (!useStatsStore.getState().spendMoney(cost)) {
+                    return {
+                        success: false,
+                        delta: 0,
+                        refusal: 'poor',
+                        message: t('social.cannotAffordGesture', { v1: formatMoney(cost) }),
+                    };
+                }
+
                 const before = member.relationship ?? RELATIONSHIP_NEUTRAL;
                 const after = Math.max(0, Math.min(100, before + delta));
 
@@ -2282,15 +2392,13 @@ export const useShareholderStore = create<ShareholderState>()(
                             ? { ...m, relationship: after, gestureCount: (m.gestureCount ?? 0) + 1 }
                             : m,
                     ),
+                    gestureLedger: noteOffered(gestureLedger, memberId, kind, quarter),
                 });
 
                 return {
-                    success: delta > 0,
+                    success: true,
                     delta,
-                    message:
-                        delta > 0
-                            ? `${member.name}: ${before.toFixed(0)} -> ${after.toFixed(0)}`
-                            : `${member.name} bunu bir jest olarak gormedi.`,
+                    message: `${member.name}: ${before.toFixed(0)} -> ${after.toFixed(0)}`,
                 };
             },
 

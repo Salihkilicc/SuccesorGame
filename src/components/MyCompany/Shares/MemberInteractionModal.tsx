@@ -26,7 +26,7 @@
 //  components/common/ScreenHost.tsx.
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { t, useLocale } from '../../../core/i18n';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,6 +37,7 @@ import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { giftEffect } from '../../../core/market/governance';
 import { acceptanceChance, MAX_ASK_PREMIUM } from '../../../core/market/buyout';
+import { BOARD_DINNER_COST, BOARD_GIFT_COST } from '../../../core/social/gestures';
 import {
     quoteAllBuyoutRoutes,
     BUYOUT_ROUTE_LABELS,
@@ -128,7 +129,65 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         st.totalShares > 0 ? (st.playerShareCount / st.totalShares) * 100 : 0,
     );
 
-    const member = members.find((m) => m.id === memberId);
+    const liveMember = members.find((m) => m.id === memberId);
+
+    // ----------------------------------------------------------------------
+    //  AND THE RECEIPT HAS TO SURVIVE THE PERSON
+    // ----------------------------------------------------------------------
+    //  The first version of the fix below closed the screen the instant the
+    //  director left the register, which is one frame after the purchase
+    //  succeeds - so the "Purchase complete" panel this file raises was set
+    //  and never drawn. The player pressed a button, the screen vanished,
+    //  and nothing said what had happened. A quieter version of the same
+    //  complaint.
+    //
+    //  So the last person seen is kept, and the page goes on rendering them
+    //  while a panel is up. What is on screen at that moment is a receipt for
+    //  somebody who is no longer a shareholder, which is exactly right.
+    // ----------------------------------------------------------------------
+    const lastMember = useRef<BoardMember | undefined>(undefined);
+    if (liveMember) lastMember.current = liveMember;
+    const member = liveMember ?? lastMember.current;
+
+    // ----------------------------------------------------------------------
+    //  BUYING SOMEBODY OUT DELETED THE SCREEN YOU WERE STANDING ON
+    // ----------------------------------------------------------------------
+    //  Reported as "I bid for a director's shares, I buy them, and then My
+    //  Company is completely blank". Reproduced through the real store: take
+    //  a director's whole holding and `negotiateSharePurchase` SPLICES them
+    //  out of `members` - correctly, they are off the register. Measured:
+    //
+    //      Marcus  1.7M shares -> members 5 -> 4, player 35.0% -> 52.0%
+    //      Elena   1.4M shares -> members 4 -> 3, player 66.0%
+    //      Victor  1.1M shares -> members 3 -> 2, player 77.0%
+    //
+    //  So `members.find(...)` returns undefined and the component below
+    //  returns null. As a MODAL that is right and always was: with the modal
+    //  closed `memberId` is '' and there is nothing to draw.
+    //
+    //  But this is also a ROUTE. `BoardMemberScreen` renders it with
+    //  `asScreen`, and a route that renders null is a blank page with a
+    //  header and nothing under it - no error, no message, no way to tell
+    //  whether the purchase worked. The player is left looking at the
+    //  successful outcome of their own decision and reading it as a crash.
+    //
+    //  So the screen leaves instead. The director is gone because you bought
+    //  them; the place to be is the board list you came from.
+    //
+    //  An effect rather than calling `onClose()` during render: navigating
+    //  while React is rendering is a warning at best and a second navigation
+    //  at worst. And ABOVE the early return, which is this file's own rule -
+    //  see the note at the top and the pass in scripts/reachability.js.
+    // ----------------------------------------------------------------------
+    useEffect(() => {
+        if (!asScreen || !visible) return;
+        // Still on the register: nothing to leave.
+        if (liveMember) return;
+        // Gone, but the receipt is still on screen. Leaving is what dismissing
+        // it does, not what raising it does.
+        if (panel) return;
+        onClose();
+    }, [asScreen, visible, liveMember, panel, onClose]);
 
     // Safe from here on: no hooks below this point.
     if (!member) {
@@ -229,7 +288,10 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
 
     // Lobbying Actions
     const handleSendGift = () => {
-        const GIFT_COST = 50000;
+        // The one number, from core/social/gestures.ts. It was written here
+        // as a literal AND in the dinner's copy as a different unit, which is
+        // how the two came to disagree with the code that spent them.
+        const GIFT_COST = BOARD_GIFT_COST;
 
         if (money < GIFT_COST) {
             setPanel({
@@ -262,7 +324,6 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             note: t('mem.giftLikes'),
             confirmLabel: t('equity.sendGift'),
             onConfirm: () => {
-                        updateStats({ money: money - GIFT_COST });
                         // ------------------------------------------------
                         //  ARTIK GERCEKTEN BIR SEY OLUYOR
                         // ------------------------------------------------
@@ -274,35 +335,61 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                         //  memnun eder, mirasini dusunen uyeyi asagilar.
                         //  Bkz. core/market/governance.ts -> giftEffect
                         // ------------------------------------------------
-                const r = offerGesture(member.id, 'money', 1);
+                        //  SHELVED: `updateStats({ money: money - GIFT_COST })`
+                        //
+                        //  The same mistake this file already has a note
+                        //  about on the buyout, left here for months: `money`
+                        //  is the value captured at RENDER, so the line wrote
+                        //  an absolute figure and a second press wrote the
+                        //  same figure again. Measured: ten presses, money
+                        //  unchanged throughout. The store spends now, once,
+                        //  through spendMoney. See core/social/gestures.ts.
+                        // ------------------------------------------------
+                const r = offerGesture(member.id, 'money', 1, 'gift');
                 setPanel({
                     title: r.success ? t('mem.giftSent') : t('mem.giftBackfired'),
+                    // Three different noes, and the player is told which:
+                    // a rule, a wallet, or somebody who has had enough.
                     summary: r.success
                         ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
-                        : t('mem.giftBackfiredBody', { v1: member.name }),
+                        : r.message,
                     confirmLabel: 'OK',
+                    tone: r.success ? 'default' : 'danger',
                 });
             },
         });
     };
 
     const handlePrivateDinner = () => {
-        const ENERGY_COST = 20;
-
-        // TODO: Check energy from stats store
+        // ------------------------------------------------------------------
+        //  IT HAD A PRICE IN THE COPY AND NO PRICE IN THE CODE
+        // ------------------------------------------------------------------
+        //  `const ENERGY_COST = 20` and `// TODO: Check energy from stats
+        //  store`. The confirmation told the player it would cost them twenty
+        //  energy, the handler spent nothing, and there is no energy stat in
+        //  the CEO cut for it ever to have spent.
+        //
+        //  So the evening costs money, which this game does have, and the
+        //  number lives in core/social/gestures.ts next to the gift's, where
+        //  the copy and the handler read the same value.
+        // ------------------------------------------------------------------
         setPanel({
             title: t('mem.dinnerTitle'),
-            summary: t('mem.dinnerBody2', { v1: member.name, v2: String(ENERGY_COST) }),
+            summary: t('mem.dinnerBody2', { v1: member.name, v2: formatMoney(BOARD_DINNER_COST) }),
+            lines: [
+                { label: t('mem.cashAfter'), value: formatMoney(money - BOARD_DINNER_COST), strong: true },
+            ],
             note: t('mem.dinnerLikes'),
             confirmLabel: t('equity.arrangeDinner'),
             onConfirm: () => {
-                const r = offerGesture(member.id, 'legacy', 1);
+                const r = offerGesture(member.id, 'legacy', 1, 'dinner');
                 setPanel({
                     title: r.success ? t('mem.dinnerArranged') : t('mem.giftBackfired'),
                     summary: r.success
                         ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
-                        : t('mem.giftBackfiredBody', { v1: member.name }),
+                        : r.message,
                     confirmLabel: 'OK',
+                    tone: r.success ? 'default' : 'danger',
                 });
             },
         });
@@ -713,6 +800,41 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                             and what it will cost, so it is not a fourth tile
                             in a grid of gestures.
                            ------------------------------------------------ */}
+                        {/* ------------------------------------------------
+                            SHELVED: SPEAK PRIVATELY
+
+                            Reported as "what happens when I press private
+                            meeting with a director makes no sense, we could
+                            cancel it for now by taking the button out".
+
+                            It is right, and the reason is worth recording
+                            because the machinery underneath is good. `lobby`
+                            asks a director where they stand ON A PROPOSAL,
+                            they may demand something in return, and the
+                            promise is settled later. All of that works.
+
+                            What it is asked ABOUT is invented on the spot:
+
+                                kind: 'acquisition'
+                                amount: companyValue * 0.3
+                                title: 'a major move next quarter'
+
+                            There is no such move. The player secures support
+                            for a thing that is not happening, and may owe a
+                            dividend or a board seat for it. So the promise is
+                            real and the thing promised about is not, which is
+                            exactly how it reads on screen.
+
+                            The button goes, not the system. When a real
+                            proposal exists to lobby about - a live
+                            acquisition, a dilution the player is about to
+                            run - this comes back pointed at that.
+
+                            `handleLobby` and the store's `lobby` stay: the
+                            first is four lines away and the second is read by
+                            `castVotes` through `lobbied`.
+                           ------------------------------------------------ */}
+                        {/*
                         <Pressable
                             style={({ pressed }) => [
                                 styles.lobbyBtn,
@@ -731,6 +853,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                 {alreadyLobbied ? t('board.spokenAlready') : t('board.speakPrivately')}
                             </Text>
                         </Pressable>
+                        */}
 
                         {/* What you owe them. It was a box in the board list,
                             which is the one place it could not be acted on. */}
@@ -905,7 +1028,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                             that gate is permanent, not temporary.
                             See core/market/buyoutFinancing.ts.
                            ------------------------------------------------ */}
-                        <Text style={styles.routeHeading}>Paid by</Text>
+                        <Text style={styles.routeHeading}>{t('fin.paidBy')}</Text>
                         {(Object.keys(BUYOUT_ROUTE_LABELS) as BuyoutRoute[]).map((r) => {
                             const q = routeQuotes[r];
                             const chosen = r === route;
@@ -1313,8 +1436,26 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 6,
     },
+    // ----------------------------------------------------------------------
+    //  THE BUTTON NOBODY COULD TELL WAS A BUTTON
+    // ----------------------------------------------------------------------
+    //  Reported as "the make offer button is silver, you cannot tell you are
+    //  supposed to press it". Measured, and it is worse than silver: the fill
+    //  was #CFD0D2 and the label #FFFFFF, which is a contrast of 1.54. The
+    //  words were not faint, they were very nearly not there.
+    //
+    //  It is the primary action of the whole screen, so it looks like one
+    //  now: the primary blue with the dark text the palette pairs with it,
+    //  the same pairing ConfirmPanel's own confirm button uses. That measures
+    //  7.94.
+    //
+    //  Worth recording that the contrast audit missed this. Pass 0f resolves
+    //  THEME TOKENS through a light fill, and both of these were literal
+    //  hexes written inline, so there was nothing for it to look up. See the
+    //  note on 0d2 in scripts/reachability.js, which has the same shape.
+    // ----------------------------------------------------------------------
     makeOfferButton: {
-        backgroundColor: '#CFD0D2',
+        backgroundColor: theme.colors.primary,
         borderRadius: 12,
         padding: 18,
         alignItems: 'center',
@@ -1333,8 +1474,11 @@ const styles = StyleSheet.create({
     makeOfferButtonText: {
         fontSize: 16,
         fontWeight: '900',
-        color: '#FFFFFF',
+        // Dark on a light fill, which is the house rule and the only pairing
+        // that reads on the primary blue. See the note above.
+        color: theme.colors.onLight,
         letterSpacing: 1,
+        textAlign: 'center',
     },
     infoBox: {
         backgroundColor: '#323A40',

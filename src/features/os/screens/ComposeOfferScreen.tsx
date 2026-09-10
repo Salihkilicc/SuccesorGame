@@ -24,6 +24,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
+import { t } from '../../../core/i18n';
 import { useNavigation } from '@react-navigation/native';
 
 import { theme } from '../../../core/theme';
@@ -169,7 +170,7 @@ const ComposeOfferScreen = () => {
 
     return (
         <View style={styles.root}>
-            <ScreenHeader title="New offer" subtitle="Compose" onBack={() => navigation.goBack()} />
+            <ScreenHeader title={t('ui.newOffer')} subtitle="Compose" onBack={() => navigation.goBack()} />
 
             <ScrollView contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: NAV_BAR_CLEARANCE }}>
                 {waiting.length > 0 && (
@@ -193,7 +194,7 @@ const ComposeOfferScreen = () => {
                                 {formatMoney(target.marketCap)} · {target.risk ?? 'Medium'} risk
                             </Text>
                         </View>
-                        <Text style={styles.change}>Change</Text>
+                        <Text style={styles.change}>{t('ui.change')}</Text>
                     </Pressable>
                 ) : banded.map(({ band, items }) => {
                     const open = openBand === band.id;
@@ -240,7 +241,7 @@ const ComposeOfferScreen = () => {
                     );
                 })}
 
-                <Text style={[styles.label, { marginTop: 24 }]}>SUBJECT</Text>
+                <Text style={[styles.label, { marginTop: 24 }]}>{t('ui.subject')}</Text>
                 {SUBJECTS.map(s => {
                     const selected = s === subject;
                     return (
@@ -318,7 +319,10 @@ const styles = StyleSheet.create({
     rowDisabled: { opacity: 0.45 },
     /** Indented under its band, so the grouping is visible without a rule. */
     rowInBand: { marginLeft: theme.spacing.md },
-    change: { color: theme.colors.guidance, fontSize: 13, fontWeight: '700' },
+    // `guidance` is a FILL and theme.ts says so in its own note. On the
+    // selected row's surfaceRaised it measured 1.16 - the one affordance
+    // that lets a player change their mind, painted and invisible.
+    change: { color: theme.colors.guidanceText, fontSize: 13, fontWeight: '700' },
     band: {
         flexDirection: 'row',
         alignItems: 'center',

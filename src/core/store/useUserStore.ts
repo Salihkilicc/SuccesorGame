@@ -123,14 +123,48 @@ export type UserState = {
 type UserStore = UserState & {
   update: (partial: Partial<UserState>) => void;
   setField: <K extends keyof UserState>(key: K, value: UserState[K]) => void;
+  // ==========================================================================
+  //  WHAT THIS STORE STILL DOES, AND WHAT IT USED TO
+  // ==========================================================================
+  //  `useUserStore` was the profile store for the life sim: a name, a bio, an
+  //  avatar, a premium flag, a job. The CEO cut asks a different question -
+  //  who you are is `useIdentityStore` and what you own is `useAssetStore` -
+  //  so the four profile setters below have had no caller for a long time.
+  //
+  //  `setField` is the live route, called from sixty one places.
+  //
+  //  ONE OF THESE IS NOT DEAD AND THE AUDIT CANNOT SEE IT. `addItem` is
+  //  called from features/shopping/hooks/useShopping.ts:104, which the
+  //  reachability script excludes because `FEATURES.shopping` is false. But
+  //  the shop IS reachable: the profile's VIP banner navigates to
+  //  `Shopping`, which is registered unconditionally on the root stack. So
+  //  the exclusion is one flag behind the app, and `addItem` runs whenever
+  //  somebody buys anything. It is marked as live below, not as dead.
+  // ==========================================================================
+
+  /** @orphan-ok-symbol setName - `useIdentityStore` owns the player's name */
   setName: (name: string) => void;
+  /** @orphan-ok-symbol setBio - profile field from the life sim; no screen edits it */
   setBio: (bio: string) => void;
+  /** @orphan-ok-symbol setAvatarUrl - the face comes from core/portraits now */
   setAvatarUrl: (url: string | null) => void;
+  /** @orphan-ok-symbol setHasPremium - there is no premium tier in the CEO cut */
   setHasPremium: (value: boolean) => Promise<void>;
+  /** @orphan-ok-symbol addItem - NOT DEAD. Called by the shop's checkout at
+   *  features/shopping/hooks/useShopping.ts:104. The audit excludes that
+   *  folder on the `shopping` flag, and the shop is reachable regardless. */
   addItem: (item: InventoryItem) => void;
   updateGymState: (partial: Partial<UserState['gymState']>) => void;
+  /** @orphan-ok-symbol addSubsidiary - the one door is
+   *  useCorporateFinanceStore.executeAcquisition. This wrote to a list the
+   *  engine never read, which is why acquisition buffs did nothing at all;
+   *  see the long note on that function. */
   addSubsidiary: (company: AcquiredCompany) => void;
+  /** @orphan-ok-symbol setAll - `setField` is the live route. The four
+   *  usages that look like callers are usePlayerStore's own setAll. */
   setAll: (partial: Partial<UserState>) => void; // Helper requested by user (same as update)
+  /** @orphan-ok-symbol updateJob - the player is the CEO; there is no job
+   *  to change. From the life sim. */
   updateJob: (job: UserJob | null) => void; // NEW Action
 
   // === RELATIONSHIP ENGINE ACTIONS ===
@@ -151,6 +185,8 @@ type UserStore = UserState & {
   proposeMarriage: (withPrenup: boolean, locationBonus?: number) => MarriageProposalResult;
   /** SHELVED with the rest. @orphan-ok-symbol marryPartner */
   marryPartner: (hasPrenup: boolean) => void;
+  /** @orphan-ok-symbol removeItem - nothing sells out of this inventory.
+   *  The collection is sold through useAssetStore. */
   removeItem: (itemId: string) => void;
   /**
    * SHELVED — useFamilyStore.breakup is the one that runs.
@@ -163,6 +199,8 @@ type UserStore = UserState & {
    * prenup protected nobody and leaving the real partner cost nothing.
    */
   breakUp: (reason: ExPartnerProfile['breakupReason']) => void;
+  /** @orphan-ok-symbol updateSpecificStat - the DNA screen is behind a flag
+   *  that is off, and education writes through usePlayerStore. */
   updateSpecificStat: (statId: string, value: number) => void; // For DNA stats from education
 
   reset: () => void;

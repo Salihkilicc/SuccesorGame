@@ -99,7 +99,7 @@ export const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({
                         >
                             <MaterialCommunityIcons name="check" size={36} color="#FFFFFF" />
                         </Animated.View>
-                        <Text style={styles.successText}>Acquisition Authorized</Text>
+                        <Text style={styles.successText}>{t('luxo.authorized')}</Text>
                         <Text style={styles.subtitleText}>
                             Asset deeds have been registered to your portfolio.
                         </Text>

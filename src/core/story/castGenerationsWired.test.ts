@@ -103,20 +103,27 @@ describe('and a message in the fourth is from the fourth', () => {
         expect(thread.age).toBe(who.age);
 
         // ------------------------------------------------------------------
-        //  AND IT IS A POOL FACE, NOT THE SEAT'S OLD PHOTOGRAPH
+        //  AND IT IS HER FACE, NOT THE SEAT'S OLD PHOTOGRAPH
         // ------------------------------------------------------------------
         //  This is what the first version got wrong. `faceFor` looks the id
         //  up before anything else, and the id here is a JOB: 'cfo' resolves
         //  to cfo.png, so the fourth generation's chief financial officer
-        //  came back wearing Arthur Vance's face under her own name. The
-        //  screens ask `poolFace` now, which does not look.
+        //  came back wearing Arthur Vance's face under her own name.
+        //
+        //  She had a pool face while the art was being drawn and has her own
+        //  file now. Either is correct and the seat's photograph never is,
+        //  so that is what this holds: anything but `cfo`.
         // ------------------------------------------------------------------
         const face = fileOf(seatFace({
             id: thread.id, name: thread.name,
             female: thread.gender === 'female', age: thread.age,
             portraitId: thread.portraitId,
         }));
-        expect(face).toMatch(/^face_(mid|old|young)_/);
+        expect(face).not.toBe(messageSeat);
+        expect(face).toMatch(/^face_(mid|old|young)_|_g\d+$/);
+        // And it is keyed on the holder rather than the chair, or the second
+        // and the fourth would be the same photograph again.
+        expect(thread.portraitId).toBe(`${messageSeat}_g4`);
     });
 
     it('and in generation one the same thread has no gender at all', () => {

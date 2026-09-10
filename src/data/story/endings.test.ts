@@ -67,7 +67,7 @@ describe('every ending is a record in this file', () => {
         }
     });
 
-    it('and the ten that exist are the ten that can happen', () => {
+    it('and the eleven that exist are the eleven that can happen', () => {
         // Reachability checks that every `ending` EFFECT names a real record.
         // Nothing checked the other direction, and an ending nobody can reach
         // is writing that will never be read.
@@ -86,6 +86,9 @@ describe('every ending is a record in this file', () => {
             'diedInOffice',
             'diedWithHeirTooYoung',
             'diedWithoutAnHeir',
+            // Losing the floor under the chair. Named by the quarterly tick,
+            // like removal and bankruptcy. See core/market/controlFloor.ts.
+            'lostTheFloor',
             'removedByBoard',
             'soldToPear',
             'soldWhatYouInherited',
@@ -95,8 +98,13 @@ describe('every ending is a record in this file', () => {
 });
 
 describe('the quarterly tick names one rather than describing one', () => {
-    it('for both of the ways a quarter can end the game', () => {
-        expect(Object.keys(ENDING_FOR_STATUS).sort()).toEqual(['bankrupt', 'removed']);
+    it('for each of the ways a quarter can end the game', () => {
+        // Three now. `lostControl` joined the day the ten per cent floor did:
+        // a run can end on a register as well as on a vote or a balance
+        // sheet, and all three are named here rather than described in a
+        // screen. See core/market/controlFloor.ts.
+        expect(Object.keys(ENDING_FOR_STATUS).sort())
+            .toEqual(['bankrupt', 'lostControl', 'removed']);
     });
 
     it('and both names resolve', () => {

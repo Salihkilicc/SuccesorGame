@@ -10,6 +10,7 @@ import { aircraftData } from './categories/aircraft';
 import { watchesData } from './categories/watches';
 import { jewelryData } from './categories/jewelry';
 import { spaceData } from './categories/space';
+import { WAVE_ITEMS } from './generationWaves';
 
 // ============================================================================
 // AGGREGATE ALL SHOPS (25+ Distinct Brands)
@@ -63,6 +64,24 @@ export const ITEMS: ShoppingItem[] = [
 
     // Space
     ...spaceData.items,
+
+    // ------------------------------------------------------------------
+    //  AND WHAT THE MARKET OPENS FOR AN HEIR
+    // ------------------------------------------------------------------
+    //  Thirty six items across two waves, of which twelve a generation are
+    //  ever drawn. They are in ITEMS from the first quarter ON PURPOSE and
+    //  are hidden by `logic/shelfNow.ts` instead.
+    //
+    //  Because TOTAL_CATALOG_VALUE is the denominator of the profile's
+    //  prestige score. A catalogue that grew at a succession would shrink
+    //  every collection in the game overnight, and a player who bought
+    //  nothing and sold nothing would watch their number fall. Counting
+    //  the whole written catalogue from quarter one costs the founder a
+    //  couple of points once and then never moves under anybody.
+    //
+    //  See data/generationWaves.ts.
+    // ------------------------------------------------------------------
+    ...WAVE_ITEMS,
 ];
 
 // ============================================================================

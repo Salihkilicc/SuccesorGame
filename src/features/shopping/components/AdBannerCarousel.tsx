@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
+import { t, useLocale } from '../../../core/i18n';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { SHOPS } from '../data/shoppingRegistry';
@@ -50,11 +51,12 @@ type AdBannerCarouselProps = {
 //   const ICON_FOR: Record<string, string> = { VEHICLE: 'car-sports', ... };
 
 export const AdBannerCarousel: React.FC<AdBannerCarouselProps> = ({ onPressBanner }) => {
+    useLocale();
     const featured = featuredFor(SHOPS, currentQuarter());
 
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>FEATURED BOUTIQUES</Text>
+            <Text style={styles.sectionTitle}>{t('luxo.featured')}</Text>
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}

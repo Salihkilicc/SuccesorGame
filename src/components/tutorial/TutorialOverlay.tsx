@@ -37,7 +37,7 @@ import { readWorld } from '../../core/story/world';
 import { useTutorialTargets } from './targets';
 import { CAST } from '../../data/story/cast';
 import { castNow } from '../../core/story/castNow';
-import { useLocale } from '../../core/i18n';
+import { t, useLocale } from '../../core/i18n';
 import { line, lockKey } from '../../data/i18n/storyText';
 
 /** Breathing room around the highlighted control. */
@@ -53,6 +53,37 @@ const HALO = 8;
 const CARD_TOP = 132;
 
 const TutorialOverlay = () => {
+    // ------------------------------------------------------------------
+    //  SHELVED, AND NOW IT SAYS SO
+    // ------------------------------------------------------------------
+    //  This was a bare `return null;` with an eslint-disable under it and
+    //  no explanation, in a file whose own header describes a working
+    //  overlay in four paragraphs. Somebody turned the tutorial off and
+    //  left the room; the next person to read this file has no way to tell
+    //  whether that was a decision or an accident.
+    //
+    //  IT IS NOT A CRASH. The reachability audit lists it under "hooks
+    //  called after an early return", which is the rule that produces
+    //  "Rendered more hooks than during the previous render". That rule
+    //  bites when the return is CONDITIONAL and the hook count changes
+    //  between renders. This return is unconditional, so the hooks below
+    //  never run at all and React never sees a count that moves.
+    //
+    //  The cost of leaving it like this is not a crash, it is noise: the
+    //  dead body below is what produces twelve of the project's forty five
+    //  TypeScript errors, all of them `'lock' is possibly undefined` on
+    //  code that cannot execute.
+    //
+    //  WHETHER THE TUTORIAL SHOULD BE BACK ON IS A DESIGN DECISION and it
+    //  is not this pass's to make. `core/tutorial/locks.ts` and the whole
+    //  TUTORIAL_SEQUENCE are alive and tested; turning this line into a
+    //  real condition is all it would take.
+    //
+    //  Both mount points stay: RootNavigator.tsx:690 and
+    //  ProductModals.tsx:1535. Rendering null from a mounted component
+    //  costs nothing, and removing them would make switching it back on a
+    //  three file change instead of a one line one.
+    // ------------------------------------------------------------------
     return null;
     // eslint-disable-next-line no-unreachable
     const locks = useStoryStore(s => s.locks);
@@ -278,7 +309,7 @@ const TutorialOverlay = () => {
                     says how to leave, which is a different sentence and the
                     only one they need immediately. */}
                 {lock.acknowledge && (
-                    <Text style={styles.dismissHint}>Tap anywhere to continue</Text>
+                    <Text style={styles.dismissHint}>{t('tut.tapToContinue')}</Text>
                 )}
 
                 {/* An acknowledge step needs no escape hatch: it IS one. */}
@@ -287,7 +318,7 @@ const TutorialOverlay = () => {
                         <Pressable
                             onPress={() => skipLock(lock.id)}
                             style={({ pressed }) => [styles.escape, pressed && styles.escapePressed]}>
-                            <Text style={styles.escapeText}>Skip this step</Text>
+                            <Text style={styles.escapeText}>{t('tut.skipStep')}</Text>
                         </Pressable>
 
                         {/* Only offered to someone who has finished it before.
@@ -297,7 +328,7 @@ const TutorialOverlay = () => {
                             <Pressable
                                 onPress={disableTutorial}
                                 style={({ pressed }) => [styles.escape, pressed && styles.escapePressed]}>
-                                <Text style={styles.escapeText}>Skip the whole tutorial</Text>
+                                <Text style={styles.escapeText}>{t('tut.skipAll')}</Text>
                             </Pressable>
                         )}
                     </View>

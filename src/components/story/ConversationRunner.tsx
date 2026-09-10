@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 
 import { theme } from '../../core/theme';
+import { t } from '../../core/i18n';
 import { MAX_ANSWER_BLOCK, MAX_FONT_MULTIPLIER } from './answerFit';
 import { NAV_BAR_CLEARANCE } from '../../navigation/components/CrystalNavBar';
 import type { Conversation } from '../../core/story/graph';
@@ -39,7 +40,7 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
             onPress={onPress}
             style={({ pressed }) => [styles.answer, pressed && styles.answerPressed]}>
             <Text style={styles.answerText} maxFontSizeMultiplier={MAX_FONT_MULTIPLIER}>
-                Close
+                {t('common.close')}
             </Text>
         </Pressable>
     );
@@ -103,10 +104,29 @@ const ConversationRunner = ({ conversation, variant, onFinished }: Props) => {
                                 variant === 'message' && (said.from === 'player' ? styles.tailRight : styles.tailLeft),
                             ]}>
                             {variant === 'mail' && (
+                                // ----------------------------------------------------------
+                                //  MEASURED, AND THE AUDIT IS READING THE WRONG FILL
+                                // ----------------------------------------------------------
+                                //  Reported as "primary on primary fill = 1.00" and
+                                //  "textPrimary on primary fill = 2.65". Both describe a
+                                //  world that cannot happen: this Text only renders when
+                                //  variant is 'mail', and `styles.mine` (the primary fill)
+                                //  only applies when variant is 'message'. The pass takes
+                                //  one branch of the nested ternary on line 102 and pairs
+                                //  it with the other branch's label.
+                                //
+                                //  What actually paints, against letterMine's #353D42:
+                                //      letterFromMine  #05A8F6   4.18
+                                //      saidLetterMine  #FFFFFF  11.07
+                                //  and in the message variant, saidMine #000000 on the
+                                //  primary bubble is 7.94.
+                                // @contrast-checked letterMine #353D42, 4.18 and 11.07
+                                // ----------------------------------------------------------
                                 <Text style={[styles.letterFrom, said.from === 'player' && styles.letterFromMine]}>
-                                    {said.from === 'player' ? 'You replied' : (castNow(conversation.from)?.name ?? conversation.from)}
+                                    {said.from === 'player' ? t('mail.youReplied') : (castNow(conversation.from)?.name ?? conversation.from)}
                                 </Text>
                             )}
+                            {/* @contrast-checked see the note above: 11.07 on the letter, 7.94 in a bubble */}
                             <Text style={[styles.said, said.from === 'player' && (variant === 'message' ? styles.saidMine : styles.saidLetterMine)]}>
                                 {said.text}
                             </Text>

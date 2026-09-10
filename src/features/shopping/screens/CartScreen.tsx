@@ -160,7 +160,7 @@ export const CartScreen = () => {
                             color={theme.colors.textMuted}
                         />
                     </View>
-                    <Text style={styles.emptyCartTitle}>Your Cart is Empty</Text>
+                    <Text style={styles.emptyCartTitle}>{t('luxo.cartEmpty')}</Text>
                     <Text style={styles.emptyCartText}>
                         Explore the LuxoNet boutique departments to acquire and reserve ultra-luxury assets.
                     </Text>
@@ -168,7 +168,7 @@ export const CartScreen = () => {
                         onPress={() => navigation.navigate('Shopping')}
                         style={styles.continueButton}
                     >
-                        <Text style={styles.continueButtonText}>EXPLORE LUXONET</Text>
+                        <Text style={styles.continueButtonText}>{t('luxo.exploreLuxonet')}</Text>
                     </Pressable>
                 </View>
             ) : (
@@ -214,7 +214,7 @@ export const CartScreen = () => {
                                             size={14}
                                             color="#FF8A8A"
                                         />
-                                        <Text style={styles.actionDeleteText}>REMOVE</Text>
+                                        <Text style={styles.actionDeleteText}>{t('luxo.remove')}</Text>
                                     </Pressable>
                                 </View>
                             </View>
@@ -223,7 +223,7 @@ export const CartScreen = () => {
 
                     {/* Order Summary */}
                     <View style={styles.summaryCard}>
-                        <Text style={styles.summaryTitle}>ACQUISITION BREAKDOWN</Text>
+                        <Text style={styles.summaryTitle}>{t('luxo.breakdown')}</Text>
 
                         <View style={styles.summaryRow}>
                             <Text style={styles.summaryLabel}>{t('shop.subtotal')} ({cart.length}):</Text>
@@ -252,7 +252,7 @@ export const CartScreen = () => {
             {cart.length > 0 && (
                 <View style={styles.checkoutFooter}>
                     <View style={styles.footerTotalContainer}>
-                        <Text style={styles.footerTotalLabel}>PAYABLE TOTAL</Text>
+                        <Text style={styles.footerTotalLabel}>{t('luxo.payableTotal')}</Text>
                         <Text style={styles.footerTotalValue}>{formatCurrency(calculatedTotal)}</Text>
                     </View>
                     <Pressable

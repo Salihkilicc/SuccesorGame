@@ -1,3 +1,17 @@
+// @palette-source a colour per company, so a list of rivals is readable.
+//
+// ============================================================================
+//  THIS FILE IS A PALETTE, NOT A USER OF ONE
+// ============================================================================
+//  Twenty two findings, and the reason is the point of the file: the player
+//  sees forty companies in one list on the acquisitions screen, and they have
+//  to be distinguishable at the size of a badge. Fifteen colours across forty
+//  rivals means three companies share every colour.
+//
+//  It is a lookup keyed on id, symbol, name and sector, so the colour follows
+//  the company wherever it is drawn: the same badge in Acquisitions, Hostile
+//  Takeover and My Empire.
+// ============================================================================
 export interface CompanyVisual {
   icon: string;
   color: string;

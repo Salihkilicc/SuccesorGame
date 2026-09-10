@@ -29,6 +29,7 @@ const LuxeNetFooter: React.FC<LuxeNetFooterProps> = ({ style }) => {
             {/* Copyright */}
             <Text style={styles.copyright}>© 2026 LuxeNet Enterprises. All rights reserved.</Text>
 
+            {/* @english-ok a version stamp is the same string in every language. */}
             <Text style={styles.version}>v2.4.0-stable</Text>
         </View>
     );

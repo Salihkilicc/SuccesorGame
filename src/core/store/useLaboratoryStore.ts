@@ -17,6 +17,8 @@ interface LaboratoryActions {
     hireResearchers: (count: number, playerCash: number, deductCash: (amount: number) => void) => { success: boolean; message: string };
     fireResearchers: (count: number) => void;
     processQuarter: (deductCash: (amount: number) => void) => { rpAwarded: number; salaryPaid: number };
+    /** @orphan-ok-symbol addRP - research points are written by the quarter
+     *  tick through the store's own update path, not handed in a lump. */
     addRP: (amount: number) => void;
     spendRP: (amount: number) => boolean;
     reset: () => void;

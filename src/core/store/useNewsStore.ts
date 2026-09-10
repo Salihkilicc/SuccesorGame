@@ -49,6 +49,8 @@ interface NewsState {
   markAsRead: () => void;
   markProductAnnounced: (id: string) => void;
   markAcquisitionAnnounced: (id: string) => void;
+  /** @orphan-ok-symbol clearNews - `reset()` is what a new game calls, and
+   *  nothing else should be emptying the wire mid run. */
   clearNews: () => void;
   publish: (headline: string, kind: NewsKind, atMonth: number) => NewsItem;
   addSingleNews: (payload: NewsPayload) => NewsItem;

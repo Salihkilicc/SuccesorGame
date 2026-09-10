@@ -404,6 +404,18 @@ const styles = StyleSheet.create({
     },
     btnConfirm: { backgroundColor: theme.colors.primary },
     btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
-    btnCancelText: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.body + 1 },
-    btnConfirmText: { color: theme.colors.onLight, fontWeight: '800', fontSize: theme.typography.body + 1 },
+    // ----------------------------------------------------------------------
+    //  CENTRED AS A BLOCK IS NOT CENTRED AS A SENTENCE
+    // ----------------------------------------------------------------------
+    //  Reported as the confirm label sitting off centre. `btn` above has
+    //  `alignItems: 'center'`, which centres the Text ELEMENT inside the
+    //  button and does nothing to the lines inside it. A short label like OK
+    //  is one line and looks fine; "Satın almayı onayla" wraps to two, and
+    //  the second line hangs left while the block sits in the middle.
+    //
+    //  So the button looks correct in English and crooked in Turkish, which
+    //  is why it was found by playing rather than by looking.
+    // ----------------------------------------------------------------------
+    btnCancelText: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.body + 1, textAlign: 'center' },
+    btnConfirmText: { color: theme.colors.onLight, fontWeight: '800', fontSize: theme.typography.body + 1, textAlign: 'center' },
 });

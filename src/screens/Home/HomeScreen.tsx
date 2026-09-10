@@ -54,6 +54,7 @@ import { useNewsStore } from '../../core/store/useNewsStore';
 // import { SiliconNewsModal } from '../../features/news';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { readTitle, currentQuarter } from '../../core/story/world';
+import { translateCeoTitle } from '../../data/i18n/profileLoveShopText';
 import { endingById, ENDING_FOR_STATUS } from '../../data/story/endings';
 import EndingOverlay from '../../components/story/EndingOverlay';
 import SponsorDroughtWarningModal from '../../components/common/SponsorDroughtWarningModal';
@@ -406,7 +407,9 @@ const HomeScreen = () => {
   // ------------------------------------------------------------------
   useStoryStore(s => s.flags);
   useStoryStore(s => s.dials.publicReputation);
-  const displayTitle = readTitle();
+  // Through the dictionary, or a Turkish player is told they are a "Tycoon".
+  // See translateCeoTitle for why it is keyed on the English.
+  const displayTitle = translateCeoTitle(readTitle());
   const genderSymbol = useMemo(() => {
     if (gender === 'male') return '♂';
     if (gender === 'female') return '♀';
@@ -447,7 +450,7 @@ const HomeScreen = () => {
 
   // Status widget satırları: CEO ve Şirket Yönetim Paneli
   const statusRows: { key: string; label: string; value: string; color?: string; delta?: number }[] = [
-    { key: 'team', label: 'Team Morale', value: moraleBrief, color: moraleColor },
+    { key: 'team', label: t('company.teamMorale'), value: moraleBrief, color: moraleColor },
     { key: 'research', label: t('company.researchPoints'), value: rpBrief },
     { key: 'brand', label: t('company.brandValue'), value: brandBrief, delta: brandDelta },
   ];

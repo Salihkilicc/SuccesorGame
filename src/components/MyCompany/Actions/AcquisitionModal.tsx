@@ -909,7 +909,10 @@ const styles = StyleSheet.create({
   /** Where to go instead, in the one colour that means "somebody is teaching
       you". See the note on `guidance` in core/theme.ts. */
   optionHint: {
-    color: theme.colors.guidance,
+    // Same fault as ComposeOfferScreen's Change link: `guidance` is a fill.
+    // On this card it measured 1.51, so the sentence telling the player
+    // HOW to unlock the route was the least readable thing on the screen.
+    color: theme.colors.guidanceText,
     fontSize: 12,
     fontWeight: '700',
     marginTop: 6,

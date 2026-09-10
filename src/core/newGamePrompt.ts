@@ -78,7 +78,14 @@ type QuestionState = {
      * One field rather than two booleans, because two booleans can both be
      * true and this is a sequence.
      */
-    mode: null | 'skip' | 'erase';
+    /**
+     * `newCharacter` is a THIRD question rather than the erase panel with
+     * different words, because it warns about something else. Erase says the
+     * run goes; this one says the run goes AND you are about to be asked who
+     * you are again. A player who read the first and got the second would
+     * have been told the smaller half.
+     */
+    mode: null | 'skip' | 'erase' | 'newCharacter';
     /** Whether the question is on screen. */
     asking: boolean;
     /**
@@ -93,6 +100,7 @@ type QuestionState = {
 export const useNewGameQuestion = create<QuestionState & {
     ask: (answer: (choice: NewGameAnswer) => void) => void;
     askConfirm: (answer: (choice: NewGameConfirm) => void) => void;
+    askNewCharacter: (answer: (choice: NewGameConfirm) => void) => void;
     clear: () => void;
 }>()((set) => ({
     mode: null,
@@ -100,6 +108,7 @@ export const useNewGameQuestion = create<QuestionState & {
     answer: null,
     ask: (answer) => set({ mode: 'skip', asking: true, answer: answer as (c: NewGameAnswer | NewGameConfirm) => void }),
     askConfirm: (answer) => set({ mode: 'erase', asking: true, answer: answer as (c: NewGameAnswer | NewGameConfirm) => void }),
+    askNewCharacter: (answer) => set({ mode: 'newCharacter', asking: true, answer: answer as (c: NewGameAnswer | NewGameConfirm) => void }),
     clear: () => set({ mode: null, asking: false, answer: null }),
 }));
 
@@ -117,6 +126,42 @@ export const confirmNewGame = (): Promise<boolean> =>
             resolve(choice === 'erase');
         });
     });
+
+/**
+ * Ask whether the player really means to become somebody else.
+ *
+ * ---------------------------------------------------------------------------
+ *  THE ORDER IS THE WHOLE OF IT, AND IT IS NOT THE OBVIOUS ONE
+ * ---------------------------------------------------------------------------
+ *  The tempting sequence is: forget the identity, then start the new game. It
+ *  deadlocks. `RootNavigator` returns the onboarding form EARLY when there is
+ *  no identity, above the navigator and above `<NewGameQuestion />` - so
+ *  forgetting first unmounts the very component that is holding the promise
+ *  the caller is awaiting, and the opening question can never be answered.
+ *
+ *  So: confirm, run the new game to completion (which asks the opening
+ *  question while the dialog still exists), and only then forget. The form
+ *  appears on the next render because the navigator reads the data.
+ *
+ *  It is `startNewGameAsking` underneath rather than a second copy of it,
+ *  because "does this player get offered the skip" is a rule that must not
+ *  have two answers depending on which button was pressed.
+ */
+export const changeCharacter = async (): Promise<boolean> => {
+    const wanted = await new Promise<boolean>(resolve => {
+        useNewGameQuestion.getState().askNewCharacter((choice) => {
+            useNewGameQuestion.getState().clear();
+            resolve(choice === 'erase');
+        });
+    });
+    if (!wanted) return false;
+
+    await startNewGameAsking();
+
+    // LAST. See the note above for what happens if this moves up.
+    useIdentityStore.getState().forgetIdentity();
+    return true;
+};
 
 /**
  * Whether this player has watched the opening act end.

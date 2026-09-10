@@ -136,6 +136,18 @@ const CasinoScreen: React.FC = () => {
                   Everything it needs is decided in data/vipRoom.ts; this
                   only draws it and reports the refusal.
                  ------------------------------------------------------ */}
+              {/* ------------------------------------------------------
+                  SHELVED: THE DOOR IN THE HEADER
+
+                  Reported as "when the noir button arrives the card falls
+                  apart", and it did: this is a second pill in a row that
+                  fits one, so it wrapped and took the layout with it.
+
+                  It lives in the travel list now, under the cities, which
+                  is where every other way of changing where you play
+                  already was. See CasinoLocationModal.
+                 ------------------------------------------------------ */}
+              {/*
               {vipVisible && (
                 <TouchableOpacity
                   style={[styles.vipButton, !vipDoor.allowed && styles.vipButtonShut]}
@@ -156,6 +168,7 @@ const CasinoScreen: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
               )}
+              */}
 
               {/* ONLY SINGLE PLACE TO TRAVEL / SWITCH CITY */}
               <TouchableOpacity
@@ -338,6 +351,21 @@ const CasinoScreen: React.FC = () => {
           currentLocationId={currentLocationId}
           unlockedLocations={unlockedLocations}
           onSelectLocation={actions.setCurrentLocationId}
+          // The room, at the bottom of the list. Same door and same words as
+          // the header button it replaced; only the place has moved.
+          vipVisible={vipVisible}
+          vipAllowed={vipDoor.allowed}
+          inVip={inVip}
+          vipLabel={
+            inVip
+              ? t('casino.vipLeave')
+              : vipDoor.allowed
+                ? t('casino.vipEnter')
+                : vipDoor.reason === 'tooSoon'
+                  ? t('casino.vipSoon', { v1: vipDoor.quartersLeft })
+                  : t('casino.vipLocked')
+          }
+          onVipPress={handleVipPress}
         />
       </View>
 

@@ -85,7 +85,19 @@ describe('the icons are icons', () => {
 
     it('including the inventory row that started this', () => {
         expect(code('features', 'products', 'components', 'ProductModals.tsx'))
-            .toMatch(/icon="package-variant-closed"[\s\S]{0,80}label="Inventory"/);
+            // ------------------------------------------------------------
+            //  THE LABEL IS A KEY NOW, AND THE ICON IS STILL THE POINT
+            // ------------------------------------------------------------
+            //  This read `label="Inventory"`, which was the English string
+            //  sitting in the source. Every player readable label on a
+            //  mounted screen goes through `t()` now; the sweep that found
+            //  them is scripts/untranslated.js.
+            //
+            //  What this test is FOR is the icon beside the label, so that
+            //  is what it still pins - the label is matched by its key,
+            //  which is the thing that cannot be renamed by accident.
+            // ------------------------------------------------------------
+            .toMatch(/icon="package-variant-closed"[\s\S]{0,120}label=\{t\('fin\.inventory'\)\}/);
     });
 });
 

@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     borderRadius: 7.5,
   },
   badgeText: {
+    // @contrast-checked #FFA94D the unread badge is amber; this measures 8.3.
     color: '#1C242C', // High-contrast black on amber
     fontSize: 9.5,
     fontWeight: '900',

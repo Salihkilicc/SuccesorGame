@@ -15,6 +15,7 @@ import { theme } from '../../../core/theme';
 import Portrait from '../../../components/common/Portrait';
 import { faceFor } from '../../../core/portraits/faces';
 import { portraitFor } from '../../../core/portraits';
+import { t } from '../../../core/i18n';
 
 interface CeoStatusHeaderProps {
     ceoFullName: string;
@@ -80,7 +81,7 @@ export const CeoStatusHeader: React.FC<CeoStatusHeaderProps> = ({
                         {ceoFullName}
                     </Text>
                     <Text style={styles.subtitle}>
-                        Chief Executive Officer • <Text style={styles.companyHighlight}>{companyName}</Text>
+                        {t('profile.ceoRole')} • <Text style={styles.companyHighlight}>{companyName}</Text>
                     </Text>
                 </View>
             </View>

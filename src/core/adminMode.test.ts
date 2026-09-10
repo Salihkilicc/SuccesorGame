@@ -85,12 +85,44 @@ describe('one press really does all five things', () => {
         expect(REPUTATION_CEILING).toBeGreaterThan(100);
     });
 
-    it('and every product, not most of them', () => {
+    it('and it does NOT open the tech tree', () => {
+        // ------------------------------------------------------------------
+        //  THIS ASSERTION CHANGED SIDES
+        // ------------------------------------------------------------------
+        //  It read "and every product, not most of them", and it was right
+        //  about what the button did. The button was wrong.
+        //
+        //  Reported the first time it was actually pressed: "let all of these
+        //  products not be open". The other four steps skip a GRIND - they
+        //  hand over the position forty years of play would reach, and the
+        //  game afterwards is the same game. Opening every product does not
+        //  fast forward the tech tree, it deletes the decision the tree is
+        //  for, and leaves a screen full of things nobody chose.
+        //
+        //  So: whatever was shut before the press is still shut after it.
+        //  Asserted as a DIFFERENCE rather than as "none are open", because a
+        //  save that had legitimately opened four should still have four.
+        // ------------------------------------------------------------------
         const total = products().length;
         expect(total).toBeGreaterThan(10);
+
+        const before = products().filter(p => p.isUnlocked).map(p => p.id).sort();
         const report = applyAdminMode();
-        expect(products().filter(p => p.isUnlocked)).toHaveLength(total);
-        expect(report.productsUnlocked).toBe(total);
+        const after = products().filter(p => p.isUnlocked).map(p => p.id).sort();
+
+        expect(after).toEqual(before);
+        expect(after.length).toBeLessThan(total);
+        // The report claims nothing, rather than claiming zero happened.
+        expect(report.productsUnlocked).toBe(0);
+    });
+
+    it('and the money and research it gives are what open them instead', () => {
+        // The part worth keeping. A player who wants something at the top of
+        // the tree can still have it, in the order the tree intends, because
+        // the press leaves them a quadrillion dollars and a billion points.
+        const report = applyAdminMode();
+        expect(report.money).toBe(ADMIN_MONEY);
+        expect(report.researchPoints).toBe(ADMIN_RESEARCH);
     });
 
     it('and the whole catalogue, one of each', () => {
@@ -153,7 +185,9 @@ describe('and it does not break what it touches', () => {
             money: useStatsStore.getState().money,
             researchPoints: useStatsStore.getState().researchPoints,
             casinoReputation: usePlayerStore.getState().reputation.casino,
-            productsUnlocked: products().filter(p => p.isUnlocked).length,
+            // Zero, not a count of what happens to be open. The button does
+            // not touch products, so it reports nothing about them.
+            productsUnlocked: 0,
             assetsOwned: useAssetStore.getState().ownedItems.length,
         });
     });
@@ -196,12 +230,36 @@ describe('and something can actually press it', () => {
         expect(live).toContain('actions.handleAdminUnlock');
     });
 
-    it('and it cannot ship', () => {
-        // Behind FEATURES.godMode, which is __DEV__: in a release build the
-        // section is not rendered at all.
-        expect(screen).toMatch(/\{FEATURES\.godMode && \(/);
+    it('and it cannot be found by accident', () => {
+        // ------------------------------------------------------------------
+        //  THIS ASSERTION CHANGED SIDES, AND THE GUARANTEE DID NOT
+        // ------------------------------------------------------------------
+        //  It used to read `{FEATURES.godMode && (` and call itself "it
+        //  cannot ship". That was true and it was also the defect: the panel
+        //  was invisible in a release build, so the person who owns the game
+        //  could not use it on the device they actually play on. Reported
+        //  exactly that way - "I took a build and there was no admin panel".
+        //
+        //  Turning the flag on would have been the wrong fix: god mode then
+        //  ships the first time somebody forgets, and nothing reports it.
+        //
+        //  So the section is drawn when the FLAG is on OR when the gesture
+        //  has opened it: seven taps on the version line, the rule in
+        //  core/adminGesture.ts. What "cannot ship" protected is intact -
+        //  nobody reaches a hidden gesture by wandering - and it no longer
+        //  depends on a build type or on anybody remembering a flag.
+        // ------------------------------------------------------------------
+        expect(screen).toMatch(/\{\(FEATURES\.godMode \|\| state\.isAdminUnlocked\) && \(/);
+
+        // The flag is still __DEV__ and still does its half: a dev build
+        // shows the section without any tapping at all.
         const flags = src('core', 'featureFlags.ts');
         expect(flags).toMatch(/godMode: __DEV__/);
+
+        // And the gesture is a real gate rather than a constant true.
+        const gesture = src('core', 'adminGesture.ts');
+        expect(gesture).toMatch(/ADMIN_TAPS = 7/);
+        expect(screen).toMatch(/actions\.tapVersion/);
     });
 
     it('and the player is told what it did, in both languages', () => {

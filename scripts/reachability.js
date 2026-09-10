@@ -428,6 +428,33 @@ const calleeName = c => (
             : null);
 
 /** Everything in one function's OWN body, never its callbacks'. */
+/**
+ * Is this return the function's very first statement?
+ *
+ * ---------------------------------------------------------------------------
+ *  AN UNCONDITIONAL RETURN IS A SHELVED COMPONENT, NOT A HOOK BUG
+ * ---------------------------------------------------------------------------
+ *  The rule this pass enforces is React's: a hook after a CONDITIONAL early
+ *  return changes the hook COUNT between renders, and React crashes with
+ *  "Rendered more hooks than during the previous render".
+ *
+ *  A `return null;` sitting as the first statement of the body cannot do
+ *  that. The hooks below it never run at all, on any render, so the count is
+ *  a stable zero and React never has two renders to compare unfavourably.
+ *  That is how a component gets switched off in this project, and reporting
+ *  it as a crash-in-waiting sends whoever is clearing the list to rewrite a
+ *  dead file - or worse, to move the hooks above the return and wake up code
+ *  that was deliberately asleep.
+ *
+ *  TutorialOverlay is the one. It has a documented `return null` at the top
+ *  and 320 lines of unreachable body under it.
+ */
+const returnsImmediately = (fn, ret) => {
+    const body = fn.body;
+    if (!body || body.type !== 'BlockStatement') return false;
+    return body.body.length > 0 && body.body[0] === ret;
+};
+
 const ownScope = (fn) => {
     const returns = [];
     const calls = [];
@@ -478,7 +505,8 @@ for (const f of files.filter(f =>
         if (/Function(Declaration|Expression)$/.test(node.type) && /^[A-Z]/.test(name || '')) {
             const { returns, calls } = ownScope(node);
             for (const call of calls) {
-                const before = returns.find(r => r.end < call.start);
+                const before = returns.find(r => r.end < call.start
+                    && !returnsImmediately(node, r));
                 if (before) {
                     problems.hooks.push(`${rel(f)}:${call.loc.start.line}`
                         + `  hook after early return on line ${before.loc.start.line}`);
@@ -596,7 +624,25 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
         const key = [...t.matchAll(/name:\s*'([\w-]+)'/g)].pop()?.[1];
         const hook = t.match(/export const (use\w+Store)/)?.[1];
         if (!key || !hook) continue;
-        if (/@orphan-ok/.test(t)) continue;
+        // ------------------------------------------------------------------
+        //  SHELVED: `if (/@orphan-ok/.test(t)) continue;`
+        // ------------------------------------------------------------------
+        //  Two things wrong with it, and together they hid a real defect.
+        //
+        //  It is REDUNDANT: `optedOut(f)` three lines above is the same check
+        //  done correctly, and the filter already applies it.
+        //
+        //  And it is WRONG, because it has no `\s`. `@orphan-ok-symbol` is a
+        //  NARROW exemption for one export inside a living file, and this
+        //  line read it as a whole file pass. `useFamilyStore` carries one
+        //  for `updatePartnerLove`, so the entire family store was exempt
+        //  from this pass, and `succesor_family_v3` sat outside PERSIST_KEYS
+        //  with nothing reporting it: start a new game, quit, reopen, and the
+        //  last dynasty's partner and children rehydrate over the new one.
+        //
+        //  Left here rather than removed because the line looks deliberate
+        //  and somebody will otherwise add it back.
+        // ------------------------------------------------------------------
 
         const onDisk = ng.includes(`'${key}'`);
         const inMemory = new RegExp(`${esc(hook)}[^\n]*\\.(reset|resetAchievements|initializeGame)|callReset\\('${esc(hook)}'`).test(ng)
@@ -636,7 +682,42 @@ const PALETTE = new Set([
 const rgbToHex = (r, g, b) =>
     '#' + [r, g, b].map(v => (+v).toString(16).padStart(2, '0')).join('').toUpperCase();
 
-for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith('theme.ts'))) {
+// ---------------------------------------------------------------------------
+//  A FILE THAT IS ITSELF A PALETTE
+// ---------------------------------------------------------------------------
+//  Three files in this project do not USE colours, they DEFINE them, and the
+//  fifteen colour palette is the wrong ruler for all three:
+//
+//      features/casino/data/casinoData.ts   five cities that have to be told
+//                                           apart at a glance
+//      core/market/companyVisuals.ts        a colour per company, so that a
+//                                           list of forty rivals is readable
+//      core/market/capacity.ts              a twenty step facility ladder
+//
+//  Between them they were 62 of the 185 findings. Forcing them into fifteen
+//  colours would make five casinos look alike and twenty factory tiers share
+//  four tones, which is a real loss for a consistency nobody would notice.
+//
+//  `@palette-source <reason>` declares that, and it is a WHOLE FILE marker on
+//  purpose: a file either is a palette or it is not. It is deliberately not
+//  `@orphan-ok`, which would also switch off the dead code, contrast and
+//  frozen text passes on the same file - the hole this project has closed
+//  once already, in the new game key check.
+//
+//  AND A LIMIT WORTH KNOWING. The first draft of this note claimed that pass
+//  0d2 below still guards the signal colours here. It does not: 0d2 reads
+//  `.tsx` only, and all three of these are `.ts`. So a palette source file is
+//  outside BOTH colour passes, which is a wider exemption than it looks.
+//
+//  There is exactly one signal colour among the three today and it is written
+//  up where somebody will find it, in the header of capacity.ts: tier 9 uses
+//  #4ADE80, the profit green. Left alone with the other hundred and twenty
+//  three decorative greens and reds; see the note on 0d2.
+// ---------------------------------------------------------------------------
+const isPaletteSource = f => /@palette-source\s/.test(body.get(f));
+
+for (const f of files.filter(f =>
+    !isDisabled(f) && !optedOut(f) && !isPaletteSource(f) && !f.endsWith('theme.ts'))) {
     const seen = new Map();
     read(f).split('\n').forEach((line, i) => {
         if (/^\s*(\/\/|\*)/.test(line)) return;          // comments may cite old values
@@ -655,6 +736,32 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 }
 
 // --- 0d2) The profit/loss colours used as decoration -------------------------
+//
+//  MEASURED, SEPTEMBER 2026, AND DELIBERATELY NOT FIXED YET
+//  ---------------------------------------------------------------------------
+//  This pass catches the signal tokens used as a FILL or a BORDER. There is a
+//  larger version of the same drift that it does not catch, because the
+//  colours involved are not the palette's own greens and reds but their
+//  neighbours: #34D399, #F87171, #10B981, #EF4444 and a dozen more.
+//
+//  Counted across reachable code, excluding features/life: 127 uses of a green
+//  or a red, of which 123 have nothing to do with profit or loss.
+//
+//      BoardRoomModal      Shark is red, Opportunist is green - personality
+//      useGiftLogic        a golf membership is green, a wine is red
+//      RepayModal          a shark loan is red, by kind rather than by cost
+//      companyVisuals      ten rivals coloured green or red by sector
+//      relationshipLogic   twelve, by how well somebody likes you
+//
+//  So on the board room screen, red means "this director is ruthless", and two
+//  screens away red means "you are losing money". The one signal this game
+//  reserves is being spent on decoration in a hundred and twenty three places.
+//
+//  Left alone on purpose. Asked, and the answer was to leave the look of the
+//  game as it is for now. Written down here rather than in a failing test,
+//  because an audit that cannot reach zero gets switched off - which is this
+//  file's own argument for the @orphan-todo category.
+//  ---------------------------------------------------------------------------
 //  Green and red are the only two colours in the app that MEAN something, and
 //  that only works if they appear nowhere else. They kept drifting: the credit
 //  rating painted six of its seven grades red (AAA included), the back arrow
@@ -1248,10 +1355,45 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
     };
     const GROUND = hx('#020626');
 
+    // ------------------------------------------------------------------
+    //  A DARK LABEL IS NOT THE SAME BUG AS AN INVISIBLE ONE
+    // ------------------------------------------------------------------
+    //  This pass compares every literal colour against the GROUND, because
+    //  it cannot see what is painted under the text. That is right for the
+    //  defect it was written for and it produces a false positive on the
+    //  opposite arrangement: dark text on a light fill, which is the house
+    //  rule and which reads perfectly.
+    //
+    //  It reported six of those, and every one of them was correct code:
+    //
+    //      #000000 on a room primary (#05A8F6 .. #EFC94C)   5.9 to 13.1
+    //      #1C242C on the amber notification badge          8.3
+    //
+    //  A false positive is not free. Somebody clearing this list would have
+    //  "fixed" a chip label to white on #EFC94C, which is 1.60 and actually
+    //  invisible - the audit would have caused the bug it exists to catch.
+    //
+    //  `@contrast-checked <fill> <measured>` is the narrow way out: one LINE,
+    //  not one file, and it has to name the fill AND the number, so the claim
+    //  can be checked by anybody reading it rather than taken on trust.
+    //
+    //  Pass 0f honours the same marker, because it has a blind spot of its
+    //  own: it resolves a nested ternary by taking one branch, which pairs a
+    //  label from one variant with a fill from the other and then reports a
+    //  world that cannot happen. One marker for both, because from the code's
+    //  point of view they are the same sentence: somebody measured this
+    //  against its real background, and here is what they got.
+    // ------------------------------------------------------------------
+    const contrastChecked = (lines, i) =>
+        /@contrast-checked\s/.test(lines[i] || '')
+        || /@contrast-checked\s/.test(lines[i - 1] || '')
+        || /@contrast-checked\s/.test(lines[i - 2] || '');
+
     for (const f of files.filter(f => f.endsWith('.tsx') && !isDisabled(f) && !optedOut(f))) {
-        read(f).split('\n').forEach((line, i) => {
+        const lines = read(f).split('\n');
+        lines.forEach((line, i) => {
             const m = line.match(/\bcolor: *'(#[0-9A-Fa-f]{6})'/);
-            if (m && ratio(hx(m[1].toUpperCase()), GROUND) < 3) {
+            if (m && ratio(hx(m[1].toUpperCase()), GROUND) < 3 && !contrastChecked(lines, i)) {
                 problems.contrast.push(`${rel(f)}:${i + 1}  ${m[1]} on the ground`);
             }
             const faint = line.match(/\bcolor: *'rgba\(255,255,255, *([\d.]+)\)'/);
@@ -1476,9 +1618,13 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f) && !f.endsWith(
 
                 const r = ratio(hx(TOKENS.get(text)), hx(TOKENS.get(fill)));
                 const key = `${text}|${fill}`;
-                if (r < 3 && !seen.has(key)) {
+                // The same one line marker pass 0e honours. See the note
+                // there for why it exists and what it has to carry.
+                const before = src.slice(0, tm.index).split('\n');
+                const marked = before.slice(-4).some(l => /@contrast-checked\s/.test(l));
+                if (r < 3 && !seen.has(key) && !marked) {
                     seen.add(key);
-                    const ln = src.slice(0, tm.index).split('\n').length;
+                    const ln = before.length;
                     problems.contrast.push(
                         `${rel(f)}:${ln}  ${text} on ${fill} fill = ${r.toFixed(2)}`);
                 }
@@ -1647,7 +1793,33 @@ if (statsFile) {
         // field on some other object cannot stand in for it.
         const shown = REFERENCE_INDEX.referencingFiles(member.decl, statsFile)
             .some(g => tsx.some(t => path.resolve(t) === path.resolve(g)));
-        if (written && !shown) problems.statsFields.push(member.name);
+        // ------------------------------------------------------------------
+        //  NOT EVERY STAT IS FOR A SCREEN
+        // ------------------------------------------------------------------
+        //  `shown` only counts references from .tsx, which is right for the
+        //  defect this pass was written for: a number the engine computes
+        //  every quarter for a panel nobody ever built.
+        //
+        //  It is wrong for BOOKKEEPING. `creditRatingPrev` exists so the
+        //  downgrade notice can tell a fall from a first rating.
+        //  `totalSharesPrev` exists so dilution can be detected at all.
+        //  `quartersInsolvent` and `lossStreak` are counters other engine
+        //  code reads, `brandFloorByCategory` is the earned floor, and
+        //  `_hasHydrated` is persistence plumbing. All six are read - by
+        //  .ts, which this pass cannot see - and none of them is a number
+        //  a player should ever be shown.
+        //
+        //  `@not-for-display <reason>` on the field says so. Narrow, one
+        //  line, and it has to give the reason, so the next reader can tell
+        //  a declared internal from an abandoned panel.
+        // ------------------------------------------------------------------
+        //  `getFullText` carries the member's own leading comment with it,
+        //  which is exactly where the marker belongs. Reading the file by
+        //  line number would not work: `decl` is a TypeScript node and has
+        //  no babel `loc`.
+        const sf = REFERENCE_INDEX.sourceOf(statsFile);
+        const internal = !!sf && /@not-for-display\s/.test(member.decl.getFullText(sf));
+        if (written && !shown && !internal) problems.statsFields.push(member.name);
     }
 }
 

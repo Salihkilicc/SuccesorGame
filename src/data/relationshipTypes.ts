@@ -110,6 +110,20 @@ export type PartnerStats = {
      */
     happiness?: number;
 
+    /**
+     * WHERE THEY CAME FROM, as an i18n KEY rather than as a sentence.
+     *
+     * `bg.<tier>.<n>`. A key rather than the rendered line because a player who
+     * changes language would otherwise carry a partner whose history is frozen
+     * in the old one, and because a raw English sentence in a data file is the
+     * one place scripts/untranslated.js cannot see - it reads .tsx only.
+     *
+     * OPTIONAL, like `happiness` and `gender` above and for the same reason:
+     * every save and every hand-written partner predates it. See
+     * features/love/data/backgrounds.ts.
+     */
+    background?: string;
+
     // === Visuals & Style (UI and AI Image Generation) ===
     looks: number; // 0-100 (affects initial attraction)
     style: 'Elegant' | 'Casual' | 'Goth' | 'Business' | 'Sporty' | 'Luxury' | 'Bohemian';
@@ -158,7 +172,21 @@ export type PartnerProfile = {
 
     // === Deep Persona Extension ===
     job?: {
+        /**
+         * WHICH job, as opposed to what it was called in English.
+         *
+         * `generatePartner` has always spread the whole JobDefinition in here,
+         * so this field has existed in every stored partner since the
+         * beginning - it was simply not DECLARED, and a field the type does
+         * not admit to is a field nothing can read.
+         *
+         * Optional because the hand-written demo partner has no id, and
+         * because a save is allowed to be older than this line. Every reader
+         * falls back to `title`. See features/love/logic/partnerText.ts.
+         */
+        id?: string;
         title: string;
+        titleFor?: Partial<Record<'male' | 'female', string>>;
         tier: string;
         buffType?: string;
         buffValue?: number;

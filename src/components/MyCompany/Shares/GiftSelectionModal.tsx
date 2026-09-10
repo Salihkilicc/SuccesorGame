@@ -45,7 +45,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                     <View style={styles.resultContent}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
                             <MaterialCommunityIcons name="gift-open-outline" size={26} color="#FBBF24" />
-                            <Text style={styles.resultTitle}>Gift Sent!</Text>
+                            <Text style={styles.resultTitle}>{t('ui.giftSent')}</Text>
                         </View>
                         <Text style={styles.resultMessage}>{shareholder.name} loved the {result.giftName}!</Text>
 

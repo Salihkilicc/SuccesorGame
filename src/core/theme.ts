@@ -235,6 +235,26 @@ export const theme = {
          */
         guidance: '#584A87',
         /**
+         * The same voice, as TEXT.
+         *
+         * `guidance` above says in its own note that it is a fill and that it
+         * is unusable as a ground. Two screens used it as a text colour
+         * anyway, and both were unreadable: the "Change" affordance on the
+         * offer composer measured 1.16 against surfaceRaised, and the locked
+         * route hint in the acquisition modal measured 1.51 against its card.
+         * Painted, present, and invisible.
+         *
+         * This is that fill's light form, which the palette already carries
+         * as `rp`. Named separately rather than reused by that name because a
+         * teaching hint is not a research point, and a screen reading
+         * `colors.rp` for a sentence about locked routes is the kind of thing
+         * that gets "corrected" later by somebody who is right about the name
+         * and wrong about the colour.
+         *
+         * Measures 6.27 on surface and 4.82 on surfaceRaised.
+         */
+        guidanceText: '#C4B5FD',
+        /**
          * "there is something here you have not read."
          *
          * The unread badge on Messages and Mail, which was `notification`

@@ -103,8 +103,17 @@ describe('and something is actually holding the gesture', () => {
     it('and both cells really hand it to a Pressable', () => {
         // The prop can be threaded all the way down and then not used, which
         // is this codebase's signature failure. Two components, two uses.
-        expect(table.match(/onLongPress=\{onLongPress\}/g)).toHaveLength(2);
+        //
+        // Through `useHoldToRepeat` now, so holding takes the whole stack
+        // down rather than one chip. `onPressOut` is what stops it, and a
+        // hold with no release is a timer that eats the next bet the player
+        // lays on that position.
+        expect(table.match(/onLongPress=\{hold\.onLongPress\}/g)).toHaveLength(2);
+        expect(table.match(/onPressOut=\{hold\.onPressOut\}/g)).toHaveLength(2);
         expect(table.match(/delayLongPress=\{LIFT_CHIP_MS\}/g)).toHaveLength(2);
+        // And each one is told when to stop, or the timer runs on an empty
+        // position.
+        expect(table.match(/canRepeat: \(\) => betAmount > 0/g)).toHaveLength(2);
     });
 
     it('and the hold is shorter than the platform default', () => {

@@ -273,7 +273,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                         <MaterialCommunityIcons name="alert-octagon-outline" size={20} color={theme.colors.warning} style={{ marginRight: 6 }} />
                         <Text style={styles.warningHeaderText}>{t('finance.collateralClause')}</Text>
                     </View>
-                    <Text style={styles.warningText}>{t('finance.failureToRepayByThe', { v1: ' ' })}<Text style={styles.warningTextBold}>immediate seizure</Text> of your personal shares
+                    <Text style={styles.warningText}>{t('finance.failureToRepayByThe', { v1: ' ' })}<Text style={styles.warningTextBold}>{t('fin.immediateSeizure')}</Text> of your personal shares
                         equivalent to the debt value{' '}
                         <Text style={styles.warningTextBold}>+ 50% penalty</Text>.
                     </Text>

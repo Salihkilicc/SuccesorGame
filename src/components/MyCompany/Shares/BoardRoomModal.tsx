@@ -8,6 +8,7 @@ import { faceFor } from '../../../core/portraits/faces';
 import { useShareholderStore } from '../../../features/shareholders/stores/useShareholderStore';
 // `useStatsStore` went with the shelved default proposal.
 import { useGameStore } from '../../../core/store';
+import { currentQuarter } from '../../../core/story/world';
 import { useCorporateFinanceStore } from '../../../features/finance/stores/useCorporateFinanceStore';
 import { formatMoney, formatNumber } from '../../../core/utils';
 import { theme } from '../../../core/theme';
@@ -18,7 +19,7 @@ import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar'
 import {
     CONTROL_THRESHOLD,
     MAJORITY_VOTE_THRESHOLDS,
-    FOUNDER_GRACE_PERIOD_MONTHS,
+    FOUNDER_GRACE_PERIOD_QUARTERS,
     // `Proposal` goes with the shelved `pendingProposal` prop below.
     // Proposal,
 } from '../../../core/market/governance';
@@ -92,8 +93,28 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
 
     // SHELVED with the default proposal below, which was its only reader.
     // const companyValue = useStatsStore(s => s.companyValue);
-    const currentMonth = useGameStore(s => s.currentMonth);
-    const inGracePeriod = (currentMonth || 1) <= FOUNDER_GRACE_PERIOD_MONTHS;
+    // ----------------------------------------------------------------------
+    //  THE BANNER OUTLIVED THE RULE BY THIRTY SIX YEARS
+    // ----------------------------------------------------------------------
+    //  Reported as "founder protection should lift at the end of year four,
+    //  and it does, but the screen goes on saying it until the end of the
+    //  game". Both halves are true and this line is why:
+    //
+    //      const inGracePeriod = (currentMonth || 1) <= 48
+    //
+    //  `currentMonth` WRAPS to 1-12 every year. It can never reach 48, so
+    //  this could never be false. The engine had exactly this bug in the same
+    //  comparison and it was fixed there in useGameStore, with a note; the
+    //  screen was left reading the wrapped field.
+    //
+    //  So the board could not remove the CEO according to the panel and could
+    //  according to the vote. Two answers to one question, which is worse
+    //  than either answer.
+    //
+    //  `currentQuarter()` is the derivation the engine uses, off `age`. One
+    //  door, and it counts past four.
+    // ----------------------------------------------------------------------
+    const inGracePeriod = currentQuarter() <= FOUNDER_GRACE_PERIOD_QUARTERS;
 
     const [tab, setTab] = useState<'board' | 'log'>('board');
     const [panel, setPanel] = useState<null | {

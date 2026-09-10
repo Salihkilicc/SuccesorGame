@@ -196,7 +196,7 @@ const FinancialReportScreen = () => {
                                 the very number it is calculated from. */}
                             {(report.ceoBonusPaid ?? 0) > 0 && (
                                 <Row
-                                    label="CEO annual bonus"
+                                    label={t('fin.ceoAnnualBonus')}
                                     amount={report.ceoBonusPaid ?? 0}
                                     negative
                                     explanation={

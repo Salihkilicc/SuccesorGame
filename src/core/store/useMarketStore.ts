@@ -89,6 +89,10 @@ interface MarketState {
     sellAsset: (symbol: string, quantity: number, currentPrice: number) => void;
     reset: () => void;
     liquidatePortfolio: () => number;
+    /** @orphan-ok-symbol acquireCompany - retired. It spent from the
+     *  PERSONAL wallet and wrote to a list the engine never read. The one
+     *  door is useCorporateFinanceStore.executeAcquisition; the function
+     *  body here already warns when called. */
     acquireCompany: (id: string) => boolean;
     updatePrices: () => void; // Quarter/Day End Update
     initializePrices: () => void;

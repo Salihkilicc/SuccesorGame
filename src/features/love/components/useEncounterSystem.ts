@@ -328,6 +328,56 @@ export const useEncounterSystem = () => {
 
     }, [candidate, partner, breakUp, setPartner]);
 
+    /**
+     * One night, and nobody is anybody's partner in the morning.
+     *
+     * -----------------------------------------------------------------------
+     *  IT WAS THE SAME FUNCTION AS THE DATE, AND THAT IS THE WHOLE BUG
+     * -----------------------------------------------------------------------
+     *  Reported as: after a hookup the person shows up as my girlfriend, and
+     *  it was a one night thing. It did, because `ProfileScreen` wired both
+     *  `onHookup` and `onDate` to the same handler and that handler ends with
+     *  `setPartner(candidate)`. A modal offering two different answers ran one.
+     *
+     *  What a hookup KEEPS from the date is the cheating. If there is somebody
+     *  at home, a night out is still a night out and they can still find out,
+     *  so the consequence path below is deliberately identical. What it does
+     *  not do is put a stranger on the profile as a partner.
+     * -----------------------------------------------------------------------
+     */
+    const handleHookup = useCallback(() => {
+        if (!candidate) return { success: false, wasCaught: false, settlement: 0 };
+
+        let wasCaught = false;
+        let settlement = 0;
+
+        if (partner) {
+            const oldPartnerName = partner.name;
+            const currentMoney = useStatsStore.getState().money;
+            const outcome = cheatingOutcome(partner, currentMoney, Math.random() * 100);
+            settlement = outcome.settlement;
+            wasCaught = outcome.caught;
+            breakUp(wasCaught ? 'cheated' : 'drifted');
+            setTimeout(() => {
+                setCheatingConsequence({
+                    settlement: wasCaught ? settlement : 0,
+                    partnerName: oldPartnerName,
+                });
+            }, 600);
+        }
+
+        // NO setPartner. That line is the difference between the two answers.
+        setIsVisible(false);
+
+        return {
+            success: true,
+            message: `A night with ${candidate.name}. Nothing more was said about it.`,
+            wasCaught,
+            settlement,
+            breakupOccurred: !!partner,
+        };
+    }, [candidate, partner, breakUp]);
+
     const closeEncounter = useCallback(() => {
         setIsVisible(false);
     }, []);
@@ -353,6 +403,7 @@ export const useEncounterSystem = () => {
         candidate,
         triggerEncounter,
         handleDate,
+        handleHookup,
         closeEncounter,
         getCheatingConsequence,
         cheatingConsequence,

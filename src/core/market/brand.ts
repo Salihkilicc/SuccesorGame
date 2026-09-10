@@ -244,10 +244,29 @@ export interface BrandQuarterResult {
 }
 
 /**
- * Bir ceyregin marka hareketinin TAMAMI. Tek kapi.
+ * SHELVED. Superseded by `advanceCategoryBrand`.
  *
- * Motor yalnizca bunu cagirir; boylece "marka nereden geliyor" sorusunun
- * tek bir cevabi olur ve ekranda kalem kalem gosterilebilir.
+ * ---------------------------------------------------------------------------
+ *  AND THE COMMENT THAT USED TO BE HERE WAS THE WORST PART
+ * ---------------------------------------------------------------------------
+ *  It said "Motor yalnizca bunu cagirir" - the engine calls only this - and
+ *  that stopped being true when brand moved from one corporate number to one
+ *  number per category. `useGameStore` calls `advanceCategoryBrand` at line
+ *  1639 and imports this one at line 16 without ever calling it, so the file
+ *  read as the live door while the engine went somewhere else entirely.
+ *
+ *  A stale comment is worse than dead code: the code is merely inert, and the
+ *  comment actively sends the next reader to the wrong function.
+ *
+ *  Kept because the shape of it - one call returning the change AND the
+ *  itemised sources - is the shape `advanceCategoryBrand` took, and this is
+ *  where that idea is written down clearest.
+ *
+ * @orphan-ok-symbol advanceBrand - superseded by advanceCategoryBrand when
+ * brand went per category. Nothing calls it; the import in useGameStore is a
+ * leftover.
+ *
+ * Bir ceyregin marka hareketinin TAMAMI, kurumsal tek sayi doneminden.
  */
 export const advanceBrand = (input: BrandQuarterInput): BrandQuarterResult => {
     const start = Math.max(0, input.currentBrand || 0);
@@ -325,6 +344,14 @@ export const CORPORATE_HALO = 0.20;
  *
  * Agirlik ciro cunku sirketi taniyan kitle nerede satiyorsan oradadir.
  * Hic ciro yoksa duz ortalamaya duser.
+ *
+ * SHELVED. `corporateBrandFrom` is what the engine calls, and the only live
+ * mention of this name is a comment in useStatsStore pointing at it. Kept
+ * because the weighting argument above is the reasoning behind its
+ * replacement and is not written down anywhere else.
+ *
+ * @orphan-ok-symbol corporateBrand - superseded by corporateBrandFrom, which
+ * is the one useGameStore calls.
  */
 export const corporateBrand = (
     byCategory: Record<string, number>,

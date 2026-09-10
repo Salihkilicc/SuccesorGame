@@ -191,7 +191,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                         </Pressable>
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={styles.big}>{Math.round(salaryRatio * 100)}%</Text>
-                            <Text style={styles.sub}>of market rate</Text>
+                            <Text style={styles.sub}>{t('fin.ofMarketRate')}</Text>
                         </View>
                         <Pressable onPress={() => changeRatio(salaryRatio + 0.05)} style={styles.adj}>
                             <Text style={styles.adjText}>+</Text>

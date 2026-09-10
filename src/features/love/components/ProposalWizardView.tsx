@@ -29,6 +29,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import { PROPOSAL_LOCATIONS } from '../data/loveConstants';
+import { translateProposalLocation } from '../../../data/i18n/profileLoveShopText';
 
 type OwnedRing = {
     instanceId: string;
@@ -237,7 +238,7 @@ const ProposalWizardView: React.FC<Props> = ({
                                 color={chosen ? theme.colors.primary : theme.colors.textMuted}
                             />
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.venueName} numberOfLines={1}>{place.name}</Text>
+                                <Text style={styles.venueName} numberOfLines={1}>{translateProposalLocation(place.name)}</Text>
                                 <Text style={styles.venueMeta}>
                                     {place.cost === 0 ? t('love.costsNothing') : `$${place.cost.toLocaleString()}`}
                                     {place.bonus > 0 ? `   ·   ${t('love.sheSaysYes', { bonus: String(place.bonus) })}` : ''}
@@ -285,7 +286,7 @@ const ProposalWizardView: React.FC<Props> = ({
                 )}
 
                 <Pressable style={styles.smallButton} onPress={onGoShopping}>
-                    <Text style={styles.smallButtonText}>{t('love.goShopping')}</Text>
+                    <Text style={styles.smallButtonText} numberOfLines={1} adjustsFontSizeToFit>{t('love.goShopping')}</Text>
                 </Pressable>
             </View>
 
@@ -378,11 +379,31 @@ const styles = StyleSheet.create({
     },
     choiceRow: { justifyContent: 'flex-start', gap: 12 },
     choiceNote: { color: theme.colors.textSecondary, fontSize: 11.5, marginTop: 2, lineHeight: 16 },
+    // ----------------------------------------------------------------------
+    //  THE LABEL DID NOT FIT AND THE BOX COULD NOT GROW
+    // ----------------------------------------------------------------------
+    //  Reported as the writing on the shopping button overflowing. It sits in
+    //  a row beside the ring picker, so it is squeezed from both sides, and
+    //  the copy was the longest thing that could go in it: "Alışverişe Git",
+    //  fourteen characters at twelve points inside twenty four points of
+    //  padding.
+    //
+    //  Two changes and the copy is the important one. "Yüzük al" says the
+    //  same thing in eight characters and says it BETTER: the player is not
+    //  going shopping, they are buying one specific object the flow has just
+    //  told them they need. The English follows it to "Buy a ring".
+    //
+    //  And the box shrinks to fit rather than being clipped: `flexShrink`
+    //  lets the row give it less than it asked for, and one line with
+    //  `adjustsFontSizeToFit` means a longer translation than either of these
+    //  bends instead of spilling.
+    // ----------------------------------------------------------------------
     smallButton: {
         backgroundColor: theme.colors.accent,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 6,
+        flexShrink: 1,
     },
     smallButtonText: {
         color: theme.colors.onLight,

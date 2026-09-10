@@ -69,6 +69,17 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
           {/* Back button or Game Emblem */}
           {onBack ? (
             <TouchableOpacity onPress={onBack} style={styles.navBtn} activeOpacity={0.7}>
+              {/* ------------------------------------------------------------
+                  THIS IS THE ONE WAY OUT, NOT A SECOND ONE
+                  ------------------------------------------------------------
+                  The audit skips any file that mentions `ScreenHeader`, on
+                  the assumption that a second arrow means a screen already
+                  has one. The four casino tables do not use ScreenHeader at
+                  all: this component IS their header, and taking its arrow
+                  away would leave a slot machine with no way back.
+                  @exit-ok the casino's own header, and the only one on those
+                  four screens.
+                  ------------------------------------------------------------ */}
               <MaterialCommunityIcons name="arrow-left" size={20} color="#FFFFFF" />
             </TouchableOpacity>
           ) : (

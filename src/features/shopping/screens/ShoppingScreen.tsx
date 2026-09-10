@@ -282,11 +282,11 @@ export const ShoppingScreen = () => {
                         <MaterialCommunityIcons name="crown" size={20} color="#FBBF24" />
                     </View>
                     <View style={styles.heroTitles}>
-                        <Text style={styles.heroTitle}>LUXONET BOUTIQUE</Text>
-                        <Text style={styles.heroSubtitle}>Exclusive Sovereign Acquisitions</Text>
+                        <Text style={styles.heroTitle}>{t('luxo.boutique')}</Text>
+                        <Text style={styles.heroSubtitle}>{t('luxo.boutiqueSub')}</Text>
                     </View>
                     <View style={styles.tierPill}>
-                        <Text style={styles.tierPillText}>CENTURION</Text>
+                        <Text style={styles.tierPillText}>{t('luxo.centurion')}</Text>
                     </View>
                 </View>
 
@@ -334,7 +334,7 @@ export const ShoppingScreen = () => {
 
             {/* Trending Items */}
             <View style={styles.section}>
-                <Text style={styles.sectionHeader}>TRENDING SHOWCASE</Text>
+                <Text style={styles.sectionHeader}>{t('luxo.trending')}</Text>
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}

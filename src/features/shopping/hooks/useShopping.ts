@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useStatsStore, useUserStore, usePlayerStore } from '../../../core/store';
 import { calculateShoppingDiscount } from '../../../logic/statsLogic';
 import { SHOP_DATA } from '../data/shoppingRegistry';
+import { onShelf, shelfIds } from '../logic/shelfNow';
 
 export interface ShopItem {
     id: string;
@@ -40,7 +41,21 @@ export const useShopLogic = (shopId?: string, triggerEncounter?: (type: string) 
         return Math.floor(price * (1 - discountPercent / 100));
     };
 
-    const shop = useMemo(() => SHOPS.find(s => s.id === shopId), [shopId]);
+    // ------------------------------------------------------------------
+    //  THE DETAIL SCREEN READS `shop.items`, WHICH IS BAKED INTO SHOP_DATA
+    // ------------------------------------------------------------------
+    //  `SHOP_DATA` is built from the whole catalogue at module load, so a
+    //  wave item would be on this screen from the first quarter even with
+    //  every other door gated. Which is the failure this project keeps
+    //  producing: the gate goes on the list somebody was looking at and
+    //  the second list nobody remembered keeps serving the same data.
+    // ------------------------------------------------------------------
+    const shop = useMemo(() => {
+        const found = SHOPS.find(s => s.id === shopId);
+        if (!found) return found;
+        const open = shelfIds();
+        return { ...found, items: found.items.filter(i => onShelf(i.id, open)) };
+    }, [shopId]);
 
     const formatMoney = (value: number) => {
         return `$${value.toLocaleString()}`;
@@ -154,10 +169,14 @@ export const useShoppingWithInventory = () => {
     const getShopItems = (shopId: string) => {
         // Import ITEMS from data
         const { ITEMS } = require('../data/shoppingRegistry');
+        const open = shelfIds();
 
         return ITEMS.filter((item: any) => {
             // 1. Must belong to this shop
             if (item.shopId !== shopId) return false;
+
+            // 1b. And the market has to have opened it. See logic/shelfNow.
+            if (!onShelf(item.id, open)) return false;
 
             // 2. Check ownership
             const itemIsOwned = isOwned(item.id);
@@ -178,8 +197,10 @@ export const useShoppingWithInventory = () => {
      */
     const getTrendingItems = (count: number = 6) => {
         const { ITEMS } = require('../data/shoppingRegistry');
+        const open = shelfIds();
 
         const availableItems = ITEMS.filter((item: any) => {
+            if (!onShelf(item.id, open)) return false;
             const itemIsOwned = isOwned(item.id);
             const isRingShop = RING_SHOP_IDS.includes(item.shopId);
             return !itemIsOwned || isRingShop;

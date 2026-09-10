@@ -47,13 +47,47 @@ import type { Conversation } from '../../core/story/graph';
  * `executeAcquisition` once the money has actually moved. NOT on `movedOnPear`:
  * that one is raised by a bid he noticed, and a letter conceding the company
  * from a man who still owns it would be the loudest bug in the game.
+ *
+ * ---------------------------------------------------------------------------
+ *  AND IT DOES NOT END THE RUN ANY MORE
+ * ---------------------------------------------------------------------------
+ *  Both closing choices raised `boughtPear` and the game stopped. Reported as
+ *  simply wrong, and it is: buying the man who tried to buy your father is
+ *  the thing the whole spine of this game has been asking about, and stopping
+ *  there takes the company away from a player who just won it.
+ *
+ *  It also read as a punishment for succeeding. The other nine endings are
+ *  losing the company, dying, or choosing to stop. This one was none of them.
+ *
+ *  The reward already existed and is quieter than an ending: `ownsPear` is
+ *  what silences the letter Vogel's successor writes to every heir, for the
+ *  rest of the dynasty. A family that bought him is never approached again,
+ *  and nobody explains why.
+ *
+ * ---------------------------------------------------------------------------
+ *  AND IT IS THE FOUNDER'S LETTER ONLY
+ * ---------------------------------------------------------------------------
+ *  Every sentence below is Vogel's own: the 1997 valuation, the nineteen
+ *  years, the two line refusal he kept, "I have been wrong about the number
+ *  twice". None of it can be said by the person holding the Pear seat four
+ *  generations later, and once the seats started turning over it was being
+ *  signed by somebody who was not born in 1997.
+ *
+ *  `noFlag: succeeded` is the whole split. The founder never has it; every
+ *  heir has it from their first quarter and it never comes off. pearBoughtHeir
+ *  carries the same beat for them, written by somebody who inherited the
+ *  folder rather than filled it. Exactly one of the two can ever arrive.
  */
 export const pearBought: Conversation = {
     id: 'pear-bought',
     channel: 'mail',
     from: 'pear',
     subject: 'Completion, ref 7724-B',
-    when: [{ kind: 'flag', flag: 'ownsPear' }],
+    when: [
+        { kind: 'flag', flag: 'ownsPear' },
+        // The founder, and nobody after. See the note above.
+        { kind: 'noFlag', flag: 'succeeded' },
+    ],
     start: 'open',
     nodes: [
         {
@@ -99,7 +133,12 @@ export const pearBought: Conversation = {
             choices: [
                 {
                     text: '(close)',
-                    effects: [{ kind: 'ending', ending: 'boughtPear' }],
+                    // What an ending used to do, in one line, without taking
+                    // the company off the player who just won it.
+                    effects: [{
+                        kind: 'news',
+                        headline: 'Pear passes to Hale. Vogel out by Friday.',
+                    }],
                 },
             ],
         },
@@ -113,7 +152,10 @@ export const pearBought: Conversation = {
             choices: [
                 {
                     text: '(close)',
-                    effects: [{ kind: 'ending', ending: 'boughtPear' }],
+                    effects: [{
+                        kind: 'news',
+                        headline: 'Pear passes to Hale. Vogel out by Friday.',
+                    }],
                 },
             ],
         },

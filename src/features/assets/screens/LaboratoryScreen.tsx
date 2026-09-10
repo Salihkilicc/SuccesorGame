@@ -244,7 +244,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                     {!nextTier && (
                         <View style={styles.maxTierBadge}>
                             <MaterialCommunityIcons name="trophy-outline" size={14} color={theme.colors.accent} style={{ marginRight: 4 }} />
-                            <Text style={styles.maxTierText}>Maximum Tier Reached</Text>
+                            <Text style={styles.maxTierText}>{t('fin.maxTierReached')}</Text>
                         </View>
                     )}
                 </View>

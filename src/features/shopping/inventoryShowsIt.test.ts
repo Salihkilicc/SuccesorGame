@@ -163,7 +163,10 @@ describe('and the screen was updated rather than redesigned', () => {
         // assertion above and been the wrong answer.
         const src = screen();
         expect(src).toMatch(/styles\.cardContainer/);
-        expect(src).toMatch(/CENTURION BLACK/);
+        // The words moved into the dictionary in the translation pass, so
+        // the card is pinned by the key rather than by the English. Same
+        // guarantee: the black card is still the black card.
+        expect(src).toMatch(/luxo\.centurionBlack/);
         expect(src).toMatch(/contactless-payment/);
         expect(src).toMatch(/FilterChip/);
         expect(src).toMatch(/numColumns=\{2\}/);

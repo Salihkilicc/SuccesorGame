@@ -117,8 +117,10 @@ describe('the payment', () => {
         // principal are what a player checks after deciding they can afford
         // the figure above.
         const s = src();
-        expect(s).toMatch(/DetailLine label="Interest"/);
-        expect(s).toMatch(/DetailLine label="Principal"/);
+        // Both labels went through `t()` in the translation pass; the
+        // breakdown being there is what this asserts and it still is.
+        expect(s).toMatch(/DetailLine label=\{t\('fin\.interest'\)\}/);
+        expect(s).toMatch(/DetailLine label=\{t\('fin\.principal'\)\}/);
         expect(s).toMatch(/<StatRow/);
     });
 

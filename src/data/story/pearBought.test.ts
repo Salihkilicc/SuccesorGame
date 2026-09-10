@@ -9,7 +9,11 @@
 //  almost identical one. `movedOnPear` is a bid he noticed. `ownsPear` is the
 //  transfer completing. Gated on the wrong one, Vogel writes to hand over a
 //  company he still owns, on a run where the player made an offer and was
-//  refused, and it ends their game.
+//  refused.
+//
+//  There is a second gate now, and a second letter behind it: `succeeded`
+//  splits the founder's version from the one an heir gets. See the note in
+//  pearBought.ts and the measurement in pearBoughtHeir.test.ts.
 //
 //  Nothing else in the codebase would catch that. The types are both `Flag`,
 //  the audit checks the flag EXISTS rather than which one this wanted, and the
@@ -41,8 +45,25 @@ const lines = () => [
 describe('when it arrives', () => {
     it('is the quarter the acquisition CLOSES, not the quarter it is attempted', () => {
         // The whole point of the file. See the header.
-        expect(pearBought.when).toEqual([{ kind: 'flag', flag: 'ownsPear' }]);
+        expect(pearBought.when).toContainEqual({ kind: 'flag', flag: 'ownsPear' });
         expect(JSON.stringify(pearBought.when)).not.toContain('movedOnPear');
+    });
+
+    it('and it is the FOUNDER who reads it, because he wrote it to the founder', () => {
+        // ------------------------------------------------------------------
+        //  THE SECOND FACT IT MUST NOT GET WRONG
+        // ------------------------------------------------------------------
+        //  Reported: the letter talks as though a particular generation
+        //  bought the company. It does, and it has to: 1997, nineteen years,
+        //  your father, a refusal the writer kept himself. None of that
+        //  survives a succession, and by the fourth Hale the Pear seat is
+        //  held by somebody four names down the roster.
+        //
+        //  pearBoughtHeir carries the same beat for them. Which of the two
+        //  arrives is measured in pearBoughtHeir.test.ts, through the gate
+        //  the runner actually calls.
+        // ------------------------------------------------------------------
+        expect(pearBought.when).toContainEqual({ kind: 'noFlag', flag: 'succeeded' });
     });
 
     it('and something actually raises that flag', () => {
@@ -61,8 +82,8 @@ describe('when it arrives', () => {
         // twenty years and one acquisition away from this moment.
         const beat = STORY_BEATS.find(b => b.conversation === pearBought.id);
         expect(beat).toBeDefined();
-        // It ends the game. Third in a queue behind two other letters is not
-        // where the last thing Vogel writes should sit.
+        // Urgent. Third in a queue behind two other letters is not where the
+        // last thing Vogel writes should sit, whether or not it ends the run.
         expect(beat?.urgent).toBe(true);
         // Not weather. It happens because the player did something enormous.
         expect(beat?.chance).toBeUndefined();
@@ -91,34 +112,61 @@ describe('it is mail', () => {
     });
 });
 
+// ============================================================================
+//  AND THE RUN GOES ON
+// ============================================================================
+//  These three used to assert the opposite: every leaf raised `boughtPear`
+//  and the game stopped. Reported as simply wrong, and it was. Buying the man
+//  who tried to buy your father is what the whole spine of this game has been
+//  asking about, and stopping there takes the company away from a player who
+//  has just won it. It also read as a punishment for succeeding: the other
+//  nine endings are losing the company, dying, or choosing to stop.
+//
+//  They are rewritten rather than removed, because "no ending here" is the
+//  kind of thing a later edit puts back while tidying.
+// ============================================================================
 describe('and however the player answers', () => {
-    it('it ends the game', () => {
-        // Every leaf. A branch that runs out without an ending would leave
-        // the player owning Pear with the game still going and nothing left
-        // in it, which is worse than no scene at all.
+    it('it does NOT end the game', () => {
+        for (const choice of pearBought.nodes.flatMap(n => n.choices ?? [])) {
+            const ends = (choice.effects ?? []).filter((e: any) => e.kind === 'ending');
+            expect({ text: choice.text, ends }).toEqual({ text: choice.text, ends: [] });
+        }
+    });
+
+    it('and every leaf still marks the day', () => {
+        // A branch that runs out in silence on the largest purchase in the
+        // game reads as a bug. The headline does in one line what the ending
+        // used to do, without closing the account.
         const terminal = pearBought.nodes
             .flatMap(n => (n.choices ?? []).map(c => ({ node: n.id, choice: c })))
             .filter(x => !x.choice.next);
         expect(terminal.length).toBeGreaterThan(0);
         for (const { node, choice } of terminal) {
-            expect((choice.effects ?? []).some(
-                (e: any) => e.kind === 'ending' && e.ending === 'boughtPear',
-            )).toBe(true);
-            expect(node).toBeTruthy();
+            const news = (choice.effects ?? []).filter((e: any) => e.kind === 'news');
+            expect({ node, news: news.length }).toEqual({ node, news: 1 });
         }
     });
 
-    it('and the ending it names exists', () => {
+    it('and the shelved ending is still written, in case it is ever wanted', () => {
+        // ------------------------------------------------------------------
+        //  NOT DELETED, JUST NO LONGER REACHED FROM HERE
+        // ------------------------------------------------------------------
+        //  `boughtPear` is a finished piece of writing. Nothing raises it any
+        //  more; the reward for the endgame is quieter and already existed.
+        //  `ownsPear` is what silences the letter Vogel's successor writes to
+        //  every heir, for the rest of the dynasty.
+        // ------------------------------------------------------------------
         expect(ENDINGS.boughtPear).toBeDefined();
+        expect(JSON.stringify(pearBought)).not.toContain('boughtPear');
     });
 
     it('and nothing else in it moves a number', () => {
-        // Deliberate. There is no quarter after this one, so a dial nudge or
-        // a capital change would be a reward paid into an account that is
-        // about to be closed.
+        // Still deliberate, for a different reason. The player has just spent
+        // a fortune and the balance sheet has already said so; a dial nudge
+        // on top would be the scene paying twice for one event.
         for (const choice of pearBought.nodes.flatMap(n => n.choices ?? [])) {
             for (const effect of choice.effects ?? []) {
-                expect(effect.kind).toBe('ending');
+                expect(effect.kind).toBe('news');
             }
         }
     });

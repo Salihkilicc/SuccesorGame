@@ -5,6 +5,7 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
+    Pressable,
     StatusBar,
     ScrollView,
     Switch,
@@ -299,6 +300,24 @@ const SettingsScreen: React.FC = () => {
                             label={t('os.newGame')}
                             onPress={actions.handleNewGame}
                             isFirst
+                            isDestructive
+                        />
+                        {/* ──────────────────────────────────────────────────
+                            Under New Game, and second on purpose. It does
+                            everything New Game does and one thing more, so it
+                            reads as the larger version of the row above it
+                            rather than as a different feature.
+
+                            The description carries the whole warning in one
+                            line: the panel that follows says it again, and a
+                            player should not need to open a dialog to find
+                            out what a button is for.
+                           ────────────────────────────────────────────────── */}
+                        <SettingsRow
+                            icon="account-convert-outline"
+                            label={t('os.changeCharacter')}
+                            description={t('os.changeCharacterSub')}
+                            onPress={actions.handleChangeCharacter}
                             isLast
                             isDestructive
                         />
@@ -322,7 +341,7 @@ const SettingsScreen: React.FC = () => {
                         disabled, not hidden: not rendered. See
                         core/featureFlags.ts.
                        ────────────────────────────────────────────────────── */}
-                    {FEATURES.godMode && (
+                    {(FEATURES.godMode || state.isAdminUnlocked) && (
                         <>
                             <Text style={styles.sectionTitle}>{t('os.admin').toUpperCase()}</Text>
                             <View style={styles.group}>
@@ -339,9 +358,28 @@ const SettingsScreen: React.FC = () => {
                         </>
                     )}
 
-                    {/* ── Footer ── */}
+                    {/* ──────────────────────────────────────────────────────
+                        THE FOOTER IS THE DOOR
+
+                        Seven taps on the version line open the admin section
+                        above. The rule is in core/adminGesture.ts; this is
+                        only the surface it is pressed on.
+
+                        No label, no hint until three from the end, and no
+                        accessibility role: a control nobody can find by
+                        accident is the entire point, and announcing it would
+                        undo that. It stays a plain line of text that happens
+                        to be pressable.
+                       ────────────────────────────────────────────────────── */}
                     <View style={styles.footer}>
-                        <Text style={styles.footerVersion}>{t('os.successorOsV100')}</Text>
+                        <Pressable onPress={actions.tapVersion} hitSlop={12}>
+                            <Text style={styles.footerVersion}>{t('os.successorOsV100')}</Text>
+                        </Pressable>
+                        {state.adminTapsLeft !== null && (
+                            <Text style={styles.footerVersion}>
+                                {t('os.adminTapsLeft', { n: String(state.adminTapsLeft) })}
+                            </Text>
+                        )}
                         <Text style={styles.footerTagline}>{t('os.designedForBillionaires')}</Text>
                     </View>
                 </ScrollView>

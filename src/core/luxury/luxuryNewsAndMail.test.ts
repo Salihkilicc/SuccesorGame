@@ -47,6 +47,7 @@ import { featuredFor } from './promotions';
 import { useNewsStore } from '../store/useNewsStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { ITEMS, SHOPS } from '../../features/shopping/data/shoppingRegistry';
+import { shelfNow } from '../../features/shopping/logic/shelfNow';
 
 const feed = () => useNewsStore.getState().newsHistory;
 
@@ -123,15 +124,47 @@ describe('and only the expensive things are news', () => {
     });
 
     it('and the thresholds actually divide the catalogue rather than sitting outside it', () => {
-        // A floor above the most expensive item would silence the shop
-        // entirely and every test above would still pass.
-        const silent = ITEMS.filter(i => i.price < NEWS_FLOOR).length;
-        const hero = ITEMS.filter(i => i.price >= NEWS_HERO_FLOOR).length;
-        expect(silent).toBeGreaterThan(ITEMS.length * 0.3);
-        expect(silent).toBeLessThan(ITEMS.length * 0.6);
-        expect(hero).toBeGreaterThan(ITEMS.length * 0.1);
-        expect(hero).toBeLessThan(ITEMS.length * 0.3);
+        // ------------------------------------------------------------------
+        //  MEASURED ON WHAT A PLAYER CAN SEE, WHICH IS NOT ALL OF `ITEMS`
+        // ------------------------------------------------------------------
+        //  A floor above the most expensive item would silence the shop
+        //  entirely and every test above would still pass. That is what this
+        //  is for and the bounds below are the calibrated ones.
+        //
+        //  It used to read `ITEMS`, and went red when the generational waves
+        //  landed: thirty six items were added and NOT ONE of them is under
+        //  the hero floor, so the whole catalogue's shape moved even though
+        //  no threshold and no visible shelf had changed.
+        //
+        //  Which was the test being right about the wrong population. The
+        //  waves are locked until an heir takes over, so the shop a founder
+        //  browses is exactly the catalogue these numbers were fitted to.
+        //  The founder's shelf is asserted at the original bounds, and the
+        //  fullest shelf is asserted more loosely because it is SUPPOSED to
+        //  skew: every one of those items is a front page and that is the
+        //  point of them. See features/shopping/data/generationWaves.ts.
+        // ------------------------------------------------------------------
+        const founder = shelfNow(1, 'Hale Industries');
+        const silent = founder.filter(i => i.price < NEWS_FLOOR).length;
+        const hero = founder.filter(i => i.price >= NEWS_HERO_FLOOR).length;
+        expect(silent).toBeGreaterThan(founder.length * 0.3);
+        expect(silent).toBeLessThan(founder.length * 0.6);
+        expect(hero).toBeGreaterThan(founder.length * 0.1);
+        expect(hero).toBeLessThan(founder.length * 0.3);
         expect(NEWS_HERO_FLOOR).toBeGreaterThan(NEWS_FLOOR);
+    });
+
+    it('and the wire still has things it does not care about once the market grows', () => {
+        // The half of the check above that must survive into the endgame. An
+        // heir whose every purchase leads the edition would turn the front
+        // page into a receipt, so the quiet end of the shelf has to stay a
+        // real slice of it rather than a rounding error.
+        const heir = shelfNow(3, 'Hale Industries');
+        const silent = heir.filter(i => i.price < NEWS_FLOOR).length;
+        expect(silent).toBeGreaterThan(heir.length * 0.2);
+        // And the whole written catalogue, locked stock included, so this
+        // cannot be passed by never opening a wave.
+        expect(heir.length).toBeGreaterThan(shelfNow(1, 'Hale Industries').length);
     });
 });
 

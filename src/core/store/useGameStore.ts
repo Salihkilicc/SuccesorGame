@@ -12,6 +12,7 @@ import type { ProductQuarterLine, QuarterReport } from '../reportTypes';
 import { getMarket, marketNow, marketCategoryForStock } from '../market/productMarkets';
 import { computeAttraction, computeShares, demandUnits, marketingBenchmark, meetsMaintenance, updateBrand } from '../market/attraction';
 import { advanceInsolvency, INSOLVENCY_GRACE_QUARTERS, insolvencyQuartersLeft } from '../market/insolvency';
+import { reviewControl, controlWarningLetter } from '../market/controlFloor';
 import {
   advanceBrand, brandFromAcquisition, brandStabilityFactor,
   // applyCorporateShock was imported here and never called - see the note in
@@ -206,6 +207,8 @@ export type GameState = {
 type GameStore = GameState & {
   setHasHydrated: (state: boolean) => void;
   setField: <K extends keyof GameState>(key: K, value: GameState[K]) => void;
+  /** @orphan-ok-symbol resetMonthlyState - the game runs on quarters and
+   *  there is no monthly boundary to reset at. From an earlier calendar. */
   resetMonthlyState: () => void;
   advanceMonth: (months?: number) => Promise<EconomyResult>;
   resetGame: () => Promise<void>;
@@ -214,6 +217,9 @@ type GameStore = GameState & {
   organizeEvent: (eventId: string) => { success: boolean; message: string };
   setOvertime: (enabled: boolean) => void;
   setSalaryRatio: (ratio: number) => void;
+  /** @orphan-ok-symbol setSalaryPolicy - superseded by
+   *  useStatsStore.setSalaryRatio, which is a continuous 0.75 to 1.35
+   *  rather than three bands, and is what the pay screen writes. */
   setSalaryPolicy: (policy: 'low' | 'avg' | 'high') => void;
 };
 
@@ -1175,13 +1181,40 @@ export const useGameStore = create<GameStore>()(
         //  Gated on FEATURES.love with everything else in this system: a
         //  shelved module must not move money.
         // ==================================================================
+        //  ------------------------------------------------------------------
+        //  AND IT CAN NOW BE MORE THAN THE PLAYER HAS
+        //  ------------------------------------------------------------------
+        //  While the dearest partner in the game cost forty thousand a month
+        //  this could not happen: nobody who could reach that room could fail
+        //  to pay it. The upkeep ladder is derived from the tier gate now and
+        //  the top of it is thirteen million a month, so it can.
+        //
+        //  And the case is the ordinary shape of this game rather than an
+        //  exotic one. Measured: an heir who inherits a GLOBAL_ELITE partner
+        //  along with the chair spends 20% of their income on them if the
+        //  company is worth half the gate, 50% at a fifth, and 200% at a
+        //  twentieth. Personal cash is allowed to go negative, so without a
+        //  consequence the failure is silent for years.
+        //
+        //  THE MONEY IS STILL CHARGED IN FULL. What the shortfall buys is
+        //  `love`, downward, in proportion - they notice. See
+        //  features/love/logic/partnerUpkeep.ts for why that and nothing else.
+        //  ------------------------------------------------------------------
         const partner = FEATURES.love
           ? require('./useFamilyStore').useFamilyStore.getState().partner
           : null;
         const partnerUpkeepCost = (partner?.finances?.monthlyCost ?? 0) * months;
         if (partnerUpkeepCost > 0) {
           const stats = useStatsStore.getState();
-          stats.setField('money', (stats.money || 0) - partnerUpkeepCost);
+          const had = stats.money || 0;
+          stats.setField('money', had - partnerUpkeepCost);
+
+          const { upkeepStrain } = require('../../features/love/logic/partnerUpkeep');
+          const shortfall = Math.max(0, partnerUpkeepCost - Math.max(0, had));
+          const strain = upkeepStrain(partnerUpkeepCost, shortfall);
+          if (strain < 0) {
+            require('./useFamilyStore').useFamilyStore.getState().updateLove(strain);
+          }
         }
 
         mark('capacity');
@@ -2206,10 +2239,49 @@ export const useGameStore = create<GameStore>()(
         require('../../features/shareholders/stores/useShareholderStore')
           .useShareholderStore.setState({ buybackOwnershipGain: 0 });
 
+        // ------------------------------------------------------------------
+        //  THE FLOOR UNDER THE CHAIR
+        // ------------------------------------------------------------------
+        //  Asked for as "if my holding falls under ten per cent the game
+        //  should end, otherwise a lot of sharp practice becomes possible".
+        //
+        //  Reviewed HERE, beside insolvency, because it is the same shape: a
+        //  counter written every quarter so it resets when the player climbs
+        //  back, one quarter of grace, and an ending named in the endings
+        //  file rather than four words in a screen. See market/controlFloor.
+        //
+        //  Read AFTER the dilutions and buybacks of this quarter have landed,
+        //  which is why it sits next to the write rather than at the top of
+        //  the tick: the number that matters is the one on the register the
+        //  player wakes up to.
+        // ------------------------------------------------------------------
+        const controlPercent = (() => {
+          try {
+            return require('../../features/shareholders/stores/useShareholderStore')
+              .useShareholderStore.getState().getPlayerOwnershipPercent();
+          } catch { return 100; }
+        })();
+        const control = reviewControl(
+          controlPercent,
+          useStatsStore.getState().quartersBelowControl || 0,
+        );
+        if (control.shouldWarn) {
+          // The board writes ONCE, on the quarter it happens. A letter every
+          // quarter would turn a deadline into wallpaper.
+          try {
+            const letter = controlWarningLetter(controlPercent);
+            require('../story/gameSink').gameSink.mail({ from: 'brother', ...letter });
+          } catch (e) {
+            console.warn('[control] the board could not write', e);
+          }
+        }
+
         useStatsStore.getState().update({
           // Written every quarter rather than only the negative ones, because
           // the whole point is that it RESETS when the company climbs back.
           quartersInsolvent: insolventQuarters,
+          // Same rule, same reason. See the note above.
+          quartersBelowControl: control.quartersBelow,
           companyCapital: newCompanyCapital,
           money: newPlayerCash,
           // The figures the engine actually collected this quarter, as a
@@ -3064,6 +3136,23 @@ export const useGameStore = create<GameStore>()(
                 return 'removed' as const;
               }
             } catch { /* kurul durumu okunamadi */ }
+
+            // ------------------------------------------------------
+            //  AND THE ONE NOBODY VOTES ON
+            // ------------------------------------------------------
+            //  Under the floor for longer than the grace. Checked after
+            //  removal and before insolvency, because a player who is
+            //  both removed and under the floor was removed: that one
+            //  has a brother in it and this one has nobody.
+            // ------------------------------------------------------
+            if (control.status === 'lost') {
+              try {
+                const { ENDING_FOR_STATUS } = require('../../data/story/endings');
+                require('./useStoryStore').useStoryStore.getState()
+                  .endGame(ENDING_FOR_STATUS.lostControl);
+              } catch { /* story store not ready - the screen still ends it */ }
+              return 'removed' as const;
+            }
 
             // ------------------------------------------------------
             //  A GRACE PERIOD ON THE ENDING, NOT AN OVERDRAFT

@@ -68,6 +68,9 @@ type RelationshipActions = {
     setHasHydrated: (state: boolean) => void;
     addContact: (npc: NPC) => void;
     updateContact: (id: string, updates: Partial<NPC>) => void;
+    /** @orphan-ok-symbol removeContact - this whole store is shelved with
+     *  the life sim; `relationship-storage` is listed under the shelved
+     *  modules in newGame.ts. */
     removeContact: (id: string) => void;
     /**
      * Oyun başında çağrılır. Ebeveynleri rastgele oluşturup contacts'a ekler.

@@ -1,5 +1,6 @@
 // src/components/common/SponsorDroughtWarningModal.tsx
 import React from 'react';
+import { t } from '../../core/i18n';
 import {
     Modal,
     View,
@@ -34,7 +35,7 @@ const SponsorDroughtWarningModal = ({ visible, quartersWithout, currentPenalty, 
                         <Text style={styles.icon}>📉</Text>
                     </View>
 
-                    <Text style={styles.title}>Brand Ceiling Eroding</Text>
+                    <Text style={styles.title}>{t('spon.ceilingEroding')}</Text>
                     <Text style={styles.subtitle}>
                         Your name has been on nothing for{' '}
                         <Text style={styles.accentWarn}>{quartersWithout} quarters</Text>
@@ -43,12 +44,12 @@ const SponsorDroughtWarningModal = ({ visible, quartersWithout, currentPenalty, 
 
                     <View style={styles.statBox}>
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Quarters without a deal</Text>
+                            <Text style={styles.statLabel}>{t('spon.quartersWithout')}</Text>
                             <Text style={styles.statValueWarn}>{quartersWithout}</Text>
                         </View>
                         <View style={styles.statDivider} />
                         <View style={styles.statRow}>
-                            <Text style={styles.statLabel}>Brand ceiling lost</Text>
+                            <Text style={styles.statLabel}>{t('spon.ceilingLost')}</Text>
                             <Text style={styles.statValueWarn}>-{currentPenalty.toFixed(1)} pts</Text>
                         </View>
                         <View style={styles.statDivider} />
@@ -79,7 +80,7 @@ const SponsorDroughtWarningModal = ({ visible, quartersWithout, currentPenalty, 
                         style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
                         onPress={onClose}
                     >
-                        <Text style={styles.btnText}>Understood</Text>
+                        <Text style={styles.btnText}>{t('ui.understood')}</Text>
                     </Pressable>
                 </View>
             </View>

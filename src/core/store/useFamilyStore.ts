@@ -118,6 +118,14 @@ export interface FamilyState {
      * small room.
      */
     courtshipCooldown: Partial<Record<string, number>>;
+    /**
+     * Which gesture was offered to whom, and in which quarter.
+     *
+     * The same shape and the same module the board uses, so a compliment and
+     * a director's dinner obey one rule rather than two that drift.
+     * See core/social/gestures.ts.
+     */
+    gestureLedger: Record<string, number>;
     exPartners: ExPartnerProfile[];
     children: Child[];
     /**
@@ -160,7 +168,17 @@ export interface FamilyActions {
 
     // --- Partner Actions ---
     setPartner: (partner: PartnerProfile | null) => void;
+    // ----------------------------------------------------------------------
+    //  THE GENERIC PAIR NOTHING REACHES FOR
+    // ----------------------------------------------------------------------
+    //  `updatePartnerLove` is the live one and it is called from eight
+    //  places, because what actually changes about a partner in this game is
+    //  one number. These two take an arbitrary patch, which is the shape you
+    //  write before you know that, and no caller has ever wanted it.
+    // ----------------------------------------------------------------------
+    /** @orphan-ok-symbol updatePartner - updatePartnerLove is the live one */
     updatePartner: (updates: Partial<PartnerProfile>) => void;
+    /** @orphan-ok-symbol updatePartnerStats - same, see above */
     updatePartnerStats: (updates: Partial<PartnerStats>) => void;
     updateLove: (amount: number) => void;
     /**
@@ -184,12 +202,50 @@ export interface FamilyActions {
 
     // --- Succession Children Actions ---
     addChild: (child: Omit<Child, 'id'> | Child) => string;
+    // ----------------------------------------------------------------------
+    //  AND THE SAME ON THE CHILDREN'S SIDE
+    // ----------------------------------------------------------------------
+    //  `addChild` and `ageUpFamily` are what move a child through this game,
+    //  and both are called. The four below are not, and two of them are
+    //  duplicates of something that IS:
+    //
+    //      setSuccessorCandidate -> `designateSuccessor` is the live one.
+    //                               FamilyMemberScreen.tsx:122 calls it and
+    //                               it writes `designatedSuccessorId`, which
+    //                               is what runSuccession reads.
+    //      removeChild           -> nothing takes a child out of a family.
+    //                               Death is handled by ageUpFamily, and a
+    //                               child leaving is not a thing the game has.
+    //
+    //  `setChildAllowance` is the interesting one and it is written up
+    //  separately below.
+    // ----------------------------------------------------------------------
+    /** @orphan-ok-symbol updateChild - addChild and ageUpFamily are the live pair */
     updateChild: (id: string, updates: Partial<Child>) => void;
+    /** @orphan-ok-symbol updateChildStats - same, see above */
     updateChildStats: (id: string, statsDelta: Partial<ChildStats>) => void;
+    /** @orphan-ok-symbol removeChild - nothing removes a child; ageUpFamily
+     *  handles the only way one leaves */
     removeChild: (id: string) => void;
+    /** @orphan-ok-symbol setSuccessorCandidate - `designateSuccessor` is the
+     *  live one and is what runSuccession reads */
     setSuccessorCandidate: (id: string, isCandidate: boolean) => void;
     designateSuccessor: (id: string | null) => void;
+    // ----------------------------------------------------------------------
+    //  WRITTEN, CORRECT, AND THERE IS NO SCREEN
+    // ----------------------------------------------------------------------
+    //  These two are not superseded by anything. They are a feature that was
+    //  half built: the store can hold a child's allowance and can move a
+    //  child's regard for the player, and nothing in the app ever asks it to.
+    //  Searched the whole of src for an allowance control and there is none.
+    //
+    //  Left exactly as they are. This is a note for whoever builds that
+    //  screen, not a defect to fix underneath one: no number is wrong today,
+    //  because no number is being written today.
+    // ----------------------------------------------------------------------
+    /** @orphan-ok-symbol adjustChildRelationship - no screen offers it yet */
     adjustChildRelationship: (id: string, delta: number) => void;
+    /** @orphan-ok-symbol setChildAllowance - no allowance screen exists yet */
     setChildAllowance: (id: string, amount: number) => void;
 
     // --- The second route to an heir ---
@@ -424,6 +480,7 @@ export const DEMO_CHILDREN: Child[] = [
 export const initialFamilyState: FamilyState = {
     partner: null,
     courtshipCooldown: {},
+    gestureLedger: {},
     exPartners: [],
     children: [],
     pendingBirth: null,
@@ -872,6 +929,11 @@ export const useFamilyStore = create<FamilyStore>()(
                 designatedSuccessorId: state.designatedSuccessorId,
                 familyReputation: state.familyReputation,
                 courtshipCooldown: state.courtshipCooldown,
+                // Persisted, or a player could offer the same compliment
+                // again by closing the app. `partialize` is a list, and a
+                // field left off it is a field that does not survive - which
+                // is the quiet half of every persistence bug in this project.
+                gestureLedger: state.gestureLedger,
                 generation: state.generation,
                 survivingParent: state.survivingParent,
             }),

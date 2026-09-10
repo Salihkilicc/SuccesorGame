@@ -43,8 +43,19 @@ const TABLE_H = 300;
 const SEAT_W = 86;
 const SEAT_H = 96;
 
+/**
+ * The table's own short form.
+ *
+ * It stopped at B, which is what "the money does not go above B in the
+ * casino" was: a player who sat down with two trillion saw 2000.0B. Two rungs
+ * added, to match core/utils formatCompact. Kept local rather than swapped
+ * for that function because this one rounds thousands differently on purpose
+ * and a chip stack reading 1.2K is not the same as 1.2K of company value.
+ */
 const money = (n: number): string => {
     const v = Math.max(0, n || 0);
+    if (v >= 1e15) return `${(v / 1e15).toFixed(1)}Q`;
+    if (v >= 1e12) return `${(v / 1e12).toFixed(1)}T`;
     if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
     if (v >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
     if (v >= 1e3) return `${Math.round(v / 1e3)}K`;

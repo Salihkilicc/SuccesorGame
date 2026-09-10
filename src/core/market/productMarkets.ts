@@ -312,7 +312,16 @@ export const marketNow = (category: string | undefined): ProductMarket | undefin
     return marketAt(category, q);
 };
 
-/** Rakiplerin toplam payı. Kalanı "diğerleri + oyuncu" demektir. */
+/**
+ * Rakiplerin toplam payı. Kalanı "diğerleri + oyuncu" demektir.
+ *
+ * SHELVED. `useMarketPosition.ts` imports it and never calls it, which is the
+ * same story as `useAllMarketPositions` in that file: both were written for a
+ * market overview screen that was never built. Correct and inert.
+ *
+ * @orphan-ok-symbol competitorShareTotal - for the overview screen that was
+ * never built. See the marker on useAllMarketPositions in useMarketPosition.ts.
+ */
 export const competitorShareTotal = (market: ProductMarket): number =>
     market.competitors.reduce((sum, c) => sum + c.share, 0);
 

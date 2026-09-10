@@ -30,6 +30,11 @@ import Portrait from '../../../components/common/Portrait';
 import { faceFor } from '../../../core/portraits/faces';
 import { PartnerProfile, SocialClass } from '../../../data/relationshipTypes';
 import { EncounterScenario } from '../data/encounterData';
+import { translateOccupation } from '../../../data/i18n/profileLoveShopText';
+import {
+    aidLine, backgroundLine, classLabel, jobTitle, lifestyleLabel, traitLabel,
+    wealthLabel,
+} from '../logic/partnerText';
 
 const { width } = Dimensions.get('window');
 
@@ -90,7 +95,12 @@ const getSocialClassTheme = (socialClass?: string): { color: string; bg: string;
         // is the thing that made these read as signals; the word and the
         // colour of the word are enough.
         bg: theme.colors.surfaceHigh,
-        label: (socialClass || 'SOCIETY').replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase(),
+        // SHELVED, not deleted: the regex that made this label. It turned the
+        // enum member "OldMoney" into "OLD MONEY", which is clever and works
+        // in exactly one language.
+        //
+        // label: (socialClass || 'SOCIETY').replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase(),
+        label: (classLabel(socialClass) || 'SOCIETY').toUpperCase(),
     };
 };
 
@@ -139,10 +149,30 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 
     const socialClass = candidate.stats?.socialClass || deepPartner?.job?.tier || 'HighSociety';
     const classTheme = getSocialClassTheme(socialClass);
-    const occupation = candidate.stats?.occupation || deepPartner?.job?.title || 'High Society Figure';
+    // ------------------------------------------------------------------
+    //  THE THREE PHRASES THAT WERE ALWAYS IN ENGLISH
+    // ------------------------------------------------------------------
+    //  Job title, personality label and class badge all came off .ts data
+    //  files, which scripts/untranslated.js cannot see - it reads .tsx. And
+    //  the other three partner surfaces have gone through
+    //  data/i18n/profileLoveShopText.ts for a long time; this card, the one
+    //  where prestige is the whole point, was the one that never asked.
+    //  See logic/partnerText.ts.
+    // ------------------------------------------------------------------
+    const occupation =
+        jobTitle(candidate.job as any, gender)
+        || translateOccupation(candidate.stats?.occupation || deepPartner?.job?.title || '');
     const age = candidate.stats?.age || deepPartner?.age || 28;
     const monthlyCost = candidate.finances?.monthlyCost || deepPartner?.finances?.monthlyCost || 0;
-    const trait = deepPartner?.personality?.label || candidate.stats?.style || null;
+    const trait = traitLabel(candidate.personality) || candidate.stats?.style || null;
+    const background = backgroundLine(candidate);
+    // The bill's badge follows the ROOM now. It used to say LUXURY for a
+    // physics fellow on two hundred a month.
+    const lifestyle = lifestyleLabel(candidate.job?.tier);
+    // What their family has, and whether any of it would ever come your way.
+    // Both derived; see logic/partnerText.ts and logic/partnerEffects.ts.
+    const wealth = wealthLabel(candidate.stats?.familyWealth);
+    const aid = aidLine(candidate, n => `$${n.toLocaleString()}`);
 
     const content = (
         <View style={styles.overlay}>
@@ -241,7 +271,41 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                     <Text style={styles.costValue}>${monthlyCost.toLocaleString()}/mo</Text>
                                 </View>
                                 <View style={styles.lifestyleTag}>
-                                    <Text style={styles.lifestyleText}>LUXURY</Text>
+                                    <Text style={styles.lifestyleText}>{lifestyle}</Text>
+                                </View>
+                            </View>
+                        )}
+
+                        {/* --------------------------------------------------
+                            WHERE THEY CAME FROM, AND WHAT THEIR FAMILY HAS
+
+                            The card had a name, a job, a badge and a bill, and
+                            nothing at all about the person. `familyWealth` and
+                            `financialAidChance` were derived from the room and
+                            the personality from the first quarter and were
+                            read by NOTHING the player could see - the
+                            signature failure of this codebase, correct data
+                            that nothing reads.
+
+                            Under the bill on purpose: the player has just been
+                            told what this person costs, and this is the other
+                            half of that sentence.
+                           -------------------------------------------------- */}
+                        {!!background && (
+                            <View style={styles.backgroundCard}>
+                                <Text style={styles.backgroundLabel}>{t('love.background')}</Text>
+                                <Text style={styles.backgroundText}>{background}</Text>
+                                <View style={styles.wealthRow}>
+                                    <MaterialCommunityIcons
+                                        name="bank-outline"
+                                        size={13}
+                                        color={theme.colors.textMuted}
+                                        style={{ marginRight: 5 }}
+                                    />
+                                    <Text style={styles.wealthText} numberOfLines={2}>
+                                        <Text style={styles.wealthStrong}>{wealth}</Text>
+                                        {'. '}{aid}
+                                    </Text>
                                 </View>
                             </View>
                         )}
@@ -267,7 +331,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                             >
                                 <View style={styles.btnRow}>
                                     <MaterialCommunityIcons name="heart" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-                                    <Text style={styles.dateButtonText}>Court & Start Dating</Text>
+                                    <Text style={styles.dateButtonText}>{t('love.courtAndDate')}</Text>
                                 </View>
                                 <Text style={styles.dateSubtext} numberOfLines={1}>
                                     "{scenario.flirt}"
@@ -282,7 +346,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                             >
                                 <View style={styles.btnRow}>
                                     <MaterialCommunityIcons name="fire" size={18} color="#FFA94D" style={{ marginRight: 6 }} />
-                                    <Text style={styles.hookupButtonText}>Casual Hookup</Text>
+                                    <Text style={styles.hookupButtonText}>{t('love.casualHookup')}</Text>
                                 </View>
                                 <Text style={styles.hookupSubtext}>
                                     {t('love.noStringsAttached') || 'No Strings Attached'}
@@ -521,6 +585,56 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: theme.colors.textSecondary,
         letterSpacing: 0.5,
+    },
+
+    // ------------------------------------------------------------------
+    //  BACKGROUND BLOCK
+    // ------------------------------------------------------------------
+    //  Same dark surface as the bill above it and the quote below it, so the
+    //  card stays three panels rather than becoming four different things.
+    //  No tint and no border colour: it is a fact about a person, not a
+    //  signal, and rule 3 in core/theme.ts is that a wayfinding colour which
+    //  looks like a signal is worse than none.
+    // ------------------------------------------------------------------
+    backgroundCard: {
+        backgroundColor: theme.colors.background,
+        borderRadius: 12,
+        paddingVertical: 11,
+        paddingHorizontal: 14,
+        marginBottom: 14,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    backgroundLabel: {
+        fontSize: 9.5,
+        fontWeight: '700',
+        color: theme.colors.textMuted,
+        letterSpacing: 0.5,
+        marginBottom: 5,
+    },
+    backgroundText: {
+        fontSize: 12.5,
+        lineHeight: 18,
+        color: theme.colors.textSecondary,
+    },
+    wealthRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 9,
+        paddingTop: 9,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    wealthText: {
+        flex: 1,
+        fontSize: 11.5,
+        fontWeight: '600',
+        color: theme.colors.textMuted,
+    },
+    /** What their family has. The louder half of that line, not a colour. */
+    wealthStrong: {
+        color: theme.colors.textSecondary,
+        fontWeight: '800',
     },
 
     // Scenario Box

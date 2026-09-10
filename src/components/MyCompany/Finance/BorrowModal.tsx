@@ -304,8 +304,8 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                 detail={
                                     <>
                                         <DetailLine label={t('bank.rate')} value={`${currentRate.toFixed(1)}% APR`} />
-                                        <DetailLine label="Interest" value={formatMoney(preview.interest)} />
-                                        <DetailLine label="Principal" value={formatMoney(preview.principalPaid)} />
+                                        <DetailLine label={t('fin.interest')} value={formatMoney(preview.interest)} />
+                                        <DetailLine label={t('fin.principal')} value={formatMoney(preview.principalPaid)} />
                                         <DetailRule />
                                         <DetailLine
                                             label={t('bank.quarterlyPayment')}

@@ -8,8 +8,10 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
+import { t, useLocale } from '../../../core/i18n';
 import { ITEMS } from '../data/shoppingRegistry';
 import { iconForItem, shopTheme } from '../data/shopIdentity';
+import { onShelf, shelfIds } from '../logic/shelfNow';
 
 // ------------------------------------------------------------------
 //  THE SHOP'S LOOK COMES FROM ITS ID, NOT FROM PROPS
@@ -38,10 +40,17 @@ export const ShopPreviewCard = ({
     description,
     onVisit,
 }: ShopPreviewCardProps) => {
+    // Re-renders when the language changes; every t() below needs it.
+    useLocale();
     const look = shopTheme(shopId);
 
     const previewItems = useMemo(() => {
-        const shopItems = ITEMS.filter((item) => item.shopId === shopId);
+        // Gated, or the card advertises three things the shop behind it will
+        // not sell you for another generation. See logic/shelfNow.
+        const open = shelfIds();
+        const shopItems = ITEMS.filter(
+            (item) => item.shopId === shopId && onShelf(item.id, open),
+        );
         return shopItems.slice(0, 3);
     }, [shopId]);
 
@@ -76,7 +85,7 @@ export const ShopPreviewCard = ({
                 </View>
 
                 <View style={[styles.visitButton, { backgroundColor: look.wash, borderColor: look.edge }]}>
-                    <Text style={[styles.visitText, { color: look.tint }]}>ENTER</Text>
+                    <Text style={[styles.visitText, { color: look.tint }]}>{t('luxo.enter')}</Text>
                     <MaterialCommunityIcons name="chevron-right" size={14} color={look.tint} />
                 </View>
             </Pressable>

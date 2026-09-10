@@ -55,7 +55,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.content}>
-                    <ScreenHeader inset title="New Product Opportunity" onBack={onClose} />
+                    <ScreenHeader inset title={t('fin.newProductOpp')} onBack={onClose} />
 
                     <View style={styles.contentPad}>
                     <View style={styles.header}>
@@ -79,7 +79,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
                                     size={15}
                                     color={theme.colors.textMuted}
                                 />
-                                <Text style={styles.sectionHeader}>Market Analysis</Text>
+                                <Text style={styles.sectionHeader}>{t('fin.marketAnalysis')}</Text>
                             </View>
                             <View style={styles.statRow}>
                                 <Text style={styles.label}>{t('product.marketDemand')}</Text>
@@ -804,7 +804,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </Pressable>
                                 <View style={styles.controlValueBox}>
                                     <Text style={styles.controlValue}>{formatNumber(willBuild)}</Text>
-                                    <Text style={styles.controlValueUnit}>units per quarter</Text>
+                                    <Text style={styles.controlValueUnit}>{t('fin.unitsPerQuarter')}</Text>
                                 </View>
                                 <Pressable
                                     onPress={() => bumpProduction(1)}
@@ -1323,7 +1323,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 </Pressable>
                                 <View style={styles.controlValueBox}>
                                     <Text style={styles.controlValue}>{formatMoney(marketing)}</Text>
-                                    <Text style={styles.controlValueUnit}>per quarter</Text>
+                                    <Text style={styles.controlValueUnit}>{t('fin.perQuarter')}</Text>
                                 </View>
                                 <Pressable
                                     onPress={() =>
@@ -1454,7 +1454,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             screen. Same information, one row. */}
                         <StatRow
                             icon="package-variant-closed"
-                            label="Inventory"
+                            label={t('fin.inventory')}
                             value={`${formatNumber(product.inventory || 0)} units`}
                             why={t('product.estStorageCostV1Quarter', { v1: formatNumber((product.inventory || 0) * 5) })}
                         />

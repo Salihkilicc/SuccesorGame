@@ -236,7 +236,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                             label={t('finance.monthly')}
                                             value={formatMoney((loan.balance * loan.rate) / 4)}
                                         />
-                                        <DetailLine label="Rate" value={`${loan.rate}% APR`} strong />
+                                        <DetailLine label={t('fin.rate')} value={`${loan.rate}% APR`} strong />
                                     </>
                                 }
                             />
@@ -261,7 +261,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     Borrow and Repay did - as modals they drew above the nav
                     bar and it vanished on them.
                    ------------------------------------------------------------ */}
-                <RowGroup title="Raise money">
+                <RowGroup title={t('fin.raiseMoney')}>
                     <StatRow
                         label={t('finance.injection')}
                         value="›"
@@ -291,9 +291,9 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                     year, because a payout you cannot see coming cannot be
                     planned around - and planning around it is the point.
                     ------------------------------------------------------------ */}
-                <RowGroup title="Your pay">
+                <RowGroup title={t('fin.yourPay')}>
                     <StatRow
-                        label="Annual bonus"
+                        label={t('fin.annualBonus')}
                         value={formatMoney(bonusProjected)}
                         why={
                             bonusQuartersLeft <= 0
@@ -303,13 +303,13 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         detail={
                             <>
                                 <DetailLine
-                                    label="Year to date, after tax"
+                                    label={t('fin.ytdAfterTax')}
                                     value={formatMoney(bonusAccrual.profitAccrued)}
                                     tone={bonusAccrual.profitAccrued >= 0 ? 'positive' : 'negative'}
                                 />
-                                <DetailLine label="Your share" value="4%" />
+                                <DetailLine label={t('fin.yourShare')} value="4%" />
                                 <DetailLine
-                                    label="Paid on"
+                                    label={t('fin.paidOn')}
                                     value={`quarter ${BONUS_PERIOD_QUARTERS} of ${BONUS_PERIOD_QUARTERS}`}
                                 />
                                 {!!lastCeoBonus && (

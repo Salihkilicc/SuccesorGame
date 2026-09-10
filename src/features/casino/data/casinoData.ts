@@ -1,3 +1,21 @@
+// @palette-source five cities, each with its own identity.
+//
+// ============================================================================
+//  THIS FILE IS A PALETTE, NOT A USER OF ONE
+// ============================================================================
+//  Twenty six of the audit's colour findings were here, and every one of them
+//  is doing its job. A casino's whole promise is that Athens does not look
+//  like Macau: each room owns a primary, a secondary, a chip colour, a text
+//  tone and two gradients, and the gradients need in between values that no
+//  fifteen colour palette can carry.
+//
+//  Three of the room primaries are already IN the palette (#05A8F6, #3FC9C0,
+//  #EFC94C) because the header rules borrowed them. The rest are this file's
+//  own and are meant to be.
+//
+//  The signal rule still applies here and pass 0d2 still enforces it: a room
+//  may not paint itself in the profit green or the loss red.
+// ============================================================================
 // src/features/casino/data/casinoData.ts
 //
 // ============================================================================

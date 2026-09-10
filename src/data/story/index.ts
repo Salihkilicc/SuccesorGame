@@ -24,6 +24,7 @@ import { fatherQ4 } from './fatherQ4';
 import { fatherDeath } from './fatherDeath';
 import { pearOffer } from './pearOffer';
 import { pearBought } from './pearBought';
+import { pearBoughtHeir } from './pearBoughtHeir';
 import { pearOfferHeir } from './pearOfferHeir';
 import { successionSibling, successionAlone } from './firstQuarter';
 import { heirAlone, heirPassedOver, heirChosen } from './heirs';
@@ -150,6 +151,10 @@ export const CONVERSATIONS: Conversation[] = [
     // The last letter he ever sends, twenty years the other way up. See the
     // note at the top of pearBought.ts.
     pearBought,
+    // And the same completion, for an heir, from somebody who inherited the
+    // folder instead of filling it. Split on `succeeded`, so exactly one of
+    // the two can ever arrive.
+    pearBoughtHeir,
     friendCondolence, friendCondolencePublic,
     cfoCondolenceMail, cfoCondolenceMessage, cfoCondolencePublic,
     brotherCondolence, brotherCondolencePublic,
@@ -320,11 +325,19 @@ export const STORY_BEATS: StoryBeat[] = [
     //  gated on the player having done something enormous rather than on
     //  the calendar.
     //
-    //  Urgent, because it ends the game. Waiting behind two other letters
-    //  for the allowance would put the last thing Vogel ever writes third
-    //  in a queue.
+    //  Urgent, because it is the largest thing that can happen in a run.
+    //  Waiting behind two other letters for the allowance would put the
+    //  last thing Vogel ever writes third in a queue. It no longer ends
+    //  the game; see the note in pearBought.ts.
+    //
+    //  Two of them, split on `succeeded`. The founder gets Vogel's own
+    //  letter, with the 1997 file in it. Every heir gets pearBoughtHeir,
+    //  written by whoever holds that seat now, who was not there. Both are
+    //  listed because the beat has to be reachable in either kind of run;
+    //  their `when` clauses are exclusive, so only one can fire.
     // ------------------------------------------------------------------
     { conversation: pearBought.id, urgent: true },
+    { conversation: pearBoughtHeir.id, urgent: true },
     // ------------------------------------------------------------------
     //  AND THE SAME QUESTION, ASKED OF WHOEVER IS IN THE CHAIR NOW
     // ------------------------------------------------------------------

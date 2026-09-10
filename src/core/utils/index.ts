@@ -46,14 +46,30 @@ export const formatNumber = (value: number | undefined | null): string => {
 };
 
 /**
- * Kompakt sayi: `1.2K`, `50K`, `1.5M`, `2.4B`, `500`.
- * 1.000'den itibaren K, M, B, T kisaltmasi yapar ve gereksiz ".0" eklerini temizler.
+ * Kompakt sayi: `1.2K`, `50K`, `1.5M`, `2.4B`, `1.2Q`, `500`.
+ * 1.000'den itibaren K, M, B, T, Q kisaltmasi yapar ve gereksiz ".0" eklerini temizler.
+ *
+ * ---------------------------------------------------------------------------
+ *  IT STOPPED AT T, AND THE GAME DOES NOT
+ * ---------------------------------------------------------------------------
+ *  Reported as "the money does not go above T in the game". It did not: a
+ *  trillion was the last rung, so everything above it printed as a growing
+ *  pile of trillions - and the admin button hands out exactly one
+ *  quadrillion, which read as "1000T".
+ *
+ *  Q is the last rung and is deliberately the last. The title ladder in
+ *  core/story/title.ts tops out at Colossus for a trillion, so a quadrillion
+ *  is already past the end of what the game names.
  */
 export const formatCompact = (value: number | undefined | null): string => {
     const val = Number.isFinite(value as number) ? (value as number) : 0;
     const abs = Math.abs(val);
     const sign = val < 0 ? '-' : '';
 
+    if (abs >= 1_000_000_000_000_000) {
+        const num = (abs / 1_000_000_000_000_000).toFixed(1).replace(/\.0$/, '');
+        return `${sign}${num}Q`;
+    }
     if (abs >= 1_000_000_000_000) {
         const num = (abs / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '');
         return `${sign}${num}T`;

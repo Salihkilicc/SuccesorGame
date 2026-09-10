@@ -51,6 +51,7 @@ export const ProfileScreen: React.FC = () => {
         actionFeedback,
         encounter,
         handleAcceptEncounterDate,
+        handleAcceptEncounterHookup,
         openPartnerModal,
         openChildModal,
         openLuxoNetModal,
@@ -124,7 +125,7 @@ export const ProfileScreen: React.FC = () => {
                     scenario={encounter.currentScenario}
                     context="VIP_LOUNGE"
                     onIgnore={encounter.closeEncounter}
-                    onHookup={handleAcceptEncounterDate}
+                    onHookup={handleAcceptEncounterHookup}
                     onDate={handleAcceptEncounterDate}
                 />
             </View>

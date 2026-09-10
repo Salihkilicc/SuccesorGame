@@ -97,17 +97,62 @@ describe('taking the whole board', () => {
     });
 
     it('and the same holds when the company retires the stock instead', () => {
-        // The treasury route leaves `playerShareCount` at the opening 3.5M and
-        // shrinks the denominator instead, so a guard that only watched the
-        // player's count would have missed this one entirely. It is the reason
-        // the check reads totalShares as well.
-        buyTheWholeBoard('treasury');
-        const before = useShareholderStore.getState();
-        expect(before.members).toHaveLength(0);
-        expect(Math.round(pct())).toBe(100);
-        mountCompanyScreen();
-        expect(Math.round(pct())).toBe(100);
+        // ------------------------------------------------------------------
+        //  THE COMPANY CANNOT TAKE THE WHOLE BOARD ANY MORE, AND SHOULD NOT
+        // ------------------------------------------------------------------
+        //  This used to buy every director through the treasury and assert an
+        //  empty register. It cannot now: a company may hold at most a tenth
+        //  of itself (Turkish Commercial Code article 379), and the opening
+        //  board is 17%, 15%, 14%, 11% and 8%. Only Sarah Jen is within
+        //  reach of the company's own money.
+        //
+        //  The guarantee this test exists for is untouched and is about the
+        //  DENOMINATOR: the treasury route leaves `playerShareCount` at the
+        //  opening 3.5M and shrinks `totalShares` instead, so a check that
+        //  only watched the player's count would miss the whole case. That is
+        //  still measured, on the one holding the rule allows.
+        // ------------------------------------------------------------------
+        const smallest = useShareholderStore.getState().members
+            .reduce((a, b) => (a.shareCount <= b.shareCount ? a : b));
+        expect(smallest.shareCount / TOTAL_SHARES).toBeLessThanOrEqual(0.10);
+
+        const before = pct();
+        const r = useShareholderStore.getState()
+            .negotiateSharePurchase(smallest.id, smallest.shareCount, 400, 'treasury');
+        expect(r.success).toBe(true);
+
+        // The player's own count did not move; the company got smaller.
+        expect(useShareholderStore.getState().playerShareCount).toBe(3_500_000);
         expect(useShareholderStore.getState().totalShares).toBeLessThan(TOTAL_SHARES);
+        expect(pct()).toBeGreaterThan(before);
+
+        // And the screen does not undo it, which is the whole file.
+        const after = Math.round(pct());
+        mountCompanyScreen();
+        expect(Math.round(pct())).toBe(after);
+    });
+
+    it('and the big holdings are yours to buy or nobody\'s', () => {
+        // The other half of the same rule, and the request behind it: "the
+        // main point should be that I can buy with my own cash".
+        const big = useShareholderStore.getState().members
+            .filter(m => m.shareCount / TOTAL_SHARES > 0.10);
+        expect(big.length).toBeGreaterThan(2);
+
+        for (const m of big) {
+            const viaCompany = useShareholderStore.getState()
+                .negotiateSharePurchase(m.id, m.shareCount, 400, 'treasury');
+            expect({ who: m.name, ok: viaCompany.success })
+                .toEqual({ who: m.name, ok: false });
+        }
+        // Still on the register, every one of them.
+        expect(useShareholderStore.getState().members.length).toBeGreaterThanOrEqual(big.length);
+
+        // And cash takes them.
+        const one = big[0];
+        const viaCash = useShareholderStore.getState()
+            .negotiateSharePurchase(one.id, one.shareCount, 400, 'cash');
+        expect(viaCash.success).toBe(true);
     });
 });
 

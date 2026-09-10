@@ -365,7 +365,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                         <DetailNote>{EQUITY_EXPLANATIONS.change}</DetailNote>
                                         {damping < 0.95 && (
                                             <DetailLine
-                                                label="Size damping"
+                                                label={t('fin.sizeDamping')}
                                                 value={`${Math.round((1 - damping) * 100)}%`}
                                             />
                                         )}
@@ -607,7 +607,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     <MaterialCommunityIcons name="account-tie" size={24} ... />
                                 </View>
                                 <View style={styles.actionContent}>
-                                    <Text style={styles.actionTitle}>Your pay</Text>
+                                    <Text style={styles.actionTitle}>{t('fin.yourPay')}</Text>
                                     <Text style={styles.actionDescription}>
                                         {`${formatMoney(ceoPay)} a quarter · the board may cap it at ${formatMoney(payMax)}`}
                                     </Text>

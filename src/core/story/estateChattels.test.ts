@@ -178,9 +178,22 @@ describe('and a fortune does not survive four generations', () => {
         // of real estate came through and this went red.
         //
         // Which is the rule working, not breaking: whatever sits at the top of
-        // the market is what an estate has to sell. Written against the top of
-        // the catalogue rather than against a named department, so the next
-        // thing added above space does not send it red again.
+        // the market is what an estate has to sell.
+        //
+        // It was then rewritten to "everything sold comes from the dearest
+        // DEPARTMENT, whichever that is today", and that went red too, when
+        // the generational waves put two hundred billion of chartered city
+        // and half a trillion of roofed sea into real estate. Space is no
+        // longer so far ahead that one department covers the whole bill, so
+        // the executor now reaches into two.
+        //
+        // The department framing was the mistake both times. `divideBelongings`
+        // has never known what a department is: it sorts by value and sells
+        // from the top down. So THAT is what is asserted here now, and it is
+        // the sentence in the title of the test - everything sold is dearer
+        // than everything kept. It cannot go red for a data change again,
+        // because it is the rule rather than a symptom of the rule.
+        //
         // `divideBelongings` takes and returns `Chattel`, which has no
         // category - deliberately, since the estate rule does not care what
         // department a thing came from. The category is carried alongside for
@@ -195,14 +208,15 @@ describe('and a fortune does not survive four generations', () => {
         const allWatches = all.filter(i => i.category === 'WATCH').length;
         expect(keptCats.filter(c => c === 'WATCH').length).toBe(allWatches);
 
-        // The dearest department in the catalogue, whatever it is today.
-        const byValue: Record<string, number> = {};
-        for (const i of all) byValue[i.category] = (byValue[i.category] ?? 0) + i.marketValue;
-        const richest = Object.entries(byValue).sort((a, b) => b[1] - a[1])[0][0];
-
-        const soldCats = sold.map(s => s.category);
         expect(sold.length).toBeGreaterThan(0);
-        expect(soldCats.every(c => c === richest)).toBe(true);
+        const cheapestSold = Math.min(...sold.map(s => s.marketValue));
+        const dearestKept = Math.max(...kept.map(k => k.marketValue));
+        expect(cheapestSold).toBeGreaterThanOrEqual(dearestKept);
+
+        // And it really did come off the top of the market, or the line above
+        // would also pass on a collection of forty identical watches.
+        const dearest = Math.max(...all.map(i => i.marketValue));
+        expect(sold.some(s => s.marketValue === dearest)).toBe(true);
     });
 
     it('and four generations of it leaves a photograph', () => {

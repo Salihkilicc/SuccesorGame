@@ -488,7 +488,16 @@ const styles = StyleSheet.create({
   betDisplay: { gap: 1 },
   betLabel: { color: 'rgba(255,255,255,0.48)', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
   betValueText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
-  betCount: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600' },
+  /**
+   * The token, for the same reason the note below gives.
+   *
+   * That note already worked this out and stopped one line short: it says
+   * "betCount at 0.30 is ALREADY below the readable floor, so matching it was
+   * copying a defect", fixed the line it was writing, and left the defect it
+   * had just named. This is how many bets are on the table, which is the one
+   * number a player checks before spinning.
+   */
+  betCount: { color: theme.colors.textMuted, fontSize: 10, fontWeight: '600' },
   /**
    * The token, not a fainter hand-mixed white.
    *

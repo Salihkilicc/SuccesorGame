@@ -118,10 +118,27 @@ export interface LuxoNetActions {
 
     // --- Marketplace Transactions ---
     buyAsset: (assetId: string, currentYear?: number, currentQuarter?: number) => PurchaseResult;
+    // ----------------------------------------------------------------------
+    //  SHELVED WITH THE CATALOGUE THIS STORE HOLDS
+    // ----------------------------------------------------------------------
+    //  This store's four item catalogue was superseded by the 144 item
+    //  `shoppingRegistry`, and what a player owns lives in `useAssetStore`.
+    //  So the transactions here have no screen: BelongingsScreen's `sellAsset`
+    //  is useAssetStore's, not this one, and the only component that ever
+    //  called into this store was `LuxoNetPreviewModal`, which nothing mounts.
+    //
+    //  Kept whole, deliberately. core/luxury/upkeep.ts calls this catalogue
+    //  "the only place in the project that priced maintenance" and lifted its
+    //  economics from here, so the numbers are load bearing even though the
+    //  functions are not.
+    // ----------------------------------------------------------------------
+    /** @orphan-ok-symbol sellAsset - useAssetStore owns what the player holds */
     sellAsset: (instanceId: string) => SaleResult;
+    /** @orphan-ok-symbol serviceAsset - no repair screen reaches this store */
     serviceAsset: (instanceId: string) => ServiceResult;
 
     // --- Asset Customization & Management ---
+    /** @orphan-ok-symbol renameAsset - nothing lets a player nickname a thing */
     renameAsset: (instanceId: string, newNickname: string) => void;
 
     // --- Financial & Market Ticks ---
@@ -131,9 +148,19 @@ export interface LuxoNetActions {
     };
 
     // --- Queries / Computed Helpers ---
+    //  Four query helpers over a collection nothing reads. Already written up
+    //  in features/assets/personalScreen.test.ts:394, which found them with
+    //  zero callers and said so; these markers are that finding, recorded
+    //  where somebody will actually be standing when they wonder.
+    /** @orphan-ok-symbol isAssetOwned - useAssetStore.isOwned is the live one */
     isAssetOwned: (assetId: string) => boolean;
+    /** @orphan-ok-symbol getTotalPrestige - the profile computes prestige from
+     *  shoppingRegistry.calculatePrestigeScore instead */
     getTotalPrestige: () => number;
+    /** @orphan-ok-symbol getTotalPortfolioValue - useAssetPortfolio does this */
     getTotalPortfolioValue: () => number;
+    /** @orphan-ok-symbol getTotalAnnualMaintenance - core/luxury/upkeep.ts is
+     *  what the quarter tick actually bills through */
     getTotalAnnualMaintenance: () => number;
 
     // --- Utility ---

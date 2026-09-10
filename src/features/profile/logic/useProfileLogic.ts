@@ -17,6 +17,8 @@ import { useStatsStore } from '../../../core/store/useStatsStore';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { useFamilyStore, Child, PartnerProfile, FALLBACK_CHILD_NAME } from '../../../core/store/useFamilyStore';
 import { useLuxoNetStore } from '../../../core/store/useLuxoNetStore';
+import { earnedTier } from '../../love/logic/runCourtship';
+import { t } from '../../../core/i18n';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { formatPrestigeScore } from '../../shopping/data/shoppingRegistry';
 import { useMarketStore } from '../../../core/store/useMarketStore';
@@ -171,8 +173,29 @@ export const useProfileLogic = () => {
                 setActionFeedback(`${outcome.name} was not interested. She has written to you.`);
                 setTimeout(() => setActionFeedback(null), 3500);
             } else if (outcome.kind === 'nobody') {
-                setActionFeedback('Nobody worth the evening tonight.');
-                setTimeout(() => setActionFeedback(null), 3000);
+                // ----------------------------------------------------------
+                //  IT SAID THE OPPOSITE OF WHAT HAD HAPPENED
+                // ----------------------------------------------------------
+                //  Reported as "when does this even appear, I do not
+                //  understand". Fair, because the sentence described an empty
+                //  world and the truth is a closed door.
+                //
+                //  `runCourtship` returns `nobody` in two cases and one of
+                //  them is almost always the real one: the room the player's
+                //  money has EARNED is cooling off, because they were turned
+                //  down there recently. A refusal shuts that room for two
+                //  quarters (REFUSAL_COOLDOWN_QUARTERS), and the game
+                //  deliberately does not walk them down to a poorer one -
+                //  that demotion was the defect fixed in runCourtship.
+                //
+                //  So the cost of a no is a WAIT, and the player had no way
+                //  to learn that: the only thing the game said was that
+                //  nobody existed. Now it says which of the two happened.
+                // ----------------------------------------------------------
+                setActionFeedback(
+                    earnedTier() ? t('love.roomCoolingOff') : t('love.noRoomYet'),
+                );
+                setTimeout(() => setActionFeedback(null), 4000);
             }
         }
     }, [family.partner, navigation, encounter]);
@@ -185,6 +208,22 @@ export const useProfileLogic = () => {
             setTimeout(() => setActionFeedback(null), 3500);
         }
     }, [encounter, family]);
+
+    /**
+     * The other answer the modal offers, which used to run this one.
+     *
+     * Reported as: after a hookup the person appears as my girlfriend, and it
+     * was one night. Both buttons were wired here, so both set a partner.
+     * `handleHookup` is the same code without that line - see the note on it
+     * in useEncounterSystem.
+     */
+    const handleAcceptEncounterHookup = useCallback(() => {
+        const res = encounter.handleHookup();
+        if (res.success) {
+            setActionFeedback(res.message ?? null);
+            setTimeout(() => setActionFeedback(null), 3500);
+        }
+    }, [encounter]);
 
     const openChildModal = useCallback(
         (child: Child) => {
@@ -305,6 +344,7 @@ export const useProfileLogic = () => {
         // Encounter System
         encounter,
         handleAcceptEncounterDate,
+        handleAcceptEncounterHookup,
 
         // Actions
         openPartnerModal,

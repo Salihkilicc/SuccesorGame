@@ -175,6 +175,43 @@ export const TYPE_ICON: Record<string, string> = {
     lunar_claim: 'moon-waning-crescent',
     asteroid_charter: 'orbit',
     ark: 'rocket-launch-outline',
+
+    // ---- WHAT THE MARKET OPENS FOR AN HEIR -------------------------------
+    //
+    //  Twenty two types arrived with data/generationWaves.ts and every one of
+    //  them fell through to the department symbol, which is the exact defect
+    //  this table was built to fix: six icons for eighty five things. Caught
+    //  by shopIdentity.test.ts on the first run, which is the whole reason
+    //  that test reads the catalogue rather than a list somebody maintains.
+    //
+    //  Distinct from each other AND from the neighbours above, or a wave item
+    //  would arrive looking like something already on the shelf.
+    estate: 'home-city-outline',
+    vault: 'safe-square-outline',
+    infrastructure: 'transmission-tower',
+    tower: 'town-hall',
+    city: 'city-variant-outline',
+    resort: 'snowflake',
+    island: 'palm-tree',
+    megastructure: 'hexagon-slice-6',
+    habitat: 'diving-helmet',
+
+    yacht: 'sail-boat',
+    yacht_fleet: 'ferry',
+    ship: 'ship-wheel',
+    ship_fleet: 'anchor',
+    submersible_fleet: 'submarine',
+
+    aircraft_fleet: 'airplane-plus',
+    jet_fleet: 'airplane-marker',
+    helicopter_fleet: 'helicopter',
+
+    jewelry_set: 'necklace',
+    gemstone: 'diamond-stone',
+
+    launch_service: 'rocket',
+    mineral_claim: 'pickaxe',
+    charter: 'file-document-outline',
 };
 
 /** The symbol for one thing in the shop. */

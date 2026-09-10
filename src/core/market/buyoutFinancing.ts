@@ -82,6 +82,16 @@ import type { ProposalKind } from './governance';
 export type BuyoutRoute = 'cash' | 'treasury' | 'leveraged';
 
 /**
+ * The most of itself a company may own.
+ *
+ * Turkish Commercial Code article 379: one tenth of the issued capital, by a
+ * general assembly resolution, and article 384 makes anything above it
+ * disposable. Written as a fraction rather than a percentage because every
+ * comparison here is against a share count.
+ */
+export const TREASURY_CAP_FRACTION = 0.10;
+
+/**
  * How much of a company's own valuation it may borrow to retire its own stock.
  *
  * Lower than MAX_LEVERAGE_RATIO in mergers.ts, which allows sixty per cent for
@@ -211,6 +221,40 @@ export const quoteBuyoutFinancing = (
         proposalKind: (route === 'leveraged' ? 'debt' : 'buyback') as ProposalKind,
     };
 
+    // ----------------------------------------------------------------------
+    //  AND THE LAW HAS A CEILING ON THIS, WHICH THE GAME DID NOT
+    // ----------------------------------------------------------------------
+    //  Reported as: a company buying its directors out is a silly button,
+    //  that is a capital reduction in real life, and there is a ten per cent
+    //  limit. There is, and it is worth having exactly because it puts the
+    //  player's own money back at the centre of the decision.
+    //
+    //  Turkish Commercial Code article 379: a joint stock company may acquire
+    //  its own shares up to one tenth of its issued capital, by a general
+    //  assembly resolution. Article 384 requires anything above that tenth to
+    //  be disposed of. Both company routes here spend the company's money on
+    //  its own stock, so both are bound by it.
+    //
+    //  WHAT THIS DOES TO THE OPENING BOARD, measured: Marcus holds 17% of the
+    //  register, Elena 14%, Victor 11%. None of them can be taken through the
+    //  company at all. That is the intended answer and it is the request:
+    //  "the main point should be that I can buy with my own cash".
+    //
+    //  The routes are not removed. A holder who has already sold part of a
+    //  block, or one diluted below a tenth, is still within reach - and the
+    //  refusal names the rule rather than merely saying no, so a player who
+    //  sees it learns why rather than concluding the button is broken.
+    // ----------------------------------------------------------------------
+    const companyCap = totalShares * TREASURY_CAP_FRACTION;
+    if (targetShares > companyCap) {
+        return {
+            ...retired,
+            feasible: false,
+            reason: `A company may hold at most ${Math.round(TREASURY_CAP_FRACTION * 100)}% of its own shares. `
+                + `That block is ${pct(targetShares, totalShares).toFixed(1)}%, so this one is yours to buy or nobody's.`,
+        };
+    }
+
     if (route === 'treasury') {
         const quote = { ...retired, companyCashUsed: price };
         if ((input.companyCapital || 0) < price) {
@@ -262,9 +306,10 @@ export const BUYOUT_ROUTE_EXPLANATIONS: Record<BuyoutRoute, string> = {
     treasury:
         'The company buys the holding and tears it up. You gain no shares at all, and your percentage still rises, '
         + 'because there is less company left to divide. It costs you nothing personally and costs the business its '
-        + 'capital, so the board votes on it, and the board is where your family sits.',
+        + 'capital, so the board votes on it, and the board is where your family sits. '
+        + 'A company may hold at most a tenth of itself, so the large blocks are out of its reach and into yours.',
     leveraged:
         'The same, borrowed. Nobody pays anything today and the company carries the interest every quarter for as '
         + 'long as the debt lives. It is how this is usually done and it is how companies are usually ruined, which '
-        + 'are the same sentence.',
+        + 'are the same sentence. The same tenth applies: borrowing does not raise the ceiling, it only moves who pays.',
 };

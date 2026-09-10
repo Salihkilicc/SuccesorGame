@@ -6,6 +6,7 @@ import { CasinoTheme } from '../data/casinoData';
 import { useLocale } from '../../../core/i18n';
 import { translateDozenBet, translateOutsideBet } from '../../../data/i18n/casinoText';
 import { feltColour } from '../../../core/casino/roulette';
+import { useHoldToRepeat } from '../logic/useHoldToRepeat';
 
 interface RouletteTableProps {
   onPlaceBet: (type: BetType) => void;
@@ -73,11 +74,18 @@ const NumberCell = ({
 }) => {
   const bgColor = NUMBER_COLORS[number];
   const isZero = number === 0;
+  // Holding takes the stack down chip by chip rather than one and stop.
+  // See logic/useHoldToRepeat.ts.
+  const hold = useHoldToRepeat({
+    onRepeat: onLongPress,
+    canRepeat: () => betAmount > 0,
+  });
 
   return (
     <Pressable
       onPress={onPress}
-      onLongPress={onLongPress}
+      onLongPress={hold.onLongPress}
+      onPressOut={hold.onPressOut}
       delayLongPress={LIFT_CHIP_MS}
       disabled={disabled}
       style={({ pressed }) => [
@@ -118,10 +126,19 @@ const AreaBetButton = ({
   customBg?: string;
   disabled?: boolean;
   chipColor: string;
-}) => (
+}) => {
+  // The outside bets stack too, and a player who put six chips on RED has
+  // the same problem as one who put six on seventeen.
+  const hold = useHoldToRepeat({
+    onRepeat: onLongPress,
+    canRepeat: () => betAmount > 0,
+  });
+
+  return (
   <Pressable
     onPress={onPress}
-    onLongPress={onLongPress}
+    onLongPress={hold.onLongPress}
+    onPressOut={hold.onPressOut}
     delayLongPress={LIFT_CHIP_MS}
     disabled={disabled}
     style={({ pressed }) => [
@@ -142,7 +159,8 @@ const AreaBetButton = ({
       </View>
     )}
   </Pressable>
-);
+  );
+};
 
 const RouletteTable = ({ onPlaceBet, onRemoveBet, getBetOnPosition, gameTheme, disabled }: RouletteTableProps) => {
   useLocale();
@@ -386,6 +404,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     // DARK ON A LIGHT CHIP. The chip takes the room's colour, and every room
     // colour is a light fill; measured in slotCabinet.test.ts.
+    // @contrast-checked room primary, 7.9 to 13.1 against the chip.
     color: '#000000',
   },
 

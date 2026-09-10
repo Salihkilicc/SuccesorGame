@@ -74,7 +74,19 @@ export const PERSIST_KEYS: string[] = [
     'succesor_sponsorship_v1',
     'succesor_casino_risk_v1',
     'succesor_story_v1',
-    'succesor_news_v1',
+    // ------------------------------------------------------------------
+    //  THE VERSION MOVED AND THIS LIST DID NOT
+    // ------------------------------------------------------------------
+    //  `useNewsStore` persists to `succesor_news_v4`. The key here said v1,
+    //  which is a key nothing has written for three versions, so a new game
+    //  wiped a file that did not exist and left the real one alone. The
+    //  in-memory reset runs, so the feed looks empty until the app is next
+    //  relaunched and the last CEO's headlines rehydrate over the new one.
+    //
+    //  v1 stays below with the other leftovers rather than being replaced,
+    //  because a device that still carries it should still be cleaned.
+    // ------------------------------------------------------------------
+    'succesor_news_v4',
 
     // Finans / piyasa
     'succesor_market_v6',
@@ -93,6 +105,21 @@ export const PERSIST_KEYS: string[] = [
     'travel-storage',
 
     // Dynasty, Family & Luxury
+    // ------------------------------------------------------------------
+    //  THE WORST ONE, AND IT WAS HIDDEN BY A TYPO IN THE AUDIT
+    // ------------------------------------------------------------------
+    //  `useFamilyStore` persists to `succesor_family_v3` and only v1 was
+    //  listed. So a new game reset the family in memory and left the old
+    //  dynasty on disk: start again, quit, reopen, and the previous run's
+    //  partner, children, generation and designated successor rehydrate
+    //  into a company they have nothing to do with.
+    //
+    //  Nothing reported it. The reachability pass that exists for exactly
+    //  this read `@orphan-ok-symbol` as a whole file exemption, and this
+    //  store carries one for a single unused action. See the note in
+    //  scripts/reachability.js.
+    // ------------------------------------------------------------------
+    'succesor_family_v3',
     'succesor_family_v1',
     'succesor_luxonet_v1',
 
@@ -106,6 +133,7 @@ export const PERSIST_KEYS: string[] = [
     'succesor_player_hub_v3',
     'succesor_education_v1',
     'succesor_education_v2',
+    'succesor_news_v1',
 ];
 
 /**

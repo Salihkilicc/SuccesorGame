@@ -85,9 +85,10 @@ describe('what the Mail app actually holds in the first year', () => {
         //  on a flag" would be correct today and would quietly stop being
         //  correct, and the failure is silent.
         //
-        //  Both are Pear and neither can reach the first year. One needs a
-        //  succession to have happened and the other needs the player to own
-        //  his company.
+        //  Three of them are Pear and none can reach the first year. One
+        //  needs a succession to have happened, and the other two need the
+        //  player to own his company: the founder's completion letter and
+        //  the one an heir gets instead of it.
         //
         //  AND THE FOUR PAYOFFS. Same category and a different reason: they
         //  have no `when` of their own because nothing rolls for them. Each is
@@ -97,7 +98,7 @@ describe('what the Mail app actually holds in the first year', () => {
         //  fifth year. See data/events/payoffs.ts.
         // ------------------------------------------------------------------
         const LATER_LIFE = new Set([
-            'pear-offer-heir', 'pear-bought',
+            'pear-offer-heir', 'pear-bought', 'pear-bought-heir',
             'event-payoff-automation', 'event-payoff-logistics',
             'event-payoff-patent', 'event-payoff-investor',
         ]);
@@ -106,7 +107,7 @@ describe('what the Mail app actually holds in the first year', () => {
         expect(byChannel('mail').length - notRandom.length).toBeGreaterThan(20);
         expect(notRandom.length).toBeLessThan(10);
 
-        // And the guard on the guard: those two exist and are still mail.
+        // And the guard on the guard: every one of them exists and is mail.
         for (const id of LATER_LIFE) {
             expect(byChannel('mail').some(c => c.id === id)).toBe(true);
         }

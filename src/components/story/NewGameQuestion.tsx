@@ -44,6 +44,31 @@ const NewGameQuestion = () => {
     //  was a white iOS sheet, which is why the panel still read as a warning
     //  after it had been themed. One flow, one dialog, both steps here.
     // ------------------------------------------------------------------
+    // ------------------------------------------------------------------
+    //  STEP ZERO, ON ONE ROUTE ONLY: ARE YOU SURE YOU WANT TO BE SOMEBODY ELSE
+    // ------------------------------------------------------------------
+    //  Its own panel rather than the erase copy with a different title. The
+    //  erase warning is about a save; this one is about a save AND about
+    //  being sent back through the form that asks your name, your gender and
+    //  what the company is called. Telling a player only the first half and
+    //  then showing them the second is how a warning stops being one.
+    // ------------------------------------------------------------------
+    if (mode === 'newCharacter') {
+        return (
+            <ConfirmPanel
+                visible
+                title={t('newGame.characterTitle')}
+                summary={t('newGame.characterSummary')}
+                note={t('newGame.characterNote')}
+                tone="danger"
+                confirmLabel={t('newGame.characterConfirm')}
+                cancelLabel={t('newGame.characterCancel')}
+                onConfirm={() => answer('erase')}
+                onCancel={() => answer('cancel')}
+            />
+        );
+    }
+
     if (mode === 'erase') {
         return (
             <ConfirmPanel
@@ -93,7 +118,7 @@ const NewGameQuestion = () => {
             //  from it is what "tapping outside" does. It is the choice a
             //  player who has not decided anything would want.
             // ----------------------------------------------------------------
-            confirmLabel="Close"
+            confirmLabel={t('ui.close')}
             onCancel={() => answer('play')}
         />
     );

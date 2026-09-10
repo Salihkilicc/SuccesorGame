@@ -48,6 +48,7 @@ import {
     type Gender,
 } from '../../../core/identity';
 import { useIdentityStore } from '../../../core/store/useIdentityStore';
+import { t, useLocale } from '../../../core/i18n';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 
 type Props = {
@@ -120,6 +121,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
     const update = useStatsStore(s => s.update);
 
     const [firstName, setFirstName] = useState(existingFirst);
+    useLocale();
     const [gender, setGender] = useState<Gender>(useIdentityStore.getState().gender);
     const [company, setCompany] = useState('');
     /** Only shown after a failed submit - see the note on `submit`. */
@@ -200,10 +202,10 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                 {wantsIdentity && (
                     <>
                         <Field
-                            label="First name"
+                            label={t('onb.firstName')}
                             value={firstName}
                             onChangeText={setFirstName}
-                            placeholder="John"
+                            placeholder={t('onb.namePlaceholder')}
                             maxLength={NAME_MAX}
                             error={errors.firstName}
                             autoFocus
@@ -223,7 +225,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                             which is the entire premise.
                            ------------------------------------------------ */}
                         <View style={styles.field}>
-                            <Text style={styles.fieldLabel}>Last name</Text>
+                            <Text style={styles.fieldLabel}>{t('onb.lastName')}</Text>
                             <Text style={styles.familyName}>{FAMILY_NAME}</Text>
                             <Text style={styles.familyNote}>
                                 Your father's name, and the company's. That part is not yours to choose.
@@ -231,7 +233,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                         </View>
 
                         <View style={styles.field}>
-                            <Text style={styles.fieldLabel}>Gender</Text>
+                            <Text style={styles.fieldLabel}>{t('onb.gender')}</Text>
                             <View style={styles.genderRow}>
                                 {(['male', 'female'] as const).map(g => (
                                     <Pressable
@@ -255,10 +257,10 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                 )}
 
                 <Field
-                    label="Company name"
+                    label={t('onb.companyName')}
                     value={company}
                     onChangeText={setCompany}
-                    placeholder="Northwind Industries"
+                    placeholder={t('onb.companyPlaceholder')}
                     maxLength={COMPANY_MAX}
                     error={errors.company}
                     autoFocus={!wantsIdentity}
@@ -267,7 +269,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                 <Pressable
                     onPress={submit}
                     style={({ pressed }) => [styles.start, pressed && styles.startPressed]}>
-                    <Text style={styles.startText}>Start</Text>
+                    <Text style={styles.startText}>{t('onb.start')}</Text>
                 </Pressable>
             </ScrollView>
         </KeyboardAvoidingView>

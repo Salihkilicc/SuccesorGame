@@ -103,7 +103,9 @@ export type StatsState = Record<StatKey, number> & {
    *  Sayisal union'a giremez, bilincli olarak ayri duruyor.
    *  Bkz. core/market/brand.ts -> corporateBrand */
   brandByCategory: Record<string, number>;
-  /** Kategorinin bir kez kazandigi ve bir daha altina dusmedigi marka tabani */
+  /** Kategorinin bir kez kazandigi ve bir daha altina dusmedigi marka tabani.
+   *  @not-for-display a floor the engine compares against, not a number to
+   *  print. `earnedFloor` reads it; the panel shows the brand itself. */
   brandFloorByCategory?: Record<string, number>;
   /**
    * Categories whose unlock requirement has been met at some point.
@@ -131,10 +133,17 @@ export type StatsState = Record<StatKey, number> & {
    * its own. Bkz. core/identity.ts
    */
   companyName: string;
+  /** @not-for-display persistence plumbing. Every store has one; it says
+   *  whether the disk copy has been read yet. */
   _hasHydrated: boolean;
-  /** Gecen ceyregin kredi notu — not dususunu yakalamak icin */
+  /** Gecen ceyregin kredi notu — not dususunu yakalamak icin.
+   *  @not-for-display it exists so the downgrade notice can tell a FALL
+   *  from a first rating. useGameStore:1137 reads it; a player is shown the
+   *  current rating, never the previous one. */
   creditRatingPrev?: string;
-  /** Ust uste zararli ceyrek sayisi — guvensizlik oyu bunu okur */
+  /** Ust uste zararli ceyrek sayisi — guvensizlik oyu bunu okur.
+   *  @not-for-display a counter market/governance.ts reads at two places to
+   *  weight a no confidence vote. The player sees the losses, not the tally. */
   lossStreak?: number;
   /**
    * Consecutive quarters with capital below zero.
@@ -142,8 +151,16 @@ export type StatsState = Record<StatKey, number> & {
    * The run used to end on the first one. See market/insolvency.ts for what
    * that cost and why the grace is four.
    */
+  /** @not-for-display the grace counter market/insolvency.ts reads. What a
+   *  player is shown is the warning it produces, not the count. */
   quartersInsolvent?: number;
-  /** Gecen ceyregin hisse adedi — seyreltmeme sozu bununla olculur */
+  /** @not-for-display the same, for the ten per cent control floor. The
+   *  player is shown the board's letter, not the tally. See
+   *  core/market/controlFloor.ts. */
+  quartersBelowControl?: number;
+  /** Gecen ceyregin hisse adedi — seyreltmeme sozu bununla olculur.
+   *  @not-for-display dilution cannot be detected without a previous count.
+   *  useGameStore:2445 compares it; nothing prints it. */
   totalSharesPrev?: number;
   facilityBuild: FacilityBuild | null;
   /**
@@ -192,17 +209,47 @@ type StatsStore = StatsState & {
   spendMoney: (amount: number) => boolean; // Returns true if successful, false if insufficient funds
   subtractMoney: (amount: number) => void; // Force subtract (no return check)
   earnMoney: (amount: number) => void;
+  // ==========================================================================
+  //  THE NAMED SETTERS NOTHING CALLS
+  // ==========================================================================
+  //  Nine of the setters below have no caller anywhere in the app, and they
+  //  are all the same story: the engine writes stats through `update()`, in
+  //  one object literal per quarter, thirty nine times across the codebase.
+  //  A per field setter is what you write before you know that, and once
+  //  `update()` exists there is no reason to reach for one again.
+  //
+  //  MONEY IS THE EXCEPTION AND IT IS THE ONE THAT MATTERS. `spendMoney`,
+  //  `subtractMoney` and `earnMoney` above ARE the live route and are called
+  //  everywhere. `setMoney` is a forced write that skips the "can they afford
+  //  it" check, which is exactly the thing this store exists to own. It is
+  //  kept for a load path and a cheat and should stay uncalled.
+  //
+  //  Kept rather than removed: they are one line each, they are correct, and
+  //  removing a public action from a persisted store is a change to its type
+  //  that ripples further than it looks.
+  // ==========================================================================
+
+  /** @orphan-ok-symbol setMoney - forced write, skips the affordability check
+   *  spendMoney does. For a load path or a cheat, not for gameplay. */
   setMoney: (amount: number) => void; // For forced updates (e.g., load game, cheats)
 
+  /** @orphan-ok-symbol setCompanyValue - the engine writes it via update() */
   setCompanyValue: (value: number) => void;
   setCompanySharePrice: (value: number) => void;
+  /** @orphan-ok-symbol setCompanyDailyChange - written via update() */
   setCompanyDailyChange: (value: number) => void;
+  /** @orphan-ok-symbol setCompanyDebt - written via update() */
   setCompanyDebt: (value: number) => void;
+  /** @orphan-ok-symbol setCompanyDebtTotal - written via update() */
   setCompanyDebtTotal: (value: number) => void;
+  /** @orphan-ok-symbol setCompanyOwnership - written via update() */
   setCompanyOwnership: (value: number) => void;
+  /** @orphan-ok-symbol setCompanyRevenueMonthly - written via update() */
   setCompanyRevenueMonthly: (value: number) => void;
+  /** @orphan-ok-symbol setCompanyExpensesMonthly - written via update() */
   setCompanyExpensesMonthly: (value: number) => void;
   setCompanyCapital: (value: number) => void;
+  /** @orphan-ok-symbol setCasinoReputation - written via update() */
   setCasinoReputation: (value: number) => void;
   setResearchPoints: (value: number) => void;
   setShareholders: (list: Shareholder[]) => void;
@@ -220,14 +267,41 @@ type StatsStore = StatsState & {
    * Tek kapi: useCorporateFinanceStore.executeAcquisition
    * Alan yalnizca eski kayitlar bozulmasin diye duruyor.
    */
+  /** @orphan-ok-symbol addAcquisition - retired; see the Turkish note above.
+   *  The one door is useCorporateFinanceStore.executeAcquisition. */
   addAcquisition: (id: string, companyData: { name: string; marketCap: number; profit: number }) => void;
   setIsPublic: (value: boolean) => void;
   performIPO: () => void;
   performStockSplit: () => void;
   updateShareholderRelationship: (id: string, delta: number) => void;
+  // --------------------------------------------------------------------
+  //  RETIRED, LIKE addAcquisition ABOVE AND FOR THE SAME REASON
+  // --------------------------------------------------------------------
+  //  These four moved out of the stats store when equity and debt got
+  //  stores of their own, and unlike `addAcquisition` nobody wrote it down.
+  //  Each one has a live successor and all four of them are reachable from
+  //  a screen, so the FEATURES work; it is only these copies that are dead.
+  //
+  //      performDilution   -> useEquityStore, via the raise flow
+  //      performBuyback    -> useEquityStore.executeBuyback
+  //                           (Shares/BuybackModal.tsx:205)
+  //      payDividend       -> useEquityStore.distributeDividend
+  //                           (finance/hooks/useDividendLogic.ts:109)
+  //      repayCapital      -> useCorporateFinanceStore.repayLoan
+  //                           (Finance/RepayModal.tsx:33)
+  //
+  //  `processCompanyMonthlyTick` is older still: the game runs on quarters
+  //  and there is no monthly tick to call it. See the note in
+  //  core/market/equity.ts, which mentions it as the place
+  //  `companyDailyChange` used to be written.
+  // --------------------------------------------------------------------
+  /** @orphan-ok-symbol performDilution - moved to useEquityStore */
   performDilution: (percentage: number) => void;
+  /** @orphan-ok-symbol performBuyback - moved to useEquityStore.executeBuyback */
   performBuyback: (percentage: number) => void;
+  /** @orphan-ok-symbol payDividend - moved to useEquityStore.distributeDividend */
   payDividend: (percentage: number) => void;
+  /** @orphan-ok-symbol processCompanyMonthlyTick - the game has no monthly tick */
   processCompanyMonthlyTick: () => void;
 
   /** Bir sonraki kademeye yukseltme baslatir. Parasi yetmezse false doner. */
@@ -247,6 +321,8 @@ type StatsStore = StatsState & {
    */
   borrowCapital: (amount: number, interestRate: number) => void;
   /** EMEKLIYE AYRILDI — yerine useCorporateFinanceStore.repayLoan */
+  /** @orphan-ok-symbol repayCapital - moved to useCorporateFinanceStore.repayLoan.
+   *  See the note above performDilution. */
   repayCapital: (amount: number) => void;
   reset: () => void;
 };
@@ -367,6 +443,7 @@ export const initialStatsState: StatsState = {
   creditRatingPrev: '',
   lossStreak: 0,
   quartersInsolvent: 0,
+  quartersBelowControl: 0,
   totalSharesPrev: 0,
   targetHeadcount: START_EMPLOYEES,
   incomingHires: 0,
@@ -1069,6 +1146,7 @@ export const useStatsStore = create<StatsStore>()(
         creditRatingPrev: state.creditRatingPrev,
         lossStreak: state.lossStreak,
         quartersInsolvent: state.quartersInsolvent,
+        quartersBelowControl: state.quartersBelowControl,
         totalSharesPrev: state.totalSharesPrev,
         targetHeadcount: state.targetHeadcount,
         incomingHires: state.incomingHires,

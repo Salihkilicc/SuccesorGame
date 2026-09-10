@@ -99,7 +99,7 @@ export const BelongingsScreen = () => {
                     {/* Card Header */}
                     <View style={styles.cardHeader}>
                         <View>
-                            <Text style={styles.cardBrand}>LUXONET</Text>
+                            <Text style={styles.cardBrand}>{t('luxo.title')}</Text>
                             <Text style={styles.cardSubtitle}>{t('shop.sovereignReserve')}</Text>
                         </View>
                         <View style={styles.contactlessWrap}>
@@ -134,7 +134,7 @@ export const BelongingsScreen = () => {
                             a loss, and red in this game means a loss.
                            ------------------------------------------------ */}
                         <View style={styles.valuationBlock}>
-                            <Text style={styles.valuationLabel}>TOTAL ASSET VALUATION</Text>
+                            <Text style={styles.valuationLabel}>{t('luxo.totalValuation')}</Text>
                             <Text style={styles.valuationValue}>
                                 {formatCurrencyMain(netWorth)}
                             </Text>
@@ -149,14 +149,14 @@ export const BelongingsScreen = () => {
                     {/* Card Footer: Cardholder Name + VIP Tier Badge */}
                     <View style={styles.cardFooter}>
                         <View style={styles.cardholderBlock}>
-                            <Text style={styles.cardholderLabel}>CARDHOLDER</Text>
+                            <Text style={styles.cardholderLabel}>{t('luxo.cardholder')}</Text>
                             <Text style={styles.cardholderName} numberOfLines={1}>
                                 {cardHolderName}
                             </Text>
                         </View>
 
                         <View style={styles.blackBadge}>
-                            <Text style={styles.blackBadgeText}>CENTURION BLACK</Text>
+                            <Text style={styles.blackBadgeText}>{t('luxo.centurionBlack')}</Text>
                         </View>
                     </View>
                 </View>
@@ -212,7 +212,7 @@ export const BelongingsScreen = () => {
                                     color={theme.colors.textMuted}
                                 />
                             </View>
-                            <Text style={styles.emptyTitle}>No Luxury Assets Found</Text>
+                            <Text style={styles.emptyTitle}>{t('luxo.noAssets')}</Text>
                             <Text style={styles.emptySubtitle}>
                                 Acquire prime real estate, supercars, and haute horlogerie via the
                                 LuxoNet Store.

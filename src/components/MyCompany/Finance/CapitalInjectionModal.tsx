@@ -73,14 +73,14 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose, asScreen }) 
             />
 
             <ScrollView contentContainerStyle={styles.body}>
-                <RowGroup title="Where the money is">
+                <RowGroup title={t('fin.whereMoneyIs')}>
                     <StatRow
                         label={t('finance.availableCash')}
                         value={formatMoney(money)}
                         why="your own account, this is what you can put in"
                     />
                     <StatRow
-                        label="Company capital"
+                        label={t('fin.companyCapital')}
                         value={formatMoney(companyCapital)}
                         why="what the business is running on"
                     />
@@ -104,7 +104,7 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose, asScreen }) 
                     ))}
                 </View>
 
-                <RowGroup title="What happens">
+                <RowGroup title={t('fin.whatHappens')}>
                     <StatRow
                         label={t('finance.injecting')}
                         value={formatMoney(amount)}
@@ -113,12 +113,12 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose, asScreen }) 
                         detail={
                             <>
                                 <DetailLine
-                                    label="Your cash after"
+                                    label={t('fin.yourCashAfter')}
                                     value={formatMoney(money - amount)}
                                     tone="down"
                                 />
                                 <DetailLine
-                                    label="Company capital after"
+                                    label={t('fin.capitalAfter')}
                                     value={formatMoney(companyCapital + amount)}
                                     tone="up"
                                 />

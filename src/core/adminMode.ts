@@ -8,6 +8,10 @@
 //  for as unlimited money, everything bought, every product open, casino
 //  standing at the top and research that never runs out.
 //
+//  FOUR OF THOSE FIVE. "Every product open" was taken back the first time it
+//  was pressed, and the reason is worth reading before anybody puts it back:
+//  see the shelved block in `applyAdminMode`.
+//
 //  ---------------------------------------------------------------------------
 //  WHY THIS IS A MODULE AND NOT SIX LINES IN A BUTTON
 //  ---------------------------------------------------------------------------
@@ -50,6 +54,14 @@ export type AdminReport = {
     money: number;
     researchPoints: number;
     casinoReputation: number;
+    /**
+     * SHELVED, and kept at zero.
+     *
+     * The button used to open every product and no longer does; see the note
+     * in `applyAdminMode`. The field stays so a save, a test or a future
+     * demo switch has the same shape, and so that "zero" is a statement
+     * rather than a missing number.
+     */
     productsUnlocked: number;
     assetsOwned: number;
 };
@@ -99,29 +111,49 @@ export const applyAdminMode = (): AdminReport => {
     } catch { /* player store not standing */ }
 
     // ------------------------------------------------------------------
-    //  EVERY PRODUCT OPEN
+    //  SHELVED: EVERY PRODUCT OPEN
     // ------------------------------------------------------------------
-    //  Written straight onto the list rather than through `unlockProduct`,
-    //  which charges research and cash and refuses anything whose
-    //  prerequisite is shut. Paying for them out of a quadrillion would work
-    //  and would also make the order matter, which is a reason for this to
-    //  fail quietly on a bad day.
+    //  Asked for in the first place as part of "everything already in it",
+    //  and taken back the moment it was actually pressed: "let all of these
+    //  products not be open".
+    //
+    //  Which is right, and it is worth writing down why, because the other
+    //  four steps stayed. Money, research, casino standing and the
+    //  collection all SKIP A GRIND. They hand the player the position that
+    //  forty years of play would have reached, and the game after the press
+    //  is the same game.
+    //
+    //  Opening every product is a different thing. The tech tree is not a
+    //  grind to be skipped, it is the decision the company screen is ABOUT:
+    //  which category to enter, what to unlock next, what to leave shut.
+    //  Turning all of it on does not fast forward that decision, it deletes
+    //  it - and leaves a screen of things the player did not choose and has
+    //  no reason to care about.
+    //
+    //  So the button no longer touches products. A player who wants one at
+    //  the top of the tree has a quadrillion dollars and a billion research
+    //  points and can open it in the ordinary way, in the order the tree
+    //  intends, which is the part that was worth keeping.
+    //
+    //  Kept commented rather than removed, in case the position it produced
+    //  is ever wanted for a screenshot or a demo. `report.productsUnlocked`
+    //  stays zero and the dialog no longer claims a number.
     // ------------------------------------------------------------------
-    try {
-        const { useProductStore } = require('./store/useProductStore');
-        const store = useProductStore.getState() as {
-            unlockableProducts?: { id: string; isUnlocked: boolean }[];
-        };
-        const list = store.unlockableProducts;
-        if (Array.isArray(list)) {
-            useProductStore.setState({
-                unlockableProducts: list.map(p => ({ ...p, isUnlocked: true })),
-            });
-            report.productsUnlocked =
-                (useProductStore.getState() as typeof store)
-                    .unlockableProducts?.filter(p => p.isUnlocked).length ?? 0;
-        }
-    } catch { /* product store not standing */ }
+    // try {
+    //     const { useProductStore } = require('./store/useProductStore');
+    //     const store = useProductStore.getState() as {
+    //         unlockableProducts?: { id: string; isUnlocked: boolean }[];
+    //     };
+    //     const list = store.unlockableProducts;
+    //     if (Array.isArray(list)) {
+    //         useProductStore.setState({
+    //             unlockableProducts: list.map(p => ({ ...p, isUnlocked: true })),
+    //         });
+    //         report.productsUnlocked =
+    //             (useProductStore.getState() as typeof store)
+    //                 .unlockableProducts?.filter(p => p.isUnlocked).length ?? 0;
+    //     }
+    // } catch { /* product store not standing */ }
 
     // ------------------------------------------------------------------
     //  AND THE WHOLE CATALOGUE IN THE COLLECTION
@@ -136,6 +168,11 @@ export const applyAdminMode = (): AdminReport => {
     // ------------------------------------------------------------------
     try {
         const { useAssetStore } = require('../features/shopping/store/useAssetStore');
+        // ITEMS, and NOT the generation gated shelf. Deliberate: this button
+        // exists to put the whole catalogue in the collection, and a debug
+        // grant that stopped short of the locked stock would leave the
+        // prestige score short of a hundred with nothing on screen to say
+        // why. See features/shopping/logic/shelfNow.ts for the shop's rule.
         const { ITEMS } = require('../features/shopping/data/shoppingRegistry');
         // TYPED, because this was written untyped first and the age field was
         // spelled `quartersHeld`. `OwnedAsset` calls it `quartersOwned`, so

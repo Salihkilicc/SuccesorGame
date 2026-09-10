@@ -80,6 +80,10 @@ export type MailState = {
 type MailStore = MailState & {
     setHasHydrated: (v: boolean) => void;
     markRead: (mailId: string) => void;
+    /** @orphan-ok-symbol markAllRead - deliberate. The inbox is the story
+     *  and a button that marks twenty letters read without opening one is
+     *  a button for skipping the game. Kept in case a settings toggle ever
+     *  wants it. */
     markAllRead: () => void;
     receiveMail: (mail: Omit<Mail, 'id' | 'isRead'>) => void;
     deleteMail: (mailId: string) => void;

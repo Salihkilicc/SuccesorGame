@@ -181,6 +181,8 @@ export interface CorporateFinanceState {
      * Parayi aliyor ama bakiyeyi azaltmiyordu; kredi hic kapanmiyordu.
      * Yerine: serviceDebtQuarter
      */
+    /** @orphan-ok-symbol payMonthlyInterests - retired; see the note above.
+     *  Yerine: serviceDebtQuarter. */
     payMonthlyInterests: (spendCashFn: (amount: number) => void) => {
         totalPayment: number;
         success: boolean;
@@ -190,6 +192,9 @@ export interface CorporateFinanceState {
     getMonthlyInterestTotal: () => number;
 
     // Subsidiary Actions
+    /** @orphan-ok-symbol acquireCompany - the third of the three old routes
+     *  described in the note below. `executeAcquisition` replaced all of
+     *  them and is the only door now. */
     acquireCompany: (company: any, price: number, deal?: AcquisitionDeal) => void;
 
     /**

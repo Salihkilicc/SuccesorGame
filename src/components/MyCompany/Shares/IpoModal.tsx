@@ -157,7 +157,7 @@ const IpoModal = ({ visible, onClose }: Props) => {
                                     Grow revenue and profit first. The multiple follows.
                                 </Text>
                                 <Pressable style={styles.primary} onPress={close}>
-                                    <Text style={styles.primaryText}>UNDERSTOOD</Text>
+                                    <Text style={styles.primaryText}>{t('ui.understood')}</Text>
                                 </Pressable>
                             </>
                         )}

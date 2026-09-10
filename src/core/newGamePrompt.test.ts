@@ -223,10 +223,34 @@ describe('the question itself', () => {
 
 describe('the destructive step', () => {
     it('is asked by the same mounted component as the pacing one', () => {
+        // ------------------------------------------------------------------
+        //  THREE PANELS NOW, AND THE COUNT IS STILL THE POINT
+        // ------------------------------------------------------------------
+        //  It asserted exactly two, which was the whole guarantee: one
+        //  component owns every question in this flow, so a second dialog
+        //  cannot appear from somewhere else and arrive first. A third
+        //  question joined them - "Change your character", which warns about
+        //  the run AND about being asked who you are - and it lives here for
+        //  the same reason the other two do.
+        //
+        //  Still an exact count rather than "at least": the number going up
+        //  should be a decision somebody makes on purpose and writes down,
+        //  which is what this line makes it.
+        // ------------------------------------------------------------------
         const dialog = code('../components/story/NewGameQuestion.tsx');
         expect(dialog).toMatch(/mode === 'erase'/);
+        expect(dialog).toMatch(/mode === 'newCharacter'/);
         expect(dialog).toMatch(/tone="danger"/);
-        expect((dialog.match(/<ConfirmPanel/g) ?? []).length).toBe(2);
+        expect((dialog.match(/<ConfirmPanel/g) ?? []).length).toBe(3);
+    });
+
+    it('and the character question warns about more than the erase one does', () => {
+        // Its own copy, not the erase panel relabelled. The erase warning
+        // says the run goes; this one has to say the run goes and that the
+        // player is about to be asked their name, gender and company.
+        const dialog = code('../components/story/NewGameQuestion.tsx');
+        expect(dialog).toMatch(/newGame\.characterTitle/);
+        expect(dialog).not.toMatch(/mode === 'newCharacter'[\s\S]{0,400}newGame\.eraseTitle/);
     });
 
     it('and settings no longer raises its own alert for it', () => {

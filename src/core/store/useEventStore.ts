@@ -29,6 +29,8 @@ type EventStore = EventState & {
   incrementCompanyEventCount: () => void;
   setLastCasinoEvent: (value: string | null) => void;
   resetCycleFlags: () => void;
+  /** @orphan-ok-symbol resetDailyFlags - the game runs on quarters. There
+   *  is no day to roll over, and nothing calls this. */
   resetDailyFlags: () => void;
   reset: () => void;
 };

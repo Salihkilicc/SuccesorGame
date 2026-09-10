@@ -17,7 +17,16 @@ type CalendarState = {
 
 type CalendarStore = CalendarState & {
     setHasHydrated: (value: boolean) => void;
+    // ------------------------------------------------------------------
+    //  THE CALENDAR SHOWS, IT DOES NOT TAKE BOOKINGS
+    // ------------------------------------------------------------------
+    //  Nothing in the CEO cut lets a player put something in the diary.
+    //  What fills it is the quarter itself, written elsewhere. These two
+    //  are what a bookable calendar would need and are correct for it.
+    // ------------------------------------------------------------------
+    /** @orphan-ok-symbol addEvent - no screen books anything */
     addEvent: (event: CalendarEvent) => void;
+    /** @orphan-ok-symbol removeEvent - same, see above */
     removeEvent: (id: string) => void;
 };
 

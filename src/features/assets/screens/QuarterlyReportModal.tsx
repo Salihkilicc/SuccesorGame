@@ -638,7 +638,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
               counted them all along, they were simply never shown. */}
           {(p.contractUnits ?? 0) > 0 && (
             <>
-              <DetailLine label="  own line" value={formatNumber(p.ownUnits ?? 0)} />
+              <DetailLine label={t('fin.ownLine2')} value={formatNumber(p.ownUnits ?? 0)} />
               <DetailLine label="  outsourced" value={formatNumber(p.contractUnits ?? 0)} />
             </>
           )}
@@ -677,16 +677,16 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
 
           <DetailRule />
 
-          <DetailLine label="Price" value={formatMoney(p.unitPrice)} />
-          <DetailLine label="Unit cost" value={formatMoney(p.unitCost)} />
+          <DetailLine label={t('fin.price')} value={formatMoney(p.unitPrice)} />
+          <DetailLine label={t('fin.unitCost')} value={formatMoney(p.unitCost)} />
           <DetailLine
-            label="Margin per unit"
+            label={t('fin.marginPerUnit')}
             value={formatMoney(p.unitPrice - p.unitCost)}
             strong
             tone={p.unitPrice - p.unitCost >= 0 ? 'positive' : 'negative'}
           />
           <DetailLine
-            label="Marketing"
+            label={t('fin.marketing')}
             value={
               (p.marketingBudget ?? 0) > 0
                 ? `${formatMoney(p.marketingBudget ?? 0)}/quarter`
@@ -1005,7 +1005,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                         very number it is a percentage of. */}
                     {(report.ceoBonusPaid ?? 0) > 0 && (
                       <StatementLine
-                        label="CEO annual bonus"
+                        label={t('fin.ceoAnnualBonus')}
                         amount={report.ceoBonusPaid ?? 0}
                         negative
                         explanation={
@@ -1313,7 +1313,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               />
               {report.researchGained > 0 && (
                 <DetailLine
-                  label="  earned this quarter"
+                  label={t('fin.earnedThisQ')}
                   value={`+${formatNumber(report.researchGained)}`}
                   tone="rp"
                 />

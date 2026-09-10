@@ -36,7 +36,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 
 import { theme } from '../../core/theme';
-import { t } from '../../core/i18n';
+import { t, useLocale } from '../../core/i18n';
 import type { Ending } from '../../data/story/endings';
 import { ENDINGS } from '../../data/story/endings';
 import { endingsProgress } from '../../core/story/record';
@@ -45,6 +45,7 @@ import { useIdentityStore } from '../../core/store/useIdentityStore';
 import { useFamilyStore } from '../../core/store/useFamilyStore';
 import { successorFor, heirInWaiting } from '../../core/story/mortality';
 import { runSuccession, type SuccessionReason } from '../../core/story/runSuccession';
+import { translateEnding, translateRecordRow } from '../../data/i18n/endingTranslations';
 
 type Props = {
     ending: Ending;
@@ -121,7 +122,10 @@ const heirWaiting = (endingId: string): { id: string; name: string } | null => {
     }
 };
 
-const EndingOverlay = ({ ending, onNewGame }: Props) => {
+const EndingOverlay = ({ ending: rawEnding, onNewGame }: Props) => {
+    useLocale();
+    const ending = translateEnding(rawEnding);
+
     const [showRecord, setShowRecord] = useState(false);
     const fade = useRef(new Animated.Value(0)).current;
 
@@ -171,6 +175,13 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
         }).start();
     }, [fade]);
 
+    const knownEndings = new Set(Object.keys(ENDINGS));
+    const foundEndingsCount = new Set(endingsSeen.filter(id => knownEndings.has(id))).size;
+    const progressLabel = t('ending.progress', {
+        found: String(foundEndingsCount),
+        total: String(Object.keys(ENDINGS).length),
+    });
+
     return (
         <Animated.View style={[styles.overlay, { opacity: fade }]}>
             {!showRecord ? (
@@ -179,12 +190,12 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
                     <Text style={styles.body}>{ending.body}</Text>
 
                     <TouchableOpacity style={styles.primaryButton} onPress={() => setShowRecord(true)}>
-                        <Text style={styles.primaryButtonText}>SEE THE RECORD</Text>
+                        <Text style={styles.primaryButtonText}>{t('ending.seeRecord')}</Text>
                     </TouchableOpacity>
                 </View>
             ) : (
                 <View style={styles.page}>
-                    <Text style={styles.recordHeading}>THE RECORD</Text>
+                    <Text style={styles.recordHeading}>{t('ending.theRecord')}</Text>
 
                     {/* Scrolls because eight rows plus two buttons is tight on
                         a small phone, and the row that gets cut off would be
@@ -194,18 +205,21 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
                         contentContainerStyle={styles.rowsContent}
                         showsVerticalScrollIndicator={false}
                     >
-                        {rows.map(row => (
-                            <View key={row.label} style={styles.row}>
-                                <Text style={styles.rowLabel}>{row.label}</Text>
-                                <Text style={styles.rowValue}>{row.value}</Text>
-                            </View>
-                        ))}
+                        {rows.map(rawRow => {
+                            const row = translateRecordRow(rawRow);
+                            return (
+                                <View key={rawRow.label} style={styles.row}>
+                                    <Text style={styles.rowLabel}>{row.label}</Text>
+                                    <Text style={styles.rowValue}>{row.value}</Text>
+                                </View>
+                            );
+                        })}
                     </ScrollView>
 
                     {/* The only line on either screen that reaches outside the
                         run, and the reason to press the button below it. */}
                     <Text style={styles.progress}>
-                        {endingsProgress(endingsSeen, Object.keys(ENDINGS))}
+                        {progressLabel}
                     </Text>
 
                     {/* ----------------------------------------------------
@@ -223,7 +237,7 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
                     {heir ? (
                         <TouchableOpacity style={styles.primaryButton} onPress={carryOn}>
                             <Text style={styles.primaryButtonText}>
-                                {`CARRY ON AS ${heir.name.toUpperCase()}`}
+                                {t('ending.carryOnAs', { name: heir.name.toUpperCase() })}
                             </Text>
                         </TouchableOpacity>
                     ) : (
@@ -238,7 +252,7 @@ const EndingOverlay = ({ ending, onNewGame }: Props) => {
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity style={styles.backButton} onPress={() => setShowRecord(false)}>
-                            <Text style={styles.backButtonText}>Read it again</Text>
+                            <Text style={styles.backButtonText}>{t('ending.readAgain')}</Text>
                         </TouchableOpacity>
                     )}
                 </View>

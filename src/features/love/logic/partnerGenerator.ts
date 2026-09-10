@@ -26,6 +26,8 @@ import type {
     SocialTier,
 } from '../../../data/relationshipTypes';
 import { fingerprintFor } from './psychometrics';
+import { upkeepFor } from './partnerUpkeep';
+import { backgroundKeyFor } from '../data/backgrounds';
 
 /**
  * How somebody dresses, by tier. Cosmetic and stated as such.
@@ -45,15 +47,33 @@ const STYLE_FOR_TIER: Record<SocialTier, PartnerProfile['stats']['style']> = {
     STUDENT_LIFE: 'Sporty',
 };
 
-const TIER_BASE_COSTS: Record<SocialTier, number> = {
-    'GLOBAL_ELITE': 40000,
-    'HIGH_SOCIETY': 10000,
-    'CORPORATE_ELITE': 5000,
-    'UNDERGROUND': 2000,
-    'ARTISTIC': 800,
-    'BLUE_COLLAR': 500,
-    'STUDENT_LIFE': 200,
-};
+// ============================================================================
+//  SHELVED: THE SEVEN NUMBERS THAT WERE TYPED RATHER THAN DERIVED
+// ============================================================================
+//
+//  Reported as: the partners are not rich, make them rich, and make it follow
+//  prestige. These are why they were not. A student to a reigning queen is two
+//  hundred times, and the GATE between those two rooms is nothing against a
+//  quarter of a trillion - so the ladder of people went flat against the
+//  ladder of money and stayed flat for the rest of the dynasty.
+//
+//  MEASURED at the moment a player stands on each gate: a GLOBAL_ELITE partner
+//  cost between 0.01% and 0.04% of what the player earned that month.
+//
+//  logic/partnerUpkeep.ts derives all seven from `TIER_UNLOCK` and the real
+//  `payCeiling` instead, so the price of the room decides the price of the
+//  people in it and the two cannot drift apart again.
+//
+//  const TIER_BASE_COSTS: Record<SocialTier, number> = {
+//      'GLOBAL_ELITE': 40000,
+//      'HIGH_SOCIETY': 10000,
+//      'CORPORATE_ELITE': 5000,
+//      'UNDERGROUND': 2000,
+//      'ARTISTIC': 800,
+//      'BLUE_COLLAR': 500,
+//      'STUDENT_LIFE': 200,
+//  };
+// ============================================================================
 
 const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
@@ -126,6 +146,11 @@ const generateId = (): string => {
 };
 
 export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
+    // Drawn HERE rather than in the return, because the background is chosen
+    // from it - see data/backgrounds.ts. A history drawn from Math.random
+    // would re-roll on every render and would not be a history.
+    const id = generateId();
+
     // 1. Pick Job (and derive Tier)
     let job: JobDefinition;
 
@@ -139,9 +164,9 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
     // 2. Pick Personality
     const personality = getRandomElement(PERSONALITY_TRAITS);
 
-    // 3. Calculate Cost
-    const baseCost = TIER_BASE_COSTS[job.tier];
-    const monthlyCost = Math.floor(baseCost * personality.costMultiplier);
+    // 3. What they cost a month. Derived from the room's own gate rather than
+    //    from a typed constant - see logic/partnerUpkeep.ts.
+    const monthlyCost = upkeepFor(job.tier, personality);
 
     // ------------------------------------------------------------------
     //  4. WHO THEY ARE: GENDER FIRST, BECAUSE THE NAME DEPENDS ON IT
@@ -234,13 +259,15 @@ export const generatePartner = (forcedTier?: SocialTier): PartnerProfile => {
     // const gender: 'male' | 'female' = Math.random() > 0.5 ? 'female' : 'male';
 
     return {
-        id: generateId(),
+        id,
         name: `${firstName} ${lastName}`,
         photo: null,
         gender,
         stats: {
             ethnicity,
             age,
+            // Where they came from. A KEY, and one of five per room.
+            background: backgroundKeyFor(job.tier, id),
             // An Heir and an Heiress are one job. See jobsData.titleFor.
             occupation: titleOf(job, gender),
             happiness,

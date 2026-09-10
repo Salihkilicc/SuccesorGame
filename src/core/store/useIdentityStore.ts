@@ -150,6 +150,35 @@ type IdentityStore = IdentityState & {
     /** Called by startNewGame, once, before anything is torn down. */
     countRunStarted: () => void;
     /**
+     * Ask the player who they are again.
+     *
+     * -----------------------------------------------------------------------
+     *  WHY THIS IS ONE FIELD AND NOT A WIPE
+     * -----------------------------------------------------------------------
+     *  Asked for as "we cannot change our gender or our name; a button under
+     *  New Game that changes your character, and the company name too, so it
+     *  is like starting from scratch".
+     *
+     *  RootNavigator already decides what to ask from DATA rather than from a
+     *  flag: no identity means ask everything, identity but no company means
+     *  ask the company only. So this does not need a new screen, a new route
+     *  or a new mode. Setting `created` back to false is the whole feature;
+     *  the full form appears by itself and writes the same fields it wrote on
+     *  the first launch.
+     *
+     *  WHAT IT DELIBERATELY KEEPS: `runsStarted`, `openingSeen`,
+     *  `endingsSeen` and `tutorialCompleted`. Those are facts about the
+     *  PERSON HOLDING THE PHONE, not about the character. Somebody who has
+     *  read four endings has still read them after choosing a new name, and
+     *  being offered the tutorial again because you changed your name would
+     *  be the feature punishing you for using it.
+     *
+     *  `ownFirstName` is left too, and is overwritten by `setIdentity` a
+     *  moment later. Clearing it here would leave a window where the game
+     *  knows nobody at all.
+     */
+    forgetIdentity: () => void;
+    /**
      * Records that the player reached this ending. Idempotent.
      *
      * Called from the closing overlay rather than from `endGame`, so that an
@@ -207,6 +236,9 @@ export const useIdentityStore = create<IdentityStore>()(
             markTutorialCompleted: () => set({ tutorialCompleted: true }),
             markOpeningSeen: () => set({ openingSeen: true }),
             countRunStarted: () => set(state => ({ runsStarted: (state.runsStarted || 0) + 1 })),
+            // One field. See the note on the type above for what it keeps and
+            // why the navigator needs nothing else to show the full form.
+            forgetIdentity: () => set({ created: false }),
             markEndingSeen: (id) => set(state => (
                 state.endingsSeen.includes(id)
                     ? state

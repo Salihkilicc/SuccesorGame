@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { CASINO_LOCATIONS, LocationId, CasinoLocation } from '../data/casinoData';
+import { CASINO_LOCATIONS, LocationId, CasinoLocation, VIP_LOCATION } from '../data/casinoData';
 import { t, useLocale } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
 import { formatCompact } from '../../../core/utils';
@@ -28,6 +28,29 @@ interface CasinoLocationModalProps {
     currentLocationId: LocationId;
     unlockedLocations: CasinoLocation[];
     onSelectLocation: (id: LocationId) => void;
+    // ----------------------------------------------------------------------
+    //  THE PRIVATE ROOM, WHICH IS NOT A CITY
+    // ----------------------------------------------------------------------
+    //  Reported twice in one sentence: the noir button breaks the casino card
+    //  when it appears, and it should live at the bottom of the countries in
+    //  travel, "like a country button but not a country, the premium place
+    //  only the important people play in".
+    //
+    //  It broke the card because it was a second control in the header row
+    //  beside the travel button - two pills competing for a width that only
+    //  fits one, so the row wrapped and took the layout with it.
+    //
+    //  And travel is where it belongs. Every other way of changing where you
+    //  are playing is in this list; the room was the one exception, and being
+    //  an exception is what put it in the header in the first place.
+    //
+    //  Optional, so a caller that has no VIP door simply does not draw one.
+    // ----------------------------------------------------------------------
+    vipVisible?: boolean;
+    vipAllowed?: boolean;
+    vipLabel?: string;
+    inVip?: boolean;
+    onVipPress?: () => void;
 }
 
 const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
@@ -36,6 +59,11 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
     currentLocationId,
     unlockedLocations,
     onSelectLocation,
+    vipVisible,
+    vipAllowed,
+    vipLabel,
+    inVip,
+    onVipPress,
 }) => {
     useLocale();
     /**
@@ -176,6 +204,41 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
                                 </TouchableOpacity>
                             );
                         })}
+                        {/* ----------------------------------------------
+                            AND THE ROOM THAT IS NOT A CITY
+
+                            Last, under all of them, and deliberately not
+                            styled like one: no flag, no reputation gate, a
+                            gold hairline and a crown. It should read as the
+                            place at the end of the list rather than as the
+                            sixth city.
+                           ---------------------------------------------- */}
+                        {vipVisible && (
+                            <TouchableOpacity
+                                onPress={() => { onVipPress?.(); onClose(); }}
+                                activeOpacity={vipAllowed || inVip ? 0.75 : 1}
+                                style={[styles.vipRow, !(vipAllowed || inVip) && styles.vipRowShut]}
+                            >
+                                <View style={styles.vipBadge}>
+                                    <MaterialCommunityIcons
+                                        name="crown-outline"
+                                        size={18}
+                                        color={VIP_LOCATION.theme.primary}
+                                    />
+                                </View>
+                                <View style={styles.detailsBlock}>
+                                    <Text style={[styles.locName, { color: VIP_LOCATION.theme.primary }]}>
+                                        {translateCasinoLocationName(VIP_LOCATION.name).toUpperCase()}
+                                    </Text>
+                                    <Text style={styles.vipSub}>{vipLabel}</Text>
+                                </View>
+                                <MaterialCommunityIcons
+                                    name={vipAllowed || inVip ? 'chevron-right' : 'lock'}
+                                    size={20}
+                                    color={vipAllowed || inVip ? VIP_LOCATION.theme.primary : theme.colors.textMuted}
+                                />
+                            </TouchableOpacity>
+                        )}
                     </ScrollView>
                 </View>
             </View>
@@ -186,6 +249,38 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
 export default CasinoLocationModal;
 
 const styles = StyleSheet.create({
+    /**
+     * A country button that is plainly not a country.
+     *
+     * Same height and the same three columns as a city row, so it belongs to
+     * the list; a gold hairline and no flag, so nobody mistakes it for one.
+     */
+    vipRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        padding: 14,
+        marginTop: 4,
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 201, 76, 0.45)',
+        backgroundColor: 'rgba(239, 201, 76, 0.06)',
+    },
+    vipRowShut: { opacity: 0.55 },
+    vipBadge: {
+        width: 38,
+        height: 38,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 201, 76, 0.45)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    vipSub: {
+        color: theme.colors.textMuted,
+        fontSize: 11,
+        marginTop: 2,
+    },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(10, 14, 18, 0.85)',
@@ -322,6 +417,10 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     currentBadgeText: {
+        // The badge takes the room's primary and every room primary is a
+        // light colour, #05A8F6 through #EFC94C. Dark on those measures 7.9
+        // to 13.1; white on the gold room would be 1.60.
+        // @contrast-checked loc.theme.primary
         color: '#000000',
         fontSize: 10,
         fontWeight: '900',

@@ -77,7 +77,7 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
                         <Text style={styles.summaryValue}>
                             {formatNumber(market.sizeUnitsPerQuarter)}
                         </Text>
-                        <Text style={styles.summaryUnit}>units/qtr</Text>
+                        <Text style={styles.summaryUnit}>{t('fin.unitsQtr')}</Text>
                     </View>
                     <View style={[styles.summaryCell, styles.summaryCellBorder]}>
                         <Text style={styles.summaryLabel}>{t('os.yourShare')}</Text>

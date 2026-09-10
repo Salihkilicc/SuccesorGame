@@ -1,3 +1,6 @@
+// @survives-new-game the chosen language is a preference, not a save. A new
+// company must not put the app back into English.
+//
 // src/core/i18n/index.ts
 //
 // ============================================================================
@@ -82,6 +85,24 @@ export const t = (key: string, vars?: Record<string, string | number>): string =
         (acc, k) => acc.split(`{${k}}`).join(String(vars[k])),
         raw,
     );
+};
+
+/**
+ * Bu anahtar ICIN gercekten bir metin var mi.
+ *
+ * `t()` bulamadigi anahtarin KENDISINI dondurur, ki bu bilincli bir karar
+ * (yukaridaki nota bakin: yarim cevrilmis uygulama calisir kalmali). Ama bazi
+ * yerlerde cagiran tarafin "yoksa baska bir sey goster" demesi gerekir, ve
+ * `t(k) === k` diye bakmak bir gun anahtarla ayni metni tasiyan bir kayitta
+ * sessizce yanlis cevap verir.
+ *
+ * Ilk kullanan: partner is unvanlari. Turkce hepsini tek satirda karsiliyor,
+ * Ingilizce ikisinde cinsiyete gore ayriliyor, ve olmayan varyant icin
+ * genel olana dusulmesi gerekiyor. Bkz. features/love/logic/partnerText.ts
+ */
+export const hasKey = (key: string): boolean => {
+    const locale = useLocaleStore.getState().locale;
+    return key in (CATALOGS[locale] || {}) || key in CATALOGS.en;
 };
 
 /**

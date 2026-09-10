@@ -33,6 +33,8 @@ export const useAchievementStore = create<AchievementStore>()(
         }));
         console.log(`Unlocked achievement: ${id}`);
       },
+      // @orphan-ok-symbol isUnlocked - the screen maps over `unlockedIds`
+      // itself rather than asking per achievement.
       isUnlocked: id => get().unlockedIds.includes(id),
       resetAchievements: () => set(() => ({ ...initialState })),
     }),

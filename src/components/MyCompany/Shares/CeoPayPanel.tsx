@@ -211,7 +211,7 @@ const CeoPayPanel = ({ open, onClose }: Props) => {
                 : t('pay.note')}
             // Unused while `choices` is present - the choices ARE the answer -
             // but ConfirmPanel takes it as required.
-            confirmLabel="Close"
+            confirmLabel={t('ui.close')}
             onCancel={onClose}
         />
     );

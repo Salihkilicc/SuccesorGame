@@ -317,6 +317,7 @@ const styles = StyleSheet.create({
     hubText: {
         // DARK ON A LIT FILL. Every room primary is a light colour; measured
         // in slotCabinet.test.ts, and this is the same rule.
+        // @contrast-checked room primary, 7.9 to 13.1 against the hub.
         color: '#000000',
         fontWeight: '900',
         letterSpacing: 0.5,

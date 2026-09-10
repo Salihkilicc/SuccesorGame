@@ -165,6 +165,11 @@ type StoryStore = StoryState & {
 
     /** Facts only go one way. There is no `clearFlag` on purpose. */
     raise: (flag: StoryFlag) => void;
+    /**
+     * @orphan-ok-symbol has - every caller reads `flags[x]` directly, or
+     * goes through core/story/conditions.ts, which is the door the scenes
+     * actually use. Kept because it is the readable form and costs a line.
+     */
     has: (flag: StoryFlag) => boolean;
 
     /**

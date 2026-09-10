@@ -483,7 +483,29 @@ const FacilityPanel: React.FC = () => {
                         setTarget(val);
                         if (confirmedHeadcount) setConfirmedHeadcount(null);
                     }}
-                    max={Math.max(tier.crew * 2, employeeCount + perQuarterHiringCap * 4)}
+                    // ------------------------------------------------------
+                    //  THE CEILING WAS A NUMBER NOTHING COULD USE
+                    // ------------------------------------------------------
+                    //  It read `Math.max(tier.crew * 2, ...)`. At the top
+                    //  tier the crew is 41,700, so the bar offered 83,400 and
+                    //  the hiring headroom pushed the label toward 99k -
+                    //  reported as "it says a maximum of 99k and the real one
+                    //  is somewhere in the forties".
+                    //
+                    //  Doubling was arbitrary. The real ceiling is the crew of
+                    //  the tier you could next build, because hiring ahead of
+                    //  an upgrade is the one honest reason to go past today's
+                    //  crew: hires arrive over several quarters, so a player
+                    //  who waits until the tier lands is short for a year.
+                    //
+                    //  At the top tier there is no next, so the ceiling is the
+                    //  crew itself, which is the number the panel has been
+                    //  calling the crew all along.
+                    // ------------------------------------------------------
+                    max={Math.max(
+                        next ? next.crew : tier.crew,
+                        employeeCount,
+                    )}
                     unit="target headcount"
                     softLimit={tier.crew}
                     softLimitLabel="Crew"

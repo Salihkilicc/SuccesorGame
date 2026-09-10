@@ -24,6 +24,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../../core/theme';
 import Portrait from '../../../components/common/Portrait';
+import ConfirmPanel from '../../../components/common/ConfirmPanel';
 import { faceFor } from '../../../core/portraits/faces';
 import { useFamilyStore, FALLBACK_CHILD_NAME } from '../../../core/store/useFamilyStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
@@ -43,6 +44,7 @@ import { surrogacyOffer } from '../../../core/story/surrogacy';
 import ProposalWizardView from '../../love/components/ProposalWizardView';
 import { NAV_BAR_CLEARANCE } from '../../../navigation/components/CrystalNavBar';
 import { t, useLocale } from '../../../core/i18n';
+import { aidLine, backgroundLine, wealthLabel } from '../../love/logic/partnerText';
 import {
     translateSocialClass,
     translateOccupation,
@@ -73,6 +75,12 @@ export const FamilyMemberScreen: React.FC = () => {
     const isDesignatedSuccessor = child
         ? child.id === family.designatedSuccessorId
         : false;
+
+    // Where the partner came from and what their family has. One door for
+    // every partner surface - see features/love/logic/partnerText.ts.
+    const partnerBackground = backgroundLine(partner);
+    const wealthWord = wealthLabel(partner?.stats?.familyWealth);
+    const partnerAid = aidLine(partner, n => `$${n.toLocaleString()}`);
 
     // "Successor" rather than "Heir" throughout, and see FALLBACK_CHILD_NAME
     // in useFamilyStore for why an unnamed child gets a word at all.
@@ -114,16 +122,39 @@ export const FamilyMemberScreen: React.FC = () => {
     const [isSurrogacyNaming, setIsSurrogacyNaming] = useState(false);
     const [pendingBabyGender, setPendingBabyGender] = useState<'Male' | 'Female'>('Male');
     const [babyName, setBabyName] = useState('');
+    // ----------------------------------------------------------------------
+    //  THE TWO WHITE SHEETS THAT WERE LEFT
+    // ----------------------------------------------------------------------
+    //  Reported as: after naming the baby a warning appears, make it a real
+    //  modal; and the same for naming a successor. Both were `Alert.alert`,
+    //  which cannot be styled, so the two most personal moments in the game
+    //  arrived as an iOS system sheet dropped into a dark screen.
+    //
+    //  `ConfirmPanel` is what every other dialog in this game uses and it was
+    //  built for exactly this complaint - see the note at the top of it and
+    //  the same fix in core/newGamePrompt.ts.
+    //
+    //  ONE piece of state rather than two booleans, for the reason the story
+    //  runner gives: two booleans can both be true and this is a sequence.
+    // ----------------------------------------------------------------------
+    const [panel, setPanel] = useState<null | {
+        title: string;
+        summary?: string;
+        note?: string;
+        confirmLabel: string;
+        onConfirm?: () => void;
+    }>(null);
 
     // ============================================================================
     // ACTIONS
     // ============================================================================
     const handleDesignateSuccessor = (targetChildId: string) => {
         family.designateSuccessor(targetChildId);
-        Alert.alert(
-            t('profile.successionDeclared'),
-            t('profile.successionDeclaredDesc', { name }),
-        );
+        setPanel({
+            title: t('profile.successionDeclared'),
+            summary: t('profile.successionDeclaredDesc', { name }),
+            confirmLabel: t('ui.close'),
+        });
     };
 
     const handleDate = () => {
@@ -322,10 +353,25 @@ export const FamilyMemberScreen: React.FC = () => {
 
         setIsBabyNamingVisible(false);
         setBabyName('');
-        Alert.alert(
-            '👶 Dynasty Expanded!',
-            `${newChildName} Hale was born and added to your succession roster.\n\nMedia Headline: "${birthRes.newsHeadline}"`,
-        );
+        // ------------------------------------------------------------------
+        //  AND THE WORDS WERE WRONG TOO
+        // ------------------------------------------------------------------
+        //  "Dynasty Expanded!" with an emoji, and a line reading "added to
+        //  your succession roster" - which is how a spreadsheet would put it.
+        //  The Turkish said "yeni bir hayat", reported as nonsense, and it
+        //  was: a stock phrase attached to nothing.
+        //
+        //  A child being born is the second most important thing that happens
+        //  in this game and it should sound like somebody telling you, not
+        //  like a record being updated. The headline goes in as the note,
+        //  which is where a quieter second line belongs.
+        // ------------------------------------------------------------------
+        setPanel({
+            title: t('family.babyBornTitle'),
+            summary: t('family.babyBornBody', { name: newChildName }),
+            note: birthRes.newsHeadline,
+            confirmLabel: t('ui.close'),
+        });
     };
 
     const handleBreakup = () => {
@@ -344,7 +390,7 @@ export const FamilyMemberScreen: React.FC = () => {
             <View style={styles.root}>
                 <ScreenHeader title={t('family.familyMember')} category="company" />
                 <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>Member not found in family registry.</Text>
+                    <Text style={styles.emptyText}>{t('ui.memberNotFound')}</Text>
                 </View>
             </View>
         );
@@ -443,6 +489,28 @@ export const FamilyMemberScreen: React.FC = () => {
                         )}
                     </View>
                 </View>
+
+                {/* ----------------------------------------------------------
+                    WHERE THEY CAME FROM
+
+                    The encounter card says it at the moment the player meets
+                    somebody, and it was gone the second they said yes. This
+                    screen is the only place a partner exists afterwards, so
+                    it is the only place the line can live.
+
+                    Empty for a partner from a save older than backgrounds,
+                    and the block does not render at all rather than drawing
+                    an empty panel. See features/love/data/backgrounds.ts.
+                   ---------------------------------------------------------- */}
+                {isPartner && !!partnerBackground && (
+                    <View style={styles.sectionCard}>
+                        <Text style={styles.metricLabel}>{t('love.background')}</Text>
+                        <Text style={styles.backgroundText}>{partnerBackground}</Text>
+                        <Text style={styles.wealthText}>
+                            {wealthWord}{'. '}{partnerAid}
+                        </Text>
+                    </View>
+                )}
 
                 {/* Bond & Love Meter Card */}
                 <View style={styles.sectionCard}>
@@ -799,7 +867,20 @@ export const FamilyMemberScreen: React.FC = () => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        {/* The game's own dialog, for the two moments that were arriving as an
+                iOS sheet. See the note beside `panel` above. */}
+            {panel && (
+                <ConfirmPanel
+                    visible
+                    title={panel.title}
+                    summary={panel.summary}
+                    note={panel.note}
+                    confirmLabel={panel.confirmLabel}
+                    onConfirm={() => { const go = panel.onConfirm; setPanel(null); go?.(); }}
+                    onCancel={() => setPanel(null)}
+                />
+            )}
+            </View>
     );
 };
 
@@ -981,6 +1062,23 @@ const styles = StyleSheet.create({
         color: '#7DD3FC',
         fontSize: 14,
         fontWeight: '800',
+    },
+    /** The background paragraph. Body text, not a metric. */
+    backgroundText: {
+        color: theme.colors.textSecondary,
+        fontSize: 13,
+        lineHeight: 19,
+        marginTop: 8,
+    },
+    /** And the family money under it, quieter. */
+    wealthText: {
+        color: theme.colors.textMuted,
+        fontSize: 11.5,
+        fontWeight: '600',
+        marginTop: 9,
+        paddingTop: 9,
+        borderTopWidth: 1,
+        borderTopColor: theme.colors.border,
     },
     progressBarBg: {
         height: 6,

@@ -1,5 +1,20 @@
+// @survives-new-game language and notification preferences belong to the
+// player, not to the save. A new company should not put the app back into
+// English.
+//
 // @orphan-ok deliberately excluded from a new game: language and notification
 // preferences belong to the player, not to the save.
+//
+// ---------------------------------------------------------------------------
+//  BOTH MARKERS, AND THE SECOND ONE IS THE OVERSHOOT
+// ---------------------------------------------------------------------------
+//  `@orphan-ok` is a WHOLE FILE pass on the reachability audit: it turns off
+//  the palette check, the frozen-text check and the dead-code check here too,
+//  which is a large hole to open for one small exemption. `@survives-new-game`
+//  is the narrow marker for exactly this, and it is what newGameKeys.test.ts
+//  reads. Left side by side rather than swapped, because dropping the old one
+//  is a change to what the audit reports about this file and that belongs in
+//  its own pass, not in a cleanup that was fixing the family store.
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';

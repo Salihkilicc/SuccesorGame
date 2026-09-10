@@ -105,12 +105,12 @@ export const CartModal: React.FC<CartModalProps> = ({
                                 color={theme.colors.textMuted}
                             />
                         </View>
-                        <Text style={styles.emptyCartTitle}>Your Cart is Empty</Text>
+                        <Text style={styles.emptyCartTitle}>{t('luxo.cartEmpty')}</Text>
                         <Text style={styles.emptyCartText}>
                             Explore the LuxoNet boutique departments to reserve ultra-luxury assets.
                         </Text>
                         <Pressable onPress={onClose} style={styles.continueButton}>
-                            <Text style={styles.continueButtonText}>CONTINUE SHOPPING</Text>
+                            <Text style={styles.continueButtonText}>{t('luxo.continueShopping')}</Text>
                         </Pressable>
                     </View>
                 ) : (
@@ -153,7 +153,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                                             size={14}
                                             color="#FF8A8A"
                                         />
-                                        <Text style={styles.actionDeleteText}>REMOVE</Text>
+                                        <Text style={styles.actionDeleteText}>{t('luxo.remove')}</Text>
                                     </Pressable>
                                 </View>
                             </View>
@@ -161,7 +161,7 @@ export const CartModal: React.FC<CartModalProps> = ({
 
                         {/* Order Summary */}
                         <View style={styles.summaryCard}>
-                            <Text style={styles.summaryTitle}>ACQUISITION BREAKDOWN</Text>
+                            <Text style={styles.summaryTitle}>{t('luxo.breakdown')}</Text>
 
                             <View style={styles.summaryRow}>
                                 <Text style={styles.summaryLabel}>{t('shop.subtotal')} ({cart.length}):</Text>
@@ -190,7 +190,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                 {cart.length > 0 && (
                     <View style={styles.checkoutFooter}>
                         <View style={styles.footerTotalContainer}>
-                            <Text style={styles.footerTotalLabel}>PAYABLE TOTAL</Text>
+                            <Text style={styles.footerTotalLabel}>{t('luxo.payableTotal')}</Text>
                             <Text style={styles.footerTotalValue}>{formatCurrency(orderTotal)}</Text>
                         </View>
                         <Pressable

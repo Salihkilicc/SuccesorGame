@@ -19,9 +19,19 @@ interface EducationState {
     completedEducations: string[]; // List of EducationItem IDs
 
     // Actions
+    // ------------------------------------------------------------------
+    //  THESE THREE ARE WIRED. THE SCREEN THAT CALLS THEM IS BEHIND A FLAG
+    // ------------------------------------------------------------------
+    //  features/life/components/Education calls all three, and `life` is
+    //  false, so the audit excludes that folder and reports them as
+    //  uncalled. Different from dead: turn the flag on and they run.
+    // ------------------------------------------------------------------
+    /** @orphan-ok-symbol enroll - called by EducationEnrollmentView, behind FEATURES.life */
     enroll: (item: EducationItem) => void;
     advanceProgress: () => { academicMessage?: string; certificateMessage?: string };
+    /** @orphan-ok-symbol study - called by the Education screens, behind FEATURES.life */
     study: (slot: 'academic' | 'certificate', multiplier: number) => { message?: string; graduated?: boolean };
+    /** @orphan-ok-symbol dropOut - called by EducationHubView, behind FEATURES.life */
     dropOut: (slot: 'academic' | 'certificate') => void;
     reset: () => void;
 }

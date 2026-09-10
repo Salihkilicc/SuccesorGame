@@ -41,6 +41,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useUserStore, useStatsStore } from '../../../core/store';
 import { useFamilyStore } from '../../../core/store/useFamilyStore';
+import { canOffer, noteOffered } from '../../../core/social/gestures';
+import { currentQuarter } from '../../../core/story/world';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { useRelationshipStore } from '../../../core/store/useRelationshipStore';
 import type { LoveStackParamList } from '../../../navigation';
@@ -61,6 +63,7 @@ import ProposalWizardView from '../components/ProposalWizardView';
 
 // Extracted constants & utils
 import { GIFTS, TEXT_MESSAGES } from '../data/loveConstants';
+import { translateGift } from '../../../data/i18n/profileLoveShopText';
 
 type LoveScreenProp = NativeStackNavigationProp<LoveStackParamList, 'LoveHome'>;
 
@@ -148,6 +151,22 @@ const LoveScreen = () => {
     setIsPickingRing(false);
   };
 
+  /**
+   * May this gesture be offered, and record it if so.
+   *
+   * The ledger lives on the family store because that is where the partner
+   * lives, and it is the same shape the board uses. See core/social/gestures.
+   */
+  const offerOnce = (kind: string): boolean => {
+    if (!partner) return false;
+    const id = partner.id || 'partner';
+    const q = currentQuarter();
+    const ledger = useFamilyStore.getState().gestureLedger;
+    if (!canOffer(ledger, id, kind, q)) return false;
+    useFamilyStore.setState({ gestureLedger: noteOffered(ledger, id, kind, q) } as never);
+    return true;
+  };
+
   const updatePartnerLove = (amount: number) => {
     if (!partner) return;
     const newLove = Math.max(0, Math.min(100, partner.love + amount));
@@ -205,7 +224,26 @@ const LoveScreen = () => {
       case 'Gift':
         setSubmenu('gift');
         break;
+      // ------------------------------------------------------------------
+      //  ONCE A QUARTER, LIKE EVERY OTHER GESTURE IN THE GAME
+      // ------------------------------------------------------------------
+      //  Reported alongside the board: "I can raise my partner's regard
+      //  without limit by hammering the button". Both of the free actions
+      //  here - this and Counseling - cost nothing and had no cooldown, so
+      //  a player could take a partner to a hundred in about twenty taps.
+      //
+      //  Gifts were never part of the complaint and are not touched: they go
+      //  through `spendMoney` and are limited by what they cost.
+      //
+      //  Same rule and same module as the board, so the two cannot drift:
+      //  core/social/gestures.ts. A compliment is a thing you can only mean
+      //  once in three months.
+      // ------------------------------------------------------------------
       case 'Compliment':
+        if (!offerOnce('compliment')) {
+          setFeedback(t('social.alreadyThisQuarter', { v1: partner.name }));
+          break;
+        }
         const success = Math.random() > 0.3;
         if (success) {
           setFeedback("She blushed and smiled! (+Love)");
@@ -237,6 +275,10 @@ const LoveScreen = () => {
         }
         break;
       case 'Counseling':
+        if (!offerOnce('counseling')) {
+          setFeedback(t('social.alreadyThisQuarter', { v1: partner.name }));
+          break;
+        }
         if (partner.love < 40) {
           setFeedback("She agreed that you need help.");
           updatePartnerLove(5);
@@ -488,7 +530,7 @@ const LoveScreen = () => {
           <Text style={styles.modalSubtitle}>{t('love.selectAGift')}</Text>
           {GIFTS.map((g, i) => (
             <Pressable key={i} style={styles.actionButton} onPress={() => handleBuyGift(g)}>
-              <Text style={styles.actionButtonText}>{g.name}</Text>
+              <Text style={styles.actionButtonText}>{translateGift(g.name)}</Text>
               <Text style={styles.priceText}>${g.price.toLocaleString()}</Text>
             </Pressable>
           ))}
@@ -694,7 +736,7 @@ const LoveScreen = () => {
           <Text style={styles.modalSubtitle}>Gift for {selectedItem?.name}</Text>
           {GIFTS.map((g, i) => (
             <Pressable key={i} style={styles.actionButton} onPress={() => handleGiftToOther(g)}>
-              <Text style={styles.actionButtonText}>{g.name}</Text>
+              <Text style={styles.actionButtonText}>{translateGift(g.name)}</Text>
               <Text style={styles.priceText}>${g.price.toLocaleString()}</Text>
             </Pressable>
           ))}

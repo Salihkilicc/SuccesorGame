@@ -79,9 +79,53 @@ export const TRAITS_TR: Record<string, string> = {
     'Loyal': 'Sadık',
     'Independent': 'Bağımsız',
     'Decisive': 'Kararlı',
+    // Partner style traits
+    'Elegant': 'Zarif',
+    'Luxury': 'Lüks',
+    'Business': 'Kurumsal',
+    'Bohemian': 'Bohem',
+    'Goth': 'Gotik',
+    'Casual': 'Günlük',
+    'Sporty': 'Sportif',
+    // ------------------------------------------------------------------
+    //  THE TEN PERSONALITIES, WHICH WERE THE HOLE IN THIS TABLE
+    // ------------------------------------------------------------------
+    //  `TRAITS_TR` had the fifteen character traits, the seven partner STYLE
+    //  words and the six child traits, and none of the ten things in
+    //  love/data/personalitiesData.ts - which is the label the encounter card
+    //  actually prints on the pill beside somebody's face.
+    //
+    //  So the pill read POWER BROKER and OLD-MONEY ELEGANCE in a Turkish
+    //  game. It fell through `translateTrait`'s own fallback, which returns
+    //  the key it was given, and that is precisely why a missing entry here
+    //  is invisible rather than loud.
+    //
+    //  Found while wiring the encounter card into this registry. That card
+    //  was the one partner surface that had never used it at all: it read
+    //  `personality.label` and `stats.occupation` straight off the data.
+    // ------------------------------------------------------------------
+    'Power Broker': 'Güç Simsarı',
+    'Old-Money Elegance': 'Köklü Zarafet',
+    'Corporate Shark': 'Kurumsal Köpekbalığı',
+    'High Maintenance': 'Masrafı Yüksek',
+    'Tech Visionary': 'Teknoloji Vizyoneri',
+    'Global Philanthropist': 'Küresel Hayırsever',
+    'Luxury Connoisseur': 'Lüks Düşkünü',
+    'Ambitious Climber': 'Hırslı Tırmanıcı',
+    'Loyal Confidante': 'Sadık Sırdaş',
+    'Strategic Pragmatist': 'Stratejik Pragmatist',
+
+    // Child traits
+    'Strategic Mind': 'Stratejik Zeka',
+    'Creative Genius': 'Yaratıcı Deha',
+    'Quick Learner': 'Hızlı Öğrenen',
+    'Curious Explorer': 'Meraklı Kaşif',
+    'Newborn Successor': 'Yeni Doğan Varis',
+    'Unplanned': 'Planlanmamış',
 };
 
 export const OCCUPATIONS_TR: Record<string, string> = {
+    // Legacy / general
     'Venture Capitalist': 'Girişim Sermayedarı',
     'Art Gallerist': 'Sanat Galerisi Sahibi',
     'Supermodel': 'Süpermodel',
@@ -96,6 +140,71 @@ export const OCCUPATIONS_TR: Record<string, string> = {
     'Socialite': 'Sosyete Mensubu',
     'Hedge Fund Analyst': 'Hedge Fon Analisti',
     'Architect': 'Mimar',
+
+    // 0. GLOBAL ELITE
+    'Reigning Sovereign': 'Hükümran Hükümdar',
+    'Reigning King': 'Hükümran Kral',
+    'Reigning Queen': 'Hükümran Kraliçe',
+    'Sovereign Wealth Fund Chair': 'Varlık Fonu Başkanı',
+    'Central Bank Governor': 'Merkez Bankası Başkanı',
+    'Head of an Oil Dynasty': 'Petrol Hanedanı Lideri',
+    'Orbital Launch Company Founder': 'Yörünge Fırlatma Şirketi Kurucusu',
+    'Owner of a Global Media Empire': 'Küresel Medya İmparatorluğu Sahibi',
+    'Shipping Dynasty Chair': 'Deniz Ticareti Hanedanı Başkanı',
+    'Nobel Laureate in Physics': 'Nobel Fizik Ödüllü Fizikçi',
+    'Grand Prix Constructor Owner': 'Formula 1 Takım Sahibi',
+    'Sovereign of a Private State': 'Özel Ada Devleti Hükümdarı',
+
+    // 1. CORPORATE ELITE
+    'Silicon Valley Tech CEO': 'Silikon Vadisi Teknoloji CEO’su',
+    'Hedge Fund Managing Director': 'Hedge Fon Yönetici Direktörü',
+    'Venture Capital General Partner': 'Risk Sermayesi Genel Ortağı',
+    'Private Equity Principal': 'Özel Sermaye Direktörü',
+    'Elite M&A Partner (Wall Street)': 'Wall Street Birleşme & Satın Alma Ortağı',
+    'Semiconductor Foundry VP': 'Yarı İletken Fabrikası Başkan Yardımcısı',
+    'AI Research Institute Director': 'Yapay Zeka Araştırma Enstitüsü Direktörü',
+    'Aerospace & Defense Executive': 'Havacılık ve Savunma Sanayii Yöneticisi',
+    'Chief Investment Officer (Family Office)': 'Yatırım Direktörü (Family Office)',
+    'Biotech Syndicate Founder': 'Biyoteknoloji Konsorsiyumu Kurucusu',
+    'Central Bank Monetary Advisor': 'Merkez Bankası Para Politikası Danışmanı',
+    'Global Energy & Oil Trader': 'Küresel Enerji & Petrol Tüccarı',
+    'Elite Neurosurgeon': 'Beyin Cerrahı',
+
+    // 2. HIGH SOCIETY
+    'Old-Money Dynasty Heiress': 'Köklü Hanedan Varisi',
+    'Old-Money Dynasty Heir': 'Köklü Hanedan Varisi',
+    'Billionaire Industrial Heir': 'Sanayici Milyarder Varisi',
+    'Billionaire Industrial Heiress': 'Sanayici Milyarder Varisi',
+    'Royal Philanthropy Ambassador': 'Kraliyet Yardım Elçisi',
+    'Haute Couture Creative Director': 'Haute Couture Kreatif Direktörü',
+    "Sotheby's Fine Art Auctioneer": "Sotheby's Sanat Müzayedecisi",
+    'Superyacht Charter Fleet Owner': 'Süperyat Filosu Sahibi',
+    'Formula 1 Team Principal': 'Formula 1 Takım Patronu',
+    'UN Ambassador & Envoy': 'BM Elçisi & Temsilcisi',
+    'Diamond Syndicate Director': 'Elmas Konsorsiyumu Direktörü',
+    '3-Star Michelin Empire Owner': '3 Yıldızlı Michelin İmparatorluğu Sahibi',
+    'Vogue Global Supermodel': 'Vogue Küresel Süpermodel',
+
+    // 3. ARTISTIC
+    'A-List Movie Star': 'A-List Film Yıldızı',
+    'Grammy-Winning Producer': 'Grammy Ödüllü Yapımcı',
+    'Blue-Chip Contemporary Artist': 'Çağdaş Sanatçı',
+    'Pritzker-Winning Architect': 'Pritzker Ödüllü Mimar',
+
+    // 4. UNDERGROUND
+    'Private Intelligence Contractor': 'Özel İstihbarat Danışmanı',
+    'Elite Cyber Security Architect': 'Siber Güvenlik Mimarı',
+    'High-Stakes VIP Syndicate Whale': 'Yüksek Bahisli VIP Oyuncu',
+    'Offshore Crypto Arbitrageur': 'Offshore Kripto Arbitrajcısı',
+
+    // 5. BLUE COLLAR & DEDICATED PROFESSIONALS
+    'Private Jet Captain': 'Özel Jet Kaptanı',
+    'Elite Celebrity Trainer': 'Ünlülerin Özel Eğitmeni',
+    'Master Sommelier': 'Master Sommelier',
+
+    // 6. STUDENT & PROMISING PRODIGIES
+    'Stanford MBA Candidate': 'Stanford MBA Öğrencisi',
+    'MIT Quantum Physics Fellow': 'MIT Kuantum Fiziği Araştırmacısı',
 };
 
 export const RARITIES_TR: Record<string, string> = {
@@ -115,6 +224,29 @@ export const CATEGORIES_TR: Record<string, string> = {
     'MARINE': 'Denizcilik',
     'AIRCRAFT': 'Havacılık',
     'COLLECTION': 'Koleksiyon',
+    'SPACE': 'Uzay',
+};
+
+export const PROPOSAL_LOCATIONS_TR: Record<string, string> = {
+    'Public Park': 'Halka Açık Park',
+    'Local Coffee Shop': 'Yerel Kafe',
+    'Sunset Beach': 'Gün Batımı Plajı',
+    'Luxury Restaurant': 'Lüks Restoran',
+    'Hot Air Balloon': 'Sıcak Hava Balonu',
+    'Fairytale Castle': 'Masalsı Şato',
+    'Private Yacht': 'Özel Yat',
+    'Eiffel Tower Top': 'Eyfel Kulesi Zirvesi',
+    'Maldives Overwater Villa': 'Maldivler Su Üstü Villası',
+    'Times Square Billboard': 'Times Meydanı Dev Reklam Panosu',
+    'Rented Private Island': 'Kiralık Özel Ada',
+    'Orbit (Space Station)': 'Yörünge (Uzay İstasyonu)',
+};
+
+export const GIFTS_TR: Record<string, string> = {
+    'Flowers': 'Çiçek',
+    'Chocolates': 'Çikolata',
+    'Jewelry': 'Mücevher',
+    'Sports Car': 'Spor Araba',
 };
 
 // Build reverse lookups for 100% strict isolation back to English
@@ -164,6 +296,17 @@ for (const [en, tr] of Object.entries(RARITIES_TR)) {
 const REVERSE_CATEGORIES_EN: Record<string, string> = {};
 for (const [en, tr] of Object.entries(CATEGORIES_TR)) {
     REVERSE_CATEGORIES_EN[tr] = en;
+    REVERSE_CATEGORIES_EN[tr.toUpperCase()] = en;
+}
+
+const REVERSE_PROPOSAL_LOCATIONS_EN: Record<string, string> = {};
+for (const [en, tr] of Object.entries(PROPOSAL_LOCATIONS_TR)) {
+    REVERSE_PROPOSAL_LOCATIONS_EN[tr] = en;
+}
+
+const REVERSE_GIFTS_EN: Record<string, string> = {};
+for (const [en, tr] of Object.entries(GIFTS_TR)) {
+    REVERSE_GIFTS_EN[tr] = en;
 }
 
 export const translateEducationLevel = (edu: string): string => {
@@ -178,6 +321,55 @@ export const translateSocialClass = (cls: string): string => {
     const locale = useLocaleStore.getState().locale;
     if (locale === 'en') return REVERSE_SOCIAL_CLASS_EN[cls] ?? cls;
     return SOCIAL_CLASS_TR[cls] ?? cls;
+};
+
+
+// ============================================================================
+//  THE ONE LINE UNDER THE PLAYER'S NAME
+// ============================================================================
+//
+//  Reported as "the titles are translated on the profile and not on the home
+//  screen". They were not translated anywhere, in fact: what the profile shows
+//  is a partner's OCCUPATION, which goes through `translateOccupation` above,
+//  and what the home screen shows is the player's own standing, which comes
+//  out of core/story/title.ts as a hardcoded English string.
+//
+//  So a Turkish player reading a Turkish game was told they were a "Tycoon".
+//
+//  Keyed on the English rather than on an id, deliberately. `titleFor` returns
+//  a STRING and always has; every rung, every dynasty name and every special
+//  title is written as prose in that file, which is the right place for a
+//  writer to work. Giving seventeen of them ids to satisfy a lookup would move
+//  the writing into a data structure to serve the translation, which is the
+//  wrong way round. An unknown title falls through unchanged, so adding a
+//  rung is never a crash - it is one line of English until somebody translates
+//  it, which is the same contract the rest of this file has.
+// ============================================================================
+
+const CEO_TITLE_TR: Record<string, string> = {
+    'Factory Owner': 'Fabrika Sahibi',
+    Manufacturer: 'Üretici',
+    Industrialist: 'Sanayici',
+    Magnate: 'Kodaman',
+    Tycoon: 'Patron',
+    'Titan of Industry': 'Sanayi Devi',
+    Colossus: 'Dev',
+    'Chief Executive': 'Genel Müdür',
+    'Old Money': 'Köklü Servet',
+    Dynast: 'Hanedan Sahibi',
+    'Head of the House': 'Hanenin Reisi',
+    'Keeper of the Name': 'Adın Bekçisi',
+    'Founder of a Dynasty': 'Bir Hanedanın Kurucusu',
+    'The Inheritor': 'Varis',
+    'The Second Founder': 'İkinci Kurucu',
+    'The One Who Kept It': 'Elinde Tutan',
+};
+
+/** The player's own standing, in the language they are playing in. */
+export const translateCeoTitle = (title: string): string => {
+    if (!title) return '';
+    if (useLocaleStore.getState().locale === 'en') return title;
+    return CEO_TITLE_TR[title] ?? title;
 };
 
 export const translateTrait = (trait: string): string => {
@@ -206,6 +398,21 @@ export const translateCategory = (cat: string): string => {
     if (!cat) return '';
     const locale = useLocaleStore.getState().locale;
     const upper = cat.toUpperCase();
-    if (locale === 'en') return REVERSE_CATEGORIES_EN[upper] ?? cat;
-    return CATEGORIES_TR[upper] ?? cat;
+    if (locale === 'en') return REVERSE_CATEGORIES_EN[cat] ?? REVERSE_CATEGORIES_EN[upper] ?? cat;
+    return CATEGORIES_TR[upper] ?? CATEGORIES_TR[cat] ?? cat;
 };
+
+export const translateProposalLocation = (venue: string): string => {
+    if (!venue) return '';
+    const locale = useLocaleStore.getState().locale;
+    if (locale === 'en') return REVERSE_PROPOSAL_LOCATIONS_EN[venue] ?? venue;
+    return PROPOSAL_LOCATIONS_TR[venue] ?? venue;
+};
+
+export const translateGift = (gift: string): string => {
+    if (!gift) return '';
+    const locale = useLocaleStore.getState().locale;
+    if (locale === 'en') return REVERSE_GIFTS_EN[gift] ?? gift;
+    return GIFTS_TR[gift] ?? gift;
+};
+

@@ -211,6 +211,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     playText: {
+        // @contrast-checked themeColor the button is filled with the room's
+        // primary, which is always a light colour. Measured 7.9 to 13.1.
         color: '#000000',
         fontSize: 13,
         fontWeight: '900',
