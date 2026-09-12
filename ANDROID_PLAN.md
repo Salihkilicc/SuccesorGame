@@ -1,5 +1,66 @@
 # Android portu, adım adım
 
+**DURUM (12 Eylül 2026):** FAZ 0, 1 ve 2 bitti ve commit'lendi. Sıradaki adım
+FAZ 4'ün ilk turu ve o senin elinde: `npx react-native run-android`.
+Aşağıdaki "Makinende bir kere" bölümü ondan önce yapılacaklar.
+
+---
+
+## Makinende bir kere kurulacaklar
+
+Projenin gerçekten istediği sürümler, `android/build.gradle` içinden okundu,
+tahmin değil:
+
+```
+compileSdk / targetSdk   36
+minSdk                   24        (Android 7.0, 2016)
+buildTools               36.0.0
+NDK                      27.1.12297006
+Kotlin                   2.1.20
+```
+
+1. **Android Studio** kur. Kurulum sırasında SDK Manager'dan **API 36** ve
+   **Build Tools 36.0.0** işaretli olsun. NDK'yı da SDK Manager > SDK Tools
+   altından, "Show Package Details" ile **27.1.12297006** sürümünü seç.
+
+2. **JDK 17**. React Native 0.81 bunu istiyor. Android Studio kendi JDK'sını
+   getiriyor, terminalden derleyeceksen ayrıca gerekli:
+   ```
+   java -version        # 17 görmelisin
+   ```
+
+3. **Ortam değişkenleri**, `~/.zshrc` içine:
+   ```
+   export ANDROID_HOME=$HOME/Library/Android/sdk
+   export PATH=$PATH:$ANDROID_HOME/platform-tools
+   ```
+   Sonra yeni bir terminal aç.
+
+4. **Bir cihaz.** Ya Android Studio > Device Manager'dan bir emülatör, ya da
+   USB hata ayıklama açık gerçek bir telefon. Gerçek telefon tercihim: gölge,
+   font ve blur farklarının hiçbiri emülatörde dürüst görünmüyor.
+   ```
+   adb devices          # cihazı listede görmelisin
+   ```
+
+5. **Çalıştır:**
+   ```
+   cd ~/Succesor
+   npx react-native run-android
+   ```
+
+İlk derleme uzun sürer, Gradle her şeyi indirir. Sonrakiler hızlı.
+
+### Takılırsan
+
+Hatayı olduğu gibi yapıştır. Bu aşamada en sık görülen üçü:
+
+- `SDK location not found` → adım 3 yapılmamış ya da terminal yenilenmemiş
+- `Could not find ... NDK` → SDK Manager'dan tam sürüm numarası seçilmemiş
+- `Unsupported class file major version` → JDK 17 değil
+
+---
+
 Bu plan ölçümle yazıldı, tahminle değil. Sayıların hepsi 11 Eylül 2026'da
 `src/` üzerinde yapılan taramadan geliyor.
 
@@ -13,7 +74,7 @@ Reanimated ve gesture-handler da yok, 58 `useNativeDriver` düz `Animated` API's
 
 ---
 
-## FAZ 0 — Önce iki karar
+## FAZ 0 — Önce iki karar  ✅ BİTTİ
 
 Kod yazmadan önce, çünkü ikisi de sonradan değiştirilemiyor.
 
@@ -31,12 +92,18 @@ Yazımları da farklı: uygulama adı `Succesor` tek s, bundle id `successor` ç
 Android'de `applicationId` **yayınlandıktan sonra değiştirilemez**. Google Play'e
 yüklediğin ilk paket adı kalıcıdır. O yüzden bu karar burada, şimdi verilmeli.
 
-Önerim: iOS'ta gerçekten yayınlanan kimliği kullan, yani `com.salihkilic.successor`.
-Tutarlı olur ve RevenueCat tarafında iki mağazayı eşleştirmek kolaylaşır.
+**KARAR: `com.salihkilic.successor`.** iOS'ta gerçekten yayınlanan kimlik bu.
 
-`app.json` içindeki yanlış kimlik ayrıca düzeltilmeli, çünkü şu an kimsenin
-okumadığı bir yerde yanlış bir değer duruyor. Bu evin klasik hatası:
-**hiçbir şeyin okumadığı doğru veri**, burada tersi.
+Araştırınca üçüncü bir değer daha çıktı ve tablo planda yazdığımdan kötüydü:
+`Info.plist` içindeki URL scheme de `com.salih115.succesor` ve **o canlı**,
+derin bağlantı onu kullanıyor. Yani üç string var ve ikisi bilerek farklı.
+Hepsi `IDENTITY.md` dosyasında, hangi dosyanın hangi isim için yetkili
+olduğuyla birlikte.
+
+`app.json` düzeltildi. Orada yıllardır yanlış bir kimlik duruyordu ve hiçbir
+şey itiraz etmiyordu, çünkü `ios.bundleIdentifier` bir Expo alışkanlığı ve
+bare RN onu okumuyor. Bu evin klasik hatası "hiçbir şeyin okumadığı doğru
+veri"ydi; bu onun aynadaki hali ve daha kötüsü.
 
 ### 0.2 minSdkVersion
 
@@ -45,7 +112,7 @@ kaybettiğin API'ye değmez.
 
 ---
 
-## FAZ 1 — Android projesini üretmek
+## FAZ 1 — Android projesini üretmek  ✅ BİTTİ
 
 React Native CLI'da var olan bir projeye platform ekleyen bir komut **yok**.
 Tek yol, aynı sürümde temiz bir proje üretip `android/` klasörünü taşımak.
@@ -74,7 +141,7 @@ görünse bile çöküyor değil.
 
 ---
 
-## FAZ 2 — Native eklentileri bağlamak
+## FAZ 2 — Native eklentileri bağlamak  ✅ BİTTİ
 
 22 bağımlılığın hepsi çapraz platform, tarandı. `react-native-tab-view` saf JS,
 onun android klasörü olmaması normal. Autolinking çoğunu kendi halleder, elle
@@ -103,11 +170,18 @@ ve/veya `ACCESS_COARSE_LOCATION` gerekiyor, artı çalışma anında izin isteme
 
 `tools/app_icon.py` şu an sadece iOS setini yazıyor. Android'in `mipmap-*`
 klasörleri ve bir de **adaptive icon** istiyor: ön plan ve arka plan iki ayrı
-katman, ve sistem maskeyi kendi uyguluyor. Portrenin kenarları kırpılabilir,
-o yüzden ön plan katmanına güvenlik boşluğu bırakmak gerek.
+katman, ve sistem maskeyi kendi uyguluyor.
 
-Araç zaten palet ve kırpmayı biliyor, ona bir `--android` bayrağı eklemek
-doğru yol. İkinci bir script yazmak iki palet yaratmanın başlangıcı olur.
+Buradaki varsayım yanlış çıktı ve ölçümle bulundu. "Güvenlik boşluğu bırakmak
+gerek" diye yazmıştım; en sert maske olan tam daireye karşı ölçünce öznenin
+sadece %7'si kayboluyor ve **hepsi sol alttaki omuz köşesi**. Yüz ve saç
+sınıra hiç yaklaşmıyor. Küçültülmüş sürüm yan yana konunca görünür şekilde
+daha kötü: kafa üçte ikiye iniyor ve yapıştırılan karenin kenarı dikiş
+bırakıyor.
+
+Yani ön plan tam tuval. `tools/app_icon.py --android` 23 dosya üretiyor ve
+arka plan katmanının rengini görselin kendi köşesinden okuyor, iki katman
+ayrışamasın diye.
 
 **Bitiş ölçütü:** uygulama açılıyor, ana ekran çiziliyor, ikonlar kare değil.
 
