@@ -133,6 +133,119 @@ def paint(img: Image.Image, ramp: str) -> Image.Image:
     return Image.fromarray(lut[PM.luminance(img)].astype('uint8'), 'RGB')
 
 
+# ===========================================================================
+#  ANDROID, AND THE THING THAT HAD TO BE MEASURED RATHER THAN ASSUMED
+# ===========================================================================
+#
+#  An adaptive icon is two layers on a 108dp canvas and the launcher supplies
+#  the mask. Google's guidance reserves the outer 18dp on every side, so only
+#  the central 72dp is GUARANTEED to survive. That is 66.7 per cent of the
+#  width, and the obvious conclusion is that the iOS artwork cannot be reused:
+#  the head fills that square and would be cut at the crown.
+#
+#  That conclusion is wrong, and it was wrong in the direction that would have
+#  made the icon worse. Measured on the real 1024, against the harshest common
+#  mask, which is the full circle:
+#
+#      subject pixels                 81,614
+#      lost to the circle mask         5,759   7.06%
+#      and all of it in rows 362..431, cols 0..219
+#
+#  Rows 362 to 431 of 432 is the BOTTOM, columns 0 to 219 the LEFT. What the
+#  circle takes is the corner of the suit shoulder. The face and the hair do
+#  not come near the boundary, because the crop already sits the head in a
+#  field of amber.
+#
+#  Rendered side by side, the "safe" version is visibly worse: the head shrinks
+#  to two thirds and the pasted square leaves a seam against the flat
+#  background, so it reads as a picture inside a picture rather than an icon.
+#
+#  So the foreground is the artwork at full canvas. Losing a corner of the
+#  shoulder to a circular launcher is the same trade iOS already makes with its
+#  squircle, and it was accepted there.
+#
+#  The background layer is flat amber anyway, which is what the mask reveals at
+#  the corners of a rounded-square launcher and what the parallax slides over.
+# ===========================================================================
+
+#  Legacy square icons, and the adaptive layers, per density.
+#  Adaptive layers are the 108dp canvas; legacy are the 48dp one.
+DENSITIES = {
+    'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4,
+}
+LEGACY_DP = 48
+ADAPTIVE_DP = 108
+
+#  Google Play's listing icon. Not in res/, uploaded by hand in the console.
+PLAY_STORE = 512
+
+RES = os.path.join(ROOT, 'android', 'app', 'src', 'main', 'res')
+STAGING = os.path.join(ROOT, 'tools', 'android_icon')
+
+#  The two XML files that tell Android these are adaptive icons at all. The
+#  `-v26` qualifier is what makes older launchers fall back to the legacy
+#  square PNGs instead, which is why both sets are written.
+ADAPTIVE_XML = """<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+</adaptive-icon>
+"""
+
+
+def write_android(master: Image.Image, ramp: str) -> list:
+    """Every density, both layers, plus the legacy squares and the Play icon.
+
+    Writes into android/app/src/main/res when that exists, and into
+    tools/android_icon when it does not, so the set can be prepared before the
+    android project has been generated.
+    """
+    root = RES if os.path.isdir(RES) else STAGING
+    staged = root is STAGING
+
+    # The flat ground the ramp gives, read from the artwork rather than typed
+    # out, so the background layer cannot drift from the foreground when the
+    # ramp changes. A corner is background by construction of the crop.
+    ground = master.getpixel((4, 4))
+
+    written = []
+    for name, scale in DENSITIES.items():
+        folder = os.path.join(root, f'mipmap-{name}')
+        os.makedirs(folder, exist_ok=True)
+
+        legacy = int(LEGACY_DP * scale)
+        square = master.resize((legacy, legacy), Image.LANCZOS)
+        square.save(os.path.join(folder, 'ic_launcher.png'))
+        # The round variant is the same artwork; the launcher masks it.
+        square.save(os.path.join(folder, 'ic_launcher_round.png'))
+
+        canvas = int(ADAPTIVE_DP * scale)
+        master.resize((canvas, canvas), Image.LANCZOS).save(
+            os.path.join(folder, 'ic_launcher_foreground.png'))
+        Image.new('RGB', (canvas, canvas), ground).save(
+            os.path.join(folder, 'ic_launcher_background.png'))
+        written.append(f'mipmap-{name} (4 files)')
+
+    anydpi = os.path.join(root, 'mipmap-anydpi-v26')
+    os.makedirs(anydpi, exist_ok=True)
+    for xml in ('ic_launcher.xml', 'ic_launcher_round.xml'):
+        with open(os.path.join(anydpi, xml), 'w', encoding='utf-8') as f:
+            f.write(ADAPTIVE_XML)
+    written.append('mipmap-anydpi-v26 (2 files)')
+
+    os.makedirs(STAGING, exist_ok=True)
+    master.resize((PLAY_STORE, PLAY_STORE), Image.LANCZOS).save(
+        os.path.join(STAGING, f'play_store_{PLAY_STORE}.png'))
+    written.append(f'play_store_{PLAY_STORE}.png')
+
+    if staged:
+        print('  android/ does not exist yet, so these were staged in')
+        print(f'  {os.path.relpath(STAGING, ROOT)} . Move them into')
+        print('  android/app/src/main/res once the project is generated,')
+        print('  or just run this again and it will write there directly.')
+    return written
+
+
 def sizes_wanted() -> set:
     """Every pixel size Contents.json actually asks for."""
     with open(os.path.join(ICONSET, 'Contents.json'), encoding='utf-8') as f:
@@ -203,6 +316,8 @@ def main() -> int:
                     help='render the candidates instead of writing the set')
     ap.add_argument('--check', action='store_true',
                     help='verify the set already on disk')
+    ap.add_argument('--android', action='store_true',
+                    help='write the Android mipmaps and adaptive layers too')
     args = ap.parse_args()
 
     if args.check:
@@ -215,6 +330,12 @@ def main() -> int:
         return 0
 
     master = paint(head(src), args.ramp)
+
+    if args.android:
+        wrote = write_android(master, args.ramp)
+        print(f'android: {", ".join(wrote)}')
+        return 0
+
     written = write_set(master)
     print(f'{len(written)} files from {os.path.basename(SOURCE)} on the {args.ramp} ramp')
     return check()
