@@ -2,6 +2,9 @@
   "name": "Succesor",
   "displayName": "Succesor",
   "ios": {
-    "bundleIdentifier": "com.salih115.succesor"
+    "bundleIdentifier": "com.salihkilic.successor"
+  },
+  "android": {
+    "applicationId": "com.salihkilic.successor"
   }
 }
