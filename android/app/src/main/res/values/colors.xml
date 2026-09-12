@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        The launch screen ground, and it is NOT theme.colors.background.
+
+        assets/bootsplash/manifest.json records what the iOS storyboard was
+        generated with, and that file is the source of truth for both
+        platforms: #000000. The two have to match or the app flashes one
+        colour on iOS and another on Android for the same half second.
+    -->
+    <color name="bootsplash_background">#000000</color>
+</resources>

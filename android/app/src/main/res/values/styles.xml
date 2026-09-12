@@ -6,4 +6,30 @@
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     </style>
 
+    <!--
+        THE LAUNCH SCREEN, AND WHY IT IS THE ACTIVITY'S THEME
+
+        On Android the splash is not a screen the app draws. It is the window
+        background the system puts up BEFORE any of our code runs, which is
+        why it is declared as a theme in the manifest rather than rendered.
+        That is also why it cannot be got wrong quietly: if this theme is
+        missing, the first thing the player sees is a white rectangle.
+
+        `postBootSplashTheme` is what the activity becomes once React Native
+        has something to show. Without it the app keeps the splash theme for
+        the rest of the session and AppTheme never applies.
+
+        Android 12 took the splash over with its own windowSplashScreen API,
+        and nothing here has to know: the library ships a values-v31 override
+        of Theme.BootSplash that maps these same two attributes onto it. So
+        inheriting is the whole of the Android 12 support, and writing a v31
+        theme in this file would be a second copy of a decision the library
+        already made.
+    -->
+    <style name="BootTheme" parent="Theme.BootSplash">
+        <item name="bootSplashBackground">@color/bootsplash_background</item>
+        <item name="bootSplashLogo">@drawable/bootsplash_logo</item>
+        <item name="postBootSplashTheme">@style/AppTheme</item>
+    </style>
+
 </resources>

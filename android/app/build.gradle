@@ -2,6 +2,23 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+// ============================================================================
+//  THE ICON FONTS, WHICH ANDROID DOES NOT GET FOR FREE
+// ============================================================================
+//  On iOS the nineteen icon fonts are listed in Info.plist under UIAppFonts.
+//  Android has no equivalent list; the fonts have to be COPIED into the
+//  assets folder at build time, and that is what this gradle file does.
+//
+//  Leave it out and nothing fails. The app builds, launches, runs, and every
+//  single icon in it renders as an empty square. Nothing in the log explains
+//  why, and the screens look like a styling bug rather than a missing build
+//  step.
+//
+//  src/core/androidBoot.test.ts checks this line is here, because a silent
+//  failure is worth a test and this one is invisible from the JavaScript.
+// ============================================================================
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.

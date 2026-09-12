@@ -127,6 +127,68 @@ describeAndroid('android boots under the name javascript registered', () => {
     });
 });
 
+describeAndroid('the things that fail without failing', () => {
+    // ------------------------------------------------------------------
+    //  EACH OF THESE BUILDS, LAUNCHES, RUNS, AND IS WRONG
+    // ------------------------------------------------------------------
+    //  None of them throws. None of them logs. All three look like a
+    //  styling mistake from the sofa, which is the most expensive kind of
+    //  bug to own because it sends you looking in the JavaScript.
+    // ------------------------------------------------------------------
+
+    it('the icon fonts are copied in, or every icon is an empty square', () => {
+        // iOS lists nineteen fonts in Info.plist under UIAppFonts. Android
+        // has no equivalent list; they have to be copied into assets at
+        // build time and this gradle file is what does it.
+        expect(read(`${ANDROID}/app/build.gradle`))
+            .toContain('react-native-vector-icons/fonts.gradle');
+    });
+
+    it('the splash theme is on the activity, or the app opens white', () => {
+        // The splash is the window background the SYSTEM puts up before any
+        // of our code runs, so it is a theme in the manifest rather than
+        // anything React draws. Missing, the first thing the player sees is
+        // a white rectangle.
+        const manifest = read(`${ANDROID}/app/src/main/AndroidManifest.xml`);
+        expect(manifest).toContain('android:theme="@style/BootTheme"');
+
+        const styles = read(`${ANDROID}/app/src/main/res/values/styles.xml`);
+        expect(styles).toContain('<style name="BootTheme" parent="Theme.BootSplash">');
+        // Without this the activity keeps the splash theme all session and
+        // AppTheme never applies.
+        expect(styles).toContain('<item name="postBootSplashTheme">@style/AppTheme</item>');
+    });
+
+    it('and the native side is told to raise it', () => {
+        const activity = read(
+            `${ANDROID}/app/src/main/java/com/salihkilic/successor/MainActivity.kt`,
+        );
+        expect(activity).toContain('RNBootSplash.init(this, R.style.BootTheme)');
+        // App.tsx hides it. If it is raised and never hidden the game is
+        // behind a logo forever; if it is hidden and never raised the hide
+        // is a no-op and the white rectangle is back.
+        expect(read('App.tsx')).toContain('BootSplash.hide');
+    });
+
+    it('the launch ground is the colour iOS already uses', () => {
+        // assets/bootsplash/manifest.json records what the iOS storyboard
+        // was generated with, and is the source of truth for both. If the
+        // two drift, the app flashes one colour on iOS and another on
+        // Android for the same half second.
+        const manifest = JSON.parse(read('assets/bootsplash/manifest.json'));
+        const colors = read(`${ANDROID}/app/src/main/res/values/colors.xml`);
+        expect(colors).toContain(
+            `<color name="bootsplash_background">${manifest.background}</color>`);
+    });
+
+    it('and the logo is present at every density', () => {
+        const missing = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+            .filter(d => !fs.existsSync(path.join(
+                ROOT, ANDROID, 'app/src/main/res', `drawable-${d}`, 'bootsplash_logo.png')));
+        expect(missing).toEqual([]);
+    });
+});
+
 describeAndroid('the launcher icon is wired and complete', () => {
     const RES = `${ANDROID}/app/src/main/res`;
 
