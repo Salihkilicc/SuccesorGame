@@ -78,3 +78,7 @@ yarn-error.log
 # tools/exportStoryText.js; the translation that matters lives in
 # src/data/i18n/storyText.ts, not here.
 build/
+
+# Python tooling
+__pycache__/
+*.pyc
