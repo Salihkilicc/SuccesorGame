@@ -37,7 +37,7 @@
 //  the middle of a place name is worse than a slightly smaller place name.
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -130,6 +130,30 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
     const insets = useSafeAreaInsets();
     const goBack = onBack || (() => navigation.goBack());
     const rule = category ? theme.categories[category] : categoryColor(route?.name);
+
+    // ------------------------------------------------------------------
+    //  TEMPORARY, AND IT IS HERE TO ANSWER ONE QUESTION
+    // ------------------------------------------------------------------
+    //  Reported on Android: the header sits too high, title and rule both.
+    //
+    //  The arithmetic below is `Math.max(insets.top, 12) + 8`, and what it
+    //  produces depends entirely on what `insets.top` is on Android, which
+    //  depends on whether the window draws under the status bar. That is a
+    //  number this codebase has never seen, and guessing it would mean
+    //  picking a padding that is right on one phone.
+    //
+    //  So it prints once per screen in development. Read it off Metro, set
+    //  the real number, and delete this block. Nothing here ships: __DEV__
+    //  is false in a release bundle.
+    // ------------------------------------------------------------------
+    useEffect(() => {
+        if (__DEV__) {
+            console.log(
+                `[header] ${route?.name ?? '?'}  insets.top=${insets.top}`,
+                `paddingTop=${inset ? Math.max(insets.top, 12) + 8 : theme.spacing.md}`,
+            );
+        }
+    }, [insets.top, inset, route?.name]);
 
     return (
         <View style={[styles.header, { paddingTop: inset ? Math.max(insets.top, 12) + 8 : theme.spacing.md }]}>
