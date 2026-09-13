@@ -44,6 +44,32 @@ const BAR_LABEL_GAP = 4;
 const BAR_HEIGHT =
     BAR_PAD_V * 2 + BAR_ICON + BAR_LABEL_GAP + Math.round(BAR_LABEL * 1.3);
 
+// ===========================================================================
+//  ANDROID PAINTS SIXTY FOUR PER CENT BLACK OVER THIS BAR
+// ===========================================================================
+//  `blurType` is an iOS word. UIVisualEffectView has named effect styles;
+//  Android has nothing of the kind, so @react-native-community/blur translates
+//  the name through a lookup table into a single flat overlay colour. The
+//  entry for 'dark' is near-black at 0.64.
+//
+//  Laid over a gradient whose own four stops are all between 0.4 and 0.5,
+//  that is not a blur that failed. The blur underneath is working; it is
+//  being buried. Which is exactly how the bar came back from the device -
+//  "tabbarda eksiklik var, crystal gibi degil" - rather than as anything that
+//  looked broken.
+//
+//  iOS never reads `overlayColor`, so naming it changes Android alone and
+//  leaves the bar that was tuned on the device it was tuned on.
+//
+//  0.28 rather than 0.64: enough to keep white icons off whatever scrolls
+//  behind, little enough that the blue still reads as blue.
+//
+//  And the colour is the palette's own ground rather than the library's,
+//  which is a sixteenth hex the reachability audit counts - correctly. The
+//  stats overlay further down this same file already dims with this one.
+// ===========================================================================
+const ANDROID_BLUR_OVERLAY = 'rgba(28,36,44,0.28)';
+
 /**
  * How much room the floating bar takes at the bottom of every screen.
  *
@@ -261,10 +287,13 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
                     locations={[0, 0.2, 0.8, 1]}
                     style={styles.blurContainer}
                 >
+                    {/* See ANDROID_BLUR_OVERLAY at the top of this file for why
+                        the overlay is named rather than left to the library. */}
                     <BlurView
                         style={StyleSheet.absoluteFill}
                         blurType="dark"
                         blurAmount={8}
+                        overlayColor={Platform.OS === 'android' ? ANDROID_BLUR_OVERLAY : undefined}
                         reducedTransparencyFallbackColor="black"
                     />
                     <View style={[styles.bottomBar, containerStyle]}>
