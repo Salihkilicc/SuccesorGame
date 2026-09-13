@@ -309,6 +309,65 @@ def sheet(src: Image.Image, dest: str) -> None:
     print(f'wrote {dest}')
 
 
+# ===========================================================================
+#  THE LAUNCH WORDMARK, WHICH ANDROID INSISTS ON TREATING AS AN ICON
+# ===========================================================================
+#
+#  Lives in this file rather than its own because it is the same problem the
+#  rest of the file solves: an image that has to be produced once per Android
+#  density, into folders whose names only this tool knows.
+#
+#  WHAT ANDROID DOES WITH IT. The launch logo goes into a 288dp SQUARE slot,
+#  and on Android 12 and up the system masks it to a circle. A wide wordmark
+#  dropped in raw is stretched to fill the square, which is what was reported
+#  as "cok buyuk ve sigmiyor, squashed".
+#
+#  So the drawable is a square canvas with the wordmark centred and
+#  letterboxed in transparency. The only question left is how wide the
+#  wordmark should be inside it, and that is a judgement rather than a
+#  calculation: the geometric maximum is 174dp, but the maximum is not
+#  necessarily the right size.
+#
+#  Hence `--mark-width`. Change it, run it, rebuild, look. Iterating on a
+#  number is cheaper than another round of me guessing.
+# ===========================================================================
+
+SPLASH_SOURCE = os.path.join(ROOT, 'assets', 'bootsplash', 'logo@4x.png')
+SPLASH_CANVAS_DP = 288
+SPLASH_MARK_DP = 130
+
+#  Android's density buckets, and the folder each one wants.
+SPLASH_DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
+
+
+def write_splash(mark_dp: int) -> list:
+    """The launch logo, square and centred, at every density."""
+    import math
+    src = Image.open(SPLASH_SOURCE).convert('RGBA')
+    ratio = src.size[1] / src.size[0]
+
+    diagonal = mark_dp * math.hypot(1, ratio)
+    print(f'  wordmark {mark_dp}dp wide, {round(mark_dp * ratio)}dp tall')
+    print(f'  diagonal {diagonal:.0f}dp against the 192dp circle: '
+          f'{"fits" if diagonal <= 192 else "WILL BE CLIPPED"}')
+
+    written = []
+    for name, scale in SPLASH_DENSITIES.items():
+        canvas = int(SPLASH_CANVAS_DP * scale)
+        w = int(mark_dp * scale)
+        h = int(round(w * ratio))
+        mark = src.resize((w, h), Image.LANCZOS)
+        # RGBA here, unlike the launcher icon: the area around the wordmark
+        # has to be transparent so the launch background shows through it.
+        out = Image.new('RGBA', (canvas, canvas), (0, 0, 0, 0))
+        out.paste(mark, ((canvas - w) // 2, (canvas - h) // 2), mark)
+        folder = os.path.join(RES, f'drawable-{name}')
+        os.makedirs(folder, exist_ok=True)
+        out.save(os.path.join(folder, 'bootsplash_logo.png'))
+        written.append(f'drawable-{name} {canvas}px canvas, {w}x{h} mark')
+    return written
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--ramp', default=DEFAULT_RAMP, choices=sorted(RAMPS))
@@ -318,6 +377,10 @@ def main() -> int:
                     help='verify the set already on disk')
     ap.add_argument('--android', action='store_true',
                     help='write the Android mipmaps and adaptive layers too')
+    ap.add_argument('--splash', action='store_true',
+                    help='write the Android launch logo at every density')
+    ap.add_argument('--mark-width', type=int, default=SPLASH_MARK_DP,
+                    help=f'how wide the wordmark sits, in dp (default {SPLASH_MARK_DP})')
     args = ap.parse_args()
 
     if args.check:
@@ -330,6 +393,11 @@ def main() -> int:
         return 0
 
     master = paint(head(src), args.ramp)
+
+    if args.splash:
+        for line in write_splash(args.mark_width):
+            print(' ', line)
+        return 0
 
     if args.android:
         wrote = write_android(master, args.ramp)
