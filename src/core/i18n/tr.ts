@@ -532,7 +532,13 @@ export const tr: Record<string, string> = {
     // ---- home ----
     'home.advanceToNextQuarter': 'Sonraki çeyreğe geç',
     'home.age': 'Yaş',
-    'home.applications': 'Başvurular',
+    // The heading over the app grid on the home screen, so this is
+    // "applications" as in the things on a phone. It said "Başvurular",
+    // which is a job application. A false friend that reads as a complete
+    // sentence in the wrong world, which is why nobody caught it by
+    // skimming: the word is correct Turkish and correct English and means
+    // the wrong thing.
+    'home.applications': 'Uygulamalar',
     'home.bePremium': 'Premium Ol',
     'home.cash': 'Nakit',
     'home.close': 'Kapat',
