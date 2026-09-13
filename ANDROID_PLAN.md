@@ -192,21 +192,50 @@ ayrışamasın diye.
 Bunlar çökme değil, görünüm. Ama bu oyunda görünüm önemsiz değil.
 Sayılar gerçek taramadan.
 
-### 3.1 Gölgeler — en büyüğü
+### 3.1 Gölgeler — DÜZELTME: bu ölçüm yanlıştı
+
+**Bu bölüm önce şunu iddia ediyordu ve iddia tersti:**
+
+> 65 dosyada 452 satır shadow, bunlardan sadece 4'ünde elevation
+> Yani 61 dosya Android'de dümdüz render olacak.
+
+Komut şuydu:
 
 ```
-65 dosyada 452 satır  shadowColor / shadowOffset / shadowOpacity / shadowRadius
-bunlardan sadece 4'ünde  elevation
+for f in $(grep -rl "shadowColor" ...); do grep -q "elevation" "$f" || echo "$f"; done | wc -l
 ```
 
-Android `shadow*` proplarını **tamamen yok sayıyor**. Yani 61 dosya Android'de
-dümdüz render olacak ve kart tabanlı tasarımın bütün derinliği gidecek.
+Bu komut elevation **içermeyen** dosyaları sayıyor ve 4 döndürdü. Ben onu
+"sadece 4'ünde var" diye okudum. Doğrusu:
 
-Tek tek gezmek yanlış olur. Tema zaten tek yerde; oraya gölgeyi iki platforma
-birden çeviren tek bir yardımcı koymak ve 65 dosyayı ona bağlamak doğru şekil.
+```
+shadowColor iceren dosya          65
+  elevation ICERMEYEN              4
+  elevation ICEREN                61
+```
 
-Ardından bunu koruyan bir test: **`shadowColor` kullanıp `elevation`
-kullanmayan dosya kalmasın.** Bu proje bu şekli seviyor ve işe yarıyor.
+Blok seviyesinde: **112 gölge bloğunun 96'sında zaten elevation var.**
+Yani Android derinliği büyük ölçüde hazırdı ve 65 dosyayı gezmeye gerek yok.
+
+Ders, ve bu projede üçüncü kez: **sayının kendisi değil, sayının neyi
+saydığı.** "Az" görünen bir sonuç iyi haber olabilir ve kontrol edilmeden
+bir faza dönüştürülmemeli.
+
+### 3.1b Gerçekten eksik olanlar
+
+Kalan gerçek iş çok daha küçük ve ölçüldü:
+
+- **4 dosyada** hiç elevation yok
+- **19 blokta** elevation var ama aynı blokta `backgroundColor` yok.
+  Android elevation saydam bir View üzerinde hiçbir şey çizmez, yani
+  bunlar sessizce hiçbir iş yapmıyor.
+
+Ayrıca cihazda görülmesi gereken bir soru kaldı: tema koyu
+(`background #1C242C`, `card #323A40`) ve Android'in elevation gölgesi
+sistem tarafından siyaha yakın çiziliyor; RN `shadowColor` değerini
+Android'in elevation'ına iletmiyor. Koyu zeminde siyah gölge görünmez.
+Yani sorun "elevation eksik" değil, "elevation bu paletle görünmüyor"
+olabilir. Bu ekran görüntüsüyle ayırt edilir, tahminle değil.
 
 ### 3.2 Yazı ağırlıkları
 
