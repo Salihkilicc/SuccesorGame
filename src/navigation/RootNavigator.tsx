@@ -284,7 +284,7 @@ export type RootStackParamList = {
 };
 
 const LifeStackNavigator = () => (
-  <LifeStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}>
+  <LifeStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' }, animation: 'slide_from_right' }}>
     <LifeStack.Screen name="LifeHome" component={LifeScreen} />
     {/* TODO: Restore these screens or create new ones */}
     {/* <LifeStack.Screen name="Profile" component={ProfileScreen} /> */}
@@ -299,7 +299,7 @@ const LifeStackNavigator = () => (
  * @orphan-ok-symbol LoveStackNavigator
  */
 const LoveStackNavigator = () => (
-  <LoveStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}>
+  <LoveStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' }, animation: 'slide_from_right' }}>
     <LoveStack.Screen name="LoveHome" component={LoveScreen} />
   </LoveStack.Navigator>
 );
@@ -316,7 +316,23 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 // cycle did.
 
 const AssetsStackNavigator = () => (
-  <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' } }}>
+  {/* ----------------------------------------------------------------------
+      AND THIS STACK SAYS HOW IT MOVES, LIKE THE OTHER TWO
+
+      It did not, and that is why Products and Innovation arrived with no
+      slide on Android while everything else pushed from the right. Reported
+      as "urunlere girerken inovasyona girerken yok saga sola gitmesi".
+
+      Nothing was broken by the port. `animation` was simply never set here,
+      and native-stack falls back to the PLATFORM default: slide from the
+      right on iOS, the system activity transition on Android, which is a
+      short fade and reads as nothing happening.
+
+      So the iOS behaviour was never chosen, it was inherited, and the two
+      platforms disagreed the moment there were two. RootStack and
+      CasinoStack both say it out loud; this one now does too.
+     ---------------------------------------------------------------------- */}
+  <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' }, animation: 'slide_from_right' }}>
     <AssetsStack.Screen
       name="AssetsHome"
       component={AssetsScreen}
