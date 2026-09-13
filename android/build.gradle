@@ -19,3 +19,49 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// ============================================================================
+//  ASYNC STORAGE SHIPS ITS OWN MAVEN REPOSITORY, AND SOMEBODY HAS TO SAY SO
+// ============================================================================
+//
+//  The first Android build of this project failed here:
+//
+//      Could not find org.asyncstorage.shared_storage:storage-android:1.0.0
+//      Required by: project :app > project :react-native-async-storage_async-storage
+//
+//  It reads like a missing repository or a network problem and it is neither.
+//  async-storage v3 split its storage engine into a separate artifact and did
+//  NOT publish it to Maven Central. It ships inside the npm package, as a
+//  small maven repository at android/local_repo, and the library expects the
+//  consuming project to declare that directory.
+//
+//  Which is why no amount of mavenCentral() helps: the artifact is on disk,
+//  four directories away, and nothing was pointing at it. See
+//  react-native-async-storage/async-storage#1280, an open request to have the
+//  library declare this itself.
+//
+//  WHY IT IS HERE rather than in app/build.gradle: `storage-android` is an
+//  `api` dependency of the async-storage module, so it lands on :app's compile
+//  classpath, and Gradle resolves a transitive external dependency using the
+//  repositories of the project doing the resolving. Declaring it for :app
+//  alone would work today and break the day another module needs it.
+//
+//  `content { includeGroup }` so this directory is consulted for exactly one
+//  group and nothing else. A bare local repository in front of the real ones
+//  is a place for a typo'd coordinate to resolve to something unexpected.
+//
+//  THIS LINE DISAPPEARS when async-storage is upgraded to a version that
+//  publishes the artifact properly, or that declares its own repository.
+//  Leaving it after that is harmless; taking it out before that is a build
+//  failure with a misleading message.
+// ============================================================================
+def asyncStorageRepo = "$rootDir/../node_modules/@react-native-async-storage/async-storage/android/local_repo"
+
+allprojects {
+    repositories {
+        maven {
+            url = uri(asyncStorageRepo)
+            content { includeGroup("org.asyncstorage.shared_storage") }
+        }
+    }
+}

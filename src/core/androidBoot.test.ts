@@ -136,6 +136,31 @@ describeAndroid('the things that fail without failing', () => {
     //  bug to own because it sends you looking in the JavaScript.
     // ------------------------------------------------------------------
 
+    it('async storage can find the engine it ships in its own package', () => {
+        // ------------------------------------------------------------------
+        //  THE ONE THAT DOES FAIL LOUDLY, AND STILL MISLEADS
+        // ------------------------------------------------------------------
+        //  Unlike the others in this block this one stops the build, but the
+        //  message it stops with sends you the wrong way:
+        //
+        //      Could not find org.asyncstorage.shared_storage:storage-android
+        //
+        //  That reads as a missing repository or a network problem. It is
+        //  neither. async-storage v3 does not publish that artifact to Maven
+        //  Central; it ships inside the npm package as a small maven
+        //  repository, and expects the project to declare the directory.
+        //
+        //  Pinned because the fix lives in a file nothing else reads, and
+        //  because `npm install` can move the package without warning.
+        // ------------------------------------------------------------------
+        const local = 'node_modules/@react-native-async-storage/async-storage/android/local_repo';
+        expect(fs.existsSync(path.join(ROOT, local,
+            'org/asyncstorage/shared_storage/storage-android/1.0.0'))).toBe(true);
+        expect(read(`${ANDROID}/build.gradle`)).toContain(local.replace('node_modules/', ''));
+        expect(read(`${ANDROID}/build.gradle`))
+            .toContain('includeGroup("org.asyncstorage.shared_storage")');
+    });
+
     it('the icon fonts are copied in, or every icon is an empty square', () => {
         // iOS lists nineteen fonts in Info.plist under UIAppFonts. Android
         // has no equivalent list; they have to be copied into assets at
