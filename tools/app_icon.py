@@ -334,7 +334,17 @@ def sheet(src: Image.Image, dest: str) -> None:
 
 SPLASH_SOURCE = os.path.join(ROOT, 'assets', 'bootsplash', 'logo@4x.png')
 SPLASH_CANVAS_DP = 288
-SPLASH_MARK_DP = 130
+#  170, and the ceiling is 174.
+#
+#  The history, because it is two wrongs that looked like one: 170 was tried
+#  first and NEVER REACHED THE DEVICE - that build failed on a missing SDK
+#  path and reported "10 tasks, 10 up-to-date", so what was on screen was
+#  still the original stretched wordmark. Reading that as "170 is too big"
+#  led to 130, which is genuinely too small.
+#
+#  So the number was tuned twice against a build that had not run. The tell
+#  was in the Gradle output all along.
+SPLASH_MARK_DP = 170
 
 #  Android's density buckets, and the folder each one wants.
 SPLASH_DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
