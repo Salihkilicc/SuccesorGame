@@ -315,23 +315,26 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 // this file imports CrystalNavBar. See the header of that file for what the
 // cycle did.
 
+// ----------------------------------------------------------------------
+//  AND THIS STACK SAYS HOW IT MOVES, LIKE THE OTHER TWO
+// ----------------------------------------------------------------------
+//  It did not, and that is why Products and Innovation arrived with no
+//  slide on Android while everything else pushed from the right. Reported
+//  as "urunlere girerken inovasyona girerken yok saga sola gitmesi".
+//
+//  Nothing was broken by the port. `animation` was simply never set here,
+//  and native-stack falls back to the PLATFORM default: slide from the
+//  right on iOS, the system activity transition on Android, which is a
+//  short fade and reads as nothing happening.
+//
+//  So the iOS behaviour was never chosen, it was inherited, and the two
+//  platforms disagreed the moment there were two. RootStack and
+//  CasinoStack both say it out loud; this one now does too.
+//
+//  A JSX comment cannot live here: this is the root of the return, not
+//  inside an element, and `{/* */}` before it makes two expressions.
+// ----------------------------------------------------------------------
 const AssetsStackNavigator = () => (
-  {/* ----------------------------------------------------------------------
-      AND THIS STACK SAYS HOW IT MOVES, LIKE THE OTHER TWO
-
-      It did not, and that is why Products and Innovation arrived with no
-      slide on Android while everything else pushed from the right. Reported
-      as "urunlere girerken inovasyona girerken yok saga sola gitmesi".
-
-      Nothing was broken by the port. `animation` was simply never set here,
-      and native-stack falls back to the PLATFORM default: slide from the
-      right on iOS, the system activity transition on Android, which is a
-      short fade and reads as nothing happening.
-
-      So the iOS behaviour was never chosen, it was inherited, and the two
-      platforms disagreed the moment there were two. RootStack and
-      CasinoStack both say it out loud; this one now does too.
-     ---------------------------------------------------------------------- */}
   <AssetsStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#434B50' }, animation: 'slide_from_right' }}>
     <AssetsStack.Screen
       name="AssetsHome"
