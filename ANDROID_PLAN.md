@@ -265,10 +265,108 @@ Android'de tek kilit yetiyor olur. Tahminle karar verilmemeli.
 
 ---
 
-## FAZ 4 — Cihazda test listesi
+## FAZ 4 — Cihazda test
 
-Buradan sonrası elde telefonla. Sıra önemli: önce açılıyor mu, sonra oynanıyor
-mu, sonra güzel mi.
+### Android'de test etmek Xcode'dan nasıl farklı
+
+Bildiğin şeye bağlayarak: Xcode'da Simulator ne ise Android'de **emulator**
+odur. İki fark var ve ikisi de işini kolaylaştırıyor.
+
+Birincisi, Android Studio'yu açmana gerek yok. Xcode'da Run tuşuna basmak
+zorundasın; burada her şey terminalden oluyor. Android Studio sadece SDK'yı
+ve emülatörü kurmak için lazım, sonra bir daha açmayabilirsin.
+
+İkincisi, iki terminal çalışıyor. Biri **Metro**, JavaScript'i servis eden
+sunucu. Diğeri derlemeyi başlatan. `run-android` Metro'yu kendi açıyor.
+
+### Emülatör oluşturmak
+
+Android Studio > sağ üstte **Device Manager** (telefon ikonu) > **Add a new
+device** > **Create Virtual Device**.
+
+- Cihaz olarak **Pixel 7** ya da **Pixel 8** seç. Gerçek dünyada yaygın bir
+  ekran oranı, ve oyun 20:9'da nasıl duruyor onu görmen lazım.
+- Sistem imajı olarak **API 36** indir.
+- Bitir, listede görünsün, yanındaki ▶ tuşuyla başlat.
+
+Emülatör açık kalsın. Şimdi terminale dön.
+
+### Çalıştırmak
+
+```
+cd ~/Succesor
+npx react-native run-android
+```
+
+İlk sefer uzun. Gradle bütün bağımlılıkları indiriyor, on dakikayı geçebilir.
+Sonraki derlemeler çok daha hızlı.
+
+Başarılıysa iki şey olur: emülatörde uygulama açılır, ve terminalde Metro
+çalışmaya devam eder. **Metro'yu kapatma**, JavaScript'i o servis ediyor.
+
+### Kod değiştirince
+
+Metro açıkken kaydettiğin her değişiklik anında yansıyor, tekrar derlemene
+gerek yok. Sadece `android/` altındaki native dosyalara dokunursan yeniden
+`run-android` gerekiyor.
+
+Elle yenilemek istersen emülatörde **R tuşuna iki kere** bas.
+
+### Geliştirici menüsü
+
+Emülatörde **Cmd + M** (gerçek telefonda telefonu salla). Açılan menüde:
+
+- **Reload** yeniden yükler
+- **Toggle Inspector** bir elemana dokununca hangi bileşen olduğunu ve
+  ölçülerini gösterir. Layout kayması ararken en işe yarar olan bu.
+
+### Hata nerede okunur
+
+Üç yer var ve hangisine bakacağın hatanın türüne göre değişiyor:
+
+1. **Kırmızı ekran.** JavaScript hatası. Sebebi ekranda yazıyor, okuyabilirsin.
+2. **Metro terminali.** `console.log` çıktıları ve JavaScript uyarıları.
+   Bu oyun çok log basıyor, hikaye ve tutorial olayları oradan görünür.
+3. **`adb logcat`.** Native taraf. Uygulama hiç açılmadan çöküyorsa ya da
+   beyaz ekranda kalıyorsa cevap SADECE burada olur, diğer ikisi sessiz kalır.
+   Gürültüsü çok, filtrele:
+   ```
+   adb logcat *:E ReactNative:V ReactNativeJS:V
+   ```
+
+### Beyaz ekranda kalırsa
+
+Bu portun en sinsi hatası ve tam olarak bunun için test yazdık. Önce testi
+çalıştır, çünkü cevabı saniyede verir:
+
+```
+npx jest src/core/androidBoot.test.ts
+```
+
+Yeşilse isim eşleşmesi doğru demektir, sorun başka yerde: `adb logcat`'e bak.
+
+### Emülatör mü gerçek telefon mu
+
+İkisi de lazım ve sırayla:
+
+**Önce emülatör**, çünkü hızlı ve "açılıyor mu, oynanıyor mu" sorusunu
+cevaplamak için yeterli.
+
+**Sonra gerçek telefon**, çünkü FAZ 3'te düzelteceğimiz üç şeyin hiçbiri
+emülatörde dürüst görünmüyor: gölgeler, yazı ağırlıkları ve blur. Emülatör
+bunları masaüstü GPU'sunda taklit ediyor ve sonuç gerçek cihazdan farklı
+çıkıyor. Gölgelerin gerçekten kaybolup kaybolmadığına telefonda karar
+vereceğiz.
+
+Gerçek telefonda: Ayarlar > Telefon hakkında > **Derleme numarasına yedi kez
+dokun** (geliştirici modu açılır), sonra Ayarlar > Geliştirici seçenekleri >
+**USB hata ayıklama** aç. USB ile bağla, `adb devices` listede görmeli, sonra
+aynı `run-android` komutu.
+
+### Ne arayacaksın
+
+Aşağıdaki liste sırayla: önce açılıyor mu, sonra oynanıyor mu, sonra güzel mi.
+Üçüncüye ancak ilk ikisi geçtikten sonra bak.
 
 ### Açılış
 - [ ] Uygulama açılıyor, beyaz ekranda kalmıyor
