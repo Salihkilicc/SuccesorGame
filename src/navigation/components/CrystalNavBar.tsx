@@ -16,16 +16,42 @@ import { formatMoney } from '../../core/utils';
 
 const { width } = Dimensions.get('window');
 
+// ===========================================================================
+//  THE BAR'S GEOMETRY, IN ONE PLACE, BECAUSE TWO PLACES WAS THE BUG
+// ===========================================================================
+//  These five numbers used to be literals scattered through the stylesheet
+//  and a hand-added "roughly 78" in the clearance below. The old comment says
+//  what that cost: the gap under Finance's buttons was wrong three times
+//  running, because resizing the bar and updating the number screens use to
+//  clear it were two separate acts and the second one kept being forgotten.
+//
+//  Named here and read by both the styles and the clearance, so the bar
+//  cannot grow without the space under it growing with it.
+// ===========================================================================
+
+/** How far the bar floats off the bottom edge. */
+const BAR_LIFT = Platform.OS === 'ios' ? 44 : 32;
+
+/** Breathing room inside the bar, above the icon and below the label. */
+const BAR_PAD_V = 20;
+
+/** The glyph, and the word under it. */
+const BAR_ICON = 28;
+const BAR_LABEL = 11;
+const BAR_LABEL_GAP = 4;
+
+/** What the bar actually measures, derived rather than estimated. */
+const BAR_HEIGHT =
+    BAR_PAD_V * 2 + BAR_ICON + BAR_LABEL_GAP + Math.round(BAR_LABEL * 1.3);
+
 /**
  * How much room the floating bar takes at the bottom of every screen.
  *
- * The bar sits `bottom: 36` on iOS and is roughly 78 tall (18 of padding top
- * and bottom around a 26pt icon and its 12pt label). Screens that end in a
- * button need to clear that, and every one of them was guessing a number -
- * which is why the gap under Finance's buttons was wrong three times running.
- * One constant, derived from the bar's own geometry.
+ * Screens that end in a button need to clear it, and every one of them was
+ * guessing a number. One constant, derived from the bar's own geometry, plus
+ * eight points so a button does not sit flush against it.
  */
-export const NAV_BAR_CLEARANCE = (Platform.OS === 'ios' ? 36 : 24) + 78 + 8;
+export const NAV_BAR_CLEARANCE = BAR_LIFT + BAR_HEIGHT + 8;
 
 interface CrystalNavBarProps {
     activeTab: NavTab;
@@ -184,7 +210,7 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         const isActive = activeTab === tabName;
         return {
             color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
-            fontSize: 26,
+            fontSize: BAR_ICON,
             textShadowColor: 'rgba(28,36,44,0.5)',
             textShadowOffset: { width: 0, height: 2 },
             textShadowRadius: 3,
@@ -195,10 +221,10 @@ const CrystalNavBar: React.FC<CrystalNavBarProps> = ({ activeTab, variant, hideD
         const isActive = activeTab === tabName;
         return {
             color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
-            fontSize: 10,
+            fontSize: BAR_LABEL,
             fontWeight: '700' as '700',
             letterSpacing: 0.3,
-            marginTop: 4,
+            marginTop: BAR_LABEL_GAP,
             textAlign: 'center' as 'center',
         };
     };
@@ -302,7 +328,7 @@ const styles = StyleSheet.create({
     },
     bottomBarContainer: {
         position: 'absolute',
-        bottom: Platform.OS === 'ios' ? 36 : 24,
+        bottom: BAR_LIFT,
         left: 18,
         right: 18,
     },
@@ -373,7 +399,7 @@ const styles = StyleSheet.create({
     bottomBar: {
         flexDirection: 'row',
         width: '100%',
-        paddingVertical: 18,
+        paddingVertical: BAR_PAD_V,
         paddingHorizontal: 16,
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -390,7 +416,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     statsIcon: {
-        fontSize: 24,
+        fontSize: BAR_ICON - 2,
         color: '#FFFFFF',
         textShadowColor: 'rgba(28,36,44,0.3)',
         textShadowOffset: { width: 0, height: 2 },
@@ -398,10 +424,10 @@ const styles = StyleSheet.create({
     },
     statsLabel: {
         color: '#FFFFFF',
-        fontSize: 10,
+        fontSize: BAR_LABEL,
         fontWeight: '700',
         letterSpacing: 0.3,
-        marginTop: 4,
+        marginTop: BAR_LABEL_GAP,
         textAlign: 'center',
     },
 });
