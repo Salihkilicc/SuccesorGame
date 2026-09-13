@@ -22,15 +22,43 @@
 //  and none of them is read by anybody. The signal to noise decides whether a
 //  check like this survives its first week.
 //
-//  So it looks at four places and no others:
+//  So it looks at a few places and no others:
 //
 //      <Text>Hello</Text>                a child of a Text element
 //      title="Hello"                     the props that name things
 //      label= / summary= / placeholder= / note=
+//      Alert.alert('Hello', 'World')     and the button labels inside it
 //
 //  That is where sentences live. It is not exhaustive and it is not trying to
 //  be: it is the net under the specific mistake this project keeps making,
 //  which is a screen built in English and translated later.
+//
+//  ---------------------------------------------------------------------------
+//  THE TWO HOLES THIS NET HAD, AND WHAT WAS SITTING IN THEM
+//  ---------------------------------------------------------------------------
+//  It reported zero for weeks while a Turkish player was being asked, in
+//  English, whether to erase their entire save:
+//
+//      Alert.alert(
+//        'New Game',
+//        'All progress will be erased and a fresh run will be set up. Are you
+//         sure?',
+//
+//  Two separate blind spots, and both of them were in this file rather than in
+//  the screens:
+//
+//    ONLY .tsx     The walk skipped every `.ts`, which is where the hooks live
+//                  - useAssetsLogic, useProductsLogic, useBuybackLogic. A file
+//                  extension was deciding whether player-facing text counted.
+//
+//    NO ALERT      An Alert's title and body are bare arguments, not a Text
+//                  child and not a named prop, so even in a `.tsx` they went
+//                  past all four rules. HomeScreen and NotesScreen are `.tsx`
+//                  and were missed anyway.
+//
+//  A green check that is not looking is worse than no check, because it is
+//  quoted as evidence. "untranslated 0" appeared in three commit messages of
+//  mine as proof of something it had not examined.
 //
 //  ---------------------------------------------------------------------------
 //  AND IT ONLY LOOKS AT SCREENS SOMEBODY CAN REACH
@@ -88,13 +116,37 @@ const walk = (dir, out = []) => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, e.name);
         if (e.isDirectory()) { walk(full, out); continue; }
-        if (!/\.tsx$/.test(e.name) || /\.test\.tsx$/.test(e.name)) continue;
+        // `.ts` as well as `.tsx`. The hooks that raise the dialogs are `.ts`,
+        // and an extension was deciding whether a sentence counted.
+        if (!/\.tsx?$/.test(e.name) || /\.test\.tsx?$/.test(e.name)) continue;
         out.push(full);
     }
     return out;
 };
 
-const FLAGGED_OFF = /[\\/]features[\\/]life[\\/]/;
+// ---------------------------------------------------------------------------
+//  WHICH FOLDERS ARE OFF - READ FROM THE FLAGS, NOT FROM A LIST
+// ---------------------------------------------------------------------------
+//  This was `/features\/life\//`, hardcoded, and scripts/reachability.js had
+//  already made this exact mistake and already fixed it, with the reason
+//  written down: an audit that disagrees with the app about what is shipping
+//  reports green while looking away.
+//
+//  The same fix, for the same reason. `shopping` is off too and was being
+//  counted; `casino` is ON and a hardcoded list from the old days would have
+//  been excluding it. Turning a module on now turns its translation check on
+//  with it.
+// ---------------------------------------------------------------------------
+const FEATURE_SRC = fs.readFileSync(
+    path.join(__dirname, '..', 'src', 'core', 'featureFlags.ts'), 'utf8');
+
+const GATED_FOLDERS = ['life', 'love', 'casino', 'shopping'];
+const OFF_FOLDERS = GATED_FOLDERS.filter(
+    name => new RegExp(`^\\s*${name}:\\s*false`, 'm').test(FEATURE_SRC));
+
+const FLAGGED_OFF = OFF_FOLDERS.length
+    ? new RegExp(`[\\\\/]features[\\\\/](${OFF_FOLDERS.join('|')})[\\\\/]`)
+    : /$^/;
 
 /** `// @english-ok <reason>` on the line, or the two above it. */
 const allowed = (lines, i) =>
@@ -116,13 +168,104 @@ const allowed = (lines, i) =>
 const fileExempt = (lines) =>
     lines.slice(0, 8).some(l => /@english-ok\s/.test(l));
 
+// ---------------------------------------------------------------------------
+//  THE STRINGS INSIDE AN Alert.alert(...)
+// ---------------------------------------------------------------------------
+//  Line by line does not work here. A real call in this tree spans a dozen
+//  lines, the body is often built with `+` across several of them, and the
+//  buttons are objects. So this one rule reads the whole call.
+//
+//  It reports a literal only when it is NOT the argument of `t(...)`, which is
+//  the one distinction that matters: `t('home.newGame')` is translated and
+//  `'New Game'` is not, and they look identical to a line-based regex.
+//
+//  Template literals count. `Sold all assets for ${formatMoney(x)}` is a
+//  sentence with a number in it, not a number.
+// ---------------------------------------------------------------------------
+/**
+ * Comments blanked out, offsets preserved.
+ *
+ * This file's own comments quote the English they are about, and the big ones
+ * sit INSIDE the call they explain. Without this the sweep reported its own
+ * explanations as findings, and worse, a `)` in a comment ended the call early
+ * and the real body was never read. Spaces rather than deletion so every index
+ * and line number still points where it did.
+ */
+const blankComments = (source) => {
+    const out = source.split('');
+    let quote = null, line = false, block = false;
+    for (let i = 0; i < source.length; i++) {
+        const c = source[i], next = source[i + 1], prev = source[i - 1];
+        if (line) { if (c === '\n') line = false; else out[i] = ' '; continue; }
+        if (block) {
+            if (c === '*' && next === '/') { out[i] = ' '; out[i + 1] = ' '; i++; block = false; }
+            else if (c !== '\n') out[i] = ' ';
+            continue;
+        }
+        if (quote) { if (c === quote && prev !== '\\') quote = null; continue; }
+        if (c === '"' || c === "'" || c === '`') { quote = c; continue; }
+        if (c === '/' && next === '/') { line = true; out[i] = ' '; continue; }
+        if (c === '/' && next === '*') { block = true; out[i] = ' '; continue; }
+    }
+    return out.join('');
+};
+
+const scanAlerts = (source, push) => {
+    let at = 0;
+    while ((at = source.indexOf('Alert.alert', at)) !== -1) {
+        const open = source.indexOf('(', at);
+        if (open === -1) break;
+
+        let depth = 0, end = open, quote = null;
+        for (; end < source.length; end++) {
+            const c = source[end], prev = source[end - 1];
+            if (quote) { if (c === quote && prev !== '\\') quote = null; continue; }
+            if (c === '"' || c === "'" || c === '`') { quote = c; continue; }
+            if (c === '(') depth++;
+            else if (c === ')') { depth--; if (depth === 0) break; }
+        }
+
+        const call = source.slice(at, end + 1);
+
+        // Every literal in the call, with where it started.
+        let q = null, start = -1;
+        for (let m = 0; m < call.length; m++) {
+            const c = call[m], prev = call[m - 1];
+            if (q) {
+                if (c === q && prev !== '\\') {
+                    const text = call.slice(start + 1, m);
+                    // `t('key')` - the one before the quote is the tell.
+                    const before = call.slice(Math.max(0, start - 2), start);
+                    const translated = /\bt\($/.test(before) || /^[a-z]+\.[a-zA-Z.]+$/.test(text);
+                    if (!translated && isSentence(text)) {
+                        push(at + start, text);
+                    }
+                    q = null;
+                }
+                continue;
+            }
+            if (c === '"' || c === "'" || c === '`') { q = c; start = m; }
+        }
+
+        at = end + 1;
+    }
+};
+
 const findings = [];
 
 for (const file of walk(SRC)) {
     if (FLAGGED_OFF.test(file)) continue;
     const rel = path.relative(SRC, file);
-    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    const source = fs.readFileSync(file, 'utf8');
+    const lines = source.split('\n');
     if (fileExempt(lines)) continue;
+
+    // 3. The dialogs. Whole-call rather than line by line, see scanAlerts.
+    scanAlerts(blankComments(source), (index, text) => {
+        const line = source.slice(0, index).split('\n').length;
+        if (allowed(lines, line - 1)) return;
+        findings.push({ rel, line, text, kind: 'Alert' });
+    });
 
     lines.forEach((line, i) => {
         if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;
@@ -167,7 +310,7 @@ if (findings.length === 0) {
         if (list.length > 6) console.log(`       ... and ${list.length - 6} more`);
     }
     console.log(`\n\x1b[33m${findings.length}\x1b[0m string(s) across ${files.length} file(s).`);
-    console.log('(features/life is flagged off and excluded. `// @english-ok <reason>` exempts a line.)\n');
+    console.log(`(${OFF_FOLDERS.map(f => `features/${f}`).join(', ')} flagged off and excluded. \`// @english-ok <reason>\` exempts a line.)\n`);
 }
 
 module.exports = { findings };
