@@ -416,11 +416,47 @@ const styles = StyleSheet.create({
         //  This is the one uncached shadow that is drawn on every screen in
         //  the game rather than on one of them.
         // ------------------------------------------------------------------
-        shadowColor: "#CFD0D2",
+        // ------------------------------------------------------------------
+        //  AND THE SAME GLOW ON ANDROID, AT THE SAME WEIGHT
+        // ------------------------------------------------------------------
+        //  I told him last turn that Android draws nothing here: that
+        //  `shadowColor` is not forwarded to an elevation, and that an
+        //  elevation on a transparent background draws no shadow at all.
+        //
+        //  Both were wrong, and BaseViewManager.java says so in ten lines:
+        //
+        //      @ReactProp(name = ViewProps.SHADOW_COLOR, ...)
+        //      public void setShadowColor(T view, int shadowColor) {
+        //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        //          view.setOutlineAmbientShadowColor(shadowColor);
+        //          view.setOutlineSpotShadowColor(shadowColor);
+        //
+        //  From Android 9 the colour IS forwarded, and the shadow is cast from
+        //  the view's OUTLINE, which a border radius provides whether or not
+        //  there is a fill. So #CFD0D2 at elevation 15 was drawing exactly
+        //  what it says: a light grey halo, fifteen density pixels wide,
+        //  underneath the bar. "Altinda gri bir parlaklik var" was a correct
+        //  bug report against a shadow I had declared invisible.
+        //
+        //  Two things make it heavier than the iOS one rather than equal:
+        //
+        //    SPREAD   iOS blurs by shadowRadius, which is 8. Android spreads
+        //             by the elevation, which was 15. Nearly twice as far.
+        //
+        //    ALPHA    iOS multiplies by shadowOpacity 0.6. Android has no such
+        //             prop and draws the colour at whatever alpha the colour
+        //             itself carries, so an opaque hex arrives at full
+        //             strength. The alpha has to be IN the colour.
+        //
+        //  So Android gets 8 to match the radius, and the same grey carrying
+        //  its own 0.6. Same glow, not a different one - if it should go away
+        //  entirely that is a look decision and belongs in its own change.
+        // ------------------------------------------------------------------
+        shadowColor: Platform.OS === 'android' ? 'rgba(207,208,210,0.6)' : '#CFD0D2',
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.6,
         shadowRadius: 8,
-        elevation: 15,
+        elevation: Platform.OS === 'android' ? 8 : 15,
         borderWidth: 1.5,
         borderColor: 'rgba(255,255,255,0.15)',
         backgroundColor: 'transparent',

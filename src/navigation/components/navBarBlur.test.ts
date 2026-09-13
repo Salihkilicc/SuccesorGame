@@ -122,3 +122,63 @@ describe('the nav bar keeps its translucency on android', () => {
         expect(read(BAR)).toMatch(/blurType="dark"/);
     });
 });
+
+// ============================================================================
+//  THE GLOW UNDER THE BAR
+// ============================================================================
+//  BaseViewManager.setShadowColor forwards the colour to the outline shadow
+//  from Android 9 onward, and the shadow is cast from the view's OUTLINE,
+//  which a border radius provides with or without a fill. I had told him the
+//  opposite on both counts, which is why "altinda gri bir parlaklik var" came
+//  back as a surprise rather than as something already accounted for.
+//
+//  What Android has no equivalent of is `shadowOpacity`. It draws the colour
+//  at whatever alpha the colour carries, so an opaque hex lands at full
+//  strength, and the spread comes from the elevation rather than the radius.
+//  A shadow declared for iOS therefore arrives on Android both wider and
+//  brighter than it was drawn.
+// ============================================================================
+describe('the nav bar glow weighs the same on both platforms', () => {
+    const barStyles = () => {
+        const source = read(BAR);
+        const start = source.indexOf('blurContainer: {');
+        expect(start).toBeGreaterThan(-1);
+        return source.slice(start, source.indexOf('\n    },', start));
+    };
+
+    it('carries its alpha in the colour on android, because there is no shadowOpacity', () => {
+        const block = barStyles();
+
+        const colour = block.match(
+            /shadowColor:\s*Platform\.OS === 'android'\s*\?\s*'([^']+)'\s*:\s*['"]([^'"]+)['"]/,
+        );
+        expect(colour).not.toBeNull();
+
+        const androidAlpha = Number(colour![1].match(/,\s*([\d.]+)\s*\)$/)![1]);
+        const iosOpacity = Number(block.match(/shadowOpacity:\s*([\d.]+)/)![1]);
+
+        // The one number iOS applies separately has to be inside the Android
+        // colour, or the glow arrives at full strength.
+        expect(androidAlpha).toBeCloseTo(iosOpacity, 2);
+
+        // And it is the same grey. A different one here would be a second
+        // palette entry hiding behind a platform check.
+        expect(colour![1]).toMatch(/rgba\(207,\s*208,\s*210,/);
+        expect(colour![2]).toBe('#CFD0D2');
+    });
+
+    it('spreads as far as the ios radius rather than as far as it likes', () => {
+        const block = barStyles();
+
+        const radius = Number(block.match(/shadowRadius:\s*(\d+)/)![1]);
+        const elevation = block.match(
+            /elevation:\s*Platform\.OS === 'android'\s*\?\s*(\d+)\s*:\s*(\d+)/,
+        );
+        expect(elevation).not.toBeNull();
+
+        // Android spreads by elevation the way iOS blurs by radius. Fifteen
+        // against eight is what made the halo read as its own object rather
+        // than as the bar being lifted.
+        expect(Number(elevation![1])).toBe(radius);
+    });
+});

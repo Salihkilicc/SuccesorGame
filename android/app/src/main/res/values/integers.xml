@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ============================================================================
+     HOW LONG A SCREEN TAKES TO SLIDE IN, ON ANDROID
+    ============================================================================
+     react-native-screens does not expose this. `animationDuration` on the
+     navigator is documented as iOS only, and only for slide_from_bottom,
+     fade_from_bottom, fade and simple_push. Ours is slide_from_right, so that
+     prop would have been a line of code that nothing reads on either platform.
+
+     What actually sets it is four animation resources inside the library, and
+     all four ask for @android:integer/config_mediumAnimTime, which is 400.
+
+     Android merges the app's resources over a library's when the names match,
+     so declaring those same four names in android/app/src/main/res/anim
+     replaces them without patching node_modules. Those four files point here,
+     so the number lives once.
+
+     300 rather than 250: "hafif daha hizli" was the ask. Android's own scale
+     is 200 short, 400 medium, and 300 is the step between them rather than a
+     number chosen by feel.
+
+     iOS is untouched and cannot be touched the same way. There,
+     slide_from_right is UINavigationController's own push and UIKit owns its
+     timing.
+    ============================================================================
+-->
+<resources>
+    <integer name="rns_push_duration">300</integer>
+</resources>

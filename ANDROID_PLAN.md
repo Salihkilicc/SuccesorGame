@@ -226,16 +226,54 @@ bir faza dönüştürülmemeli.
 Kalan gerçek iş çok daha küçük ve ölçüldü:
 
 - **4 dosyada** hiç elevation yok
-- **19 blokta** elevation var ama aynı blokta `backgroundColor` yok.
-  Android elevation saydam bir View üzerinde hiçbir şey çizmez, yani
-  bunlar sessizce hiçbir iş yapmıyor.
+- **19 blokta** elevation var ama aynı blokta `backgroundColor` yok
 
-Ayrıca cihazda görülmesi gereken bir soru kaldı: tema koyu
-(`background #1C242C`, `card #323A40`) ve Android'in elevation gölgesi
-sistem tarafından siyaha yakın çiziliyor; RN `shadowColor` değerini
-Android'in elevation'ına iletmiyor. Koyu zeminde siyah gölge görünmez.
-Yani sorun "elevation eksik" değil, "elevation bu paletle görünmüyor"
-olabilir. Bu ekran görüntüsüyle ayırt edilir, tahminle değil.
+### 3.1c DÜZELTME: elevation hakkında iki şey daha yanlış yazmıştım
+
+Yukarıdaki ikinci madde ve onu izleyen paragraf şunu iddia ediyordu:
+
+> Android elevation saydam bir View üzerinde hiçbir şey çizmez.
+> RN `shadowColor` değerini Android'in elevation'ına iletmiyor.
+> Koyu zeminde siyah gölge görünmez.
+
+İkisi de yanlış. `BaseViewManager.java`, on satırda söylüyor:
+
+```java
+@ReactProp(name = ViewProps.SHADOW_COLOR, defaultInt = Color.BLACK, customType = "Color")
+public void setShadowColor(@NonNull T view, int shadowColor) {
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    view.setOutlineAmbientShadowColor(shadowColor);
+    view.setOutlineSpotShadowColor(shadowColor);
+  }
+}
+```
+
+- **Android 9'dan itibaren `shadowColor` iletiliyor.** Gölge siyah değil,
+  ne yazdıysak o renk.
+- **Gölge zeminden değil OUTLINE'dan çiziliyor.** `borderRadius` bir
+  outline üretiyor, dolgu olsun olmasın. Yani saydam arka planlı bir
+  View da gölge çiziyor.
+
+Bu iddianın bedeli hemen görüldü: `CrystalNavBar`'ın `blurContainer`
+bloğu `shadowColor: '#CFD0D2'` ve `elevation: 15` taşıyor, arka planı da
+`transparent`. Ben "Android burada hiçbir şey çizmiyor" dedim, cihaz
+"tab bar'ın altında gri bir parlaklık var" diye geri döndü. Doğru olan
+cihazdı.
+
+İki platform arasındaki gerçek fark şu ve 19 bloğun hepsini ilgilendirir:
+
+```
+YAYILMA   iOS shadowRadius kadar bulanıklaştırır.
+          Android elevation kadar yayar. Aynı sayı değiller.
+
+ALFA      iOS shadowOpacity ile çarpar.
+          Android'de böyle bir prop yok; rengin kendi alfasını kullanır.
+          Opak bir hex Android'e tam güçte varır.
+```
+
+Yani iOS için yazılmış bir gölge Android'e hem daha geniş hem daha
+parlak varıyor. 19 bloğun işi "elevation ekle" değil, "aynı ağırlığa
+getir".
 
 ### 3.2 Yazı ağırlıkları
 
