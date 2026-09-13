@@ -25,7 +25,7 @@
 //  the player takes before reading anything.
 // ============================================================================
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
 
 import { theme } from '../../core/theme';
@@ -42,8 +42,57 @@ import { castNow } from '../../core/story/castNow';
 import { t, useLocale } from '../../core/i18n';
 import { line, lockKey } from '../../data/i18n/storyText';
 
-/** Breathing room around the highlighted control. */
-const HALO = 8;
+/**
+ * Breathing room around the highlighted control.
+ *
+ * The ring sits just OUTSIDE the control rather than exactly on it, and that
+ * is a decision rather than an accident. A ring drawn on the border reads as
+ * part of the button, so a card that already has a border gets a slightly
+ * thicker one and nothing looks highlighted. Eight points of clear space
+ * reads as "this thing, here" on every control in the game, whatever its own
+ * edge looks like.
+ */
+export const HALO = 8;
+
+/**
+ * Where the hole goes, in the OVERLAY's coordinates.
+ *
+ * ---------------------------------------------------------------------------
+ *  TWO COORDINATE SYSTEMS, AND THE GAP BETWEEN THEM
+ * ---------------------------------------------------------------------------
+ *  `rect` comes from TutorialTarget's `measureInWindow`, so it is relative to
+ *  the WINDOW. This overlay is drawn with absoluteFill inside the React root.
+ *
+ *  On iOS those two origins are the same point, so the numbers were used raw
+ *  and it worked. On Android they are not: the window includes the status bar
+ *  and the React root, under a theme that does not draw edge to edge, starts
+ *  below it. Every hole therefore sat lower than its control by the height of
+ *  the status bar, which is a different number on every phone. Reported on
+ *  the first Android build as "tam kutuyu secmiyor".
+ *
+ *  NOT fixed with `StatusBar.currentHeight`, which is the usual answer and is
+ *  a constant standing in for a distance. The overlay measures its own origin
+ *  and passes it here, so the correction is whatever the gap actually is:
+ *  zero on iOS, the status bar on Android today, and right by construction if
+ *  either ever changes.
+ *
+ *  Pure and exported because the correction is the whole point and it cannot
+ *  be seen from a rendered tree: under the test renderer `measureInWindow`
+ *  never calls back, so the origin stays at zero and a component test would
+ *  pass whether or not the subtraction were there at all.
+ * ---------------------------------------------------------------------------
+ */
+export const holeFor = (
+    rect: { x: number; y: number; width: number; height: number },
+    origin: { x: number; y: number },
+) => ({
+    // Clamped at zero: a control under the notch measures above the overlay's
+    // own top, and a negative origin would drag the ring off screen.
+    x: Math.max(0, rect.x - origin.x - HALO),
+    y: Math.max(0, rect.y - origin.y - HALO),
+    w: rect.width + HALO * 2,
+    h: rect.height + HALO * 2,
+});
 
 /**
  * Where the card sits when it has to go above the highlight.
@@ -134,6 +183,12 @@ const TutorialOverlay = () => {
     const lock = activeLock(TUTORIAL_SEQUENCE, locks, world);
 
     const [escapeVisible, setEscapeVisible] = useState(false);
+
+    // Where this overlay's own top left sits in WINDOW coordinates, which is
+    // the system TutorialTarget reports in. Zero on iOS; the status bar on
+    // Android. See the note further down on the two coordinate systems.
+    const rootRef = useRef<View>(null);
+    const [origin, setOrigin] = useState({ x: 0, y: 0 });
 
     // The timer restarts per lock, so each step gets its own grace period
     // rather than one timer that has already expired by the second step.
@@ -233,9 +288,37 @@ const TutorialOverlay = () => {
         }
     }, [reason]);
 
-    if (!lock) return null;
+    // ------------------------------------------------------------------
+    //  THE TWO COORDINATE SYSTEMS, AND THE GAP BETWEEN THEM
+    // ------------------------------------------------------------------
+    //  Reported on the first Android build: the ring was near the control
+    //  but not on it. "tam kutuyu secmiyor".
+    //
+    //  TutorialTarget reports `measureInWindow`, which is relative to the
+    //  WINDOW. This overlay is drawn with absoluteFill inside the React
+    //  root. On iOS those two origins are the same point, so the numbers
+    //  could be used raw and were.
+    //
+    //  On Android they are not. The window includes the status bar; the
+    //  React root, under a theme that does not draw edge to edge, starts
+    //  below it. So every hole sat lower than its control by the height of
+    //  the status bar, which is a different number on every phone.
+    //
+    //  NOT `StatusBar.currentHeight`, which is the usual answer. That is a
+    //  constant standing in for a distance, and it becomes wrong the day
+    //  this app goes edge to edge or a manufacturer does something unusual
+    //  with a cutout. The overlay measures its own origin instead and
+    //  subtracts it, so the correction is whatever the gap actually is:
+    //  zero on iOS, the status bar on Android today, and right by
+    //  construction if either ever changes.
+    // ------------------------------------------------------------------
+    const onRootLayout = useCallback(() => {
+        rootRef.current?.measureInWindow((x, y) => {
+            setOrigin(prev => (prev.x === x && prev.y === y ? prev : { x, y }));
+        });
+    }, []);
 
-    const rect = rects[lock.highlight];
+    const rect = lock ? rects[lock.highlight] : undefined;
 
     // ------------------------------------------------------------------
     //  THE LESSON LIVES ON THE SCREEN IT IS ABOUT
@@ -256,25 +339,35 @@ const TutorialOverlay = () => {
     //  and it is sitting in the inbox. The teaching is the reward for
     //  arriving rather than a toll gate on the way.
     // ------------------------------------------------------------------
-    if (!rect) return null;
-
+    //  ---------------------------------------------------------------
+    //  AND THE MEASURING FRAME STAYS, EVEN WHEN THERE IS NOTHING TO SHOW
+    //  ---------------------------------------------------------------
+    //  This used to be `return null` and now it is a conditional inside a
+    //  root that is always mounted. The root is what `onRootLayout`
+    //  measures, and a frame that unmounts whenever the overlay is quiet
+    //  could only ever report its origin after a lock had already been
+    //  drawn once in the wrong place.
+    //
+    //  An absoluteFill View with `pointerEvents="box-none"` and no
+    //  children draws nothing and swallows nothing.
+    //  ---------------------------------------------------------------
     const { width: W, height: H } = Dimensions.get('window');
 
     // Per lock. See the note on `dim` in core/tutorial/locks.ts: one value
     // was wrong for a sheet full of figures and wrong for a bare button, in
     // opposite directions.
-    const shade = { backgroundColor: `rgba(28,36,44,${lock.dim ?? DIM_DEFAULT})` };
+    const shade = { backgroundColor: `rgba(28,36,44,${lock?.dim ?? DIM_DEFAULT})` };
 
-    // Unconditional now: the null case returned above, so there is always a
-    // control to cut a hole around.
-    const hole = {
-        x: Math.max(0, rect.x - HALO),
-        y: Math.max(0, rect.y - HALO),
-        w: rect.width + HALO * 2,
-        h: rect.height + HALO * 2,
-    };
+    // In THIS overlay's coordinates rather than the window's. See holeFor.
+    const hole = rect && holeFor(rect, origin);
 
     return (
+        <View
+            ref={rootRef}
+            onLayout={onRootLayout}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="box-none">
+            {!lock || !rect || !hole ? null : (
         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
             {/* SHELVED: this was `hole ? (four panels) : (full-screen dim)`.
                 The second branch is what greyed out every screen in the game
@@ -396,6 +489,8 @@ const TutorialOverlay = () => {
                     </View>
                 )}
             </View>
+        </View>
+            )}
         </View>
     );
 };

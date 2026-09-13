@@ -29,7 +29,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 
-import TutorialOverlay from './TutorialOverlay';
+import TutorialOverlay, { holeFor, HALO } from './TutorialOverlay';
 import { useTutorialTargets } from './targets';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
@@ -40,6 +40,82 @@ import { line, lockKey } from '../../data/i18n/storyText';
 import { castNow } from '../../core/story/castNow';
 
 jest.mock('@react-navigation/native', () => ({ useIsFocused: () => true }));
+
+// ============================================================================
+//  THE RING SITS ON THE CONTROL, NOT NEAR IT
+// ============================================================================
+//  Reported on the first Android build: "tam kutuyu secmiyor". The ring was
+//  in the neighbourhood of the button and not on it.
+//
+//  TutorialTarget reports measureInWindow, which is relative to the WINDOW.
+//  The overlay is drawn with absoluteFill inside the React root. On iOS those
+//  origins are the same point and the numbers worked raw. On Android the
+//  window includes the status bar and the React root starts below it, so
+//  every hole sat that far below its control.
+//
+//  TESTED HERE AND NOT THROUGH A RENDER, which is the point. Under the test
+//  renderer `measureInWindow` never calls back, so the origin stays at zero
+//  and a component test passes whether or not the subtraction exists at all.
+//  The arithmetic is the fix, so the arithmetic is what is pinned.
+// ============================================================================
+describe('where the hole goes', () => {
+    const control = { x: 40, y: 300, width: 200, height: 60 };
+
+    it('sits HALO outside the control when the two origins agree', () => {
+        // iOS, and Android drawing edge to edge.
+        expect(holeFor(control, { x: 0, y: 0 })).toEqual({
+            x: 40 - HALO, y: 300 - HALO,
+            w: 200 + HALO * 2, h: 60 + HALO * 2,
+        });
+    });
+
+    it('and subtracts the gap when they do not', () => {
+        // Android, status bar 48. Without this the ring is 48 points low.
+        expect(holeFor(control, { x: 0, y: 48 })).toEqual({
+            x: 40 - HALO, y: 300 - 48 - HALO,
+            w: 200 + HALO * 2, h: 60 + HALO * 2,
+        });
+    });
+
+    it('the correction moves the hole, never resizes it', () => {
+        // A control is the same size in both coordinate systems. If an origin
+        // ever changed the width, the ring would be the wrong shape rather
+        // than in the wrong place, which is a different and worse bug.
+        for (const y of [0, 24, 48, 96]) {
+            const h = holeFor(control, { x: 0, y });
+            expect([y, h.w, h.h]).toEqual([y, 200 + HALO * 2, 60 + HALO * 2]);
+        }
+    });
+
+    it('and the overlay is actually wired to measure its own origin', () => {
+        // ---------------------------------------------------------------
+        //  A PROBE STAYED GREEN, SO THIS EXISTS
+        // ---------------------------------------------------------------
+        //  holeFor does the arithmetic and the tests above prove it. But
+        //  the arithmetic is fed by an origin that the overlay has to go
+        //  and measure, and deleting `onLayout` from the root left every
+        //  test passing: the correction quietly became zero, which is
+        //  exactly the broken behaviour it replaced.
+        //
+        //  So the wiring is checked as well as the sum. The root is
+        //  rendered even when there is no lock, precisely so it can be
+        //  measured before the first hole is ever drawn.
+        // ---------------------------------------------------------------
+        const tree = draw();
+        const root = tree.toJSON() as any;
+        expect(root).not.toBeNull();
+        expect(typeof root.props.onLayout).toBe('function');
+    });
+
+    it('and never drags the ring off the top of the screen', () => {
+        // A control under a notch measures above the overlay's own top. The
+        // clamp is why that reads as a ring at the edge rather than a ring
+        // that has left.
+        const high = { x: 4, y: 10, width: 100, height: 40 };
+        const h = holeFor(high, { x: 0, y: 48 });
+        expect([h.x, h.y]).toEqual([0, 0]);
+    });
+});
 
 const RECT = { x: 40, y: 500, width: 200, height: 60 };
 
