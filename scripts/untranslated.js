@@ -104,7 +104,20 @@ const NOT_A_SENTENCE = [
 ];
 
 const isSentence = (s) => {
-    const t = s.trim();
+    // ----------------------------------------------------------------------
+    //  WHAT IS INSIDE `${...}` IS NOT WRITING
+    // ----------------------------------------------------------------------
+    //  `-${formatMoney(result.tax)}` and `\n\n${gate.reason}` were both
+    //  reported, because the identifiers inside the braces are made of
+    //  letters and the test below only asks for letters. There is nothing to
+    //  translate in either: the sentence they belong to lives in the
+    //  dictionary, and these are the figure being slotted into it.
+    //
+    //  Stripped rather than allowed wholesale, so a template that DOES carry
+    //  prose still counts. `${n} units still in the warehouse` loses the
+    //  count and keeps the sentence.
+    // ----------------------------------------------------------------------
+    const t = s.replace(/\$\{[^}]*\}/g, '').replace(/\\n/g, ' ').trim();
     if (t.length < 3) return false;
     if (NOT_A_SENTENCE.some(re => re.test(t))) return false;
     // Has to contain a run of letters. "· 12 ·" does not.
@@ -210,6 +223,48 @@ const blankComments = (source) => {
     return out.join('');
 };
 
+/**
+ * Every string literal in `text`, as [offsetWithinText, contents].
+ * Skips the argument of `t(...)`, which is the one distinction that matters:
+ * `t('home.newGame')` is translated and `'New Game'` is not, and they look
+ * identical to a line-based regex.
+ */
+const literals = (text) => {
+    const out = [];
+    let q = null, start = -1;
+    for (let m = 0; m < text.length; m++) {
+        const c = text[m], prev = text[m - 1];
+        if (q) {
+            if (c === q && prev !== '\\') {
+                const body = text.slice(start + 1, m);
+                if (!/\bt\($/.test(text.slice(Math.max(0, start - 2), start))) {
+                    out.push([start, body]);
+                }
+                q = null;
+            }
+            continue;
+        }
+        if (c === '"' || c === "'" || c === '`') { q = c; start = m; }
+    }
+    return out;
+};
+
+/** Split an argument list at the commas that are actually separators. */
+const topLevelArgs = (inner) => {
+    const parts = [];
+    let depth = 0, q = null, from = 0;
+    for (let i = 0; i < inner.length; i++) {
+        const c = inner[i], prev = inner[i - 1];
+        if (q) { if (c === q && prev !== '\\') q = null; continue; }
+        if (c === '"' || c === "'" || c === '`') { q = c; continue; }
+        if ('([{'.includes(c)) depth++;
+        else if (')]}'.includes(c)) depth--;
+        else if (c === ',' && depth === 0) { parts.push([from, inner.slice(from, i)]); from = i + 1; }
+    }
+    parts.push([from, inner.slice(from)]);
+    return parts;
+};
+
 const scanAlerts = (source, push) => {
     let at = 0;
     while ((at = source.indexOf('Alert.alert', at)) !== -1) {
@@ -225,29 +280,52 @@ const scanAlerts = (source, push) => {
             else if (c === ')') { depth--; if (depth === 0) break; }
         }
 
-        const call = source.slice(at, end + 1);
+        // ------------------------------------------------------------------
+        //  ARGUMENT BY ARGUMENT, NOT THE WHOLE CALL
+        // ------------------------------------------------------------------
+        //  Reading every literal between the parentheses looked right and was
+        //  not. A button's `onPress` is a function body sitting inside the
+        //  call, and it has strings of its own: store field names, console
+        //  tags. The sweep reported `'companyOwnership'` from an update() and
+        //  `'[DilutionLogic] Dilution executed:'` from a console.log, and a
+        //  net that catches the wrong fish gets ignored, which is how it ends
+        //  up reporting zero again.
+        //
+        //  A player reads three things: the title, the body, and the words on
+        //  the buttons. So those three and nothing else.
+        // ------------------------------------------------------------------
+        const argsFrom = open + 1;
+        const args = topLevelArgs(source.slice(argsFrom, end));
 
-        // Every literal in the call, with where it started.
-        let q = null, start = -1;
-        for (let m = 0; m < call.length; m++) {
-            const c = call[m], prev = call[m - 1];
-            if (q) {
-                if (c === q && prev !== '\\') {
-                    const text = call.slice(start + 1, m);
-                    // `t('key')` - the one before the quote is the tell.
-                    const before = call.slice(Math.max(0, start - 2), start);
-                    const translated = /\bt\($/.test(before) || /^[a-z]+\.[a-zA-Z.]+$/.test(text);
-                    if (!translated && isSentence(text)) {
-                        push(at + start, text);
-                    }
-                    q = null;
-                }
-                continue;
+        // Title and body: every literal, because the body is routinely built
+        // with `+` across a dozen lines.
+        for (const [offset, arg] of args.slice(0, 2)) {
+            for (const [where, text] of literals(arg)) {
+                if (isSentence(text)) push(argsFrom + offset + where, text);
             }
-            if (c === '"' || c === "'" || c === '`') { q = c; start = m; }
         }
 
-        at = end + 1;
+        // The buttons: the `text:` of each, and only that.
+        if (args[2]) {
+            const [offset, arg] = args[2];
+            for (const m of arg.matchAll(/\btext:\s*(['"`])((?:\\.|(?!\1).)*)\1/g)) {
+                const quoteAt = m.index + m[0].indexOf(m[1]);
+                if (/\bt\($/.test(arg.slice(Math.max(0, quoteAt - 2), quoteAt))) continue;
+                if (isSentence(m[2])) push(argsFrom + offset + quoteAt, m[2]);
+            }
+        }
+
+        // ------------------------------------------------------------------
+        //  AND ON TO THE NEXT `Alert.alert`, INCLUDING ONE INSIDE THIS ONE
+        // ------------------------------------------------------------------
+        //  This was `end + 1`, which skipped past the whole call - and the
+        //  result Alerts live INSIDE the first one's onPress. Two of the
+        //  sharpest strings in the game, 'It worked!' and 'Backfired!', went
+        //  quiet the moment the onPress bodies stopped being read. Stepping
+        //  one character finds them, and cannot double-report, because the
+        //  outer pass now only reads the title, the body and the buttons.
+        // ------------------------------------------------------------------
+        at = open + 1;
     }
 };
 

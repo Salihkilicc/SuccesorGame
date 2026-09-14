@@ -60,7 +60,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
             if (qty > 0 && qty <= maxQuantity) {
               sellAsset(symbol, qty, currentPrice);
             } else if (qty > maxQuantity) {
-              Alert.alert('Error', `You only have ${maxQuantity} shares`);
+              Alert.alert(t('ui.error'), t('market.onlyHaveShares', { count: maxQuantity }));
             }
           },
         },

@@ -180,7 +180,7 @@ const LoveScreen = () => {
     const partnerNPC = contacts.find(c => c.id === partner.id);
 
     if (partnerNPC?.madeLoveThisQuarter) {
-      Alert.alert('Not Now', 'You need to wait until the next quarter.');
+      Alert.alert(t('love.notNow'), t('love.waitUntilNextQuarter'));
       return;
     }
 
@@ -287,11 +287,11 @@ const LoveScreen = () => {
         }
         break;
       case 'Insult':
-        Alert.alert("Are you sure?", "This will severely damage your relationship.", [
-          { text: "No", style: "cancel" },
+        Alert.alert(t('love.areYouSure'), t('love.willDamageRelationship'), [
+          { text: t('ui.cancel'), style: "cancel" },
           {
             text: t('love.doIt'), style: 'destructive', onPress: () => {
-              setFeedback("You had a huge fight!");
+              setFeedback(t('love.hadAHugeFight'));
               updatePartnerLove(-25);
             }
           }
@@ -399,14 +399,14 @@ const LoveScreen = () => {
         setFeedback("Coming Soon...");
         break;
       case 'Stalk Her':
-        Alert.alert("Stalk?", "Do you want to stalk their social media?", [
-          { text: 'No', style: 'cancel' },
+        Alert.alert(t('love.stalkTitle'), t('love.stalkBody'), [
+          { text: t('ui.cancel'), style: 'cancel' },
           {
-            text: 'Yes', onPress: () => {
+            text: t('ui.yes'), onPress: () => {
               if (Math.random() > 0.5) {
-                setFeedback("She looks happy without you... (Stress +5)");
+                setFeedback(t('love.stalkHappy'));
               } else {
-                setFeedback("She posted a sad song. She might miss you.");
+                setFeedback(t('love.stalkSad'));
               }
             }
           }
@@ -935,7 +935,7 @@ const LoveScreen = () => {
           context={currentScenario?.id.split('_')[0] || 'Unknown'}
           onDate={handleDate}
           onHookup={() => {
-            Alert.alert("Fling", "You had a great night! (Stress -10)");
+            Alert.alert(t('love.flingTitle'), t('love.flingBody'));
             closeEncounter();
           }}
           onIgnore={closeEncounter}

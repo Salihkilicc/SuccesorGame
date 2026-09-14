@@ -83,7 +83,11 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
             if (currentLevel < def.req.level) {
                 Alert.alert(
                     t('alert.investmentRequired'),
-                    `Research ${def.req.category.charAt(0).toUpperCase() + def.req.category.slice(1)} Level ${def.req.level} to unlock ${def.label}.`
+                    t('product.researchToUnlock', {
+                        category: def.req.category.charAt(0).toUpperCase() + def.req.category.slice(1),
+                        level: def.req.level,
+                        label: def.label,
+                    })
                 );
                 return;
             }

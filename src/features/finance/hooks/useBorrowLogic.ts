@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
+import { t } from '../../../core/i18n';
 import { useCorporateFinanceStore } from '../stores/useCorporateFinanceStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
 import { formatMoney } from '../../../core/utils';
@@ -63,7 +64,7 @@ export const useBorrowLogic = (
     // Actions
     const handleConfirm = () => {
         if (amount > maxBorrowable) {
-            Alert.alert("High Risk", "Bank refuses to lend more than 40% of your valuation.");
+            Alert.alert(t('finance.highRisk'), t('finance.bankRefusesOverForty'));
             return;
         }
 
@@ -82,16 +83,16 @@ export const useBorrowLogic = (
         );
 
         if (!result.success) {
-            Alert.alert('Loan Declined', result.message);
+            Alert.alert(t('finance.loanDeclined'), result.message);
             return;
         }
 
         Alert.alert(
-            "Loan Approved",
+            t('finance.loanApproved'),
             result.message,
             [
                 {
-                    text: "OK",
+                    text: t('ui.ok'),
                     onPress: () => {
                         onClose();
                     }

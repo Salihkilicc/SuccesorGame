@@ -2598,4 +2598,182 @@ export const tr: Record<string, string> = {
     'lab.tierFutureCampusDesc': 'Sınırları zorlayan yenilik merkezi',
     'lab.tierGlobalSiliconHQ': 'Küresel Silikon Merkezi',
     'lab.tierGlobalSiliconHQDesc': 'Dünya çapında araştırma genel merkezi',
+
+    // ------------------------------------------------------------------
+    //  DIYALOGLAR
+    // ------------------------------------------------------------------
+    //  Bunlar ekranda degil, Alert icinde yasiyordu ve tarama Alert'in
+    //  icine bakmadigi icin yillardir Ingilizce duruyorlardi. Kayidi
+    //  scripts/untranslated.js dosyasinin basinda.
+    // ------------------------------------------------------------------
+
+    // Halka arz
+    'ipo.launchTitle': '🔔 Halka Arz',
+    'ipo.launchBody':
+        'Halka açıldığında:\n\n' +
+        '• Hisselerin %20\'si yatırımcılara satılır\n' +
+        '• {cash} sermaye girer\n' +
+        '• Sahipliğin %80\'e iner\n' +
+        '• 1.5 kat halka arz çarpanı uygulanır\n\n' +
+        'Şirket değeri: {value}\n\n' +
+        'Halka açılmaya hazır mısın?',
+    'ipo.successTitle': '🎉 Halka Arz Tamamlandı',
+    'ipo.successBody':
+        '{cash} topladın.\n\n' +
+        'Piyasa artık işleme açık.\n' +
+        'Sahipliğin: %{percent}',
+    'ipo.successDetail':
+        'Şirketin artık borsada işlem görüyor. Değeri {increase} arttı ve {cash} sermaye aldın.',
+
+    // Geri alim
+    'equity.invalidAmount': 'Geçersiz Miktar',
+    'equity.pickAPercentage': 'Bir yüzde seç.',
+    'equity.insufficientCapital': 'Sermaye Yetersiz',
+    'equity.buybackNeeds': 'Şirketin hisseleri geri alması için {cost} lazım.',
+    'equity.confirmBuyback': 'Geri Alımı Onayla',
+    'equity.buybackBody':
+        'Hisselerin %{percent} kadarını geri almak için {cost} harcansın mı?\n\n' +
+        '📈 Piyasa etkisi: Hisse fiyatı %5 yükselir\n\n' +
+        'Sahipliğin %{newOwnership} olur.',
+    'equity.buybackDoneTitle': 'Geri Alım Tamam',
+    'equity.buybackDoneBody':
+        '{shares} hisse iptal edildi.\n' +
+        'Sahipliğin %{percent} seviyesine çıktı.',
+
+    // Sulandirma
+    'equity.confirmDilution': 'Sulandırmayı Onayla',
+    'equity.dilutionBody':
+        'Hisseler %{percent} sulandırılıyor.\n\n' +
+        '⚠️ Piyasa şoku: Hisse fiyatı %5 düşer\n\n' +
+        'Sahipliğin %{newOwnership} seviyesine iner.',
+    'equity.confirmAndSell': 'Onayla ve Sat',
+    'equity.dilutionDoneTitle': 'Tamamlandı',
+    'equity.dilutionDoneBody':
+        '{cash} sermaye girdi.\n' +
+        'Yeni sahiplik: %{percent}',
+
+    // Temettu
+    'equity.insufficientFunds': 'Kasada yeterli para yok.',
+    'equity.dividendPaidTitle': 'Temettü ödendi',
+    'equity.dividendPaidBody':
+        'Şirket toplam {total} dağıttı.\n\n' +
+        'Senin payın: {gross}\n' +
+        'Temettü vergisi: {tax}\n' +
+        'Kişisel hesabına geçen: {net}\n\n' +
+        'Şirket bu kâr için zaten kurumlar vergisi ödedi, sen ikinci kez ' +
+        'vergilendiriliyorsun. Geri alımın nakdi geri vermenin çoğu zaman ' +
+        'daha ucuz yolu olmasının sebebi bu.',
+
+    // Hissedar baskisi
+    'equity.pressureTitle': 'Baskı Kur',
+    'equity.pressureBody':
+        'Emin misin? Bu yüksek riskli bir hamle.\n\n' +
+        '• %95 ihtimal: İlişki 20 düşer\n' +
+        '• %5 ihtimal: Panikleyip %1 payını sana bırakır',
+    'equity.pressureWorkedTitle': 'İşe yaradı',
+    'equity.pressureWorkedBody':
+        '{name} skandaldan kaçmak için panikledi ve %{percent} payını sana bıraktı.',
+    'equity.pressureBackfiredTitle': 'Geri tepti',
+    'equity.pressureBackfiredBody': '{name} davranışına çok kızgın. İlişki 20 düştü.',
+
+    // Hediye
+    'equity.cannotAffordGift': 'Bu hediyeyi karşılayamıyorsun.',
+    'equity.confirmGift': 'Hediyeyi Onayla',
+    'equity.sendGiftBody': '{gift} ({cost}) gönderilsin mi?',
+    'equity.send': 'Gönder',
+
+    // Kredi
+    'finance.highRisk': 'Yüksek Risk',
+    'finance.bankRefusesOverForty':
+        'Banka değerinin %40\'ından fazlasını ödünç vermeyi reddediyor.',
+    'finance.loanApproved': 'Kredi Onaylandı',
+    'finance.loanDeclined': 'Kredi Reddedildi',
+
+    // Her diyalogda gecen kelimeler. Tek yerde, cunku bir diyalog 'Tamam'
+    // digerinin 'OK' dedigi bir uygulama yarim cevrilmis gorunur.
+    'ui.ok': 'Tamam',
+    'ui.yes': 'Evet',
+    'ui.error': 'Hata',
+    'ui.success': 'Başarılı',
+    'ui.failed': 'Olmadı',
+    'ui.notYet': 'Şimdi değil',
+
+    // Piyasa
+    'market.onlyHaveShares': 'Elinde yalnızca {count} hisse var.',
+    'shareholders.notEnoughCashForOffer': 'Bu teklif için yeterli naktin yok.',
+
+    // Yeni oyun ve sifirlama
+    'newgame.title': 'Yeni Oyun',
+    'newgame.eraseWarning':
+        'Bütün ilerleme silinecek ve sıfırdan yeni bir hayat kurulacak. Emin misin?',
+    'newgame.couldNotStart':
+        'Yeni oyun başlatılamadı. Uygulamayı kapatıp yeniden açmayı dene.',
+    'newgame.couldNotChangeCharacter':
+        'Karakter değiştirilemedi. Uygulamayı kapatıp yeniden açmayı dene.',
+    'newgame.couldNotAdvanceTime':
+        'Çeyrek ilerletilemedi. Uygulamayı kapatıp yeniden açmayı dene.',
+    'godmode.resetTitle': 'Oyunu Sıfırla',
+    'godmode.resetBody': 'İlerlemeni tamamen sıfırlamak istediğine emin misin?',
+    'godmode.moneyAdded': 'Bakiyene 100 milyon dolar eklendi.',
+
+    // Notlar
+    'os.deleteNoteTitle': 'Notu Sil',
+    'os.deleteNoteBody': 'Bu notu silmek istediğine emin misin?',
+    'os.documentUnavailable': '{doc} şu anda kullanılamıyor.',
+    'os.documentUnavailableGeneric': 'Bu belge şu anda kullanılamıyor.',
+
+    // Varliklar
+    'assets.portfolioEmpty': 'Portföy Boş',
+    'assets.nothingToSell': 'Satacak varlığın yok.',
+    'assets.liquidateTitle': 'Portföyü Nakde Çevir',
+    'assets.liquidateBody':
+        'Bütün varlıklarını satmak istediğine emin misin? Tahmini değer: {value}',
+    'assets.sellAll': 'Hepsini Sat',
+    'assets.soldAllFor': 'Bütün varlıklar {amount} karşılığında satıldı.',
+
+    // Urunler
+    'product.alreadyOnTheMarket': 'Bu ürün zaten piyasada.',
+    'product.launchSuccessful': '🚀 Lansman Başarılı',
+    'product.nowOnTheMarket': '{name} artık piyasada.',
+    'product.thisProduct': 'bu ürün',
+    'product.stockWrittenOff': '{count} adet depodaki stok zarar yazılacak.\n\n',
+    'product.technologyRelocks':
+        'Teknoloji tekrar kilitlenir. Sonra geri getirebilirsin ama araştırma ve nakit bedelini yeniden ödersin.',
+    'product.researchToUnlock':
+        '{label} için {category} araştırmasını {level}. seviyeye çıkar.',
+
+    // Sirket satisi
+    'company.soldFor': '{name} şirketini {amount} karşılığında sattın.',
+    'company.buyersWalkedAway': 'Alıcılar masadan kalktı.',
+
+    // Posta
+    'mail.cannotMeetToday': 'Bugün bunu karşılayamazsın.',
+    'mail.theyCameBackTitle': 'Sana geri döndüler',
+    'mail.termsChanged': 'Şartlar değişti. Tekrar oku.',
+    'mail.tenderTitle': 'Hissedarlarına doğrudan teklif',
+    'mail.tenderBody':
+        '{name} şirketinde yönetim kurulunun üstünden atlamış olursun. Pazarlık yok ve bunun bedelini ödersin. İnsanları kalır ve kimin için çalıştıklarını hatırlarlar.',
+    'mail.notSent': 'Gönderilmedi',
+    'mail.sent': 'Gönderildi',
+    'mail.letterGone':
+        'Mektubun {name} adresine ulaştı. Bir yönetim kurulu aynı hafta cevap vermez, önümüzdeki çeyreği bekle.',
+
+    // Aile
+    'profile.couldNotSendGift': 'Hediye gönderilemedi.',
+    'profile.breakupTitle': 'Ayrılık',
+    'profile.relationshipDissolved': 'İlişki Bitti',
+    'profile.newsBroadcast': 'Haber bülteni: "{headline}"',
+
+    // Iliski
+    'love.notNow': 'Şimdi Olmaz',
+    'love.waitUntilNextQuarter': 'Bir sonraki çeyreği beklemen gerek.',
+    'love.areYouSure': 'Emin misin?',
+    'love.willDamageRelationship': 'Bu ilişkine ciddi zarar verir.',
+    'love.hadAHugeFight': 'Büyük bir kavga ettiniz.',
+    'love.stalkTitle': 'Takip et',
+    'love.stalkBody': 'Sosyal medyasını kurcalamak ister misin?',
+    'love.stalkHappy': 'Sensiz mutlu görünüyor. (Stres +5)',
+    'love.stalkSad': 'Hüzünlü bir şarkı paylaşmış. Belki seni özlüyordur.',
+    'love.flingTitle': 'Kaçamak',
+    'love.flingBody': 'Harika bir gece geçirdin. (Stres 10 azaldı)',
 };

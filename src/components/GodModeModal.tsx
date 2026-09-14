@@ -15,8 +15,8 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
     useLocale();
     const handleReset = () => {
         Alert.alert(
-            'Reset Game',
-            'Are you sure you want to completely reset your progress?',
+            t('godmode.resetTitle'),
+            t('godmode.resetBody'),
             [
                 { text: t('ui.cancel'), style: 'cancel' },
                 {
@@ -33,7 +33,7 @@ const GodModeModal: React.FC<GodModeModalProps> = ({ visible, onClose }) => {
 
     const handleAddMoney = () => {
         useStatsStore.getState().earnMoney(100_000_000);
-        Alert.alert('Success', '$100M added to your balance!');
+        Alert.alert(t('ui.success'), t('godmode.moneyAdded'));
     };
 
     return (

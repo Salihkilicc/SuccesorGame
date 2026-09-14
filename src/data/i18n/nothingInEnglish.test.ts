@@ -100,9 +100,25 @@ describe('and the sweep is really looking', () => {
     });
 
     it('and only what is genuinely unreadable is exempt today', () => {
-        // Four files: the three shelved LuxoNet modals, which nothing mounts,
-        // and a version stamp. If this list grows the exemption has become
-        // the way to pass rather than the exception.
+        // Six files, and the list is named rather than counted so that adding
+        // to it is a decision somebody has to write down.
+        //
+        //   LuxeNetFooter, LuxoNetInventoryModal, LuxoNetModalWrapper,
+        //   LuxoNetPreviewModal   shelved, nothing mounts them
+        //
+        //   newGame.ts            a developer integrity warning. It fires only
+        //                         when a field survived a reset that should
+        //                         have cleared it, it names store fields, and
+        //                         the only useful response is to open the
+        //                         code. Translating it would dress a bug
+        //                         report up as something to act on in game.
+        //
+        //   useSettingsLogic.ts   'Successor OS', the name of the in game
+        //                         operating system. A phone says iOS in every
+        //                         language.
+        //
+        // If this list grows the exemption has become the way to pass rather
+        // than the exception.
         const walk = (dir: string, out: string[] = []): string[] => {
             for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
                 const full = path.join(dir, e.name);
@@ -120,6 +136,8 @@ describe('and the sweep is really looking', () => {
             'LuxoNetInventoryModal.tsx',
             'LuxoNetModalWrapper.tsx',
             'LuxoNetPreviewModal.tsx',
+            'newGame.ts',
+            'useSettingsLogic.ts',
         ]);
     });
 });

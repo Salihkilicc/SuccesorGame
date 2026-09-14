@@ -87,15 +87,18 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
             if (Platform.OS === 'android') {
                 ToastAndroid.show(`Sold for ${formatMoney(got)}!`, ToastAndroid.LONG);
             } else {
-                Alert.alert(t('alert.offerAccepted'), `You successfully sold ${company.name} for ${formatMoney(got)}.`);
+                Alert.alert(
+                    t('alert.offerAccepted'),
+                    t('company.soldFor', { name: company.name, amount: formatMoney(got) }),
+                );
             }
             onClose();
         } else {
             // Failure Logic
             Alert.alert(
                 t('alert.dealFellThrough'),
-                result.msg || "Buyers walked away.",
-                [{ text: 'OK', onPress: onClose }]
+                result.msg || t('company.buyersWalkedAway'),
+                [{ text: t('ui.ok'), onPress: onClose }]
             );
         }
     };

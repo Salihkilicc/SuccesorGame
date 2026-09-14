@@ -2608,4 +2608,185 @@ export const en: Record<string, string> = {
     'lab.tierFutureCampusDesc': 'Cutting-edge innovation hub',
     'lab.tierGlobalSiliconHQ': 'Global Silicon HQ',
     'lab.tierGlobalSiliconHQDesc': 'World-class research headquarters',
+
+    // ------------------------------------------------------------------
+    //  THE DIALOGS
+    // ------------------------------------------------------------------
+    //  These lived inside Alert calls rather than on a screen, and the
+    //  sweep did not look inside an Alert, so they sat in English for
+    //  months. The record is at the top of scripts/untranslated.js.
+    // ------------------------------------------------------------------
+
+    // Going public
+    'ipo.launchTitle': '🔔 Launch IPO',
+    'ipo.launchBody':
+        'Going public will:\n\n' +
+        '• Sell 20% of shares to public investors\n' +
+        '• Raise {cash} in capital\n' +
+        '• Reduce your ownership to 80%\n' +
+        '• Apply a 1.5x IPO hype multiplier\n\n' +
+        'Company valuation: {value}\n\n' +
+        'Are you ready to go public?',
+    'ipo.successTitle': '🎉 IPO Successful',
+    'ipo.successBody':
+        'You raised {cash}.\n\n' +
+        'The market is now open for trading.\n' +
+        'Your ownership: {percent}%',
+    'ipo.successDetail':
+        'Your company is now publicly traded. Valuation increased by {increase} and you received {cash} in capital.',
+
+    // Buyback
+    'equity.invalidAmount': 'Invalid Amount',
+    'equity.pickAPercentage': 'Please select a percentage.',
+    'equity.insufficientCapital': 'Insufficient Capital',
+    'equity.buybackNeeds': 'The company needs {cost} to buy back shares.',
+    'equity.confirmBuyback': 'Confirm Buyback',
+    'equity.buybackBody':
+        'Spend {cost} to buy back {percent}% of shares?\n\n' +
+        '📈 Market boost: the share price rises by 5%\n\n' +
+        'This takes your ownership to {newOwnership}%.',
+    'equity.buybackDoneTitle': 'Buyback Complete',
+    'equity.buybackDoneBody':
+        '{shares} shares retired.\n' +
+        'Your ownership increased to {percent}%.',
+
+    // Dilution
+    'equity.confirmDilution': 'Confirm Dilution',
+    'equity.dilutionBody':
+        'Diluting shares by {percent}%.\n\n' +
+        '⚠️ Market shock: the share price drops by 5%\n\n' +
+        'Your ownership will fall to {newOwnership}%.',
+    'equity.confirmAndSell': 'Confirm and Sell',
+    'equity.dilutionDoneTitle': 'Done',
+    'equity.dilutionDoneBody':
+        '{cash} raised.\n' +
+        'New ownership: {percent}%',
+
+    // Dividend
+    'equity.insufficientFunds': 'There is not enough in the account.',
+    'equity.dividendPaidTitle': 'Dividend paid',
+    'equity.dividendPaidBody':
+        'The company paid out {total} in total.\n\n' +
+        'Your share: {gross}\n' +
+        'Dividend tax: {tax}\n' +
+        'Into your personal account: {net}\n\n' +
+        'The company already paid corporate tax on this profit, so you are ' +
+        'taxed on it a second time. That is why buybacks are often the ' +
+        'cheaper way to return cash.',
+
+    // Pressuring a shareholder
+    'equity.pressureTitle': 'Apply Pressure',
+    'equity.pressureBody':
+        'Are you sure? This is a high risk action.\n\n' +
+        '• 95% chance: relationship falls by 20\n' +
+        '• 5% chance: they panic and surrender a 1% stake',
+    'equity.pressureWorkedTitle': 'It worked',
+    'equity.pressureWorkedBody':
+        '{name} panicked to avoid a scandal and surrendered a {percent}% stake to you.',
+    'equity.pressureBackfiredTitle': 'It backfired',
+    'equity.pressureBackfiredBody': '{name} is furious at your behaviour. Relationship down 20.',
+
+    // Gifts
+    'equity.cannotAffordGift': 'You cannot afford this gift.',
+    'equity.confirmGift': 'Confirm Gift',
+    'equity.sendGiftBody': 'Send {gift} ({cost})?',
+    'equity.send': 'Send',
+
+    // Borrowing
+    'finance.highRisk': 'High Risk',
+    'finance.bankRefusesOverForty':
+        'The bank refuses to lend more than 40% of your valuation.',
+    'finance.loanApproved': 'Loan Approved',
+    'finance.loanDeclined': 'Loan Declined',
+
+    // The words that turn up in every dialog. One place, because an app where
+    // one dialog says OK and the next says Tamam reads as half translated.
+    'ui.ok': 'OK',
+    'ui.yes': 'Yes',
+    'ui.error': 'Error',
+    'ui.success': 'Success',
+    'ui.failed': 'Failed',
+    'ui.notYet': 'Not yet',
+
+    // Market
+    'market.onlyHaveShares': 'You only have {count} shares.',
+    'shareholders.notEnoughCashForOffer': 'You do not have enough cash for this offer.',
+
+    // Starting over
+    'newgame.title': 'New Game',
+    'newgame.eraseWarning':
+        'All progress will be erased and a fresh run will be set up. Are you sure?',
+    // These three used to end with "Check the console." A player has no
+    // console. Telling them to look at one is the same as telling them
+    // nothing, in either language.
+    'newgame.couldNotStart':
+        'Could not start a new game. Try closing the app and opening it again.',
+    'newgame.couldNotChangeCharacter':
+        'Could not change the character. Try closing the app and opening it again.',
+    'newgame.couldNotAdvanceTime':
+        'Could not advance the quarter. Try closing the app and opening it again.',
+    'godmode.resetTitle': 'Reset Game',
+    'godmode.resetBody': 'Are you sure you want to completely reset your progress?',
+    'godmode.moneyAdded': '$100M added to your balance.',
+
+    // Notes
+    'os.deleteNoteTitle': 'Delete Note',
+    'os.deleteNoteBody': 'Are you sure you want to delete this note?',
+    'os.documentUnavailable': '{doc} is currently unavailable.',
+    'os.documentUnavailableGeneric': 'This document is currently unavailable.',
+
+    // Assets
+    'assets.portfolioEmpty': 'Portfolio Empty',
+    'assets.nothingToSell': 'You do not have any assets to sell.',
+    'assets.liquidateTitle': 'Liquidate Portfolio',
+    'assets.liquidateBody':
+        'Are you sure you want to sell all your assets? Estimated value: {value}',
+    'assets.sellAll': 'Sell All',
+    'assets.soldAllFor': 'Sold all assets for {amount}.',
+
+    // Products
+    'product.alreadyOnTheMarket': 'This product is already on the market.',
+    'product.launchSuccessful': '🚀 Launch Successful',
+    'product.nowOnTheMarket': '{name} is now on the market.',
+    'product.thisProduct': 'this product',
+    'product.stockWrittenOff': '{count} units still in the warehouse will be written off.\n\n',
+    'product.technologyRelocks':
+        'The technology goes back to locked. You can bring it back later, but you will pay the research and cash cost again.',
+    'product.researchToUnlock':
+        'Research {category} to level {level} to unlock {label}.',
+
+    // Selling a company
+    'company.soldFor': 'You successfully sold {name} for {amount}.',
+    'company.buyersWalkedAway': 'Buyers walked away.',
+
+    // Mail
+    'mail.cannotMeetToday': 'You cannot meet that today.',
+    'mail.theyCameBackTitle': 'They have come back to you',
+    'mail.termsChanged': 'The terms have changed. Read it again.',
+    'mail.tenderTitle': 'Tender to their shareholders',
+    'mail.tenderBody':
+        'You would go over the board\'s head at {name}. No negotiation, and you pay for that. Their people stay, and they will remember which of you they work for.',
+    'mail.notSent': 'Not sent',
+    'mail.sent': 'Sent',
+    'mail.letterGone':
+        'Your letter has gone to {name}. A board does not answer the same week, so expect a reply next quarter.',
+
+    // Family
+    'profile.couldNotSendGift': 'Could not send gift.',
+    'profile.breakupTitle': 'Breakup',
+    'profile.relationshipDissolved': 'Relationship Dissolved',
+    'profile.newsBroadcast': 'News broadcast: "{headline}"',
+
+    // Relationships
+    'love.notNow': 'Not Now',
+    'love.waitUntilNextQuarter': 'You need to wait until the next quarter.',
+    'love.areYouSure': 'Are you sure?',
+    'love.willDamageRelationship': 'This will severely damage your relationship.',
+    'love.hadAHugeFight': 'You had a huge fight.',
+    'love.stalkTitle': 'Stalk',
+    'love.stalkBody': 'Do you want to stalk their social media?',
+    'love.stalkHappy': 'She looks happy without you. (Stress +5)',
+    'love.stalkSad': 'She posted a sad song. She might miss you.',
+    'love.flingTitle': 'Fling',
+    'love.flingBody': 'You had a great night. (Stress down 10)',
 };

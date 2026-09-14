@@ -178,7 +178,7 @@ export const FamilyMemberScreen: React.FC = () => {
     const handleGiftPartner = () => {
         const res = handleGift(15000);
         if (!res.success) {
-            Alert.alert(t('profile.giftFailed'), res.error || 'Could not send gift.');
+            Alert.alert(t('profile.giftFailed'), res.error || t('profile.couldNotSendGift'));
         } else {
             Alert.alert(t('profile.luxuryGift'), t('profile.luxuryGiftDesc', { delta: String(res.loveDelta) }));
         }
@@ -377,11 +377,13 @@ export const FamilyMemberScreen: React.FC = () => {
     const handleBreakup = () => {
         const res = handleMessyBreakup('drifted');
         if (!res.success) {
-            Alert.alert('Breakup', res.error || 'Failed.');
+            Alert.alert(t('profile.breakupTitle'), res.error || t('ui.failed'));
         } else {
-            Alert.alert('Relationship Dissolved', `News Broadcast: "${res.newsHeadline}"`, [
-                { text: 'OK', onPress: () => navigation.goBack() },
-            ]);
+            Alert.alert(
+                t('profile.relationshipDissolved'),
+                t('profile.newsBroadcast', { headline: res.newsHeadline }),
+                [{ text: t('ui.ok'), onPress: () => navigation.goBack() }],
+            );
         }
     };
 

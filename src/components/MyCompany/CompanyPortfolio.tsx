@@ -26,14 +26,11 @@ const CompanyPortfolio = () => {
 
     // Show confirmation dialog
     Alert.alert(
-      '🔔 Launch IPO',
-      `Going public will:\n\n` +
-      `• Sell 20% of shares to public investors\n` +
-      `• Raise ${formatMoney(cashRaised)} in capital\n` +
-      `• Reduce your ownership to 80%\n` +
-      `• Apply 1.5x IPO hype multiplier\n\n` +
-      `Company Valuation: ${formatMoney(companyValue)}\n\n` +
-      `Are you ready to go public?`,
+      t('ipo.launchTitle'),
+      t('ipo.launchBody', {
+        cash: formatMoney(cashRaised),
+        value: formatMoney(companyValue),
+      }),
       [
         { text: t('ui.cancel'), style: 'cancel' },
         {
@@ -59,10 +56,11 @@ const CompanyPortfolio = () => {
 
             // Success feedback
             Alert.alert(
-              '🎉 IPO Successful!',
-              `You raised ${formatMoney(result.cashRaised)}!\n\n` +
-              `The market is now open for trading.\n` +
-              `Your ownership: ${result.newOwnershipPercent.toFixed(1)}%`
+              t('ipo.successTitle'),
+              t('ipo.successBody', {
+                cash: formatMoney(result.cashRaised),
+                percent: result.newOwnershipPercent.toFixed(1),
+              })
             );
           },
         },

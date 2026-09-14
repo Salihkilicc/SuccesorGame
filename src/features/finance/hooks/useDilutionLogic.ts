@@ -64,14 +64,15 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
     // Actions
     const handleConfirm = () => {
         Alert.alert(
-            "Confirm Dilution",
-            `Diluting shares by ${dilutionPercentage}%.\n\n` +
-            `⚠️ Market Shock: Stock price will drop by 5%\n\n` +
-            `Your ownership will drop to ${newOwnership.toFixed(1)}%.`,
+            t('equity.confirmDilution'),
+            t('equity.dilutionBody', {
+                percent: dilutionPercentage,
+                newOwnership: newOwnership.toFixed(1),
+            }),
             [
-                { text: "Cancel", style: "cancel" },
+                { text: t('ui.cancel'), style: "cancel" },
                 {
-                    text: "Confirm & Sell",
+                    text: t('equity.confirmAndSell'),
                     style: "destructive",
                     onPress: () => {
                         // ------------------------------------------------------
@@ -123,10 +124,11 @@ export const useDilutionLogic = (visible: boolean, onClose: () => void): Dilutio
                         console.log('[DilutionLogic] Dilution executed:', result);
 
                         Alert.alert(
-                            "Success",
-                            `${formatMoney(result.capitalRaised)} Raised!\n` +
-                            `New Ownership: ${result.newOwnershipPercent.toFixed(1)}%` +
-                            (gate.needed ? `\n\n${gate.reason}` : ''),
+                            t('equity.dilutionDoneTitle'),
+                            t('equity.dilutionDoneBody', {
+                                cash: formatMoney(result.capitalRaised),
+                                percent: result.newOwnershipPercent.toFixed(1),
+                            }) + (gate.needed ? `\n\n${gate.reason}` : ''),
                         );
                         onClose();
                     }

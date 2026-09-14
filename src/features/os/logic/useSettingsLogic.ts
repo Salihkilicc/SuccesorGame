@@ -99,7 +99,16 @@ export const useSettingsLogic = (): SettingsLogicReturn => {
     }, []);
 
     const handleUnavailable = useCallback((docName?: string) => {
-        Alert.alert('Successor OS', docName ? `${docName} is currently unavailable.` : 'This document is currently unavailable.');
+        Alert.alert(
+            // The name of the in game operating system, the same way a phone
+            // says iOS in every language. Translating it would rename a
+            // product the player sees on its own home screen.
+            // @english-ok a product name, see above
+            'Successor OS',
+            docName
+                ? t('os.documentUnavailable', { doc: docName })
+                : t('os.documentUnavailableGeneric'),
+        );
     }, []);
 
     // ------------------------------------------------------------------
@@ -134,7 +143,7 @@ export const useSettingsLogic = (): SettingsLogicReturn => {
             console.error('[Settings] Yeni oyun baslatilamadi', e);
             // Alert is still right for a genuinely unexpected failure - see
             // the note at the top of ConfirmPanel.
-            Alert.alert('Error', 'Could not start a new game. Check the console.');
+            Alert.alert(t('ui.error'), t('newgame.couldNotStart'));
         }
     }, [navigation]);
 
@@ -167,7 +176,7 @@ export const useSettingsLogic = (): SettingsLogicReturn => {
             await changeCharacter();
         } catch (e) {
             console.error('[Settings] Karakter degistirilemedi', e);
-            Alert.alert('Error', 'Could not change the character. Check the console.');
+            Alert.alert(t('ui.error'), t('newgame.couldNotChangeCharacter'));
         }
     }, []);
 

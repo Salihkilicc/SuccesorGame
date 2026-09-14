@@ -79,7 +79,7 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
         // Upgrade uses same capital logic? The store calls deductCash. 
         // We should pass a deduct function that uses Company Capital effectively since they want expenses from Capital.
         const result = upgradeFacility(companyCapital, deductCapital);
-        Alert.alert(result.success ? 'Success' : 'Error', result.message);
+        Alert.alert(result.success ? t('ui.success') : t('ui.error'), result.message);
     };
 
     const handleAdjust = (delta: number) => {

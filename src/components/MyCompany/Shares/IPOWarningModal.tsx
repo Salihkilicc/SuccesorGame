@@ -31,7 +31,10 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
         onClose();
         Alert.alert(
             t('alert.ipoSuccessful'),
-            `Your company is now publicly traded. Valuation increased by ${formatMoney(valuationIncrease)} and you received ${formatMoney(cashInjection)} in capital.`
+            t('ipo.successDetail', {
+                increase: formatMoney(valuationIncrease),
+                cash: formatMoney(cashInjection),
+            })
         );
     };
 

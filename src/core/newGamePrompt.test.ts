@@ -257,8 +257,20 @@ describe('the destructive step', () => {
         const settings = code('../features/os/logic/useSettingsLogic.ts');
         expect(settings).toMatch(/confirmNewGame\(\)/);
         expect(settings).not.toMatch(/Alert\.alert\(\s*'New Game'/);
-        // Alert is still right for an unexpected failure, and that one stays.
-        expect(settings).toMatch(/Alert\.alert\('Error'/);
+        expect(settings).not.toMatch(/Alert\.alert\(\s*t\('newgame\.title'\)/);
+        // ------------------------------------------------------------------
+        //  Alert is still right for an unexpected failure, and that one stays.
+        // ------------------------------------------------------------------
+        //  This used to look for the literal `Alert.alert('Error'`, which is
+        //  the same mistake the untranslated sweep was making: it pinned the
+        //  ENGLISH rather than the behaviour. The moment the failure alert was
+        //  translated, a test about which dialogs Settings raises started
+        //  failing over a word.
+        //
+        //  The claim is that Settings still warns when starting over fails. It
+        //  is a translated string now, so the key is what to look for.
+        // ------------------------------------------------------------------
+        expect(settings).toMatch(/Alert\.alert\(t\('ui\.error'\), t\('newgame\.couldNotStart'\)\)/);
     });
 
     it('and a cancel stops before anything is torn down', () => {

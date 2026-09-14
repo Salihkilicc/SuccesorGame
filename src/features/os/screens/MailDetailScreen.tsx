@@ -136,7 +136,7 @@ const MailDetailScreen = () => {
             // thing they are short of has changed.
             Alert.alert(
                 negotiation.targetName,
-                result.reason ?? 'You cannot meet that today.',
+                result.reason ?? t('mail.cannotMeetToday'),
             );
             return;
         }
@@ -145,7 +145,7 @@ const MailDetailScreen = () => {
             // yes too fast, or Køhl splitting the difference because you said
             // no. Back to the first pair of buttons, once.
             setStage('first');
-            Alert.alert('They have come back to you', 'The terms have changed. Read it again.');
+            Alert.alert(t('mail.theyCameBackTitle'), t('mail.termsChanged'));
             return;
         }
 
@@ -173,7 +173,7 @@ const MailDetailScreen = () => {
                 owning
                     ? t('mail.closed')
                     : t('mail.partnershipSignedAlert'),
-                [{ text: 'OK', onPress: () => navigation.goBack() }],
+                [{ text: t('ui.ok'), onPress: () => navigation.goBack() }],
             );
             return;
         }
@@ -206,10 +206,10 @@ const MailDetailScreen = () => {
     const onHostile = () => {
         if (!negotiation) return;
         Alert.alert(
-            'Tender to their shareholders',
-            `You would go over the board's head at ${hostileLabel} — no negotiation, and you pay for that. Their people stay, and they will remember which of you they work for.`,
+            t('mail.tenderTitle'),
+            t('mail.tenderBody', { name: hostileLabel }),
             [
-                { text: 'Not yet', style: 'cancel' },
+                { text: t('ui.notYet'), style: 'cancel' },
                 {
                     text: t('mail.doIt'),
                     onPress: () => {

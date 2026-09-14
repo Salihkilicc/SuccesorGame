@@ -8,6 +8,7 @@ import { personalNetWorth } from '../../../core/market/personalEconomy';
 import { useAssetStore } from '../../shopping/store/useAssetStore';
 import { calculateQuarterlyFinances } from '../logic/EconomyEngine';
 import { Alert } from 'react-native';
+import { t } from '../../../core/i18n';
 import { STOCKS } from '../data/marketData';
 import { formatMoney } from '../../../core/utils';
 
@@ -77,21 +78,24 @@ export const useAssetsLogic = () => {
         const portfolioValue = investmentsValue;
 
         if (portfolioValue <= 0) {
-            Alert.alert("Portfolio Empty", "You don't have any assets to sell.");
+            Alert.alert(t('assets.portfolioEmpty'), t('assets.nothingToSell'));
             return;
         }
 
         Alert.alert(
-            "Liquidate Portfolio",
-            `Are you sure you want to sell all your assets? Estimated value: ${formatMoney(portfolioValue)}`,
+            t('assets.liquidateTitle'),
+            t('assets.liquidateBody', { value: formatMoney(portfolioValue) }),
             [
-                { text: "Cancel", style: "cancel" },
+                { text: t('ui.cancel'), style: "cancel" },
                 {
-                    text: "Sell All",
+                    text: t('assets.sellAll'),
                     style: "destructive",
                     onPress: () => {
                         const soldAmount = liquidatePortfolio();
-                        Alert.alert("Success", `Sold all assets for ${formatMoney(soldAmount)}`);
+                        Alert.alert(
+                            t('ui.success'),
+                            t('assets.soldAllFor', { amount: formatMoney(soldAmount) }),
+                        );
                     }
                 }
             ]

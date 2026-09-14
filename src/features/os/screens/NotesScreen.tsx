@@ -51,8 +51,8 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
 
     const handleDelete = () => {
         Alert.alert(
-            'Delete Note',
-            'Are you sure you want to delete this note?',
+            t('os.deleteNoteTitle'),
+            t('os.deleteNoteBody'),
             [
                 { text: t('os.cancel'), style: 'cancel' },
                 {

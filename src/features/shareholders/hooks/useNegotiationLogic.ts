@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
+import { t } from '../../../core/i18n';
 import { useStatsStore, Shareholder } from '../../../core/store/useStatsStore';
 
 export type TransactionType = 'buy' | 'sell';
@@ -124,7 +125,10 @@ export const useNegotiationLogic = (
         if (transactionType === 'buy') {
             // BUY Logic
             if (money < currentTotal) {
-                Alert.alert('Insufficient Funds', "You don't have enough cash for this offer.");
+                Alert.alert(
+                    t('equity.insufficientCapital'),
+                    t('shareholders.notEnoughCashForOffer'),
+                );
                 return;
             }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
+import { t } from '../../../core/i18n';
 import { useGameStore } from '../../../core/store/useGameStore';
 import { quoteDividend } from '../../../core/market/equity';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -99,7 +100,7 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
     // Actions
     const handleConfirm = () => {
         if (remainingCapital < 0) {
-            Alert.alert("Error", "Insufficient funds!");
+            Alert.alert(t('ui.error'), t('equity.insufficientFunds'));
             return;
         }
 
@@ -123,16 +124,19 @@ export const useDividendLogic = (visible: boolean, onClose: () => void): Dividen
         // Brut/net/vergi AYRI gosterilir. Once yalnizca tek bir rakam
         // vardi ve oyuncu kasasindaki degisimle eslestiremiyordu.
         Alert.alert(
-            'Dividend paid',
-            `The company paid out ${formatMoney(result.totalRequired)} in total.\n\n` +
-            `Your share: ${formatMoney(result.playerGross)}\n` +
-            `Dividend tax: −${formatMoney(result.tax)}\n` +
-            `Into your personal account: ${formatMoney(result.playerPortion)}\n\n` +
-            `The company already paid corporate tax on this profit — you are taxed on it ` +
-            `a second time. That is why buybacks are often the cheaper way to return cash.`,
+            t('equity.dividendPaidTitle'),
+            t('equity.dividendPaidBody', {
+                total: formatMoney(result.totalRequired),
+                gross: formatMoney(result.playerGross),
+                // The minus sign is part of the figure rather than part of the
+                // sentence, so it stays out of the dictionary: a translator
+                // should not be able to lose the sign on a tax line.
+                tax: `-${formatMoney(result.tax)}`,
+                net: formatMoney(result.playerPortion),
+            }),
             [
                 {
-                    text: "OK",
+                    text: t('ui.ok'),
                     onPress: () => {
                         // Explicit Reset before closing
                         setDividendPercentage(0);

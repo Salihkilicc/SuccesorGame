@@ -1,4 +1,5 @@
 import { Alert } from 'react-native';
+import { t } from '../../../../core/i18n';
 // 👇 DÜZELTME: Bir "../" daha eklendi
 import { useStatsStore, Shareholder } from '../../../../core/store/useStatsStore';
 
@@ -7,12 +8,12 @@ export const useShareholderActions = () => {
 
     const performInsult = (shareholder: Shareholder) => {
         Alert.alert(
-            'Apply Pressure / Insult',
-            `Are you sure? This is a High Risk action.\n\n• 95% Chance: Relationship -20\n• 5% Chance: They panic and surrender 1% stake`,
+            t('equity.pressureTitle'),
+            t('equity.pressureBody'),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('ui.cancel'), style: 'cancel' },
                 {
-                    text: 'Do it',
+                    text: t('ui.confirm'),
                     style: 'destructive',
                     onPress: () => {
                         const roll = Math.random();
@@ -38,15 +39,18 @@ export const useShareholderActions = () => {
                             setField('companyOwnership', newPlayerPct);
 
                             Alert.alert(
-                                'It worked!',
-                                `${shareholder.name} panicked to avoid a scandal and surrendered ${panicAmount.toFixed(1)}% stake to you.`
+                                t('equity.pressureWorkedTitle'),
+                                t('equity.pressureWorkedBody', {
+                                    name: shareholder.name,
+                                    percent: panicAmount.toFixed(1),
+                                })
                             );
                         } else {
                             // Başarısız (İlişki Düşer)
                             updateShareholderRelationship(shareholder.id, -20);
                             Alert.alert(
-                                'Backfired!',
-                                `${shareholder.name} is furious at your behavior! Relationship -20.`
+                                t('equity.pressureBackfiredTitle'),
+                                t('equity.pressureBackfiredBody', { name: shareholder.name })
                             );
                         }
                     },

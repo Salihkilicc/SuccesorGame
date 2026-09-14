@@ -158,13 +158,13 @@ const ComposeOfferScreen = () => {
                 : 0,
         });
         if (!result.ok) {
-            Alert.alert('Not sent', result.reason);
+            Alert.alert(t('mail.notSent'), result.reason);
             return;
         }
         Alert.alert(
-            'Sent',
-            `Your letter has gone to ${target.name}. A board does not answer the same week — expect a reply next quarter.`,
-            [{ text: 'OK', onPress: () => navigation.goBack() }],
+            t('mail.sent'),
+            t('mail.letterGone', { name: target.name }),
+            [{ text: t('ui.ok'), onPress: () => navigation.goBack() }],
         );
     };
 

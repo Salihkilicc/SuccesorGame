@@ -70,7 +70,7 @@ export const useProductsLogic = () => {
 
         const currentProduct = products.find((p: Product) => p.id === target.id);
         if (currentProduct?.status === 'active') {
-            Alert.alert(t('product.alreadyActive'), 'This product is already on the market.');
+            Alert.alert(t('product.alreadyActive'), t('product.alreadyOnTheMarket'));
             return false;
         }
 
@@ -87,7 +87,10 @@ export const useProductsLogic = () => {
             supplierId: 'local'
         });
 
-        Alert.alert('🚀 Launch Successful', `${target.name} is now on the market!`);
+        Alert.alert(
+            t('product.launchSuccessful'),
+            t('product.nowOnTheMarket', { name: target.name }),
+        );
         closeModal();
         return true;
     };
@@ -112,11 +115,11 @@ export const useProductsLogic = () => {
 
         Alert.alert(
             t('product.discontinueProduct'),
-            t('product.takeV1OffTheLine', { v1: product?.name || 'this product' }) +
+            t('product.takeV1OffTheLine', { v1: product?.name || t('product.thisProduct') }) +
             (stock > 0
-                ? `${stock.toLocaleString()} units still in the warehouse will be written off.\n\n`
+                ? t('product.stockWrittenOff', { count: stock.toLocaleString() })
                 : '') +
-            'The technology goes back to locked. You can bring it back later, but you will pay the research and cash cost again.',
+            t('product.technologyRelocks'),
             [
                 { text: t('product.keepIt'), style: 'cancel' },
                 {

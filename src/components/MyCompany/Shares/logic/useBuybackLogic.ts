@@ -55,23 +55,28 @@ export const useBuybackLogic = (onClose: () => void) => {
             return;
         }
         if (buybackPercentage <= 0) {
-            Alert.alert('Invalid Amount', 'Please select a percentage.');
+            Alert.alert(t('equity.invalidAmount'), t('equity.pickAPercentage'));
             return;
         }
         if (!isAffordable) {
-            Alert.alert('Insufficient Capital', `Company needs ${formatMoney(cost)} to buy back shares.`);
+            Alert.alert(
+                t('equity.insufficientCapital'),
+                t('equity.buybackNeeds', { cost: formatMoney(cost) }),
+            );
             return;
         }
 
         Alert.alert(
-            'Confirm Buyback',
-            `Spend ${formatMoney(cost)} to buy back ${buybackPercentage.toFixed(1)}% of shares?\n\n` +
-            `📈 Market Boost: Stock price will increase by 5%\n\n` +
-            `This will increase your ownership to ${newOwnership.toFixed(1)}%.`,
+            t('equity.confirmBuyback'),
+            t('equity.buybackBody', {
+                cost: formatMoney(cost),
+                percent: buybackPercentage.toFixed(1),
+                newOwnership: newOwnership.toFixed(1),
+            }),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('ui.cancel'), style: 'cancel' },
                 {
-                    text: 'Confirm',
+                    text: t('ui.confirm'),
                     style: 'destructive',
                     onPress: () => {
                         // Execute buyback via Equity Store
@@ -93,9 +98,11 @@ export const useBuybackLogic = (onClose: () => void) => {
 
                         onClose();
                         Alert.alert(
-                            'Buyback Complete',
-                            `${formatNumber(result.sharesBurned)} shares retired.\n` +
-                            `Your ownership increased to ${result.newOwnershipPercent.toFixed(1)}%.`
+                            t('equity.buybackDoneTitle'),
+                            t('equity.buybackDoneBody', {
+                                shares: formatNumber(result.sharesBurned),
+                                percent: result.newOwnershipPercent.toFixed(1),
+                            })
                         );
                     },
                 },

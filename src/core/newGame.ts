@@ -369,8 +369,15 @@ export const startNewGame = async (options: NewGameOptions = {}): Promise<void> 
         // build the audit now interrupts.
         try {
             const { Alert } = require('react-native');
+            // This one is addressed to whoever is building the game, not to a
+            // player. It only fires when a field survived a reset that should
+            // not have, it names store fields, and the only useful response to
+            // it is to open the code. Translating it would make it look like a
+            // message somebody is meant to act on in the game.
             Alert.alert(
+                // @english-ok a developer integrity warning, see above
                 'New game: data carried over',
+                // @english-ok a developer integrity warning, see above
                 problems.join('\n\n') + '\n\nThis is a bug. The field names above say where.',
             );
         } catch { /* Alert unavailable, the console warning still stands */ }

@@ -291,12 +291,12 @@ const HomeScreen = () => {
       // core/newGamePrompt.ts.
       await startNewGameAsking();
       Alert.alert(
-        'New Game',
+        t('newgame.title'),
         t('newgame.freshStartBody', { v1: String(START_EMPLOYEES) }),
       );
     } catch (e) {
       console.error('[HomeScreen] Yeni oyun baslatilamadi', e);
-      Alert.alert('Error', 'Could not start a new game. Check the console.');
+      Alert.alert(t('ui.error'), t('newgame.couldNotStart'));
     }
   };
 
@@ -373,7 +373,7 @@ const HomeScreen = () => {
       }
     } catch (e) {
       console.error("Home Advance Error", e);
-      Alert.alert("Error", "Could not advance time.");
+      Alert.alert(t('ui.error'), t('newgame.couldNotAdvanceTime'));
     }
   };
 
@@ -837,8 +837,8 @@ const HomeScreen = () => {
                   onPress={() => {
                     setDrawerOpen(false);
                     Alert.alert(
-                      'New Game',
-                      'All progress will be erased and a fresh run will be set up. Are you sure?',
+                      t('newgame.title'),
+                      t('newgame.eraseWarning'),
                       [
                         { text: t('home.cancel'), style: 'cancel' },
                         {

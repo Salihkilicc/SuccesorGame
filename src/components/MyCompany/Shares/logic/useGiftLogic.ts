@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
+import { t } from '../../../../core/i18n';
 // 👇 DÜZELTME: Bir "../" daha eklendi
 import { useStatsStore, Shareholder } from '../../../../core/store/useStatsStore';
 import { formatMoney } from '../../../../core/utils';
@@ -17,17 +18,17 @@ export const useGiftLogic = (shareholder: Shareholder) => {
 
     const sendGift = (gift: typeof GIFTS[0]) => {
         if (money < gift.cost) {
-            Alert.alert('Insufficient Funds', "You can't afford this gift.");
+            Alert.alert(t('equity.insufficientCapital'), t('equity.cannotAffordGift'));
             return;
         }
 
         Alert.alert(
-            'Confirm Gift',
-            `Send ${gift.name} (${formatMoney(gift.cost)})?`,
+            t('equity.confirmGift'),
+            t('equity.sendGiftBody', { gift: gift.name, cost: formatMoney(gift.cost) }),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('ui.cancel'), style: 'cancel' },
                 {
-                    text: 'Send',
+                    text: t('equity.send'),
                     onPress: () => {
                         setField('money', money - gift.cost);
                         updateShareholderRelationship(shareholder.id, gift.impact);
