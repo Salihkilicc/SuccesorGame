@@ -318,10 +318,29 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                             onPress={handleConfirm}
                             disabled={!hasChanges}
                         >
-                            <Text style={[
-                                styles.confirmBtnText,
-                                !hasChanges && !hiredNotice && styles.confirmBtnTextDisabled,
-                            ]}>
+                            {/* --------------------------------------------
+                                THE LABEL FITS THE BUTTON, NOT THE OTHER WAY
+                                --------------------------------------------
+                                Four states share this button and Turkish is
+                                the longest of them: CONFIRM is seven
+                                characters and Q4'TE GUNCELLENDI is eighteen.
+                                A button sized for the English wraps or clips
+                                the Turkish.
+
+                                Same answer as the department cards on My
+                                Company: one line, always, and the type
+                                shrinks to fit rather than the box growing.
+                                Nothing here depends on how long a word is in
+                                any particular language.
+                               -------------------------------------------- */}
+                            <Text
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
+                                minimumFontScale={0.7}
+                                style={[
+                                    styles.confirmBtnText,
+                                    !hasChanges && !hiredNotice && styles.confirmBtnTextDisabled,
+                                ]}>
                                 {hasChanges
                                     ? t('staff.confirm')
                                     : (hiredNotice

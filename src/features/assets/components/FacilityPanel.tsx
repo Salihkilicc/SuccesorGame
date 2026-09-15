@@ -552,10 +552,17 @@ const FacilityPanel: React.FC = () => {
                     disabled={!hasChanges}
                     onPress={applyTarget}
                 >
-                    <Text style={[
-                        styles.primaryBtnText,
-                        !hasChanges && !confirmedHeadcount && styles.primaryBtnTextOff,
-                    ]}>
+                    {/* One line, shrink to fit. See the note on the same
+                        button in LaboratoryScreen: Turkish is up to eighteen
+                        characters where CONFIRM is seven. */}
+                    <Text
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.7}
+                        style={[
+                            styles.primaryBtnText,
+                            !hasChanges && !confirmedHeadcount && styles.primaryBtnTextOff,
+                        ]}>
                         {hasChanges
                             ? t('staff.confirm')
                             : (confirmedHeadcount

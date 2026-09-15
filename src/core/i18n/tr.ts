@@ -1925,8 +1925,9 @@ export const tr: Record<string, string> = {
 
     // Kadro butonunun dort hali
     'staff.confirm': 'ONAYLA',
-    'staff.arrivesInQ': 'Q{quarter} DE GELİYOR',
-    'staff.updatedInQ': 'Q{quarter} DE GÜNCELLENDİ',
+    // Kesme isareti: "Q4 DE" degil "Q4'TE". Ilk yazimda dusmustu.
+    'staff.arrivesInQ': 'Q{quarter}\'TE GELİYOR',
+    'staff.updatedInQ': 'Q{quarter}\'TE GÜNCELLENDİ',
     'staff.noChange': 'DEĞİŞİKLİK YOK',
 
     // Laboratuvar
