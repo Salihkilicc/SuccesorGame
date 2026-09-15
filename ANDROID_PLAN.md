@@ -275,19 +275,74 @@ Yani iOS için yazılmış bir gölge Android'e hem daha geniş hem daha
 parlak varıyor. 19 bloğun işi "elevation ekle" değil, "aynı ağırlığa
 getir".
 
-### 3.2 Yazı ağırlıkları
+### 3.2 Yazı ağırlıkları — DÜZELTME: mekanizma iddiası yanlıştı
+
+**Bu bölüm önce şunu söylüyordu:**
+
+> Android'in varsayılan Roboto'su bu ağırlıkların hepsini taşımıyor, RN en
+> yakınına yuvarlıyor. Pratikte 600, 800 ve 900 hep bold'a düşüyor.
+
+RN'in kendi kaynağı, `ReactFontManager.kt`, tersini söylüyor:
+
+```kotlin
+public fun apply(typeface: Typeface?): Typeface =
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+      Typeface.create(typeface, nearestStyle)     // NORMAL ya da BOLD
+    } else {
+      Typeface.create(typeface, weight, italic)   // gerçek sayısal ağırlık
+    }
+```
+
+`nearestStyle` gerçekten de 700'ün altını NORMAL, üstünü BOLD yapıyor. Ama
+o dal **yalnızca API 28'in altında** çalışıyor. Android 9 ve sonrasında
+sayısal ağırlık doğrudan Android'e gidiyor.
+
+`minSdkVersion = 24`, yani çökme API 24 ile 27 arasında gerçek: Android
+7.0, 7.1, 8.0, 8.1. 2026'da bu cihazlar tek haneli bir yüzde. Emülatör API
+36, yani **emülatörde bu hata hiç görünmez.**
+
+#### Geriye kalan gerçek soru
+
+API 28 üstünde sayı Android'e gidiyor, ama sistem Roboto ailesinde her
+ağırlığın bir yüzü yok. Android en yakınını seçiyor. Kullandığımız dağılım:
 
 ```
-783 yerde  fontWeight: '100'|'200'|'300'|'500'|'600'|'800'|'900'
+550  fontWeight: '700'
+387  fontWeight: '800'
+219  fontWeight: '600'
+126  fontWeight: '900'
+ 31  fontWeight: '500'
+ 19  fontWeight: '300'
+  4  fontWeight: '400'
+  1  fontWeight: '200'
+103  fontWeight: 'bold'   (= 700)
 ```
 
-Android'in varsayılan Roboto'su bu ağırlıkların hepsini taşımıyor, RN en
-yakınına yuvarlıyor. Pratikte 600, 800 ve 900 hep bold'a düşüyor. Bu projede
-700 ile 800 arasındaki fark bilinçli kullanılmış; Android'de o hiyerarşi iki
-ağırlığa iner.
+700 ve 800 birlikte 937 bildirim, yani ekranın çoğu. Roboto'da 700 var,
+800 yok. Android 800 için 700 ya da 900'ü seçiyor; 700'ü seçerse bu iki
+ağırlık aynı görünür ve hiyerarşi yok olur.
 
-Çözüm: değişken ağırlıklı bir font ailesini paketlemek ve `fontFamily` ile
-açıkça istemek. Şu an 29 yerde `fontFamily` var, yani zemin kısmen hazır.
+**Bunu okuyarak karara bağlayamam, cihaz ister.** Gölge ölçümünde tam bu
+hatayı yaptım: plan bir mekanizma iddia etti, ben ölçmeden üzerine iş
+yazdım, ve iddia tersti.
+
+#### Cihazda tek bakışta karar
+
+Ana ekrandaki oyuncu kartı, üç ağırlığı yan yana taşıyor:
+
+```
+name          800     "uihuhi Hale"
+ageChipLabel  700     "AGE"  /  "MTH"
+ageChipValue  900     "20"   /  "4"
+```
+
+- **AGE ile 20 farklı kalınlıkta görünüyorsa** 900 çalışıyor demektir.
+- **İsim ile AGE aynı kalınlıkta görünüyorsa** 800, 700'e düşüyor demektir
+  ve font paketlemek gerekir.
+- **İsim, AGE'den belirgin kalınsa** sorun yok ve bu fazın işi biter.
+
+Font paketlemek 1337 bildirime ve iOS'un görünümüne dokunur. Doğrulanmamış
+bir önerme için yapılacak iş değil.
 
 ### 3.3 Alert
 
