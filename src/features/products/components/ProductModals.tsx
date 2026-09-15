@@ -52,7 +52,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
     const isAnalyzed = analysisData?.id === product.id;
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.content}>
                     <ScreenHeader inset title={t('fin.newProductOpp')} onBack={onClose} />

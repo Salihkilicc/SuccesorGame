@@ -50,7 +50,7 @@ const TravelExperienceModal = ({
     if (!visible || !spot || !resultData) return null;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="fade"
             presentationStyle="fullScreen"

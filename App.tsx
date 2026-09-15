@@ -75,7 +75,37 @@ const App = () => {
   // ==========================================================================
   return (
     <SafeAreaProvider style={{ flex: 1, backgroundColor: '#1C242C' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#1C242C" />
+      {/* ====================================================================
+          THE STATUS BAR IS GONE, AND THAT IS THE FIX RATHER THAN A TASTE
+          ====================================================================
+          Reported from the device with a photograph: the clock and the
+          system icons are sliced in half horizontally on every screen. Only
+          their bottom halves are drawn.
+
+          An app cannot clip the status bar - the system draws it. What an
+          app CAN do is leave the window in a state where the system has less
+          height for it than the glyphs need, which is what a hole-punch
+          camera does to a status bar the window has not made room for. So
+          this is not a padding number being slightly wrong; it is the bar
+          being asked to fit somewhere it does not fit.
+
+          Two ways out, and he was offered both: give it its full height, or
+          take it away. Giving it height means finding the right inset on a
+          phone I cannot see, on a cutout whose size I would be guessing at,
+          and getting it right on his device and wrong on the next one. That
+          is the same shape as the shadow measurement and the font weights.
+
+          Taking it away removes the whole class: no cutout arithmetic, no
+          per device inset, nothing for the system to squeeze. And this is a
+          game played in portrait with its own header on every screen, which
+          already carries the date; the system clock was never load-bearing.
+
+          Declared HERE as well as in the Android theme, and not by
+          duplication: the theme makes it true from the very first frame so
+          there is no flash of a bar before JavaScript runs, and this one
+          covers iOS, where there is no theme to set it in.
+         ==================================================================== */}
+      <StatusBar hidden barStyle="light-content" backgroundColor="#1C242C" />
       <RootNavigator />
     </SafeAreaProvider>
   );

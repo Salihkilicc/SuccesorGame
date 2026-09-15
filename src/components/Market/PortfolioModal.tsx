@@ -110,7 +110,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
   const totalValue = portfolioList.reduce((sum, item) => sum + item.currentValue, 0);
 
   return (
-    <Modal
+    <Modal statusBarTranslucent navigationBarTranslucent
       visible={visible}
       animationType="slide"
       transparent={true}

@@ -81,7 +81,7 @@ export const CartModal: React.FC<CartModalProps> = ({
     };
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             presentationStyle="pageSheet"

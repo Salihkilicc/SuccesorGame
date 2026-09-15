@@ -104,7 +104,7 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
     };
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             transparent={true}

@@ -73,7 +73,7 @@ const CasinoLocationModal: React.FC<CasinoLocationModalProps> = ({
     const playerMoney = useStatsStore(st => st.money);
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             animationType="fade"
             transparent={true}
             visible={visible}

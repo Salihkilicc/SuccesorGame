@@ -142,7 +142,7 @@ export function HookupModal({
     // const avatarEmoji = candidate?.gender === 'female' ? '\u{1F469}' : '\u{1F468}';
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="none"
             transparent={false}

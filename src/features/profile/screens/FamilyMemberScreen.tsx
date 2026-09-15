@@ -845,7 +845,7 @@ export const FamilyMemberScreen: React.FC = () => {
             />
 
             {/* Proposal Wizard Modal */}
-            <Modal
+            <Modal statusBarTranslucent navigationBarTranslucent
                 visible={isProposalWizardVisible}
                 transparent
                 animationType="fade"

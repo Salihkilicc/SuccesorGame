@@ -31,7 +31,7 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
                     company.boardSentiment === 'Cautious' ? '#FF8A8A' : 'rgba(255,255,255,0.48)';
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="slide"

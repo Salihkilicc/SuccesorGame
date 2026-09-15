@@ -39,7 +39,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
     const relationship = shareholder?.relationship || 50;
 
     return (
-        <Modal visible={visible} animationType="fade" onRequestClose={handleClose}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} animationType="fade" onRequestClose={handleClose}>
             <View style={styles.overlay} pointerEvents="box-none">
                 {result ? (
                     <View style={styles.resultContent}>

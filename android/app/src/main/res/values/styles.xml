@@ -4,6 +4,22 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+
+        <!--
+            NO STATUS BAR
+
+            It was arriving sliced in half on a phone with a hole-punch
+            camera: the system had less height for it than the glyphs need,
+            so only their bottom halves were drawn. See the long note in
+            App.tsx for why the answer is to remove it rather than to guess
+            at an inset.
+
+            Set HERE as well as in JavaScript on purpose. The theme is what
+            the window is built with, before a line of our code runs, so
+            there is no frame where the bar exists and then vanishes. The
+            StatusBar element in App.tsx is for iOS, which has no theme.
+        -->
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <!--

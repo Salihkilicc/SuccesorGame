@@ -47,7 +47,7 @@ export const LuxoNetPreviewModal: React.FC<LuxoNetPreviewModalProps> = ({
     const { catalog, ownedAssets } = useLuxoNetStore();
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             transparent={true}

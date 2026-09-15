@@ -42,7 +42,7 @@ const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
   const yearlyColor = stock.yearlyChange >= 0 ? theme.colors.success : theme.colors.danger;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <View style={styles.header}>

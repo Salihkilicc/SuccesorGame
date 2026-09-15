@@ -99,7 +99,7 @@ const HookupGameModal = ({
     if (!visible || !scenario || !partner) return null;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

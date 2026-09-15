@@ -777,7 +777,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
 
   if (!report) {
     return (
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
         <View style={styles.overlay}>
           <View style={styles.card}>
             <Text style={styles.emptyText}>{t('company.noQuarterHasBeenCompleted')}</Text>
@@ -795,7 +795,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
   const e = report.expenses;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.card}>
 

@@ -73,7 +73,7 @@ const TravelBookingModal = ({
     };
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             transparent

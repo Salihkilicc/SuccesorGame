@@ -17,7 +17,7 @@ const BreakupModal = ({ visible, onClose, partnerName, settlementCost = 0 }: Bre
     const safePartnerName = partnerName || 'Your Partner';
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

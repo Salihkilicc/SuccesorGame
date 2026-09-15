@@ -23,7 +23,7 @@ const SponsorDroughtWarningModal = ({ visible, quartersWithout, currentPenalty, 
     const quartersUntilCap = Math.ceil((DROUGHT_PENALTY_CAP - currentPenalty) / DROUGHT_PENALTY_PER_QUARTER);
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

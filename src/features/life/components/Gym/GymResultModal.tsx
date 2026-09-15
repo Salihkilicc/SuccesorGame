@@ -22,7 +22,7 @@ const GymResultModal = ({ visible, onClose, result }: GymResultModalProps) => {
     if (!result) return null;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

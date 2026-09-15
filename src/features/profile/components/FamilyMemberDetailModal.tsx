@@ -78,7 +78,7 @@ export const FamilyMemberDetailModal: React.FC<FamilyMemberDetailModalProps> = (
         .toUpperCase();
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             presentationStyle="pageSheet"

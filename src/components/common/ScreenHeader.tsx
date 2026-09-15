@@ -132,31 +132,31 @@ const ScreenHeader = ({ title, subtitle, onBack, right, inset = true, category }
     const rule = category ? theme.categories[category] : categoryColor(route?.name);
 
     // ------------------------------------------------------------------
-    //  TEMPORARY, AND IT IS HERE TO ANSWER ONE QUESTION
+    //  THE FLOOR IS 24 NOW, BECAUSE THE STATUS BAR IS GONE
     // ------------------------------------------------------------------
-    //  Reported on Android: the header sits too high, title and rule both.
+    //  SHELVED: a `console.log` that printed `insets.top` once per screen.
+    //  It was put here to answer "what is the inset on Android", and that
+    //  question stopped existing when the status bar was removed. See the
+    //  note in App.tsx.
     //
-    //  The arithmetic below is `Math.max(insets.top, 12) + 8`, and what it
-    //  produces depends entirely on what `insets.top` is on Android, which
-    //  depends on whether the window draws under the status bar. That is a
-    //  number this codebase has never seen, and guessing it would mean
-    //  picking a padding that is right on one phone.
+    //      useEffect(() => {
+    //          if (__DEV__) console.log(`[header] ${route?.name} ...`);
+    //      }, [insets.top, inset, route?.name]);
     //
-    //  So it prints once per screen in development. Read it off Metro, set
-    //  the real number, and delete this block. Nothing here ships: __DEV__
-    //  is false in a release bundle.
+    //  What replaced it is the FLOOR. It was 12, which was fine while the
+    //  status bar existed and paid for the cutout itself. With the bar gone
+    //  the window runs to the top of the glass, so on a phone with a
+    //  hole-punch camera `insets.top` can come back small and a 12 point
+    //  floor would put the title under the lens.
+    //
+    //  24 is a floor rather than a measurement: on any device that reports
+    //  a real cutout `insets.top` is larger and wins, and this only decides
+    //  what happens on a device that reports nothing.
     // ------------------------------------------------------------------
-    useEffect(() => {
-        if (__DEV__) {
-            console.log(
-                `[header] ${route?.name ?? '?'}  insets.top=${insets.top}`,
-                `paddingTop=${inset ? Math.max(insets.top, 12) + 8 : theme.spacing.md}`,
-            );
-        }
-    }, [insets.top, inset, route?.name]);
+    const HEADER_TOP_FLOOR = 24;
 
     return (
-        <View style={[styles.header, { paddingTop: inset ? Math.max(insets.top, 12) + 8 : theme.spacing.md }]}>
+        <View style={[styles.header, { paddingTop: inset ? Math.max(insets.top, HEADER_TOP_FLOOR) + 8 : theme.spacing.md }]}>
             {/* Absolute, so it never pushes the title off centre. */}
             <Pressable
                 onPress={goBack}

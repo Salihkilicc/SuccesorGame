@@ -185,7 +185,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <ScreenHeader
@@ -221,7 +221,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
              If I put it inside 'backdrop', I need to be careful. 
              'backdrop' has padding.
              Better to put it OUTSIDE 'card', but inside 'backdrop'.
-             Or structure: <Modal><View style={{flex:1}}><Backdrop><Card/></Backdrop><BottomBar/></View></Modal>
+             Or structure: <Modal statusBarTranslucent navigationBarTranslucent><View style={{flex:1}}><Backdrop><Card/></Backdrop><BottomBar/></View></Modal>
              
              Let's change the structure slightly to support full screen usage.
          */}
@@ -364,7 +364,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       {/* Full Screen Container */}
       <View style={{ flex: 1 }}>
 

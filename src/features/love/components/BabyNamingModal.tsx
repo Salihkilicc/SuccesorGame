@@ -21,7 +21,7 @@ const BabyNamingModal: React.FC<Props> = ({
 }) => {
     useLocale();
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

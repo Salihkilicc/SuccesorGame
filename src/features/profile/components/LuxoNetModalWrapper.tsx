@@ -51,7 +51,7 @@ export const LuxoNetModalWrapper: React.FC<LuxoNetModalWrapperProps> = ({
     onClose,
 }) => {
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             presentationStyle="pageSheet"

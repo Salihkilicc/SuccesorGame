@@ -36,7 +36,7 @@ const NightConclusionModal = ({ visible, data, onClose }: NightConclusionModalPr
     const isVibeCheck = typeof data.enjoymentScore === 'number';
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

@@ -36,7 +36,7 @@ const SouvenirCollectionModal = ({
     const totalCount = allSouvenirs.length;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             presentationStyle="fullScreen"

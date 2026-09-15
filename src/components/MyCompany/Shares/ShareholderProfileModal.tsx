@@ -322,7 +322,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
     if (!member) return null;
 
     return (
-        <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="slide" onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.container}>
                     <ScreenHeader

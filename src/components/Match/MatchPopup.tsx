@@ -31,7 +31,7 @@ const MatchPopup = ({
 }: MatchPopupProps) => {
     useLocale();
     return (
-  <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+  <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <View style={styles.backdrop}>
       <View style={styles.card}>
         <Text style={styles.header}>{t('ui.newMatchOpportunity')}</Text>

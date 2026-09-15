@@ -22,7 +22,7 @@ const PregnancyRevealModal = ({ visible, onClose }: PregnancyRevealModalProps) =
     if (!visible) return null;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

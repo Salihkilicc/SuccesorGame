@@ -52,7 +52,7 @@ export const InfoDot = ({ title, text, detail, small }: Props) => {
                 <Text style={[styles.dotText, small && styles.dotTextSmall]}>i</Text>
             </Pressable>
 
-            <Modal visible={open} transparent animationType="fade" onRequestClose={hide}>
+            <Modal statusBarTranslucent navigationBarTranslucent visible={open} transparent animationType="fade" onRequestClose={hide}>
                 <Pressable style={styles.overlay} onPress={hide}>
                     {/* Ic karta basinca kapanmasin */}
                     <Pressable style={styles.card} onPress={() => { }}>

@@ -39,7 +39,7 @@ const GameModal = ({ visible, onClose, title, subtitle, children, fixedBottomCon
     }
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

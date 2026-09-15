@@ -51,7 +51,7 @@ export const LuxoNetInventoryModal: React.FC<LuxoNetInventoryModalProps> = ({
     onClose,
 }) => {
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="slide"
             presentationStyle="pageSheet"

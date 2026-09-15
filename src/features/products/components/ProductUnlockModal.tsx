@@ -141,7 +141,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
     };
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

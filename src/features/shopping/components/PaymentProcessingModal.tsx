@@ -76,7 +76,7 @@ export const PaymentProcessingModal: React.FC<PaymentProcessingModalProps> = ({
     };
 
     return (
-        <Modal visible={visible} transparent={false} animationType="fade">
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent={false} animationType="fade">
             <View style={styles.container}>
                 {!showSuccess ? (
                     <View style={styles.content}>

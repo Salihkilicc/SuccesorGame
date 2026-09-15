@@ -33,7 +33,7 @@ const ScreenHost = ({ asScreen, visible, children, ...modalProps }: Props) => {
         return <View style={styles.root}>{children}</View>;
     }
     return (
-        <Modal visible={visible} {...modalProps}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} {...modalProps}>
             {children}
         </Modal>
     );

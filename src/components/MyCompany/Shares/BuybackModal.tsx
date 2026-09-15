@@ -48,7 +48,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
 
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent={true}
             animationType="fade"

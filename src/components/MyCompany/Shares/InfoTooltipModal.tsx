@@ -39,7 +39,7 @@ const InfoTooltipModal = ({ visible, term, onClose }: Props) => {
     const content = TOOLTIP_CONTENT[term] || { title: term, description: t('equity.noInformationAvailable') };
 
     return (
-        <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay} pointerEvents="box-none">
                 <View style={styles.content}>
                     <Text style={styles.title}>ℹ️ {content.title}</Text>

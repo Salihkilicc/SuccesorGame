@@ -27,7 +27,7 @@ const LoanModal = ({ visible, onClose }: LoanModalProps) => {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <Text style={styles.title}>{t('action.takeLoan')}</Text>

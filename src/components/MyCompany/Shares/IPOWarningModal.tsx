@@ -39,7 +39,7 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
     };
 
     return (
-        <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay} pointerEvents="box-none">
                 <View style={styles.content}>
                     <Text style={styles.title}>{t('ipo.warningTitle')}</Text>

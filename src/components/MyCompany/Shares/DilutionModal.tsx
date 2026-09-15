@@ -44,7 +44,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
     const predictedPrice = currentStockPrice * (1 - predictedDrop);
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent={true}
             animationType="fade"

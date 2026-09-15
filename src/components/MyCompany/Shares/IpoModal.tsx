@@ -136,7 +136,7 @@ const IpoModal = ({ visible, onClose }: Props) => {
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={close}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={close}>
             <View style={styles.overlay}>
                 <View style={styles.centred}>
                     <View style={styles.card}>

@@ -22,7 +22,7 @@ const NightEndModal = ({ visible, onDecision }: NightEndModalProps) => {
     if (!visible) return null;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="slide"

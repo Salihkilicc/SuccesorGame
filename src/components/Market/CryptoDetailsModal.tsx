@@ -41,7 +41,7 @@ const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
   const changeText = `${adjusted >= 0 ? '+' : ''}${adjusted}%`;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal statusBarTranslucent navigationBarTranslucent visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <View style={styles.header}>

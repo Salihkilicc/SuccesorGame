@@ -61,7 +61,7 @@ const SouvenirMiniGame = ({ visible, souvenir, onComplete, onHomePress }: Souven
     const isWin = selectedBox === winningBox;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             animationType="fade"
             transparent

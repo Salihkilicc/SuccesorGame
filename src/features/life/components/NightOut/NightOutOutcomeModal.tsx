@@ -41,7 +41,7 @@ const NightOutOutcomeModal = ({
     if (!visible || !type || type !== 'enjoyment') return null;
 
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

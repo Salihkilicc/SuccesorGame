@@ -13,7 +13,7 @@ export type InteractionModalProps = {
 const InteractionModal = ({ visible, onClose, title, children }: InteractionModalProps) => {
     useLocale();
     return (
-        <Modal
+        <Modal statusBarTranslucent navigationBarTranslucent
             visible={visible}
             transparent
             animationType="fade"

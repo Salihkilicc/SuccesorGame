@@ -43,7 +43,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
     const { companySharePrice } = require('../../../core/store/useStatsStore').useStatsStore(); // Required for display hint
 
     return (
-        <Modal visible={visible} animationType="fade" onRequestClose={handleClose}>
+        <Modal statusBarTranslucent navigationBarTranslucent visible={visible} animationType="fade" onRequestClose={handleClose}>
             <View style={styles.overlay} pointerEvents="box-none">
                 {result !== 'pending' ? (
                     <View style={[styles.content, styles.resultContent, result === 'success' ? styles.successBorder : styles.failBorder]}>
