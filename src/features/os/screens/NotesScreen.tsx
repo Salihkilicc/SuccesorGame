@@ -80,7 +80,7 @@ const NoteCard = ({ note, onPress, onDelete }: NoteCardProps) => {
             <View style={styles.noteCardBody}>
                 <View style={styles.noteCardTop}>
                     <Text style={styles.noteTitle} numberOfLines={1}>
-                        {note.title || 'Untitled'}
+                        {note.title || t('ui.untitled')}
                     </Text>
                     <TouchableOpacity
                         style={styles.deleteBtn}
@@ -217,7 +217,7 @@ const EmptyState = ({ onNew }: { onNew: () => void }) => (
         </LinearGradient>
         <Text style={styles.emptyTitle}>{t('os.noNotesYet')}</Text>
         <Text style={styles.emptySubtitle}>
-            Tap the + button to create{'\n'}your first note.
+            {t('os.tapPlusToCreate')}
         </Text>
         <Pressable
             style={({ pressed }) => [styles.emptyAction, pressed && { opacity: 0.7 }]}

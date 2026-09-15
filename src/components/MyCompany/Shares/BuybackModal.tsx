@@ -139,13 +139,13 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         {/* Impact Analysis */}
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
-                                <Text style={styles.impactLabel}>📈 Stock Price</Text>
+                                <Text style={styles.impactLabel}>{t('equity.stockPriceLabel')}</Text>
                                 <Text style={[styles.impactValue, { color: '#FFFFFF' }]}>
                                     {formatPrice(currentStockPrice)} → {formatPrice(estimatedNewStockPrice)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
-                                <Text style={styles.impactLabel}>⚡ Est. Price Impact</Text>
+                                <Text style={styles.impactLabel}>{t('equity.estPriceImpact')}</Text>
                                 <View style={{ alignItems: 'flex-end' }}>
                                     <Text style={[styles.impactValue, { color: '#FFFFFF' }]}>
                                         +{(predictedImpact * 100).toFixed(1)}%
@@ -154,7 +154,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                                 </View>
                             </View>
                             <View style={styles.impactRow}>
-                                <Text style={styles.impactLabel}>👤 Your Ownership</Text>
+                                <Text style={styles.impactLabel}>{t('equity.yourOwnershipLabel')}</Text>
                                 <Text style={[styles.impactValue, { color: '#FFFFFF' }]}>
                                     {newOwnership.toFixed(2)}%
                                 </Text>
@@ -177,7 +177,7 @@ const BuybackModal = ({ visible, onClose }: Props) => {
                         {/* Warning */}
                         {!isAffordable && (
                             <View style={styles.warningBox}>
-                                <Text style={styles.warningText}>⚠️ Insufficient capital</Text>
+                                <Text style={styles.warningText}>{t('equity.insufficientCapitalShort')}</Text>
                             </View>
                         )}
 

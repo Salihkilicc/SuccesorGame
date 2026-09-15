@@ -66,7 +66,7 @@ const ManagementCard = ({
                 {headerRight}
                 {!headerRight && costPerUnit > 0 && (
                     <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{formatCost(costPerUnit)} / unit</Text>
+                        <Text style={styles.badgeText}>{t('ui.perUnitShort', { cost: formatCost(costPerUnit) })}</Text>
                     </View>
                 )}
             </View>
@@ -86,7 +86,7 @@ const ManagementCard = ({
                     {delta !== 0 && (
                         <>
                             <Text style={styles.costLabel}>
-                                {isIncrease ? 'Cost' : 'Refund'}
+                                {isIncrease ? t('ui.cost') : t('ui.refund')}
                             </Text>
                             <Text style={[
                                 styles.costValue,

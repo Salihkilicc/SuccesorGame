@@ -41,7 +41,7 @@ const LoanModal = ({ visible, onClose }: LoanModalProps) => {
                   styles.option,
                   pressed && styles.optionPressed,
                 ]}>
-                <Text style={styles.optionText}>+{amount / 1_000_000}M Loan</Text>
+                <Text style={styles.optionText}>{t('company.loanAmount', { amount: amount / 1_000_000 })}</Text>
               </Pressable>
             ))}
           </View>

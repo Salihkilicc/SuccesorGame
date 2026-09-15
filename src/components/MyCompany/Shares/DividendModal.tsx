@@ -100,9 +100,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                         {fundedFromReserves && (
                             <View style={styles.flagBox}>
                                 <Text style={styles.flagText}>
-                                    You did not make a profit last quarter. Paying a dividend now
-                                    means paying out of reserves — investors read that as a company
-                                    buying goodwill it cannot afford.
+                                    {t('equity.noProfitLastQuarter')}
                                 </Text>
                             </View>
                         )}
@@ -213,7 +211,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
 
                         {/* You Receive Highlight */}
                         <View style={styles.profitHighlight}>
-                            <Text style={styles.profitLabel}>💰 You Receive</Text>
+                            <Text style={styles.profitLabel}>{t('equity.youReceiveLabel')}</Text>
                             <Text style={styles.profitAmount}>
                                 {formatMoney(playerDividend * (1 - DIVIDEND_TAX))}
                             </Text>
@@ -227,7 +225,7 @@ const DividendModal = ({ visible, onClose }: Props) => {
                         {isRisky && (
                             <View style={styles.warningBox}>
                                 <Text style={styles.warningText}>
-                                    ⚠️ High distribution risk - low capital reserves
+                                    {t('equity.highDistributionRisk')}
                                 </Text>
                             </View>
                         )}

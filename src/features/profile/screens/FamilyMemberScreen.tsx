@@ -232,7 +232,10 @@ export const FamilyMemberScreen: React.FC = () => {
             const rejRes = handleProposalRejected(name);
             setProposalResult({
                 success: false,
-                message: `${partner.name} doesn't feel ready yet... She declined.\n\nNews: "${rejRes.newsHeadline}"`,
+                message: t('profile.proposalDeclined', {
+                    name: partner.name,
+                    headline: rejRes.newsHeadline,
+                }),
             });
             setProposalStep(3);
             return;
@@ -257,7 +260,12 @@ export const FamilyMemberScreen: React.FC = () => {
 
             setProposalResult({
                 success: true,
-                message: `💍 ${name} said YES! Corporate Brand Surge: +${res.brandValueDelta} pts.${prenupBadge}\n\nMedia: "${res.newsHeadline}"`,
+                message: t('profile.proposalAccepted', {
+                    name,
+                    delta: res.brandValueDelta,
+                    prenup: prenupBadge,
+                    headline: res.newsHeadline,
+                }),
             });
         } else {
             setProposalResult({

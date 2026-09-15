@@ -455,7 +455,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     </View>
                                     <View style={styles.actionButtonContent}>
                                         <Text style={styles.actionButtonText}>{t('equity.sendGift')}</Text>
-                                        <Text style={styles.actionButtonSubtext}>$10,000 • +5 Trust</Text>
+                                        <Text style={styles.actionButtonSubtext}>{t('equity.giftCost', { amount: '$10,000' })}</Text>
                                     </View>
                                 </TouchableOpacity>
 
@@ -469,7 +469,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     </View>
                                     <View style={styles.actionButtonContent}>
                                         <Text style={styles.actionButtonText}>{t('equity.hostDinner')}</Text>
-                                        <Text style={styles.actionButtonSubtext}>$100,000 • +15 Trust</Text>
+                                        <Text style={styles.actionButtonSubtext}>{t('equity.dinnerCost', { amount: '$100,000' })}</Text>
                                     </View>
                                 </TouchableOpacity>
                             </View>
@@ -522,10 +522,10 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
 
                                         <View style={styles.stepperDisplay}>
                                             <Text style={styles.stepperValue}>
-                                                {formatNumber(shareCount)} Shares
+                                                {t('market.sharesUnit', { count: formatNumber(shareCount) })}
                                             </Text>
                                             <Text style={styles.stepperPremium}>
-                                                (= {((shareCount / totalShares) * 100).toFixed(2)}% Ownership)
+                                                {t('market.ownershipPercent', { percent: ((shareCount / totalShares) * 100).toFixed(2) })}
                                             </Text>
                                         </View>
 
@@ -575,7 +575,7 @@ const ShareholderProfileModal: React.FC<ShareholderProfileModalProps> = ({
                                     <View style={styles.reactionLabelRow}>
                                         <Text style={styles.reactionLabel}>{t('equity.reactionV1', { v1: getReactionLabel() })}</Text>
                                         <Text style={styles.reactionChance}>
-                                            {calculateSuccessChance()}% chance
+                                            {t('market.chancePercent', { percent: calculateSuccessChance() })}
                                         </Text>
                                     </View>
                                     <View style={styles.reactionBarBg}>

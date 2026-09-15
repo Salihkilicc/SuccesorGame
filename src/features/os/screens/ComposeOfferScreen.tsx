@@ -69,14 +69,14 @@ const SUBJECT_NOTE: Record<Subject, string> = {
 const BANDS = [
     {
         id: 'locked',
-        title: 'Letters only',
-        note: 'Too big to buy over the counter. This is the only way in.',
+        get title() { return t('offer.bandLockedTitle'); },
+        get note() { return t('offer.bandLockedNote'); },
         min: FRIENDLY_LOCK_MARKET_CAP,
         max: Infinity,
     },
-    { id: 'large', title: 'Large', note: 'Serious companies. They will want something.', min: 10_000_000_000, max: FRIENDLY_LOCK_MARKET_CAP },
-    { id: 'mid', title: 'Mid-market', note: 'Big enough to have a board with opinions.', min: 1_000_000_000, max: 10_000_000_000 },
-    { id: 'small', title: 'Small', note: 'Most of these can simply be bought.', min: 0, max: 1_000_000_000 },
+    { id: 'large', get title() { return t('offer.bandLargeTitle'); }, get note() { return t('offer.bandLargeNote'); }, min: 10_000_000_000, max: FRIENDLY_LOCK_MARKET_CAP },
+    { id: 'mid', get title() { return t('offer.bandMidTitle'); }, get note() { return t('offer.bandMidNote'); }, min: 1_000_000_000, max: 10_000_000_000 },
+    { id: 'small', get title() { return t('offer.bandSmallTitle'); }, get note() { return t('offer.bandSmallNote'); }, min: 0, max: 1_000_000_000 },
 ];
 
 const ComposeOfferScreen = () => {

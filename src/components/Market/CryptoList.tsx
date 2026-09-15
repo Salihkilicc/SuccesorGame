@@ -70,7 +70,7 @@ const CryptoList = ({ onSelect }: Props) => {
             <View style={{ gap: theme.spacing.xs }}>
               <Text style={styles.name}>{asset.name}</Text>
               <Text style={styles.meta}>
-                Cost {formatMoney(asset.cost)} • Market Cap {formatCap(asset.marketCap)}
+                {t('market.cryptoMeta', { cost: formatMoney(asset.cost), cap: formatCap(asset.marketCap) })}
               </Text>
             </View>
             <View style={styles.trendBlock}>

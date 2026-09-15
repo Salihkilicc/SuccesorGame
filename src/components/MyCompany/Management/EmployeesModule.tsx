@@ -101,9 +101,9 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
         if (shock > 0) {
             setPanel({
                 title: t('alert.cutPay'),
-                summary: 'Raising pay is easy; taking it back is not.',
-                lines: [{ label: 'Immediate morale cost', value: `−${shock}`, tone: 'negative' }],
-                note: 'That is on top of the lower level your pay will sustain from here on.',
+                summary: t('emp.raisingPayIsEasy'),
+                lines: [{ label: t('emp.immediateMoraleCost'), value: `−${shock}`, tone: 'negative' }],
+                note: t('emp.onTopOfLowerLevel'),
                 cancelLabel: t('ui.neverMind'),
                 confirmLabel: t('ui.cutAnyway'),
                 tone: 'danger',

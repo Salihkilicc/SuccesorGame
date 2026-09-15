@@ -78,7 +78,7 @@ const CompanyPortfolio = () => {
             style={({ pressed }) => [styles.card, styles.shareCard, pressed && styles.cardPressed]}
             onPress={() => setShowShareControl(true)}>
             <View style={styles.shareHeader}>
-              <Text style={styles.name}>📊 Share Control</Text>
+              <Text style={styles.name}>{t('company.shareControl')}</Text>
               <Text style={styles.ownershipBadge}>{companyOwnership.toFixed(1)}%</Text>
             </View>
             <Text style={styles.revenue}>{t('ui.manageShareholdersEquity')}</Text>

@@ -443,7 +443,7 @@ const BoardRoomModal = ({ visible, onClose, asScreen }: Props) => {
                                                 <View style={{ flex: 1, marginLeft: 10 }}>
                                                     <Text style={styles.memberName}>{m.name}</Text>
                                                     <Text style={styles.memberTrait}>
-                                                        {t('data.trait.' + m.trait)} · {weight.toFixed(1)}% of the vote
+                                                        {t('data.trait.' + m.trait)} · {t('company.voteWeight', { percent: weight.toFixed(1) })}
                                                     </Text>
                                                 </View>
                                                 <View style={{ alignItems: 'flex-end' }}>

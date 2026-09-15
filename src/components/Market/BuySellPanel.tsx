@@ -55,7 +55,7 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
 
       {/* Owned Indicator */}
       {ownedQty > 0 && (
-        <Text style={styles.ownedText}>You own: {ownedQty.toFixed(2)} units</Text>
+        <Text style={styles.ownedText}>{t('market.youOwn', { qty: ownedQty.toFixed(2) })}</Text>
       )}
 
       <View style={styles.qtyRow}>
@@ -88,7 +88,7 @@ const BuySellPanel = ({ symbol, price, category }: BuySellPanelProps) => {
         </Pressable>
       </View>
       <Text style={styles.helper}>
-        Est. cost: {formatMoney(qty * price)} • Balance: {formatMoney(money)}
+        {t('market.estCostBalance', { cost: formatMoney(qty * price), balance: formatMoney(money) })}
       </Text>
       <View style={styles.actions}>
         <Pressable

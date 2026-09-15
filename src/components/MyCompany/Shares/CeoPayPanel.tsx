@@ -155,9 +155,9 @@ const CeoPayPanel = ({ open, onClose }: Props) => {
         amount: number;
         icon: string;
     }[] = [
-        { label: 'The founder\'s wage', amount: CEO_BASE_SALARY_QUARTERLY, icon: 'shield-outline' },
-        { label: 'A real rise', amount: Math.min(ceiling, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2), icon: 'trending-up' },
-        { label: 'All it can carry', amount: ceiling, icon: 'crown-outline' },
+        { label: t('ceo.founderWage'), amount: CEO_BASE_SALARY_QUARTERLY, icon: 'shield-outline' },
+        { label: t('ceo.aRealRise'), amount: Math.min(ceiling, CEO_BASE_SALARY_QUARTERLY * PAY_VOTE_MULTIPLE * 2), icon: 'trending-up' },
+        { label: t('ceo.allItCanCarry'), amount: ceiling, icon: 'crown-outline' },
     ];
 
     const choices = options.map(o => {

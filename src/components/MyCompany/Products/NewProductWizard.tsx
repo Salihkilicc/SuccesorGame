@@ -183,8 +183,8 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
         <GameModal
             visible={visible}
             onClose={handleClose}
-            title={step === 1 ? "✨ Select Product" : `Market Research: ${selectedDef?.label}`}
-            subtitle={step === 1 ? "Step 1 of 2: Choose Line" : "Step 2 of 2: Analyze & Launch"}
+            title={step === 1 ? t('wizard.selectProduct') : t('wizard.marketResearch', { label: selectedDef?.label ?? '' })}
+            subtitle={step === 1 ? t('wizard.step1') : t('wizard.step2')}
         >
             <View style={{ gap: 16, height: '100%' }}>
                 {step === 1 && (
@@ -228,7 +228,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                                         )}
                                         {locked && (
                                             <Text style={styles.lockText}>
-                                                🔒 Req: {item.req?.category} Lv{item.req?.level}
+                                                {t('wizard.reqLine', { category: item.req?.category ?? '', level: item.req?.level ?? 0 })}
                                             </Text>
                                         )}
                                     </View>
@@ -261,7 +261,7 @@ const NewProductWizard = ({ visible, onClose }: Props) => {
                         ) : (
                             <>
                                 <View style={styles.resultsCard}>
-                                    <Text style={styles.resultsTitle}>✓ Market Analysis Complete</Text>
+                                    <Text style={styles.resultsTitle}>{t('wizard.analysisComplete')}</Text>
                                     {currentMarketData && (
                                         <View style={{ gap: 12 }}>
                                             <View>

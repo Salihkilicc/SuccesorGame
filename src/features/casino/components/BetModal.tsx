@@ -83,13 +83,13 @@ const BetModal = ({ visible, roomId, onClose, onBetResult }: BetModalProps) => {
       visible={visible}
       onClose={onClose}
       title={title}
-      subtitle={`Min bet: $${minBet.toLocaleString()} — Luck & Risk Appetite influence odds.`}
+      subtitle={t('casino.minBetNote', { amount: `$${minBet.toLocaleString()}` })}
     >
       <View style={styles.betRow}>
         {[1, 2, 5].map(multiplier => (
           <GameButton
             key={multiplier}
-            title={`Bet ${multiplier}x ($${(minBet * multiplier).toLocaleString()})`}
+            title={t('casino.betMultiplier', { multiplier, amount: `$${(minBet * multiplier).toLocaleString()}` })}
             onPress={() => handleBet(multiplier)}
             variant="primary"
             style={styles.betButton}

@@ -47,7 +47,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                             <MaterialCommunityIcons name="gift-open-outline" size={26} color="#FBBF24" />
                             <Text style={styles.resultTitle}>{t('ui.giftSent')}</Text>
                         </View>
-                        <Text style={styles.resultMessage}>{shareholder.name} loved the {result.giftName}!</Text>
+                        <Text style={styles.resultMessage}>{t('equity.lovedTheGift', { name: shareholder.name, gift: result.giftName })}</Text>
 
                         <View style={styles.appreciationCard}>
                             <Text style={styles.appreciationLabel}>{t('equity.relationshipImprovement')}</Text>
@@ -68,7 +68,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                                     />
                                 </View>
                             </View>
-                            <Text style={styles.impactText}>+{result.impact}% Increase</Text>
+                            <Text style={styles.impactText}>{t('equity.increasePercent', { percent: result.impact })}</Text>
                         </View>
 
                         <Pressable style={styles.closeBtn} onPress={handleClose}>
@@ -99,7 +99,7 @@ const GiftSelectionModal = ({ visible, shareholder, onClose }: Props) => {
                                     <Text style={styles.name}>{gift.name}</Text>
                                     <Text style={styles.cost}>{formatMoney(gift.cost)}</Text>
                                     <View style={styles.impactBadge}>
-                                        <Text style={styles.impactTextSmall}>+{gift.impact} Rel</Text>
+                                        <Text style={styles.impactTextSmall}>{t('equity.relShort', { amount: gift.impact })}</Text>
                                     </View>
                                 </Pressable>
                             ))}

@@ -52,7 +52,7 @@ const FinancialAdvisorsButton = () => {
                   style={({ pressed }) => [styles.advisorRow, pressed && styles.advisorPressed]}>
                   <View>
                     <Text style={styles.advisorName}>{advisor.name}</Text>
-                    <Text style={styles.advisorFee}>Fee: {formatMoney(advisor.fee)}</Text>
+                    <Text style={styles.advisorFee}>{t('market.feeLabel', { fee: formatMoney(advisor.fee) })}</Text>
                   </View>
                   <Text style={styles.chevron}>›</Text>
                 </Pressable>

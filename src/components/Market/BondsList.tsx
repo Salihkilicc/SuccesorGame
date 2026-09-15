@@ -85,7 +85,7 @@ const BondsList = ({ onSelect }: Props) => {
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
             <View style={{ gap: theme.spacing.xs }}>
               <Text style={styles.name}>{bond.name}</Text>
-              <Text style={styles.meta}>{bond.years}y • Coupon {bond.coupon}%</Text>
+              <Text style={styles.meta}>{t('market.bondMeta', { years: bond.years, coupon: bond.coupon })}</Text>
             </View>
             <View style={styles.riskPill}>
               <Text style={[styles.riskText, { color: getRiskColor(bond.risk) }]}>{bond.risk}</Text>

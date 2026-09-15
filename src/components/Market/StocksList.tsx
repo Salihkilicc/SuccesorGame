@@ -2,6 +2,7 @@
 // Kept deliberately: nothing renders this, and it is not meant to be.
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { t } from '../../core/i18n';
 import { theme } from '../../core/theme';
 import type { SimpleStockItem } from './marketTypes';
 import { formatMoney, formatPrice } from '../../core/utils';
@@ -134,7 +135,7 @@ const StocksList = ({ onSelect }: Props) => {
                 <Text style={styles.symbol}>{stock.symbol}</Text>
                 <Text style={styles.company}>{stock.company}</Text>
                 <Text style={styles.meta}>
-                  Sector: {stock.sector} • Market Cap: {formatCap(stock.marketCap)}
+                  {t('market.stockMeta', { sector: stock.sector, cap: formatCap(stock.marketCap) })}
                 </Text>
               </View>
               <View style={styles.priceBlock}>

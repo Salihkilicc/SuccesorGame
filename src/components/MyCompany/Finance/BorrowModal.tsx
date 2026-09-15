@@ -164,7 +164,13 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                     <View style={styles.container}>
                         <ScreenHeader
                             title={t('bank.borrow.title')}
-                            subtitle={`${assessment.rating} · ${assessment.leverage === Infinity ? '∞' : assessment.leverage.toFixed(1)}x leverage · ${borrowingCapacity > 0 ? `${formatMoney(borrowingCapacity)} available` : 'no capacity'}`}
+                            subtitle={t('bank.assessmentSub', {
+                                rating: assessment.rating,
+                                leverage: assessment.leverage === Infinity ? '∞' : assessment.leverage.toFixed(1),
+                                capacity: borrowingCapacity > 0
+                                    ? t('finance.availableAmount', { amount: formatMoney(borrowingCapacity) })
+                                    : t('finance.noCapacity'),
+                            })}
                             onBack={onClose}
                         />
 
@@ -223,8 +229,10 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                             <View style={styles.warningBox}>
                                 <MaterialCommunityIcons name="scale-balance" size={16} color={theme.colors.warning} style={{ marginRight: 6 }} />
                                 <Text style={styles.warningText}>
-                                    If unpaid, this becomes {mezzQuote.dilutionPercent.toFixed(1)}% of your company
-                                    {mezzQuote.costsBoardSeat ? ', and a board seat.' : '.'}
+                                    {t('finance.mezzFull', {
+                                        percent: mezzQuote.dilutionPercent.toFixed(1),
+                                        seat: mezzQuote.costsBoardSeat ? t('finance.andABoardSeat') : '.',
+                                    })}
                                 </Text>
                             </View>
                         )}
@@ -276,11 +284,12 @@ const BorrowModal = ({ visible, onClose, asScreen }: Props) => {
                                 {formatMoney(preview.totalPayment)}
                             </Text>
                             <Text style={styles.paymentHeroCaption}>
-                                {`${currentRate.toFixed(1)}% APR · ${
-                                    selected.product.termQuarters === 0
+                                {t('bank.aprAndTerm', {
+                                    rate: currentRate.toFixed(1),
+                                    term: selected.product.termQuarters === 0
                                         ? t('bank.revolving')
-                                        : t('bank.forNQuarters', { v1: String(selected.product.termQuarters) })
-                                }`}
+                                        : t('bank.forNQuarters', { v1: String(selected.product.termQuarters) }),
+                                })}
                             </Text>
                             {selected.product.termQuarters > 0 && (
                                 <Text style={styles.paymentHeroCaption}>

@@ -91,7 +91,7 @@ const CompanyAnalysisModal = ({ visible, onClose, company, onAcquire }: Props) =
                                     <View style={[styles.progressBarFill, { width: `${company.synergyScore}%` }]} />
                                 </View>
                                 <Text style={styles.fitDesc}>
-                                    {company.synergyDescription || (company.synergyScore > 80 ? 'High Synergy. Will significantly boost operations.' : 'Low Synergy.')}
+                                    {company.synergyDescription || (company.synergyScore > 80 ? t('company.highSynergy') : t('company.lowSynergy'))}
                                 </Text>
                             </View>
 

@@ -49,6 +49,7 @@
 
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { t } from '../../core/i18n';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { theme } from '../../core/theme';
 
@@ -273,14 +274,14 @@ const ConfirmPanel = ({
                         <Pressable
                             onPress={onCancel}
                             style={({ pressed }) => [styles.btn, styles.btnCancel, pressed && styles.btnPressed]}>
-                            <Text style={styles.btnCancelText}>{cancelLabel || 'Cancel'}</Text>
+                            <Text style={styles.btnCancelText}>{cancelLabel || t('ui.cancel')}</Text>
                         </Pressable>
                     )}
                     {choices?.length ? (
                         <Pressable
                             onPress={onCancel}
                             style={({ pressed }) => [styles.btn, styles.btnCancel, pressed && styles.btnPressed]}>
-                            <Text style={styles.btnCancelText}>{cancelLabel || 'Cancel'}</Text>
+                            <Text style={styles.btnCancelText}>{cancelLabel || t('ui.cancel')}</Text>
                         </Pressable>
                     ) : (
                         <Pressable

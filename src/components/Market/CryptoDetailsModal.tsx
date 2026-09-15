@@ -54,11 +54,11 @@ const CryptoDetailsModal = ({ visible, asset, onClose, onBuy }: Props) => {
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.meta}>Current Cost: {formatMoney(asset.cost)}</Text>
-            <Text style={styles.meta}>Market Cap: {formatCap(asset.marketCap)}</Text>
-            <Text style={styles.meta}>Risk: {asset.risk}</Text>
-            <Text style={styles.meta}>Trend: {asset.trend}</Text>
-            <Text style={styles.meta}>3-Month Change: {changeText}</Text>
+            <Text style={styles.meta}>{t('market.currentCost', { cost: formatMoney(asset.cost) })}</Text>
+            <Text style={styles.meta}>{t('market.marketCapLabel', { cap: formatCap(asset.marketCap) })}</Text>
+            <Text style={styles.meta}>{t('market.riskLabel', { risk: asset.risk })}</Text>
+            <Text style={styles.meta}>{t('market.trendLabel', { trend: asset.trend })}</Text>
+            <Text style={styles.meta}>{t('market.threeMonthChange', { change: changeText })}</Text>
             <Text style={styles.meta}>{t('market.highTrendCoinHasStrong')}</Text>
           </View>
 

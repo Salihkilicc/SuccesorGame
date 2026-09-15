@@ -117,6 +117,11 @@ describe('and the sweep is really looking', () => {
         //                         operating system. A phone says iOS in every
         //                         language.
         //
+        //   SettingsScreen.tsx    the language picker, which names each
+        //                         language in ITS OWN language. Translating
+        //                         'English' into Turkish would hide the option
+        //                         from the person looking for it.
+        //
         // If this list grows the exemption has become the way to pass rather
         // than the exception.
         const walk = (dir: string, out: string[] = []): string[] => {
@@ -136,6 +141,7 @@ describe('and the sweep is really looking', () => {
             'LuxoNetInventoryModal.tsx',
             'LuxoNetModalWrapper.tsx',
             'LuxoNetPreviewModal.tsx',
+            'SettingsScreen.tsx',
             'newGame.ts',
             'useSettingsLogic.ts',
         ]);

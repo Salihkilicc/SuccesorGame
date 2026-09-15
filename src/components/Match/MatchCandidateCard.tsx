@@ -20,7 +20,7 @@ const MatchCandidateCard = ({candidate}: Props) => {
         {candidate.name} {candidate.age ? `• ${candidate.age}` : ''}
       </Text>
       <Text style={styles.meta}>{t('ui.attractivenessHigh')}</Text>
-      <Text style={styles.meta}>{candidate.bio ?? 'Enerjik ve sosyal biri.'}</Text>
+      <Text style={styles.meta}>{candidate.bio ?? t('ui.defaultBio')}</Text>
     </View>
   </View>
     );

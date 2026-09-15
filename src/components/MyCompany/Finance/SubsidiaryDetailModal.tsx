@@ -171,7 +171,7 @@ export default function SubsidiaryDetailModal({ visible, subsidiaryId, companyId
                                     <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
                                         <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
                                     </View>
-                                    <Text style={styles.sectorText} numberOfLines={1}>{company.sector} Sector</Text>
+                                    <Text style={styles.sectorText} numberOfLines={1}>{t('company.sectorSuffix', { sector: company.sector })}</Text>
                                 </View>
                             </View>
                         </View>

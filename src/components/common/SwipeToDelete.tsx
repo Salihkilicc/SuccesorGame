@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { t } from '../../core/i18n';
 import {
     View,
     Text,
@@ -142,7 +143,7 @@ const SwipeToDelete = ({ children, label, guarded, onDelete }: Props) => {
                     accessibilityLabel={guarded ? `Delete ${label} (not played yet)` : `Delete ${label}`}>
                     <MaterialCommunityIcons name="trash-can-outline" size={22} color="#FFFFFF" />
                     <Text style={styles.behindText} numberOfLines={1}>
-                        {guarded ? 'Not played' : 'Delete'}
+                        {guarded ? t('ui.notPlayed') : t('ui.delete')}
                     </Text>
                 </Pressable>
             </View>

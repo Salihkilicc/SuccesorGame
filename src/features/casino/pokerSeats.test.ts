@@ -301,8 +301,14 @@ describe('the avatars', () => {
 
     it('and it says what they just DID, which is what makes it a table', () => {
         // A seat showing only a name and a number is a scoreboard.
+        //
+        // The KEY rather than the English. This read /RAISE \$\{money\(...\)\}/
+        // and went red the day the seat was translated. That is the fifth
+        // test this week caught pinning a word rather than a claim, and the
+        // claim here is that the bubble names the ACTION and its amount,
+        // which survives being said in Turkish.
         const src = read('components', 'PokerSeat.tsx');
-        expect(src).toMatch(/RAISE \$\{money\(lastAmount \|\| 0\)\}/);
+        expect(src).toMatch(/t\('casino\.raiseAction', \{ amount: money\(lastAmount \|\| 0\) \}\)/);
         expect(src).toMatch(/styles\.bubble/);
     });
 

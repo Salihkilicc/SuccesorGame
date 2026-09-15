@@ -15,12 +15,12 @@ const StockInfoSection = ({ description, targetPrice = 165, valuation }: StockIn
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('market.stockInfo')}</Text>
-      <Text style={styles.row}>🎯 Target Price: ${targetPrice}</Text>
+      <Text style={styles.row}>{t('market.targetPrice', { price: `$${targetPrice}` })}</Text>
       {valuation !== undefined && (
-        <Text style={styles.row}>Company Valuation: {formatMoney(valuation)}</Text>
+        <Text style={styles.row}>{t('market.companyValuation', { amount: formatMoney(valuation) })}</Text>
       )}
       <Text style={styles.row}>
-        {description || "Company Bio: Rising player in its sector with strong fundamentals."}
+        {description || t('market.defaultBio')}
       </Text>
       <View style={styles.sentimentChip}>
         <Text style={styles.sentimentText}>{t('market.marketSentimentMildlyPositive')}</Text>

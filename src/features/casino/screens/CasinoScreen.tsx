@@ -76,7 +76,7 @@ const CasinoScreen: React.FC = () => {
 
       <View style={styles.safeArea}>
         {/* Standard Game Header with Gold accent line */}
-        <ScreenHeader title={t('home.casino') || 'CASINO'} category="finance" />
+        <ScreenHeader title={t('home.casino')} category="finance" />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -267,7 +267,7 @@ const CasinoScreen: React.FC = () => {
             <View style={styles.repTrackWrapper}>
               <View style={styles.repTrackHeader}>
                 <Text style={styles.repTrackLabel}>
-                  {t('ui.casinoRep') || 'Reputation'}: {casinoReputation.toFixed(0)} / {CASINO_LADDER_TOP}
+                  {t('ui.casinoRep')}: {casinoReputation.toFixed(0)} / {CASINO_LADDER_TOP}
                 </Text>
               </View>
               <View style={styles.repTrack}>

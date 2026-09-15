@@ -58,9 +58,9 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
     return (
         <CollapsibleSection
             title={t('os.marketPosition')}
-            note={`${market.category}${market.region ? ` · ${market.region}` : ''}`}
+            note={t('mkt.categoryRegion', { category: market.category, region: market.region ? ` · ${market.region}` : '' })}
             info={t('os.everyProductCategoryIsA')}
-            infoDetail="Building more units does not create demand. Buying a competitor transfers most of their share to you."
+            infoDetail={t('mkt.infoDetail')}
             summary={`#${playerRank} · ${formatShare(playerShare)}`}
             summaryColor={playerShare > 0 ? theme.colors.primary : theme.colors.textMuted}
             defaultOpen={defaultOpen}

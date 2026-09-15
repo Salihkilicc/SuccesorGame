@@ -2,6 +2,7 @@
 // but no screen renders them, so nothing is ever awarded or shown. Kept for a later pass.
 import React, { useEffect, useState } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
+import { t } from '../../core/i18n';
 import { useAchievementStore } from '../../core/store/useAchievementStore';
 import { ACHIEVEMENTS } from '../../achievements/achievements';
 import { theme } from '../../core/theme';
@@ -29,7 +30,7 @@ const AchievementToast = () => {
   return (
     <Animated.View style={[styles.toast, { opacity }]}>
       <Text style={styles.icon}>🏅</Text>
-      <Text style={styles.text}>Achievement unlocked: {achievement.title}</Text>
+      <Text style={styles.text}>{t('ui.achievementUnlocked', { title: achievement.title })}</Text>
     </Animated.View>
   );
 };

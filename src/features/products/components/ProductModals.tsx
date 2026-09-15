@@ -1069,8 +1069,8 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             have to be open to be readable. */}
                         <CollapsibleSection
                             title={t('product.contractMfg')}
-                            note={chosenPartner ? chosenPartner.name : 'In-house only'}
-                            summary={chosenPartner ? `${formatNumber(contractQuote?.units || 0)} units` : 'In-House'}
+                            note={chosenPartner ? chosenPartner.name : t('product.inHouseOnly')}
+                            summary={chosenPartner ? t('product.unitsCount', { count: formatNumber(contractQuote?.units || 0) }) : t('product.inHouse')}
                             summaryColor={chosenPartner ? theme.colors.warning : theme.colors.textMuted}
                             compact
                         >
@@ -1161,7 +1161,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                                 key: string; icon: string; label: string;
                                                 units: number; off?: boolean;
                                             }[] = [
-                                                { key: 'off', icon: 'close', label: 'Off', units: 0 },
+                                                { key: 'off', icon: 'close', label: t('ui.off'), units: 0 },
                                                 {
                                                     key: 'gap',
                                                     icon: 'target',
@@ -1174,7 +1174,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                                 {
                                                     key: 'max',
                                                     icon: 'arrow-collapse-up',
-                                                    label: `Max  ${formatNumber(partnerMaxUnits)}`,
+                                                    label: t('product.maxUnits', { v1: formatNumber(partnerMaxUnits) }),
                                                     units: partnerMaxUnits,
                                                 },
                                             ];

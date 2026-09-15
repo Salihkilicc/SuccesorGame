@@ -250,7 +250,21 @@ const literals = (text) => {
         if (q) {
             if (c === q && prev !== '\\') {
                 const body = text.slice(start + 1, m);
-                if (!/\bt\($/.test(text.slice(Math.max(0, start - 2), start))) {
+                // ----------------------------------------------------------
+                //  A LITERAL BEING COMPARED IS A VALUE, NOT TEXT
+                // ----------------------------------------------------------
+                //  `pendingChildGender === 'Female'` and `context ===
+                //  'VIP_LOUNGE'` were both reported as untranslated English
+                //  inside a <Text>, and both are the opposite: a state value
+                //  being tested, with the WORDS on the other side of the
+                //  ternary already coming from t().
+                //
+                //  This is the one case where acting on the report would be
+                //  worse than the report: translating either breaks the
+                //  comparison, and the screen stops branching.
+                // ----------------------------------------------------------
+                const compared = /[=!]==?\s*$/.test(text.slice(Math.max(0, start - 6), start));
+                if (!compared && !/\bt\($/.test(text.slice(Math.max(0, start - 2), start))) {
                     out.push([start, body]);
                 }
                 q = null;

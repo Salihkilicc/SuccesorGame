@@ -95,7 +95,7 @@ const RepayModal = ({ visible, onClose, asScreen }: Props) => {
                     <View style={styles.container}>
                         <ScreenHeader
                             title={t('finance.repayDebt')}
-                            subtitle={`${formatMoney(totalDebt)} owed · ${formatMoney(companyCapital)} cash`}
+                            subtitle={t('finance.owedAndCash', { owed: formatMoney(totalDebt), cash: formatMoney(companyCapital) })}
                             onBack={onClose}
                         />
 
@@ -112,8 +112,8 @@ const RepayModal = ({ visible, onClose, asScreen }: Props) => {
                                                     <MaterialCommunityIcons name={visual.icon} size={22} color={visual.color} />
                                                 </View>
                                                 <View>
-                                                    <Text style={styles.loanType}>{loan.name} Loan</Text>
-                                                    <Text style={styles.loanRate}>{loan.rate}% APR</Text>
+                                                    <Text style={styles.loanType}>{t('finance.namedLoan', { name: loan.name })}</Text>
+                                                    <Text style={styles.loanRate}>{t('finance.aprShort', { rate: loan.rate })}</Text>
                                                 </View>
                                             </View>
                                             <View style={{ alignItems: 'flex-end' }}>

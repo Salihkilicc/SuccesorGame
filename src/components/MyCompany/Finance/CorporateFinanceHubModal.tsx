@@ -179,7 +179,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         />
                     </View>
                     <Text style={styles.capacityNote}>
-                        {formatMoney(borrowingCapacity)} still available · {formatMoney(totalDebt)} drawn
+                        {t('finance.stillAvailableDrawn', { available: formatMoney(borrowingCapacity), drawn: formatMoney(totalDebt) })}
                     </Text>
                 </View>
 
@@ -226,7 +226,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                         loans.map(loan => (
                             <StatRow
                                 key={loan.id}
-                                label={`${loan.name} Loan`}
+                                label={t('finance.namedLoan', { name: loan.name })}
                                 value={formatMoney(loan.balance)}
                                 why={`${loan.rate}% APR`}
                                 detail={
@@ -314,7 +314,7 @@ const CorporateFinanceHubModal = ({ visible, onClose, onRequestLoan, onRepayDebt
                                 />
                                 {!!lastCeoBonus && (
                                     <DetailLine
-                                        label={`Last paid (${lastCeoBonus.periodLabel})`}
+                                        label={t('finance.lastPaid', { period: lastCeoBonus.periodLabel })}
                                         value={formatMoney(lastCeoBonus.amount)}
                                         strong
                                     />

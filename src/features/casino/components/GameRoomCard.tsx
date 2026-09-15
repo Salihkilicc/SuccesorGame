@@ -118,7 +118,7 @@ export const GameRoomCard: React.FC<GameRoomCardProps> = ({
                 ) : (
                     <View style={styles.lockBadge}>
                         <MaterialCommunityIcons name="lock" size={14} color={theme.colors.textMuted} />
-                        <Text style={styles.lockText}>{t('ui.locked') || 'LOCKED'}</Text>
+                        <Text style={styles.lockText}>{t('ui.locked')}</Text>
                     </View>
                 )}
             </View>

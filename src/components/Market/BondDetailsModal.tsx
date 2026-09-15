@@ -37,11 +37,11 @@ const BondDetailsModal = ({ visible, bond, onClose, onBuy }: Props) => {
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.meta}>Years: {bond.years}y</Text>
-            <Text style={styles.meta}>Coupon: {bond.coupon}%</Text>
-            <Text style={styles.meta}>Risk: {bond.risk}</Text>
+            <Text style={styles.meta}>{t('market.yearsLabel', { years: bond.years })}</Text>
+            <Text style={styles.meta}>{t('market.couponLabel', { coupon: bond.coupon })}</Text>
+            <Text style={styles.meta}>{t('market.riskLabel', { risk: bond.risk })}</Text>
             <Text style={styles.meta}>
-              Expected Annual Gain: {formatMoney(expectedGain)} (placeholder)
+              {t('market.expectedAnnualGain', { amount: formatMoney(expectedGain) })}
             </Text>
           </View>
 

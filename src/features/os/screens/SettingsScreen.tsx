@@ -165,6 +165,11 @@ const SettingsScreen: React.FC = () => {
 
                             <View style={styles.langSelectorBadge}>
                                 <Text style={styles.langBadgeText}>
+                                    {/* A language picker names each language in
+                                        ITS OWN language. Translating 'English'
+                                        into Turkish would hide the option from
+                                        the person looking for it.
+                                        @english-ok a language name, see above */}
                                     {currentLocaleObj.code === 'tr' ? '🇹🇷 Türkçe' : '🇬🇧 English'}
                                 </Text>
                                 <MaterialCommunityIcons

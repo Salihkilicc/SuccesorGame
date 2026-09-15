@@ -27,6 +27,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { t } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
 import { avatarHue, type SeatKind } from '../../../core/casino/pokerTable';
 import { translateOccupation } from '../../../data/i18n/profileLoveShopText';
@@ -198,8 +199,8 @@ const PokerSeat = ({
             ) : !!lastAction && (
                 <View style={[styles.bubble, { borderColor: `${tint}55` }]}>
                     <Text style={styles.bubbleText} numberOfLines={1}>
-                        {lastAction === 'raise' ? `RAISE ${money(lastAmount || 0)}`
-                            : lastAction === 'call' ? `CALL ${money(lastAmount || 0)}`
+                        {lastAction === 'raise' ? t('casino.raiseAction', { amount: money(lastAmount || 0) })
+                            : lastAction === 'call' ? t('casino.callAction', { amount: money(lastAmount || 0) })
                                 : lastAction.toUpperCase()}
                     </Text>
                 </View>

@@ -2,6 +2,7 @@
 // Kept deliberately: nothing renders this, and it is not meant to be.
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { t } from '../../core/i18n';
 import { theme } from '../../core/theme';
 import { formatPrice, formatNumber } from '../../core/utils';
 
@@ -46,11 +47,11 @@ const StockDetailHeader = ({
         <Text style={[styles.change, changePositive ? styles.up : styles.down]}>
           {changeText}
         </Text>
-        <Text style={styles.meta}>Risk: {risk}</Text>
-        {volatility && <Text style={styles.meta}>Vol: {volatility}</Text>}
+        <Text style={styles.meta}>{t('market.riskLabel', { risk })}</Text>
+        {volatility && <Text style={styles.meta}>{t('market.volLabel', { vol: volatility })}</Text>}
         {marketCap && (
           <Text style={[styles.meta, { color: theme.colors.textPrimary, fontWeight: '700' }]}>
-            Cap: ${formatCompactNumber(marketCap)}
+            {t('market.capLabel', { cap: `$${formatCompactNumber(marketCap)}` })}
           </Text>
         )}
       </View>

@@ -8,7 +8,7 @@ import { CasinoLocation } from '../data/casinoData';
 import { theme } from '../../../core/theme';
 import { formatCompact } from '../../../core/utils';
 import { CASINO_LADDER_TOP } from '../data/casinoData';
-import { useLocale } from '../../../core/i18n';
+import { t, useLocale } from '../../../core/i18n';
 import {
   translateCasinoLocationName,
   translateCasinoLocationSubtitle,
@@ -136,7 +136,7 @@ const CasinoHeader: React.FC<CasinoHeaderProps> = ({
             <View style={styles.repLeftLabel}>
               <MaterialCommunityIcons name="star-circle-outline" size={12} color={location.theme.primary} />
               <Text style={styles.repLabelText}>
-                CASINO VIP: <Text style={{ color: location.theme.textColor, fontWeight: '800' }}>{translateCasinoRank(rankName).toUpperCase()}</Text>
+                {t('casino.vipPrefix')}<Text style={{ color: location.theme.textColor, fontWeight: '800' }}>{translateCasinoRank(rankName).toUpperCase()}</Text>
               </Text>
             </View>
             <Text style={styles.repNumbersText}>

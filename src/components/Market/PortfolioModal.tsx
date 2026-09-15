@@ -80,7 +80,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
           <Text style={styles.itemSymbol}>{item.symbol}</Text>
           <Text style={styles.itemQuantity}>{item.quantity.toFixed(2)} shares</Text>
           <Text style={styles.itemCostInfo}>
-            Avg: {formatPrice(item.averageCost)} → Now: {formatPrice(item.currentPrice)}
+            {t('market.avgNow', { avg: formatPrice(item.averageCost), now: formatPrice(item.currentPrice) })}
           </Text>
         </View>
 
@@ -94,12 +94,12 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
             <Pressable
               style={({ pressed }) => [styles.buyButton, pressed && styles.buttonPressed]}
               onPress={() => handleBuy(item.symbol, item.currentPrice, item.type)}>
-              <Text style={styles.buyButtonText}>+ Buy</Text>
+              <Text style={styles.buyButtonText}>{t('market.buyShort')}</Text>
             </Pressable>
             <Pressable
               style={({ pressed }) => [styles.sellButton, pressed && styles.buttonPressed]}
               onPress={() => handleSell(item.symbol, item.currentPrice, item.quantity)}>
-              <Text style={styles.sellButtonText}>- Sell</Text>
+              <Text style={styles.sellButtonText}>{t('market.sellShort')}</Text>
             </Pressable>
           </View>
         </View>
@@ -119,7 +119,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ visible, onClose }) => 
         <View style={styles.modalContainer}>
           <ScreenHeader
             title={t('market.myPortfolio')}
-            subtitle={`Total Value: ${formatMoney(totalValue)}`}
+            subtitle={t('market.totalValue', { amount: formatMoney(totalValue) })}
             onBack={onClose}
             inset={false}
             category="market"

@@ -171,7 +171,7 @@ const SellCompanyModal = ({ visible, companyId, onClose }: Props) => {
                             {successChance.toFixed(0)}%
                         </Text>
                         <Text style={styles.markupText}>
-                            {markup > 0 ? `+${(markup * 100).toFixed(1)}% Markup` : 'Fair Value'}
+                            {markup > 0 ? t('company.markup', { percent: (markup * 100).toFixed(1) }) : t('acq.fairValue')}
                         </Text>
                     </View>
 

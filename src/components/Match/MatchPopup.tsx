@@ -44,7 +44,7 @@ const MatchPopup = ({
               styles.skipButton,
               pressed && styles.buttonPressed,
             ]}>
-            <Text style={styles.buttonText}>✖ Skip</Text>
+            <Text style={styles.buttonText}>{t('ui.skip')}</Text>
           </Pressable>
           <Pressable
             onPress={onAccept}
@@ -53,7 +53,7 @@ const MatchPopup = ({
               styles.matchButton,
               pressed && styles.buttonPressed,
             ]}>
-            <Text style={styles.matchButtonText}>✔ Match</Text>
+            <Text style={styles.matchButtonText}>{t('ui.match')}</Text>
           </Pressable>
         </View>
       </View>

@@ -55,15 +55,15 @@ const StockDetailsModal = ({ visible, stock, onClose, onBuy }: Props) => {
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>
-            <Text style={styles.meta}>Symbol: {stock.symbol}</Text>
-            <Text style={styles.meta}>Sector: {stock.sector}</Text>
-            <Text style={styles.meta}>Market Cap: {formatCap(stock.marketCap)}</Text>
-            <Text style={styles.meta}>Current Price: {formatPrice(stock.price)}</Text>
+            <Text style={styles.meta}>{t('market.symbolLabel', { symbol: stock.symbol })}</Text>
+            <Text style={styles.meta}>{t('market.sectorLabel', { sector: stock.sector })}</Text>
+            <Text style={styles.meta}>{t('market.marketCapLabel', { cap: formatCap(stock.marketCap) })}</Text>
+            <Text style={styles.meta}>{t('market.currentPrice', { price: formatPrice(stock.price) })}</Text>
             <Text style={[styles.meta, { color: dailyColor }]}>
-              Daily Change (size-adjusted): {dailyAdjusted}%
+              {t('market.dailyChangeAdjusted', { change: dailyAdjusted })}
             </Text>
-            <Text style={[styles.meta, { color: yearlyColor }]}>Yearly Change: {stock.yearlyChange}%</Text>
-            <Text style={styles.meta}>Risk Level: {stock.risk}</Text>
+            <Text style={[styles.meta, { color: yearlyColor }]}>{t('market.yearlyChange', { change: stock.yearlyChange })}</Text>
+            <Text style={styles.meta}>{t('market.riskLevel', { risk: stock.risk })}</Text>
           </View>
 
           <View style={{ gap: theme.spacing.xs }}>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { t } from '../../../core/i18n';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useMarketStore } from '../../../core/store/useMarketStore';
 import { useGameStore } from '../../../core/store/useGameStore';
@@ -49,7 +50,7 @@ const StockDetailScreen = () => {
     return (
         <AppScreen
             title={symbol}
-            subtitle={name || "Stock Details"}
+            subtitle={name || t('market.stockDetails')}
             leftNode={
                 <Pressable
                     onPress={() => navigation.goBack()}

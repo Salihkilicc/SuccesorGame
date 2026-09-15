@@ -47,7 +47,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
         if (success) {
             setPanel({
                 title: t('alert.success'),
-                summary: `${product.name} has been launched successfully!`,
+                summary: t('product.launchedSuccessfully', { name: product.name }),
                 confirmLabel: 'OK',
                 onDismiss: onLaunchComplete,
             });
@@ -75,7 +75,7 @@ export const ProductLaunchModal: React.FC<ProductLaunchModalProps> = ({ visible,
             <View style={styles.divider} />
             <View style={styles.infoRow}>
                 <Text style={styles.label}>{t('product.baseRDCost')}</Text>
-                <Text style={styles.costValue}>{product.rndCost} Pts</Text>
+                <Text style={styles.costValue}>{t('product.rdCostPts', { count: product.rndCost })}</Text>
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.label}>{t('product.baseDemand')}</Text>

@@ -30,12 +30,12 @@ const ProductSupplierSection = ({
 
             <SectionCard
                 title={currentSupplier.name}
-                subtitle={`Quality: ${currentSupplier.quality}%`}
+                subtitle={t('supplier.qualityPercent', { quality: currentSupplier.quality })}
                 rightText={`$${currentSupplier.cost}/unit`}
             />
 
             <GameButton
-                title={showSuppliers ? "Cancel Search" : "Find New Suppliers"}
+                title={showSuppliers ? t('supplier.cancelSearch') : t('supplier.findNew')}
                 variant="secondary"
                 onPress={onFindSuppliers}
                 style={{ marginTop: 8 }}

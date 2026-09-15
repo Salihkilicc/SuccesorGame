@@ -68,7 +68,7 @@ const ProductionModal = ({ visible, onClose }: Props) => {
                         rightText={`${maxProductionPossible > 0 ? ((localProductionTarget / maxProductionPossible) * 100).toFixed(0) : 0}%`}
                     />
                     <Text style={styles.hint}>
-                        * Staff efficiency is 350 units per employee.
+                        {t('company.staffEfficiencyHint')}
                     </Text>
                 </View>
 

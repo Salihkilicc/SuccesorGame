@@ -53,8 +53,8 @@ const CasinoBetModal = ({
             subtitle={t('ui.placeYourBet')}
         >
             <View style={styles.infoRow}>
-                <Text style={styles.limitText}>Min: ${minBet.toLocaleString()}</Text>
-                <Text style={styles.limitText}>Max: ${maxBet.toLocaleString()}</Text>
+                <Text style={styles.limitText}>{t('casino.minLabel', { amount: `$${minBet.toLocaleString()}` })}</Text>
+                <Text style={styles.limitText}>{t('casino.maxLabel', { amount: `$${maxBet.toLocaleString()}` })}</Text>
             </View>
 
             <View style={styles.betDisplay}>

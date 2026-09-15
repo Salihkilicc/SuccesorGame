@@ -672,7 +672,7 @@ const ProductRow = ({ p }: { p: QuarterReport['products'][number] }) => {
             />
           </View>
           <Text style={styles.sellThroughLabel}>
-            {formatPercent(p.sellThrough)} of available units sold
+            {formatPercent(p.sellThrough)} {t('qr.ofAvailableUnitsSold')}
           </Text>
 
           <DetailRule />
@@ -831,7 +831,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 {formatSignedMoney(report.netProfit)}
               </Text>
               <Text style={styles.heroSub}>
-                {formatPercent(report.netMargin)} net margin · {formatPercent(report.grossMargin)} gross margin
+                {formatPercent(report.netMargin)} {t('qr.netMargin')} {formatPercent(report.grossMargin)} {t('qr.grossMargin')}
               </Text>
             </View>
 
@@ -1051,7 +1051,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
               summary={
                 report.totalUnmetDemand > 0
                   ? `${formatNumber(report.totalUnmetDemand)} lost`
-                  : 'fully served'
+                  : t('qr.fullyServed')
               }
               summaryColor={report.totalUnmetDemand > 0 ? theme.colors.down : theme.colors.up}
             >
@@ -1100,8 +1100,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                 </View>
               </View>
               <Text style={styles.footnote}>
-                Each market has a fixed size. You earn a share of it through price, marketing,
-                quality and brand — not by producing more.
+                {t('qr.fixedSizeNote')}
               </Text>
             </CollapsibleSection>
 
@@ -1120,7 +1119,7 @@ const QuarterlyReportModal = ({ visible, onClose }: Props) => {
                   <Text style={styles.opsLabel}>{t('company.facility')}</Text>
                   <Text style={styles.facilityName}>
                     {report.facilityName}
-                    {report.isRetooling ? '  · retooling' : ''}
+                    {report.isRetooling ? t('qr.retoolingSuffix') : ''}
                   </Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>

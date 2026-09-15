@@ -255,7 +255,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
 
                                 {candidate.stats?.reputationBuff && candidate.stats.reputationBuff > 0 && (
                                     <View style={[styles.pillBadge, styles.buffPill]}>
-                                        <Text style={styles.buffPillText}>+{candidate.stats.reputationBuff} Rep</Text>
+                                        <Text style={styles.buffPillText}>{t('love.repBuff', { amount: candidate.stats.reputationBuff })}</Text>
                                     </View>
                                 )}
                             </View>
@@ -268,7 +268,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                     <MaterialCommunityIcons name="credit-card-outline" size={18} color="#FFA94D" />
                                 </View>
                                 <View style={styles.costInfo}>
-                                    <Text style={styles.costLabel}>{t('love.monthlyUpkeep') || 'MONTHLY UPKEEP'}</Text>
+                                    <Text style={styles.costLabel}>{t('love.monthlyUpkeep')}</Text>
                                     <Text style={styles.costValue}>${monthlyCost.toLocaleString()}/mo</Text>
                                 </View>
                                 <View style={styles.lifestyleTag}>
@@ -350,7 +350,7 @@ export const EncounterModal: React.FC<EncounterModalProps> = ({
                                     <Text style={styles.hookupButtonText}>{t('love.casualHookup')}</Text>
                                 </View>
                                 <Text style={styles.hookupSubtext}>
-                                    {t('love.noStringsAttached') || 'No Strings Attached'}
+                                    {t('love.noStringsAttached')}
                                 </Text>
                             </TouchableOpacity>
                         </View>

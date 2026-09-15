@@ -415,7 +415,7 @@ const MyCompanyScreen = () => {
                 />
               }
               title={t('company.teamMorale')}
-              subtitle={`${Math.round(employeeMorale)}/100 — events, bonuses and salary policy`}
+              subtitle={t('company.moraleSubtitle', { value: Math.round(employeeMorale) })}
               onPress={() => navigation.navigate('TeamMorale')}
               info={{
                 title: t('tactic.teamMoraleTitle'),

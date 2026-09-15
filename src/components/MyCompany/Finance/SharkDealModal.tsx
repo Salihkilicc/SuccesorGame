@@ -92,13 +92,13 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                 title: t('alert.dealSigned'),
                 summary: result.message,
                 lines: [
-                    { label: 'You receive', value: formatMoney(LOAN_AMOUNT) },
-                    { label: 'You owe', value: formatMoney(totalOwed), tone: 'negative' },
-                    { label: 'Due within', value: `${DEADLINE_QUARTERS} quarters` },
-                    { label: 'Collateral pledged', value: formatMoney(collateralValue), strong: true },
+                    { label: t('shark.youReceive'), value: formatMoney(LOAN_AMOUNT) },
+                    { label: t('shark.youOwe'), value: formatMoney(totalOwed), tone: 'negative' },
+                    { label: t('shark.dueWithin'), value: t('ui.quarters', { count: DEADLINE_QUARTERS }) },
+                    { label: t('shark.collateralPledged'), value: formatMoney(collateralValue), strong: true },
                 ],
-                note: 'Miss the date and he takes the shares, not the money. This is now enforced every quarter.',
-                confirmLabel: 'OK',
+                note: t('shark.missTheDateNote'),
+                confirmLabel: t('ui.ok'),
                 tone: 'danger',
                 onConfirm: undefined,
             });
@@ -155,7 +155,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                                     setPanel({
                                         title: r.success ? t('finance.loanRepaid') : t('finance.cannotRepay'),
                                         summary: r.message,
-                                        confirmLabel: 'OK',
+                                        confirmLabel: t('ui.ok'),
                                         tone: r.success ? 'default' : 'danger',
                                     });
                                 }}

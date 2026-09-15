@@ -42,13 +42,13 @@ const IPOWarningModal = ({ visible, onClose }: Props) => {
         <Modal visible={visible} animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay} pointerEvents="box-none">
                 <View style={styles.content}>
-                    <Text style={styles.title}>⚠️ IPO Warning</Text>
+                    <Text style={styles.title}>{t('ipo.warningTitle')}</Text>
 
                     <View style={styles.warningBox}>
                         <Text style={styles.warningText}>{t('equity.goingPublicIsIrreversibleInvestors')}</Text>
-                        <Text style={styles.warningBullet}>• Stock price fluctuations</Text>
-                        <Text style={styles.warningBullet}>• Investor pressure</Text>
-                        <Text style={styles.warningBullet}>• Market volatility</Text>
+                        <Text style={styles.warningBullet}>{t('ipo.bullet1')}</Text>
+                        <Text style={styles.warningBullet}>{t('ipo.bullet2')}</Text>
+                        <Text style={styles.warningBullet}>{t('ipo.bullet3')}</Text>
                     </View>
 
                     <View style={styles.projectionBox}>

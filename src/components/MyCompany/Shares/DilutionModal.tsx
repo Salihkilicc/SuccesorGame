@@ -60,7 +60,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         {/* Warning Banner */}
                         <View style={styles.warningBanner}>
                             <Text style={styles.warningBannerText}>
-                                ⚡ This will dilute your ownership and impact stock price
+                                {t('equity.dilutionBanner')}
                             </Text>
                         </View>
 
@@ -134,13 +134,13 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         {/* Impact Analysis */}
                         <View style={styles.impactSection}>
                             <View style={styles.impactRow}>
-                                <Text style={styles.impactLabel}>💵 Cash Raised</Text>
+                                <Text style={styles.impactLabel}>{t('equity.cashRaisedLabel')}</Text>
                                 <Text style={[styles.impactValue, { color: '#FFFFFF' }]}>
                                     +{formatMoney(capitalRaised)}
                                 </Text>
                             </View>
                             <View style={styles.impactRow}>
-                                <Text style={styles.impactLabel}>👤 Your Ownership</Text>
+                                <Text style={styles.impactLabel}>{t('equity.yourOwnershipLabel')}</Text>
                                 <Text style={[
                                     styles.impactValue,
                                     { color: newOwnership < 50 ? '#FF8A8A' : '#FF8A8A' }
@@ -156,7 +156,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                             <View style={styles.stockWarningContent}>
                                 <Text style={styles.stockWarningTitle}>{t('equity.stockPriceImpact')}</Text>
                                 <Text style={styles.stockWarningText}>
-                                    Est. Price Drop: <Text style={{ color: theme.colors.textPrimary, fontWeight: '700' }}>
+                                    {t('equity.estPriceDrop')} <Text style={{ color: theme.colors.textPrimary, fontWeight: '700' }}>
                                         -{(predictedDrop * 100).toFixed(1)}%
                                     </Text>
                                 </Text>
@@ -167,7 +167,7 @@ const DilutionModal = ({ visible, onClose }: Props) => {
                         {/* Critical Warning */}
                         {newOwnership < 50 && (
                             <View style={styles.criticalBox}>
-                                <Text style={styles.criticalText}>⚠️ You will lose majority control</Text>
+                                <Text style={styles.criticalText}>{t('equity.willLoseMajority')}</Text>
                             </View>
                         )}
 

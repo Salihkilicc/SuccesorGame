@@ -59,7 +59,7 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose, asScreen }) 
     const handleConfirm = () => {
         const res = injectCapital(amount);
         if (res.success) onClose();
-        else setPanel({ title: 'Error', summary: res.msg, confirmLabel: 'OK', tone: 'danger' });
+        else setPanel({ title: t('ui.error'), summary: res.msg, confirmLabel: t('ui.ok'), tone: 'danger' });
     };
 
     return (
@@ -141,7 +141,7 @@ const CapitalInjectionModal: React.FC<Props> = ({ visible, onClose, asScreen }) 
                         pressed && canAfford && styles.confirmPressed,
                     ]}>
                     <Text style={[styles.confirmText, !canAfford && styles.confirmTextOff]}>
-                        {canAfford ? `${t('finance.confirm')} · ${formatMoney(amount)}` : 'Nothing to inject'}
+                        {canAfford ? `${t('finance.confirm')} · ${formatMoney(amount)}` : t('finance.nothingToInject')}
                     </Text>
                 </Pressable>
 

@@ -240,7 +240,7 @@ const PortfolioCard = ({
           styles.seeInvestmentsButton,
           pressed && styles.seeInvestmentsButtonPressed
         ]}>
-        <Text style={styles.seeInvestmentsButtonText}>👁️ See Investments</Text>
+        <Text style={styles.seeInvestmentsButtonText}>{t('market.seeInvestments')}</Text>
       </Pressable>
       {investmentsValue > 0 && (
         <Pressable

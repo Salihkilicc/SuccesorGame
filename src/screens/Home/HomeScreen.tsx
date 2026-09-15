@@ -811,7 +811,7 @@ const HomeScreen = () => {
                   label={t('home.notifications')}
                   onPress={() => setNotificationsEnabled(prev => !prev)}
                   rightNode={
-                    <Text style={styles.drawerMeta}>{notificationsEnabled ? 'On' : 'Off'}</Text>
+                    <Text style={styles.drawerMeta}>{notificationsEnabled ? t('ui.on') : t('ui.off')}</Text>
                   }
                 />
                 <DrawerItem

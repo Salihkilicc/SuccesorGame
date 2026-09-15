@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { t } from '../../core/i18n';
 import { theme } from '../../core/theme'; // Tema yolunu projene göre kontrol et
 import { formatNumber } from '../../core/utils';
 
@@ -64,7 +65,7 @@ export const PercentageSelector = ({
             </View>
             <View style={styles.barLabels}>
                 <Text style={styles.limitText}>{min}</Text>
-                <Text style={styles.limitText}>{percentage.toFixed(0)}% Capacity</Text>
+                <Text style={styles.limitText}>{t('ui.percentCapacity', { percent: percentage.toFixed(0) })}</Text>
                 <Text style={styles.limitText}>{max}</Text>
             </View>
 
