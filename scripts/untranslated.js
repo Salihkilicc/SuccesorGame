@@ -491,6 +491,48 @@ for (const file of walk(SRC)) {
         }
     }
 
+    // ------------------------------------------------------------------
+    //  6. THE SAME NAMES AS OBJECT KEYS
+    // ------------------------------------------------------------------
+    //  ComposeOfferScreen keeps four subject lines and four bands in plain
+    //  const objects at the top of the file:
+    //
+    //      const BANDS = [{ id: 'locked', title: 'Letters only', note: '...' }]
+    //
+    //  Every one of those is on the screen. None of them is a prop, a Text
+    //  child or an Alert argument, so five rules walked past them.
+    //
+    //  Keyed on the same words the prop rule uses, which is what keeps this
+    //  narrow: a file is full of object literals and almost all of them are
+    //  ids, colours and icon names. `title:` and `note:` are not.
+    //
+    //  ---------------------------------------------------------------------
+    //  AND ONLY IN `.tsx`, WHICH IS A MEASUREMENT RATHER THAN A PREFERENCE
+    //  ---------------------------------------------------------------------
+    //  Run across `.ts` as well this reported 742 across 101 files, and the
+    //  extra 564 are not screens. They are CATALOGUES:
+    //
+    //      marketData.ts        114   company descriptions and perks
+    //      educationData.ts      53   degree names
+    //      jobsData.ts           47   partner job titles
+    //
+    //  That is a real body of untranslated content and it is a different one,
+    //  with its own route: this repo already keeps catalogue copy in
+    //  data/i18n and tests it in catalogueText.test.ts. Folding it in here
+    //  would turn a list somebody can finish into a number nobody looks at,
+    //  which is the failure mode this file's own header warns about.
+    //
+    //  So the screens are the screens, and the catalogues get counted
+    //  separately when somebody decides to do them.
+    // ---------------------------------------------------------------------
+    for (const m of (/\.tsx$/.test(file) ? clean : '').matchAll(
+        /\b(title|label|note|description|subtitle|summary|placeholder|hint|message):\s*(['"`])((?:\\.|(?!\2).)*)\2/g,
+    )) {
+        const quoteAt = m.index + m[0].indexOf(m[2]);
+        if (/\bt\($/.test(clean.slice(Math.max(0, quoteAt - 2), quoteAt))) continue;
+        if (isSentence(m[3])) report(m[1])(quoteAt, m[3]);
+    }
+
     lines.forEach((line, i) => {
         if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;
         if (allowed(lines, i)) return;

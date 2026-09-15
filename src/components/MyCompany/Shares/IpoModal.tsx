@@ -147,14 +147,14 @@ const IpoModal = ({ visible, onClose }: Props) => {
                             <>
                                 <Text style={styles.title}>{t('alert.notReadyToList')}</Text>
                                 <Text style={styles.subtitle}>
-                                    Underwriters will not take a company public at this valuation.
+                                    {t('ipo.notReadyBody')}
                                 </Text>
                                 <Figures rows={[
-                                    { label: 'They need', value: formatMoney(IPO_MIN_VALUATION) },
-                                    { label: 'You are at', value: formatMoney(companyValue), strong: true },
+                                    { label: t('ipo.theyNeed'), value: formatMoney(IPO_MIN_VALUATION) },
+                                    { label: t('ipo.youAreAt'), value: formatMoney(companyValue), strong: true },
                                 ]} />
                                 <Text style={styles.note}>
-                                    Grow revenue and profit first. The multiple follows.
+                                    {t('ipo.growFirst')}
                                 </Text>
                                 <Pressable style={styles.primary} onPress={close}>
                                     <Text style={styles.primaryText}>{t('ui.understood')}</Text>
@@ -169,35 +169,38 @@ const IpoModal = ({ visible, onClose }: Props) => {
                             <>
                                 <Text style={styles.title}>{t('alert.launchIpo')}</Text>
                                 <Text style={styles.subtitle}>
-                                    {`Selling ${Math.round(FLOAT * 100)}% of the company to public investors.`}
+                                    {t('ipo.sellingPercent', { percent: Math.round(FLOAT * 100) })}
                                 </Text>
 
                                 <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
                                     <Figures rows={[
-                                        { label: 'Fair value per share', value: formatPrice(quote.fairPrice) },
+                                        { label: t('ipo.fairValuePerShare'), value: formatPrice(quote.fairPrice) },
                                         {
-                                            label: `Offer price (${Math.round(IPO_DISCOUNT * 100)}% under)`,
+                                            label: t('ipo.offerPriceUnder', { percent: Math.round(IPO_DISCOUNT * 100) }),
                                             value: formatPrice(quote.offerPrice),
                                         },
-                                        { label: 'Gross proceeds', value: formatMoney(quote.grossProceeds) },
+                                        { label: t('ipo.grossProceeds'), value: formatMoney(quote.grossProceeds) },
                                         {
-                                            label: 'Underwriting fee',
+                                            label: t('ipo.underwritingFee'),
                                             value: `-${formatMoney(quote.underwritingFee)}`,
                                             negative: true,
                                         },
                                         {
-                                            label: 'Net to the company',
+                                            label: t('ipo.netToCompany'),
                                             value: formatMoney(quote.netProceeds),
                                             strong: true,
                                         },
                                         {
-                                            label: 'Your ownership',
-                                            value: `${(ownership ?? 0).toFixed(1)}% to ${quote.playerOwnershipAfter.toFixed(1)}%`,
+                                            label: t('ipo.yourOwnership'),
+                                            value: t('ipo.ownershipFromTo', {
+                                                from: (ownership ?? 0).toFixed(1),
+                                                to: quote.playerOwnershipAfter.toFixed(1),
+                                            }),
                                         },
                                     ]} />
 
                                     <Text style={styles.note}>
-                                        {`Shares are priced below fair value on purpose so the book fills. That ${formatMoney(quote.moneyLeftOnTable)} is the cost of listing.\n\nOnce public your multiples rise, and the market reprices you every quarter.`}
+                                        {t('ipo.discountNote', { amount: formatMoney(quote.moneyLeftOnTable) })}
                                     </Text>
 
                                     {!!failure && (
@@ -230,20 +233,19 @@ const IpoModal = ({ visible, onClose }: Props) => {
                             <>
                                 <Text style={styles.title}>{t('alert.ipoComplete')}</Text>
                                 <Text style={styles.subtitle}>
-                                    You are a public company. Every quarter is a scorecard now.
+                                    {t('ipo.doneBody')}
                                 </Text>
                                 <Figures rows={[
-                                    { label: 'Raised', value: formatMoney(done.raised) },
-                                    { label: 'Fees', value: `-${formatMoney(done.fee)}`, negative: true },
+                                    { label: t('ipo.raised'), value: formatMoney(done.raised) },
+                                    { label: t('ipo.fees'), value: `-${formatMoney(done.fee)}`, negative: true },
                                     {
-                                        label: 'Your ownership',
+                                        label: t('ipo.yourOwnership'),
                                         value: `${done.ownershipAfter.toFixed(1)}%`,
                                         strong: true,
                                     },
                                 ]} />
                                 <Text style={styles.note}>
-                                    The register is public from today. So is every figure you
-                                    were previously the only person to see.
+                                    {t('ipo.registerPublicNote')}
                                 </Text>
                                 <Pressable style={styles.primary} onPress={close}>
                                     <Text style={styles.primaryText}>DONE</Text>

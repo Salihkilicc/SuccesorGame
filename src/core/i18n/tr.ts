@@ -288,6 +288,47 @@ export const tr: Record<string, string> = {
     'company.equity': 'Hisse & Sahiplik',
     // Bolum kartlarinin alt satirlari. Sablon dizesi olarak yazilmislardi,
     // yani ekrandaydilar ama taramanin gormedigi yerde.
+    // Halka arz modali
+    'ipo.notReadyBody': 'Aracı kurumlar bu değerlemeyle bir şirketi halka açmaz.',
+    'ipo.theyNeed': 'İstedikleri',
+    'ipo.youAreAt': 'Senin değerin',
+    'ipo.growFirst': 'Önce geliri ve kârı büyüt. Çarpan arkasından gelir.',
+    'ipo.sellingPercent': 'Şirketin %{percent} kadarı halka satılıyor.',
+    'ipo.fairValuePerShare': 'Hisse başına gerçek değer',
+    'ipo.offerPriceUnder': 'Arz fiyatı (%{percent} altında)',
+    'ipo.grossProceeds': 'Brüt hasılat',
+    'ipo.underwritingFee': 'Aracılık komisyonu',
+    'ipo.netToCompany': 'Şirkete net kalan',
+    'ipo.yourOwnership': 'Sahipliğin',
+    'ipo.ownershipFromTo': '%{from} → %{to}',
+    'ipo.discountNote':
+        'Hisseler talep defteri dolsun diye bilerek gerçek değerin altında fiyatlanır. O {amount} borsaya açılmanın bedeli.\n\nHalka açıldıktan sonra çarpanların yükselir ve piyasa seni her çeyrek yeniden fiyatlar.',
+    'ipo.doneBody': 'Artık halka açık bir şirketsin. Bundan sonra her çeyrek bir karne.',
+    'ipo.raised': 'Toplanan',
+    'ipo.fees': 'Komisyonlar',
+    'ipo.registerPublicNote':
+        'Pay defteri bugünden itibaren herkese açık. Daha önce yalnızca senin gördüğün her rakam da öyle.',
+
+    // Yonetim kurulu uyesiyle pazarlik
+    'member.wantsSomething': '{name} bir şey istiyor',
+    'member.theyWantYouTo': 'Senden istedikleri',
+    'member.youPromisedTo': 'Söz verdiğin şey',
+    'member.energyCost': '{amount} Enerji',
+    'member.offerRejected': 'Teklif reddedildi',
+    'member.offerTooLow': 'Teklif çok düşük',
+    'member.willNotSellForThat': '{name} bu fiyata satmaz.',
+    'member.youOffered': 'Teklifin',
+    'member.theyWant': 'İstedikleri',
+    'member.offerQuestion': '{amount} teklif edilsin mi?',
+    'member.askingFor': '{name}, şirketin %{percent} kadarı için {amount} istiyor.',
+    'member.youPay': 'Ödeyeceğin',
+    'member.sharesAcquired': 'Alınan hisse',
+    'member.stakeAfter': 'Sonraki payın',
+    'member.certain': 'Kesin',
+    'member.theyAccept': 'Kabul ederler mi',
+    'member.notThisQuarter': 'Bu çeyrek olmaz',
+    'member.sharesTransferred': 'Devredilen hisse',
+
     // Teklif mektubu
     'offer.waitingOn': '{names} bekleniyor.',
     'offer.riskMedium': 'Orta',
@@ -1247,6 +1288,22 @@ export const tr: Record<string, string> = {
     'ui.marketValue': 'Piyasa Değeri',
     'ui.max': 'Maks',
     'ui.needed': 'Gerekli',
+    // ------------------------------------------------------------------
+    //  ORTAK ETIKETLER
+    // ------------------------------------------------------------------
+    //  Tarama JSX'in icini gormeye baslayinca ayni kelimeler on ayri
+    //  modalda ayri ayri yaziliyor cikti: Cost, You have, Price, Off.
+    //  Her birine ayri anahtar acmak, bir gun birinin "Bedel" digerinin
+    //  "Maliyet" demesi demek. Tek yerde.
+    // ------------------------------------------------------------------
+    'ui.cost': 'Maliyet',
+    'ui.youHave': 'Sende',
+    'ui.price': 'Fiyat',
+    'ui.off': 'Kapalı',
+    'ui.on': 'Açık',
+    'ui.buildTime': 'İnşa süresi',
+    'ui.relativeSize': 'Göreli büyüklük',
+    'ui.yourValuation': 'Senin değerin',
     'ui.memberSince2024': '2024\'Ten beri üye',
     'ui.min': 'Min',
     'ui.morale': 'Moral',

@@ -292,6 +292,47 @@ export const en: Record<string, string> = {
     'company.equity': 'Equity',
     // The subtitles on the department cards. They were template strings, so
     // they were on screen in a place the sweep did not look.
+    // The IPO modal
+    'ipo.notReadyBody': 'Underwriters will not take a company public at this valuation.',
+    'ipo.theyNeed': 'They need',
+    'ipo.youAreAt': 'You are at',
+    'ipo.growFirst': 'Grow revenue and profit first. The multiple follows.',
+    'ipo.sellingPercent': 'Selling {percent}% of the company to public investors.',
+    'ipo.fairValuePerShare': 'Fair value per share',
+    'ipo.offerPriceUnder': 'Offer price ({percent}% under)',
+    'ipo.grossProceeds': 'Gross proceeds',
+    'ipo.underwritingFee': 'Underwriting fee',
+    'ipo.netToCompany': 'Net to the company',
+    'ipo.yourOwnership': 'Your ownership',
+    'ipo.ownershipFromTo': '{from}% to {to}%',
+    'ipo.discountNote':
+        'Shares are priced below fair value on purpose so the book fills. That {amount} is the cost of listing.\n\nOnce public your multiples rise, and the market reprices you every quarter.',
+    'ipo.doneBody': 'You are a public company. Every quarter is a scorecard now.',
+    'ipo.raised': 'Raised',
+    'ipo.fees': 'Fees',
+    'ipo.registerPublicNote':
+        'The register is public from today. So is every figure you were previously the only person to see.',
+
+    // Negotiating with a board member
+    'member.wantsSomething': '{name} wants something',
+    'member.theyWantYouTo': 'They want you to',
+    'member.youPromisedTo': 'You promised to',
+    'member.energyCost': '{amount} Energy',
+    'member.offerRejected': 'Offer rejected',
+    'member.offerTooLow': 'Offer too low',
+    'member.willNotSellForThat': '{name} will not sell for that.',
+    'member.youOffered': 'You offered',
+    'member.theyWant': 'They want',
+    'member.offerQuestion': 'Offer {amount}?',
+    'member.askingFor': '{name} is asking {amount} for {percent}% of the company.',
+    'member.youPay': 'You pay',
+    'member.sharesAcquired': 'Shares acquired',
+    'member.stakeAfter': 'Your stake after',
+    'member.certain': 'Certain',
+    'member.theyAccept': 'They accept',
+    'member.notThisQuarter': 'Not this quarter',
+    'member.sharesTransferred': 'Shares transferred',
+
     // The offer letter
     'offer.waitingOn': 'Waiting on {names}.',
     'offer.riskMedium': 'Medium',
@@ -1244,6 +1285,22 @@ export const en: Record<string, string> = {
     'ui.manageShareholdersEquity': 'Manage shareholders & equity',
     'ui.marketValue': 'Market Value',
     'ui.needed': 'Needed',
+    // ------------------------------------------------------------------
+    //  THE SHARED LABELS
+    // ------------------------------------------------------------------
+    //  Once the sweep could see inside JSX it turned out the same words
+    //  were written out separately in ten different modals: Cost, You
+    //  have, Price, Off. A key each is how one screen ends up saying
+    //  Maliyet and the next one Bedel. One place.
+    // ------------------------------------------------------------------
+    'ui.cost': 'Cost',
+    'ui.youHave': 'You have',
+    'ui.price': 'Price',
+    'ui.off': 'Off',
+    'ui.on': 'On',
+    'ui.buildTime': 'Build time',
+    'ui.relativeSize': 'Relative size',
+    'ui.yourValuation': 'Your valuation',
     'ui.max': 'Max',
     'ui.memberSince2024': 'MEMBER SINCE 2024',
     'ui.min': 'Min',

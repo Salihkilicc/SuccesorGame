@@ -259,7 +259,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         };
         const res = lobby(member.id, proposal);
         if (!res.success) {
-            setPanel({ title: t('board.noCommitment'), summary: res.message, confirmLabel: 'OK', tone: 'danger' });
+            setPanel({ title: t('board.noCommitment'), summary: res.message, confirmLabel: t('ui.ok'), tone: 'danger' });
             return;
         }
         if (!res.demands) {
@@ -274,9 +274,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             reduce_debt: 'bring the debt down',
         };
         setPanel({
-            title: `${member.name} wants something`,
+            title: t('member.wantsSomething', { name: member.name }),
             summary: res.message,
-            lines: [{ label: 'They want you to', value: labels[res.demands], strong: true }],
+            lines: [{ label: t('member.theyWantYouTo'), value: labels[res.demands], strong: true }],
             note: t('board.breakPromise'),
             confirmLabel: t('board.giveMyWord'),
             onConfirm: () => {
@@ -297,7 +297,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             setPanel({
                 title: t('alert.insufficientFunds'),
                 summary: t('mem.needForGift', { v1: formatMoney(GIFT_COST) }),
-                confirmLabel: 'OK',
+                confirmLabel: t('ui.ok'),
             });
             return;
         }
@@ -353,7 +353,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                     summary: r.success
                         ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
                         : r.message,
-                    confirmLabel: 'OK',
+                    confirmLabel: t('ui.ok'),
                     tone: r.success ? 'default' : 'danger',
                 });
             },
@@ -388,7 +388,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                     summary: r.success
                         ? t('mem.relationshipUp', { v1: member.name, v2: String(r.delta) })
                         : r.message,
-                    confirmLabel: 'OK',
+                    confirmLabel: t('ui.ok'),
                     tone: r.success ? 'default' : 'danger',
                 });
             },
@@ -492,7 +492,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         //          setPanel({
         //              title: t('alert.insufficientFunds'),
         //              summary: t('mem.needForOffer', { v1: formatMoney(offerPrice) }),
-        //              confirmLabel: 'OK',
+        //              confirmLabel: t('ui.ok'),
         //          });
         //          return;
         //      }
@@ -505,7 +505,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             setPanel({
                 title: t('alert.insufficientFunds'),
                 summary: affordability.reason || t('mem.needForOffer', { v1: formatMoney(offerPrice) }),
-                confirmLabel: 'OK',
+                confirmLabel: t('ui.ok'),
             });
             return;
         }
@@ -517,16 +517,16 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
             setPanel({
                 title: t('alert.error'),
                 summary: t('alert.unableToCalculateBuyoutPrice'),
-                confirmLabel: 'OK',
+                confirmLabel: t('ui.ok'),
             });
             return;
         }
 
         if (!buyoutResult.canSell) {
             setPanel({
-                title: 'Offer rejected',
+                title: t('member.offerRejected'),
                 summary: buyoutResult.refusalReason || `${member.name} refuses to sell their shares.`,
-                confirmLabel: 'OK',
+                confirmLabel: t('ui.ok'),
                 tone: 'danger',
             });
             return;
@@ -546,11 +546,11 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
 
         if (offerPrice < requiredPrice) {
             setPanel({
-                title: 'Offer too low',
-                summary: `${member.name} will not sell for that.`,
+                title: t('member.offerTooLow'),
+                summary: t('member.willNotSellForThat', { name: member.name }),
                 lines: [
-                    { label: 'You offered', value: formatMoney(offerPrice) },
-                    { label: 'They want', value: formatMoney(requiredPrice), strong: true },
+                    { label: t('member.youOffered'), value: formatMoney(offerPrice) },
+                    { label: t('member.theyWant'), value: formatMoney(requiredPrice), strong: true },
                 ],
                 // ----------------------------------------------------------
                 //  WHY THE ASK IS ABOVE THE TICKER
@@ -566,7 +566,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                         v2: formatMoney(buyoutResult.basePrice),
                     })
                     : undefined,
-                confirmLabel: 'OK',
+                confirmLabel: t('ui.ok'),
                 tone: 'danger',
             });
             return;
@@ -587,13 +587,13 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
         const chance = acceptanceChance(offerPrice, requiredPrice);
 
         setPanel({
-            title: `Offer ${formatMoney(offerPrice)}?`,
-            summary: `${member.name} is asking ${formatMoney(requiredPrice)} for ${memberPercent.toFixed(1)}% of the company.`,
+            title: t('member.offerQuestion', { amount: formatMoney(offerPrice) }),
+            summary: t('member.askingFor', { name: member.name, amount: formatMoney(requiredPrice), percent: memberPercent.toFixed(1) }),
             lines: [
-                { label: 'You pay', value: formatMoney(offerPrice) },
-                { label: 'Shares acquired', value: `${memberPercent.toFixed(1)}%` },
-                { label: 'Your stake after', value: `${(memberPercent + playerPercent).toFixed(1)}%`, strong: true },
-                { label: 'They accept', value: chance >= 1 ? 'Certain' : `${Math.round(chance * 100)}%` },
+                { label: t('member.youPay'), value: formatMoney(offerPrice) },
+                { label: t('member.sharesAcquired'), value: `${memberPercent.toFixed(1)}%` },
+                { label: t('member.stakeAfter'), value: `${(memberPercent + playerPercent).toFixed(1)}%`, strong: true },
+                { label: t('member.theyAccept'), value: chance >= 1 ? t('member.certain') : `${Math.round(chance * 100)}%` },
             ],
             confirmLabel: t('equity.completePurchase'),
             onConfirm: () => {
@@ -611,9 +611,9 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
 
                 if (!r.success) {
                     setPanel({
-                        title: 'Not this quarter',
+                        title: t('member.notThisQuarter'),
                         summary: r.message,
-                        confirmLabel: 'OK',
+                        confirmLabel: t('ui.ok'),
                         tone: 'danger',
                     });
                     return;
@@ -631,8 +631,8 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                 setPanel({
                     title: t('mem.purchaseComplete'),
                     summary: t('mem.purchaseCompleteBody', { v1: memberPercent.toFixed(1) }),
-                    lines: [{ label: 'Shares transferred', value: formatNumber(r.sharesBought) }],
-                    confirmLabel: 'OK',
+                    lines: [{ label: t('member.sharesTransferred'), value: formatNumber(r.sharesBought) }],
+                    confirmLabel: t('ui.ok'),
                     onConfirm: undefined,
                 });
             },
@@ -864,7 +864,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                     color={theme.colors.warning} style={{ marginRight: 6 }}
                                 />
                                 <Text style={styles.promiseNote}>
-                                    You promised to {pr.description}
+                                    {t('member.youPromisedTo')} {pr.description}
                                 </Text>
                             </View>
                         ))}
@@ -921,7 +921,7 @@ const MemberInteractionModal = ({ visible, onClose, memberId, asScreen }: Props)
                                     <MaterialCommunityIcons name="silverware-fork-knife" size={24} color={theme.colors.highlight} />
                                 </View>
                                 <Text style={styles.actionTitle}>{t('equity.privateDinner')}</Text>
-                                <Text style={styles.actionCost}>20 Energy</Text>
+                                <Text style={styles.actionCost}>{t('member.energyCost', { amount: 20 })}</Text>
                                 <Text style={[styles.actionEffect, { color: dinnerPreview >= 0 ? '#CFD0D2' : '#FF8A8A' }]}>
                                     {fmtDelta(dinnerPreview)}
                                 </Text>

@@ -102,8 +102,25 @@ describe('the listing modal', () => {
     });
 
     it('and shows the two costs an IPO screen usually hides', () => {
-        expect(code).toMatch(/Underwriting fee/);
+        // ------------------------------------------------------------------
+        //  THE KEY, NOT THE ENGLISH
+        // ------------------------------------------------------------------
+        //  This read `/Underwriting fee/` and went red the day the modal was
+        //  translated, which is the same mistake the untranslated sweep was
+        //  making: it pinned the WORD rather than the claim. The claim is that
+        //  this screen names the fee and the discount instead of quietly
+        //  netting them off, and that survives being said in Turkish.
+        // ------------------------------------------------------------------
+        expect(code).toMatch(/t\('ipo\.underwritingFee'\)/);
         expect(code).toMatch(/moneyLeftOnTable/);
+
+        // And the words themselves still exist, in both catalogues, which is
+        // where checking the wording belongs.
+        for (const lang of ['tr', 'en']) {
+            const dict = read(`core/i18n/${lang}.ts`);
+            expect(dict).toMatch(/'ipo\.underwritingFee':/);
+            expect(dict).toMatch(/'ipo\.discountNote':/);
+        }
     });
 
     it('and a refusal keeps the offer on screen rather than closing it', () => {
