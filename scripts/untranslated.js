@@ -461,6 +461,36 @@ for (const file of walk(SRC)) {
     //    button words that live inside an expression.
     scanTextElements(clean, report('Text'));
 
+    // ------------------------------------------------------------------
+    //  5. THE NAMING PROPS AGAIN, WHEN THE VALUE IS AN EXPRESSION
+    // ------------------------------------------------------------------
+    //  Rule 2 reads `summary="Available"`. It does not read this:
+    //
+    //      summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : ''}
+    //
+    //  Same prop, same screen, same two words, and a quote character is the
+    //  whole difference. I found that one by eye while translating the file
+    //  around it, which is the way this project keeps finding things and the
+    //  reason the sweep exists.
+    // ------------------------------------------------------------------
+    for (const m of clean.matchAll(
+        /\b(title|label|summary|placeholder|note|description|confirmLabel|cancelLabel|unit|softLimitLabel|subtitle)=\{/g,
+    )) {
+        const open = m.index + m[0].length - 1;
+        let d = 0, q = null, end = open;
+        for (; end < clean.length; end++) {
+            const c = clean[end], prev = clean[end - 1];
+            if (q) { if (c === q && prev !== '\\') q = null; continue; }
+            if (c === '"' || c === "'" || c === '`') { q = c; continue; }
+            if (c === '{') d++;
+            else if (c === '}') { d--; if (d === 0) break; }
+        }
+        const expr = clean.slice(open, end + 1);
+        for (const [where, text] of literals(expr)) {
+            if (isSentence(text)) report(m[1])(open + where, text);
+        }
+    }
+
     lines.forEach((line, i) => {
         if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;
         if (allowed(lines, i)) return;

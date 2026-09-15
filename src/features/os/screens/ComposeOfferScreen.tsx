@@ -176,7 +176,7 @@ const ComposeOfferScreen = () => {
                 {waiting.length > 0 && (
                     <View style={styles.waitingCard}>
                         <Text style={styles.waitingText}>
-                            Waiting on {waiting.map(o => o.targetName).join(', ')}.
+                            {t('offer.waitingOn', { names: waiting.map(o => o.targetName).join(', ') })}
                         </Text>
                     </View>
                 )}
@@ -191,7 +191,10 @@ const ComposeOfferScreen = () => {
                         <View style={{ flex: 1 }}>
                             <Text style={styles.rowTitle}>{target.name}</Text>
                             <Text style={styles.rowNote}>
-                                {formatMoney(target.marketCap)} · {target.risk ?? 'Medium'} risk
+                                {t('offer.marketCapAndRisk', {
+                                    cap: formatMoney(target.marketCap),
+                                    risk: target.risk ?? t('offer.riskMedium'),
+                                })}
                             </Text>
                         </View>
                         <Text style={styles.change}>{t('ui.change')}</Text>
@@ -212,26 +215,29 @@ const ComposeOfferScreen = () => {
                                 </Text>
                             </Pressable>
 
-                            {open && items.map(t => {
-                                const shut = !!closedForever[t.id];
+                            {open && items.map(co => {
+                                const shut = !!closedForever[co.id];
                                 const pending = offers.some(
-                                    o => o.targetId === t.id && o.status !== 'closed');
+                                    o => o.targetId === co.id && o.status !== 'closed');
                                 return (
                                     <Pressable
-                                        key={t.id}
+                                        key={co.id}
                                         disabled={shut || pending}
-                                        onPress={() => setTargetId(t.id)}
+                                        onPress={() => setTargetId(co.id)}
                                         style={[
                                             styles.row,
                                             styles.rowInBand,
                                             (shut || pending) && styles.rowDisabled,
                                         ]}>
                                         <View style={{ flex: 1 }}>
-                                            <Text style={styles.rowTitle}>{t.name}</Text>
+                                            <Text style={styles.rowTitle}>{co.name}</Text>
                                             <Text style={styles.rowNote}>
-                                                {formatMoney(t.marketCap)} · {t.risk ?? 'Medium'} risk
-                                                {shut ? ' · they asked you not to write again' : ''}
-                                                {pending && !shut ? ' · awaiting their reply' : ''}
+                                                {t('offer.marketCapAndRisk', {
+                                                    cap: formatMoney(co.marketCap),
+                                                    risk: co.risk ?? t('offer.riskMedium'),
+                                                })}
+                                                {shut ? t('offer.askedNotToWrite') : ''}
+                                                {pending && !shut ? t('offer.awaitingReply') : ''}
                                             </Text>
                                         </View>
                                     </Pressable>
@@ -264,13 +270,12 @@ const ComposeOfferScreen = () => {
                     onPress={onSend}
                     style={[styles.send, !target && styles.sendDisabled]}>
                     <Text style={[styles.sendText, !target && styles.sendTextDisabled]}>
-                        {target ? `Send to ${target.name}` : 'Choose a company'}
+                        {target ? t('offer.sendTo', { name: target.name }) : t('offer.chooseCompany')}
                     </Text>
                 </Pressable>
 
                 <Text style={styles.footnote}>
-                    No price goes in this letter. You are asking whether they will talk, and
-                    what they want is theirs to say.
+                    {t('offer.footnote')}
                 </Text>
             </ScrollView>
         </View>

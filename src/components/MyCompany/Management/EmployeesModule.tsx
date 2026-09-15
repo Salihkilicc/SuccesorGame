@@ -159,7 +159,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                                     }]}>
                                         ×{efficiency.toFixed(2)}
                                     </Text>
-                                    <Text style={styles.sub}>scrap ×{scrap.toFixed(2)}</Text>
+                                    <Text style={styles.sub}>{t('emp.scrapTimes', { multiplier: scrap.toFixed(2) })}</Text>
                                 </View>
                             </View>
 
@@ -199,19 +199,20 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                     </View>
 
                     <Text style={styles.line}>
-                        {formatMoney(perPerson)} per person · {formatNumber(employeeCount)} people ·{' '}
-                        <Text style={styles.strong}>{formatMoney(wageBill)}</Text> per quarter
+                        {t('emp.wageLine', {
+                            perPerson: formatMoney(perPerson),
+                            count: formatNumber(employeeCount),
+                            total: formatMoney(wageBill),
+                        })}
                     </Text>
 
                     {salaryRatio < 0.95 ? (
                         <Text style={styles.warn}>
-                            Below market. Morale is heading for {target.toFixed(0)}, people leave faster,
-                            and defects go up. You are saving cash and paying for it in output.
+                            {t('emp.belowMarket', { target: target.toFixed(0) })}
                         </Text>
                     ) : salaryRatio > 1.15 ? (
                         <Text style={styles.warn}>
-                            Past the point where pay still buys morale. The ceiling money can reach is 85 —
-                            the rest has to come from events, bonuses and the company actually doing well.
+                            {t('emp.pastTheCeiling')}
                         </Text>
                     ) : (
                         <Text style={styles.ok}>{t('company.aroundMarketMoraleSettlesNear', { v1: target.toFixed(0) })}</Text>
@@ -271,11 +272,14 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                 <CollapsibleSection
                     title={t('ui.bonus')}
                     note={t('ui.shareLastQuarterSProfit')}
-                    summary={bonusDistributed ? 'Paid' : canBonus ? 'Available' : ', '}
+                    // Found by eye rather than by the sweep: a prop whose value
+                    // is an EXPRESSION, so the rule that reads `summary="..."`
+                    // walks straight past it. Noted in scripts/untranslated.js.
+                    summary={bonusDistributed ? t('emp.paid') : canBonus ? t('emp.available') : ''}
                     summaryColor={canBonus ? theme.colors.up : theme.colors.down}
                 >
                     <Text style={styles.line}>
-                        5% of last quarter's profit: {formatMoney(bonusCost)}
+                        {t('emp.profitShareLabel')} {formatMoney(bonusCost)}
                     </Text>
                     <Pressable
                         disabled={!canBonus}
@@ -284,10 +288,10 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                     >
                         <Text style={styles.primaryText}>
                             {bonusDistributed
-                                ? 'Already paid this quarter'
+                                ? t('emp.alreadyPaid')
                                 : lastQuarterProfit <= 0
-                                    ? 'No profit to share'
-                                    : `Distribute ${formatMoney(bonusCost)}`}
+                                    ? t('emp.noProfit')
+                                    : t('emp.distribute', { amount: formatMoney(bonusCost) })}
                         </Text>
                     </Pressable>
                 </CollapsibleSection>
@@ -300,8 +304,7 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
                             <InfoDot title={t('ui.overtime2')} text={WORKFORCE_EXPLANATIONS.overtime} />
                         </View>
                         <Text style={styles.sub}>
-                            Runs to {Math.round(OVERTIME_MAX_RATIO * 100)}% of capacity · wages ×1.5 ·
-                            morale −3 every quarter it stays on
+                            {t('emp.overtimeLine', { percent: Math.round(OVERTIME_MAX_RATIO * 100) })}
                         </Text>
                     </View>
                     {/* An unstyled Switch is iOS green when it is on. Green is
@@ -325,8 +328,8 @@ const EmployeesModule = ({ visible, onClose, asScreen }: Props) => {
 
                 {avgTenure > 0 && (
                     <Text style={styles.note}>
-                        Average tenure {avgTenure.toFixed(1)} quarters — experienced teams produce more,
-                        but every hiring wave dilutes it.
+                        {t('emp.averageTenure')}{' '}
+                        {t('emp.tenureNote', { count: avgTenure.toFixed(1) })}
                     </Text>
                 )}
             </ScrollView>

@@ -49,14 +49,14 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                     <View style={[styles.content, styles.resultContent, result === 'success' ? styles.successBorder : styles.failBorder]}>
                         <Text style={styles.resultEmoji}>{result === 'success' ? '✅' : '❌'}</Text>
                         <Text style={styles.resultTitle}>
-                            {result === 'success' ? 'Deal Reached!' : 'Offer Rejected!'}
+                            {result === 'success' ? t('nego.dealReached') : t('nego.offerRejected')}
                         </Text>
                         <Text style={styles.resultMessage}>
                             {result === 'success'
-                                ? "Share transfer completed."
+                                ? t('nego.transferDone')
                                 : transactionType === 'buy'
-                                    ? "They didn't like your price."
-                                    : "They were a bit offended by your rejection."}
+                                    ? t('nego.didNotLikePrice')
+                                    : t('nego.offendedByRejection')}
                         </Text>
                         <Pressable style={styles.closeBtn} onPress={handleClose}>
                             <Text style={styles.closeBtnText}>{t('equity.close')}</Text>
@@ -112,9 +112,9 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                         ) : (
                             <View style={styles.npcOfferCard}>
                                 <Text style={styles.npcOfferLabel}>{t('equity.theirOfferMarket20')}</Text>
-                                <Text style={styles.npcOfferValue}>{formatPrice(npcOfferPrice)} <Text style={styles.perShare}>/share</Text></Text>
+                                <Text style={styles.npcOfferValue}>{formatPrice(npcOfferPrice)} <Text style={styles.perShare}>{t('nego.perShare')}</Text></Text>
                                 <Text style={styles.npcOfferContext}>
-                                    "I'm offering {formatPrice(npcOfferPrice)} per share for your lots. Take it or leave it."
+                                    {t('nego.theirLine', { price: formatPrice(npcOfferPrice) })}
                                 </Text>
                             </View>
                         )}
@@ -136,7 +136,7 @@ const ShareNegotiationModal = ({ visible, shareholder, onClose }: Props) => {
                                 style={[styles.mainBtn, transactionType === 'sell' ? styles.acceptBtn : styles.submitBtn]}
                                 onPress={handleAction}>
                                 <Text style={styles.mainBtnText}>
-                                    {transactionType === 'buy' ? 'Submit Offer' : 'Accept & Sell'}
+                                    {transactionType === 'buy' ? t('nego.submitOffer') : t('nego.acceptAndSell')}
                                 </Text>
                             </Pressable>
                         </View>

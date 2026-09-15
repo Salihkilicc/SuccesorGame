@@ -37,9 +37,7 @@ const SponsorDroughtWarningModal = ({ visible, quartersWithout, currentPenalty, 
 
                     <Text style={styles.title}>{t('spon.ceilingEroding')}</Text>
                     <Text style={styles.subtitle}>
-                        Your name has been on nothing for{' '}
-                        <Text style={styles.accentWarn}>{quartersWithout} quarters</Text>
-                        {' '}— {overBy} past the grace period.
+                        {t('spon.nameOnNothing', { quarters: quartersWithout, over: overBy })}
                     </Text>
 
                     <View style={styles.statBox}>
@@ -55,24 +53,24 @@ const SponsorDroughtWarningModal = ({ visible, quartersWithout, currentPenalty, 
                         <View style={styles.statDivider} />
                         <View style={styles.statRow}>
                             <Text style={styles.statLabel}>
-                                {penaltyCapped ? 'Ceiling penalty (capped)' : 'Quarters until cap'}
+                                {penaltyCapped ? t('spon.ceilingPenaltyCapped') : t('spon.quartersUntilCap')}
                             </Text>
                             <Text style={styles.statValueWarn}>
-                                {penaltyCapped ? `${DROUGHT_PENALTY_CAP} pts MAX` : quartersUntilCap}
+                                {penaltyCapped ? t('spon.ptsMax', { points: DROUGHT_PENALTY_CAP }) : quartersUntilCap}
                             </Text>
                         </View>
                     </View>
 
                     <Text style={styles.body}>
-                        Sponsorships move the{' '}
-                        <Text style={styles.accentBrand}>equilibrium</Text>
-                        {' '}your brand is walking towards. A drought lowers the{' '}
-                        <Text style={styles.accentWarn}>ceiling</Text>
-                        {' '}— and unlike a scandal, it grows quietly every quarter.
+                        {t('spon.bodyPart1')}{' '}
+                        <Text style={styles.accentBrand}>{t('spon.bodyEquilibrium')}</Text>
+                        {' '}{t('spon.bodyPart2')}{' '}
+                        <Text style={styles.accentWarn}>{t('spon.bodyCeiling')}</Text>
+                        {' '}{t('spon.bodyPart3')}
                     </Text>
                     {!penaltyCapped && (
                         <Text style={styles.bodySmall}>
-                            Check your mail — a sponsorship offer may already be waiting.
+                            {t('spon.checkYourMail')}
                         </Text>
                     )}
 

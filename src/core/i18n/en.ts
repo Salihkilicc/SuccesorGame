@@ -292,6 +292,78 @@ export const en: Record<string, string> = {
     'company.equity': 'Equity',
     // The subtitles on the department cards. They were template strings, so
     // they were on screen in a place the sweep did not look.
+    // The offer letter
+    'offer.waitingOn': 'Waiting on {names}.',
+    'offer.riskMedium': 'Medium',
+    'offer.marketCapAndRisk': '{cap} · {risk} risk',
+    'offer.askedNotToWrite': ' · they asked you not to write again',
+    'offer.awaitingReply': ' · awaiting their reply',
+    'offer.sendTo': 'Send to {name}',
+    'offer.chooseCompany': 'Choose a company',
+    'offer.footnote':
+        'No price goes in this letter. You are asking whether they will talk, and what they want is theirs to say.',
+
+    // Share negotiation
+    'nego.dealReached': 'Deal Reached',
+    'nego.offerRejected': 'Offer Rejected',
+    'nego.transferDone': 'Share transfer completed.',
+    'nego.didNotLikePrice': 'They did not like your price.',
+    'nego.offendedByRejection': 'They were a bit offended by your rejection.',
+    'nego.perShare': '/share',
+    'nego.theirLine': '"I am offering {price} per share for your lots. Take it or leave it."',
+    'nego.submitOffer': 'Submit Offer',
+    'nego.acceptAndSell': 'Accept and Sell',
+
+    // The sponsorship drought
+    'spon.nameOnNothing': 'Your name has been on nothing for {quarters} quarters, {over} past the grace period.',
+    'spon.quartersUnit': '{count} quarters',
+    'spon.ceilingPenaltyCapped': 'Ceiling penalty (capped)',
+    'spon.quartersUntilCap': 'Quarters until cap',
+    'spon.ptsMax': '{points} pts MAX',
+    'spon.bodyPart1': 'Sponsorships move the',
+    'spon.bodyEquilibrium': 'equilibrium',
+    'spon.bodyPart2': 'your brand is walking towards. A drought lowers the',
+    'spon.bodyCeiling': 'ceiling',
+    'spon.bodyPart3': 'and unlike a scandal, it grows quietly every quarter.',
+    'spon.checkYourMail': 'Check your mail, a sponsorship offer may already be waiting.',
+
+    // The shark deal
+    'shark.maxLoanNote':
+        'He will go up to {amount}, 30% of what your company is worth. Beyond that even he thinks you are a bad bet.',
+    'shark.ratePerYear': '30% a year',
+    'shark.quartersPlain': '{count} quarters',
+    'shark.quartersTitled': '{count} Quarters',
+    'shark.collateralShares': '{amount} of your shares',
+    'shark.seizureClause': 'of your personal shares equivalent to the debt value',
+    'shark.penalty': '+ 50% penalty',
+    'shark.riskTitle': '⚡ RISK FACTORS',
+    'shark.risk1': '• No grace period or extensions',
+    'shark.risk2': '• Seizure is automatic and irreversible',
+    'shark.risk3': '• Stock price fluctuations affect the seizure amount',
+    'shark.risk4': '• May trigger hostile takeover scenarios',
+    'shark.signButton': '⚠️ SIGN AGREEMENT',
+    'shark.disclaimer':
+        'By signing, you acknowledge understanding of all terms and accept full responsibility for the consequences of default.',
+
+    // The employees panel
+    'emp.scrapTimes': 'scrap ×{multiplier}',
+    'emp.wageLine': '{perPerson} per person · {count} people · {total} per quarter',
+    'emp.belowMarket':
+        'Below market. Morale is heading for {target}, people leave faster, and defects go up. You are saving cash and paying for it in output.',
+    'emp.pastTheCeiling':
+        'Past the point where pay still buys morale. The ceiling money can reach is 85, and the rest has to come from events, bonuses and the company actually doing well.',
+    'emp.profitShareLabel': "5% of last quarter's profit:",
+    'emp.paid': 'Paid',
+    'emp.available': 'Available',
+    'emp.alreadyPaid': 'Already paid this quarter',
+    'emp.noProfit': 'No profit to share',
+    'emp.distribute': 'Distribute {amount}',
+    'emp.overtimeLine':
+        'Runs to {percent}% of capacity · wages ×1.5 · morale down 3 every quarter it stays on',
+    'emp.averageTenure': 'Average tenure',
+    'emp.tenureNote':
+        '{count} quarters. Experienced teams produce more, but every hiring wave dilutes it.',
+
     // The product screens. All of these were spread across a <Text> element.
     'product.marketDataHidden': '??? Market Data Hidden ???',
     'product.categoryAndLevel': '{category} · Lvl {level}',

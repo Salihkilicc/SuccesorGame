@@ -288,6 +288,78 @@ export const tr: Record<string, string> = {
     'company.equity': 'Hisse & Sahiplik',
     // Bolum kartlarinin alt satirlari. Sablon dizesi olarak yazilmislardi,
     // yani ekrandaydilar ama taramanin gormedigi yerde.
+    // Teklif mektubu
+    'offer.waitingOn': '{names} bekleniyor.',
+    'offer.riskMedium': 'Orta',
+    'offer.marketCapAndRisk': '{cap} · {risk} risk',
+    'offer.askedNotToWrite': ' · bir daha yazmamanı istediler',
+    'offer.awaitingReply': ' · cevaplarını bekliyorsun',
+    'offer.sendTo': '{name} şirketine gönder',
+    'offer.chooseCompany': 'Bir şirket seç',
+    'offer.footnote':
+        'Bu mektuba fiyat yazılmaz. Konuşup konuşmayacaklarını soruyorsun, ne istedikleri onların söyleyeceği şey.',
+
+    // Hisse pazarligi
+    'nego.dealReached': 'Anlaşma Sağlandı',
+    'nego.offerRejected': 'Teklif Reddedildi',
+    'nego.transferDone': 'Hisse devri tamamlandı.',
+    'nego.didNotLikePrice': 'Fiyatını beğenmediler.',
+    'nego.offendedByRejection': 'Reddetmen onları biraz gücendirdi.',
+    'nego.perShare': '/hisse',
+    'nego.theirLine': '"Lotların için hisse başına {price} veriyorum. Ya alırsın ya bırakırsın."',
+    'nego.submitOffer': 'Teklif Ver',
+    'nego.acceptAndSell': 'Kabul Et ve Sat',
+
+    // Sponsorluk kurakligi
+    'spon.nameOnNothing': 'Adın {quarters} çeyrektir hiçbir şeyin üstünde değil, yani hoşgörü süresini {over} aştın.',
+    'spon.quartersUnit': '{count} çeyrek',
+    'spon.ceilingPenaltyCapped': 'Tavan cezası (sınırda)',
+    'spon.quartersUntilCap': 'Sınıra kaç çeyrek kaldı',
+    'spon.ptsMax': '{points} puan MAKS',
+    'spon.bodyPart1': 'Sponsorluklar markanın yürüdüğü',
+    'spon.bodyEquilibrium': 'dengeyi',
+    'spon.bodyPart2': 'değiştirir. Kuraklık ise',
+    'spon.bodyCeiling': 'tavanı',
+    'spon.bodyPart3': 'düşürür, ve skandalın aksine her çeyrek sessizce büyür.',
+    'spon.checkYourMail': 'Postana bak, bir sponsorluk teklifi çoktan bekliyor olabilir.',
+
+    // Tefeci anlasmasi
+    'shark.maxLoanNote':
+        'En fazla {amount} veriyor, yani şirketinin değerinin %30\'u. Ötesinde onun bile gözünde kötü bir bahis olursun.',
+    'shark.ratePerYear': 'yılda %30',
+    'shark.quartersPlain': '{count} çeyrek',
+    'shark.quartersTitled': '{count} Çeyrek',
+    'shark.collateralShares': 'hisselerinden {amount}',
+    'shark.seizureClause': 'kişisel hisselerinden borç değeri kadarı',
+    'shark.penalty': '+ %50 ceza',
+    'shark.riskTitle': '⚡ RİSK BAŞLIKLARI',
+    'shark.risk1': '• Ek süre yok, erteleme yok',
+    'shark.risk2': '• El koyma otomatik ve geri dönüşü yok',
+    'shark.risk3': '• Hisse fiyatı oynarsa el konulan miktar da oynar',
+    'shark.risk4': '• Düşmanca devralma senaryolarını tetikleyebilir',
+    'shark.signButton': '⚠️ SÖZLEŞMEYİ İMZALA',
+    'shark.disclaimer':
+        'İmzalayarak bütün şartları anladığını ve ödeyememenin sonuçlarının sorumluluğunu tamamen üstlendiğini kabul ediyorsun.',
+
+    // Calisanlar paneli
+    'emp.scrapTimes': 'fire ×{multiplier}',
+    'emp.wageLine': 'kişi başı {perPerson} · {count} kişi · çeyrekte {total}',
+    'emp.belowMarket':
+        'Piyasanın altında. Moral {target} seviyesine gidiyor, insanlar daha hızlı ayrılıyor ve hatalar artıyor. Nakit biriktiriyorsun ve bedelini üretimden ödüyorsun.',
+    'emp.pastTheCeiling':
+        'Paranın morali aldığı noktayı geçtin. Paranın ulaşabileceği tavan 85, gerisi olaylardan, primlerden ve şirketin gerçekten iyi gitmesinden gelir.',
+    'emp.profitShareLabel': 'Geçen çeyreğin kârının %5\'i:',
+    'emp.paid': 'Ödendi',
+    'emp.available': 'Hazır',
+    'emp.alreadyPaid': 'Bu çeyrek zaten ödendi',
+    'emp.noProfit': 'Paylaşılacak kâr yok',
+    'emp.distribute': '{amount} dağıt',
+    'emp.overtimeLine':
+        'Kapasitenin %{percent} kadarıyla çalışır · maaşlar ×1.5 · açık kaldığı her çeyrek moral 3 düşer',
+    'emp.averageTenure': 'Ortalama kıdem',
+    'emp.tenureNote':
+        '{count} çeyrek. Deneyimli ekipler daha çok üretir, ama her işe alım dalgası bunu seyreltir.',
+
     // Urun ekranlari. Hepsi <Text> etiketinin icinde yayilmis duruyordu.
     'product.marketDataHidden': '??? Pazar Verisi Gizli ???',
     'product.categoryAndLevel': '{category} · Sv {level}',

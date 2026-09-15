@@ -189,8 +189,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                         ))}
                     </View>
                     <Text style={styles.amountNote}>
-                        He will go up to {formatMoney(maxLoan)} — 30% of what your company is worth.
-                        Beyond that even he thinks you are a bad bet.
+                        {t('shark.maxLoanNote', { amount: formatMoney(maxLoan) })}
                     </Text>
                 </View>
 
@@ -198,11 +197,11 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                 <View style={styles.termsCard}>
                     <View style={styles.termRow}>
                         <Text style={styles.termLabel}>{t('finance.rate')}</Text>
-                        <Text style={styles.termBad}>30% a year</Text>
+                        <Text style={styles.termBad}>{t('shark.ratePerYear')}</Text>
                     </View>
                     <View style={styles.termRow}>
                         <Text style={styles.termLabel}>{t('finance.dueIn')}</Text>
-                        <Text style={styles.termValue}>{DEADLINE_QUARTERS} quarters</Text>
+                        <Text style={styles.termValue}>{t('shark.quartersPlain', { count: DEADLINE_QUARTERS })}</Text>
                     </View>
                     <View style={styles.termRow}>
                         <Text style={styles.termLabel}>{t('finance.totalToRepay')}</Text>
@@ -210,7 +209,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                     </View>
                     <View style={styles.termRow}>
                         <Text style={styles.termLabel}>{t('finance.collateral')}</Text>
-                        <Text style={styles.termBad}>{formatMoney(collateralValue)} of your shares</Text>
+                        <Text style={styles.termBad}>{t('shark.collateralShares', { amount: formatMoney(collateralValue) })}</Text>
                     </View>
                 </View>
                 {/* Lender Info */}
@@ -258,7 +257,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
 
                     <View style={styles.dealRow}>
                         <Text style={styles.dealLabel}>{t('finance.deadline')}</Text>
-                        <Text style={styles.dealDeadline}>{DEADLINE_QUARTERS} Quarters</Text>
+                        <Text style={styles.dealDeadline}>{t('shark.quartersTitled', { count: DEADLINE_QUARTERS })}</Text>
                     </View>
 
                     <View style={styles.dealRow}>
@@ -273,20 +272,19 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                         <MaterialCommunityIcons name="alert-octagon-outline" size={20} color={theme.colors.warning} style={{ marginRight: 6 }} />
                         <Text style={styles.warningHeaderText}>{t('finance.collateralClause')}</Text>
                     </View>
-                    <Text style={styles.warningText}>{t('finance.failureToRepayByThe', { v1: ' ' })}<Text style={styles.warningTextBold}>{t('fin.immediateSeizure')}</Text> of your personal shares
-                        equivalent to the debt value{' '}
-                        <Text style={styles.warningTextBold}>+ 50% penalty</Text>.
+                    <Text style={styles.warningText}>{t('finance.failureToRepayByThe', { v1: ' ' })}<Text style={styles.warningTextBold}>{t('fin.immediateSeizure')}</Text> {t('shark.seizureClause')}{' '}
+                        <Text style={styles.warningTextBold}>{t('shark.penalty')}</Text>.
                     </Text>
                     <Text style={styles.warningSubtext}>{t('finance.thisMayResultInPermanent')}</Text>
                 </View>
 
                 {/* Additional Warnings */}
                 <View style={styles.riskBox}>
-                    <Text style={styles.riskTitle}>⚡ RISK FACTORS</Text>
-                    <Text style={styles.riskItem}>• No grace period or extensions</Text>
-                    <Text style={styles.riskItem}>• Seizure is automatic and irreversible</Text>
-                    <Text style={styles.riskItem}>• Stock price fluctuations affect seizure amount</Text>
-                    <Text style={styles.riskItem}>• May trigger hostile takeover scenarios</Text>
+                    <Text style={styles.riskTitle}>{t('shark.riskTitle')}</Text>
+                    <Text style={styles.riskItem}>{t('shark.risk1')}</Text>
+                    <Text style={styles.riskItem}>{t('shark.risk2')}</Text>
+                    <Text style={styles.riskItem}>{t('shark.risk3')}</Text>
+                    <Text style={styles.riskItem}>{t('shark.risk4')}</Text>
                 </View>
 
                 {/* Buttons */}
@@ -308,15 +306,12 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                         ]}
                         onPress={handleSignAgreement}
                     >
-                        <Text style={styles.signButtonText}>⚠️ SIGN AGREEMENT</Text>
+                        <Text style={styles.signButtonText}>{t('shark.signButton')}</Text>
                     </Pressable>
                 </View>
 
                 {/* Legal Disclaimer */}
-                <Text style={styles.disclaimer}>
-                    By signing, you acknowledge understanding of all terms and accept full responsibility
-                    for consequences of default.
-                </Text>
+                <Text style={styles.disclaimer}>{t('shark.disclaimer')}</Text>
             </ScrollView>
         
             <ConfirmPanel
