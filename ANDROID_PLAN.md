@@ -359,11 +359,14 @@ zorunlu hale getiriyor.
 Hepsini bir anda çevirme. Önce `style: 'destructive'` olan 36'sı, çünkü
 kaybolan tek bilgi orada.
 
-### 3.4 letterSpacing
+### 3.4 letterSpacing — cihazda bakıldı, şikâyet gelmedi
 
-458 yer. İki platformda ölçüm farkı var, en görünür olduğu yer bu projedeki
-büyük harfli küçük etiketler. Cihazda bakılacak, toplu düzeltilecek bir şey
-değil.
+458 yer, sayı doğru. Ama bu fazın kapanma ölçütü baştan "cihazda bakılacak"
+idi ve bakıldı: uygulama Android'de elli küsur ekran boyunca gezildi,
+ekran görüntüleri geldi, harf aralığıyla ilgili tek bir rapor gelmedi.
+
+Bir şeyin yanlış göründüğünü kimse söylemiyorsa 458 yere dokunmak
+düzeltme değil, risk. **Kapalı.** Geri açan şey bir rapor olur, sayı değil.
 
 ### 3.5 Blur
 
@@ -373,8 +376,33 @@ bir zemin fallback'i gerekiyor.
 
 ### 3.6 Modal ve tutorial'ın iOS varsayımı
 
-61 dosyada Modal var, 7 yerde `presentationStyle`/`pageSheet` gibi iOS'a özel
-proplar.
+#### iOS'a özel proplar: ölçüldü, sorun değil
+
+7 yerde `presentationStyle` var. Android bu prop'u yok sayıyor, yani o
+modallar sayfa yaprağı yerine tam ekran açılıyor. Bunun bir de tehlikeli
+hali var ve o yok: RN, `transparent` ile `presentationStyle` birlikte
+verilirse uyarı basıp davranışı bozuyor. **Yedisinde de `transparent` yok.**
+
+Üstelik yedinin beşi kapalı bayrakların ya da rafa kaldırılmış LuxoNet'in
+içinde. Erişilebilir olan tek bir tane: `FamilyMemberDetailModal`, ve o da
+Android'de tam ekran açılıyor. Kozmetik.
+
+#### Asıl mesele: modal penceresi durum çubuğunun altına inmiyordu
+
+Plan bunu görmemişti ve cihazdan rapor geldi: çeyrek raporunun üstünde
+keskin kenarlı gri bir dikdörtgen, arkasında uygulamanın moru.
+
+Android'de `Modal` **kendi penceresini** açıyor, ve o pencere söylenmediği
+sürece durum çubuğunun altına inmiyor. Karartma orada bitiyor, üstünde
+uygulamanın kendisi kalıyor. Keskin kenar, pencere sınırı.
+
+Bunu söyleyen prop `statusBarTranslucent` ve **64 modalın 6'sında** vardı.
+Şimdi hepsinde, `navigationBarTranslucent` ile birlikte. 57 modal.
+
+#### Tutorial'ın iki adımlı ürün dersi
+
+Hâlâ cihazda bakılacak bir soru, ve şu ana kadar Android'de tutorial'ın
+bozulduğuna dair rapor gelmedi. Açık bırakıldı, tahminle kapatılmadı.
 
 Daha önemlisi: tutorial'ın ürün dersini iki adıma bölme kararı tamamen bir iOS
 davranışına dayanıyor. `sequence.ts` içinde yazıyor: "iOS'ta Modal React

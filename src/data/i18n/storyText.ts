@@ -1427,7 +1427,7 @@ export const STORY_TR: StoryDictionary = {
     'pear-bought-heir/sendIt#0': '(kapat)',
     'pear-bought/@subject': 'Kapanış, ref 7724-B',
     'pear-bought/open': 'Devir işlemi bu sabah saat dokuzda tamamlandı. Evraklar tertemizdi, zaten çoğunu benim adamlarım hazırladığı için aksini beklemezdim.\n\nBu konuda alicenap davranacak değilim. Çok fazla ödediniz ve çok fazla ödediğinizi siz de biliyorsunuz. Bu işler böyle yapılır. Bizzat ben de yaptım.',
-    'pear-bought/open#0': 'Edirini ödedim.',
+    'pear-bought/open#0': 'Ederini ödedim.',
     'pear-bought/open#1': 'Daha fazlasını da öderdim.',
     'pear-bought/paidMore': 'İnanırım. Fiyatlamadığım kısım tam olarak buydu; bunu öğrenmek için de önümde on dokuz yıl vardı.\n\nOn birinci katta 1997\'den kalma, sırtında babanızın adı yazan bir dosya var. Dün gece tekrar okudum. Ona karşı dört milyonla yanılmışız.\n\nAynı aile hakkında rakam konusunda iki kez yanılmış oldum.',
     'pear-bought/paidMore#0': 'Bunu bana neden anlatıyorsunuz?',

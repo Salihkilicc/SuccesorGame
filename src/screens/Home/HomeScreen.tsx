@@ -37,7 +37,7 @@ import { startNewQuarter } from '../../features/life/components/Sanctuary/store/
 // import { useShareholderStore } from '../../features/shareholders/stores/useShareholderStore';
 // import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
-import { startNewGameAsking } from '../../core/newGamePrompt';
+import { startNewGameAsking, confirmNewGame } from '../../core/newGamePrompt';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import Portrait from '../../components/common/Portrait';
 import { portraitFor } from '../../core/portraits';
@@ -836,18 +836,37 @@ const HomeScreen = () => {
                   rightNode={<Text style={styles.drawerMeta}>{t('home.reset')}</Text>}
                   onPress={() => {
                     setDrawerOpen(false);
-                    Alert.alert(
-                      t('newgame.title'),
-                      t('newgame.eraseWarning'),
-                      [
-                        { text: t('home.cancel'), style: 'cancel' },
-                        {
-                          text: t('home.reset'),
-                          style: 'destructive',
-                          onPress: () => { void handleRestart(); },
-                        },
-                      ],
-                    );
+                    // ------------------------------------------------------
+                    //  THE SAME WARNING SETTINGS ALREADY STOPPED RAISING
+                    // ------------------------------------------------------
+                    //  SHELVED: an `Alert.alert` with a destructive button,
+                    //  fired before `handleRestart`:
+                    //
+                    //      Alert.alert(t('newgame.title'),
+                    //                  t('newgame.eraseWarning'), [
+                    //        { text: t('home.cancel'), style: 'cancel' },
+                    //        { text: t('home.reset'), style: 'destructive',
+                    //          onPress: () => { void handleRestart(); } },
+                    //      ]);
+                    //
+                    //  Settings had exactly this and it was taken out, with
+                    //  the reason written down: two dialogs in one flow, and
+                    //  the ugly one goes first. `newGamePrompt.test.ts` even
+                    //  checks that Settings no longer does it. It checked one
+                    //  of the two doors.
+                    //
+                    //  And on Android it is worse than ugly. `style:
+                    //  'destructive'` is an iOS word: Alert.js never reads it
+                    //  on Android, so the most destructive action in the game
+                    //  was offered in a system dialog with two identical grey
+                    //  buttons.
+                    //
+                    //  `confirmNewGame` is the themed panel that both doors
+                    //  should have been using. See core/newGamePrompt.ts.
+                    // ------------------------------------------------------
+                    void (async () => {
+                      if (await confirmNewGame()) await handleRestart();
+                    })();
                   }}
                 />
               </View>

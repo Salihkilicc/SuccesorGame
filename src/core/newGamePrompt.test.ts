@@ -289,9 +289,37 @@ describe('the destructive step', () => {
         // Confirming that progress will be erased is noise when the run is
         // already over. Deliberate, and worth pinning so a later tidy does not
         // "make them consistent".
+        //
+        // ------------------------------------------------------------------
+        //  THE CALL SITE, NOT THE FILE
+        // ------------------------------------------------------------------
+        //  This said `expect(home).not.toMatch(/confirmNewGame/)`, which was
+        //  true for the wrong reason: HomeScreen has TWO ways to start over,
+        //  and the other one - New Game in the drawer, pressed while a run is
+        //  alive - was raising its own Alert.alert with a destructive button.
+        //  So the file did not mention the themed confirm, and the assertion
+        //  read that as the game over card being right rather than as the
+        //  drawer being wrong.
+        //
+        //  A file-wide `not.toMatch` cannot tell two call sites apart. These
+        //  look at the handlers.
+        // ------------------------------------------------------------------
         const home = code('../screens/Home/HomeScreen.tsx');
         expect(home).toMatch(/startNewGameAsking\(\)/);
-        expect(home).not.toMatch(/confirmNewGame/);
+
+        // The ending overlay goes straight there, with nothing in between.
+        // (The old game over card had its own button and is shelved in a
+        // comment, which `code()` strips - so only the live door counts.)
+        expect(home).toMatch(/onNewGame=\{handleRestart\}/);
+
+        // And the drawer, which erases a LIVE save, confirms first.
+        expect(home).toMatch(/if \(await confirmNewGame\(\)\) await handleRestart\(\);/);
+
+        // Whichever door, the raw system dialog is gone: `style:
+        // 'destructive'` is an iOS word that Android never reads, so that
+        // warning had two identical grey buttons on the device it was
+        // reported from.
+        expect(home).not.toMatch(/newgame\.eraseWarning/);
     });
 
     it('and its words exist in both catalogues, with no dashes', () => {
