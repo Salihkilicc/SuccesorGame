@@ -286,6 +286,30 @@ export const tr: Record<string, string> = {
     'company.factoryOverhead': 'Tesis Gideri',
     'company.finance': 'Finans',
     'company.equity': 'Hisse & Sahiplik',
+    // Bolum kartlarinin alt satirlari. Sablon dizesi olarak yazilmislardi,
+    // yani ekrandaydilar ama taramanin gormedigi yerde.
+    // Urun ekranlari. Hepsi <Text> etiketinin icinde yayilmis duruyordu.
+    'product.marketDataHidden': '??? Pazar Verisi Gizli ???',
+    'product.categoryAndLevel': '{category} · Sv {level}',
+    'product.levelArrow': 'Sv {from} → {to}',
+    'product.marketSizeLine': '{units} birim · çeyrekte {money}',
+    'product.standardUnits': '{count} standart birim',
+    'product.capacityNote':
+        'Her ürün, kapasitenin birimi başına aşağı yukarı aynı geliri getirir. Ucuz bir hoparlör hattın çok azını kullanır, endüstriyel bir kol çok fazlasını. Kazancını asıl belirleyen hangi kategoride olduğun: aynı pay, dolar olarak daha büyük bir pazarda çok daha değerli. Teknoloji ağacında yükselmenin küçük bir ürünü optimize etmekten önemli olmasının sebebi bu.',
+    'product.perQtr': '{money}/çyr',
+    'product.partnerMeta': '×{multiplier} maliyet · kalite ≤{ceiling}',
+    'product.partnerLocked': '{name} için {need} marka gerekiyor (sende {have} var)',
+    'product.unitsPerQuarterStep': 'birim / çeyrek (±{step})',
+    'product.perUnit': '{money} / birim',
+    'product.plusSetup': ' + {money} kurulum',
+    'product.percentOfYourUnits': 'birimlerinin %{percent} kadarı',
+    'product.alertsCount': 'Uyarılar · {count}',
+    'product.noAlerts': 'Uyarı yok',
+
+    'company.debtSub': 'Borç: {v1}',
+    'company.activeSub': '{v1} aktif',
+    'company.rpSub': '{v1} RP',
+    'company.ownedSub': '%{v1} senin',
     'company.financing': 'Finansman',
     'company.financialReport': 'Finansal Rapor',
     'company.fixedCosts': 'Sabit Giderler',
@@ -913,6 +937,18 @@ export const tr: Record<string, string> = {
     'onb.companyName': 'Şirket adı',
     'onb.namePlaceholder': 'Ahmet',
     'onb.companyPlaceholder': 'Kuzeyrüzgarı Sanayi',
+    'onb.kickerIdentity': 'Başlamadan önce',
+    'onb.kickerCompany': 'Yeni bir şirket',
+    'onb.titleIdentity': 'Sen kimsin?',
+    'onb.titleCompany': 'Adını ne koyacaksın?',
+    'onb.ledeIdentity':
+        'Adını sonra Profil ekranından değiştirebilirsin. Şirket adı ise her yeniden başlayışta tekrar sorulur.',
+    'onb.ledeCompany':
+        'Adın sende kalıyor. Bu sefer kuracağın şirket bu.',
+    'onb.familyNote':
+        'Babanın adı, ve şirketin adı. O kısım senin seçimin değil.',
+    'onb.male': 'Erkek',
+    'onb.female': 'Kadın',
     'fin.paidOn': 'Ödeme günü',
     'fin.ownLine2': 'kendi hattı',
     'fin.earnedThisQ': 'bu çeyrek kazanılan',
@@ -1138,6 +1174,7 @@ export const tr: Record<string, string> = {
     'ui.manageShareholdersEquity': 'Hissedarları ve özkaynağı yönet',
     'ui.marketValue': 'Piyasa Değeri',
     'ui.max': 'Maks',
+    'ui.needed': 'Gerekli',
     'ui.memberSince2024': '2024\'Ten beri üye',
     'ui.min': 'Min',
     'ui.morale': 'Moral',
@@ -1870,6 +1907,33 @@ export const tr: Record<string, string> = {
     'fac.upgradeTo': '{v1} kademesine yükselt?',
     'fac.needMoreCash': '{v1} daha gerekiyor',
     'fac.needMoreRp': '{v1} RP daha gerekiyor',
+    // Tesis ve laboratuvar paneli. Bunlar ekrandaydi ama <Text> etiketinin
+    // icine yayilmis oldugu icin tarama gormuyordu.
+    'fac.capacityAndCrew': '{units} birim · kadro {have}/{max}',
+    'fac.quartersLeftRunningAt': '{quarters} çeyrek kaldı · o zamana kadar %{percent} kapasite',
+    'fac.peopleHired': '{count} kişi alındı',
+    'fac.upgradeCostLine': '{cost} peşin · {quarters} çeyrek inşaat · inşaat boyunca %{percent} kapasite',
+    'fac.rpShort': ' ({amount} eksik)',
+    'fac.rpCleared': ', tamam.',
+    'fac.nothingLeftToBuild':
+        'İnşa edecek bir şey kalmadı. Buradan sonrası ürün, fiyat ve satın almalarla büyür.',
+    'fac.noLineToWorkOn':
+        '{count} kişinin çalışacağı hat yok. Maaşlarını ödersin, hiçbir şey üretmezler. Önce tesisi büyüt.',
+    'fac.targetHeadcount': 'hedef kadro',
+    'fac.crew': 'Kadro',
+    'fac.now': 'Şu an',
+
+    // Kadro butonunun dort hali
+    'staff.confirm': 'ONAYLA',
+    'staff.arrivesInQ': 'Q{quarter} DE GELİYOR',
+    'staff.updatedInQ': 'Q{quarter} DE GÜNCELLENDİ',
+    'staff.noChange': 'DEĞİŞİKLİK YOK',
+
+    // Laboratuvar
+    'lab.researchersProduce': '{count} araştırmacı çeyrekte',
+    'lab.perQuarterAt': 'üretir, kişi başı {cost}. Çıktı 0.85 kuvvetiyle ölçeklenir, yani ekibi ikiye katlamak keşifleri ikiye katlamaz.',
+    'lab.researchersUnit': 'araştırmacı',
+
     'fac.hiringCost': '{v1} kişi almak peşin {v2} tutuyor. Gelecek çeyrek başlıyorlar.',
     'fac.layoffCost': '{v1} kişiyi çıkarmak {v2} tazminat, üstüne moral hasarı.',
     'fac.hiringCapWarn': 'Çeyrekte en fazla {v1} kişi alabilirsin. Gerisi sonraki çeyreklerde gelir, güçlü marka ve iyi moral bu tavanı yükseltir.',

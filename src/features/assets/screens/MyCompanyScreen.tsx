@@ -54,8 +54,34 @@ const DepartmentCard = ({ icon, iconColor = theme.colors.textPrimary, title, sub
     <View style={[styles.deptIconBadge, { backgroundColor: `${iconColor}18`, borderColor: `${iconColor}38` }]}>
       <MaterialCommunityIcons name={icon} size={24} color={iconColor} />
     </View>
-    <Text style={styles.deptTitle}>{title}</Text>
-    <Text style={styles.deptSub}>{subtitle}</Text>
+    {/* ------------------------------------------------------------------
+        THE FOUR CARDS ARE THE SAME HEIGHT BY CONSTRUCTION
+        ------------------------------------------------------------------
+        In Turkish the equity card ran taller than the other three, and the
+        cause was the TITLE rather than the figure under it: "Hisse &
+        Sahiplik" wraps to two lines where "Finansman", "Urunler" and
+        "Ar-Ge Yatirimi" do not, and `minHeight: 120` lets a card grow.
+
+        Tuning a font size until it happens to fit would fix it in Turkish
+        and break it in the next language, so the box is reserved instead.
+        Two lines for the title and one for the figure, always, whether the
+        words need them or not, and the text shrinks to fit rather than
+        adding a line. Nothing here depends on how long a word is.
+       ------------------------------------------------------------------ */}
+    <Text
+      style={styles.deptTitle}
+      numberOfLines={2}
+      adjustsFontSizeToFit
+      minimumFontScale={0.75}>
+      {title}
+    </Text>
+    <Text
+      style={styles.deptSub}
+      numberOfLines={1}
+      adjustsFontSizeToFit
+      minimumFontScale={0.7}>
+      {subtitle}
+    </Text>
   </Pressable>
 );
 
@@ -296,7 +322,7 @@ const MyCompanyScreen = () => {
               icon="bank-outline"
               iconColor="#4ADE80"
               title={t('company.financing')}
-              subtitle={`Debt: ${formatCurrency(stats.companyDebtTotal)}`}
+              subtitle={t('company.debtSub', { v1: formatCurrency(stats.companyDebtTotal) })}
               onPress={() => navigation.navigate('Finance')}
               info={{
                 title: t('tactic.financingTitle'),
@@ -310,7 +336,7 @@ const MyCompanyScreen = () => {
                 icon="package-variant-closed"
                 iconColor="#60A5FA"
                 title={t('company.products')}
-                subtitle={`${activeProductsCount} Active`}
+                subtitle={t('company.activeSub', { v1: activeProductsCount })}
                 onPress={() => navigation.navigate('Products')}
                 info={{
                   title: t('tactic.productsTitle'),
@@ -338,7 +364,7 @@ const MyCompanyScreen = () => {
                 icon="flask-outline"
                 iconColor="#A78BFA"
                 title={t('company.rDInvestment')}
-                subtitle={`${formatRP(totalRP)} RP`}
+                subtitle={t('company.rpSub', { v1: formatRP(totalRP) })}
                 onPress={() => navigation.navigate('Research')}
                 info={{
                   title: t('tactic.rdTitle'),
@@ -352,7 +378,7 @@ const MyCompanyScreen = () => {
               icon="chart-timeline-variant-shimmer"
               iconColor="#FBBF24"
               title={t('company.equity')}
-              subtitle={`${stats.companyOwnership.toFixed(1)}% Owned`}
+              subtitle={t('company.ownedSub', { v1: stats.companyOwnership.toFixed(1) })}
               onPress={() => navigation.navigate('StockMarket')}
               info={{
                 title: t('tactic.equityTitle'),
@@ -596,7 +622,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 4,
   },
-  deptTitle: { fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary, textAlign: 'center', letterSpacing: 0.3 },
-  deptSub: { fontSize: 12, color: 'rgba(255,255,255,0.48)', textAlign: 'center' },
+  // `height` rather than `minHeight`: the point is that a card with a short
+  // title occupies exactly as much room as one with a long title.
+  deptTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    lineHeight: 19,
+    height: 38,
+  },
+  deptSub: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.48)',
+    textAlign: 'center',
+    lineHeight: 16,
+    height: 16,
+  },
   sharePrice: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
 });

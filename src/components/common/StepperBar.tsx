@@ -27,6 +27,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { formatNumber } from '../../core/utils';
+import { t } from '../../core/i18n';
 
 export interface StepperBarMarker {
     /** Barda nerede duracagi (mutlak deger) */
@@ -122,7 +123,7 @@ const StepperBar: React.FC<Props> = ({
             {(markers.length > 0 || softLimit !== undefined) && (
                 <Text style={styles.scale}>
                     {softLimit !== undefined &&
-                        `${softLimitLabel || 'Needed'} ${formatNumber(softLimit)}`}
+                        `${softLimitLabel || t('ui.needed')} ${formatNumber(softLimit)}`}
                     {markers.map(m => `  ·  ${m.label} ${formatNumber(m.value)}`).join('')}
                 </Text>
             )}
@@ -155,7 +156,7 @@ const StepperBar: React.FC<Props> = ({
                                 onPress={() => apply(targetValue)}
                             >
                                 <Text style={[styles.pctText, active && styles.pctTextActive]}>
-                                    {p === 100 ? 'Max' : `${p}%`}
+                                    {p === 100 ? t('ui.max') : `${p}%`}
                                 </Text>
                             </Pressable>
                         );
@@ -166,7 +167,7 @@ const StepperBar: React.FC<Props> = ({
                             onPress={() => apply(softLimit)}
                         >
                             <Text style={[styles.pctText, styles.pctTextAccent]}>
-                                {softLimitLabel || 'Needed'}
+                                {softLimitLabel || t('ui.needed')}
                             </Text>
                         </Pressable>
                     )}

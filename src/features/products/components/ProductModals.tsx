@@ -99,7 +99,7 @@ export const ProductLaunchModal = ({ visible, product, onClose, onAnalyze, onLau
                         </View>
                     ) : (
                         <View style={styles.blurBox}>
-                            <Text style={styles.blurText}>??? Market Data Hidden ???</Text>
+                            <Text style={styles.blurText}>{t('product.marketDataHidden')}</Text>
                             <Text style={styles.blurSubText}>{t('product.runAnalysisToReveal')}</Text>
                         </View>
                     )}
@@ -694,7 +694,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             <ProductIconBadge productId={product.id} category={product.category} size={48} iconSize={26} />
                             <View style={{ flex: 1, marginLeft: 12 }}>
                                 <Text style={styles.bannerTitle} numberOfLines={1}>{displayName}</Text>
-                                <Text style={styles.bannerSub}>{product.category} · Lvl {qualityLevel}</Text>
+                                <Text style={styles.bannerSub}>{t('product.categoryAndLevel', { category: product.category, level: qualityLevel })}</Text>
                             </View>
                             <Pressable style={styles.diceBtn} onPress={handleRandomizeName}>
                                 <MaterialCommunityIcons name="dice-5-outline" size={20} color={theme.colors.textSecondary} />
@@ -724,7 +724,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text style={styles.heroValue}>${currentUnitCost}</Text>
                                         <Text style={{ color: theme.colors.textPrimary, fontWeight: 'bold' }}>(-2%)</Text>
                                     </View>
-                                    <Text style={styles.hint}>Lvl {processLevel} → {processLevel + 1}</Text>
+                                    <Text style={styles.hint}>{t('product.levelArrow', { from: processLevel, to: processLevel + 1 })}</Text>
                                 </View>
                                 <Pressable
                                     style={[
@@ -750,7 +750,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         <Text style={styles.heroValue}>${product.sellingPrice || product.suggestedPrice}</Text>
                                         <Text style={{ color: theme.colors.textPrimary, fontWeight: 'bold' }}>(+3%)</Text>
                                     </View>
-                                    <Text style={styles.hint}>Lvl {qualityLevel} → {qualityLevel + 1}</Text>
+                                    <Text style={styles.hint}>{t('product.levelArrow', { from: qualityLevel, to: qualityLevel + 1 })}</Text>
                                     {/* Owned but not yet buildable — queued, not lost. */}
                                     {queuedQuality > 0 && (
                                         <Text style={styles.queuedLine}>
@@ -1014,8 +1014,10 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 <View style={styles.whyRow}>
                                     <Text style={styles.whyLabel}>{t('product.categoryMarket')}</Text>
                                     <Text style={styles.whyValue}>
-                                        {formatNumber(market.sizeUnitsPerQuarter)} units ·{' '}
-                                        {formatMoney(marketDollarSize(market))} per quarter
+                                        {t('product.marketSizeLine', {
+                                            units: formatNumber(market.sizeUnitsPerQuarter),
+                                            money: formatMoney(marketDollarSize(market)),
+                                        })}
                                     </Text>
                                 </View>
                                 <View style={styles.whyRow}>
@@ -1025,7 +1027,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 <View style={styles.whyRow}>
                                     <Text style={styles.whyLabel}>{t('product.capacityPerUnit')}</Text>
                                     <Text style={styles.whyValue}>
-                                        {(complexity / 50).toFixed(2)} standard units
+                                        {t('product.standardUnits', { count: (complexity / 50).toFixed(2) })}
                                     </Text>
                                 </View>
                                 <View style={styles.whyRow}>
@@ -1035,14 +1037,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                     </Text>
                                 </View>
 
-                                <Text style={styles.whyNote}>
-                                    Every product returns roughly the same revenue per unit of capacity —
-                                    a cheap speaker uses very little of the line, an industrial arm uses a
-                                    lot. What actually decides your earnings is which category you are in:
-                                    the same share is worth far more in a category with a bigger dollar
-                                    market. That is why moving up the tech tree matters more than
-                                    optimising a small product.
-                                </Text>
+                                <Text style={styles.whyNote}>{t('product.capacityNote')}</Text>
 
                                 <View style={styles.whyTable}>
                                     {marketsByValue().map(({ market: m, dollarSize }) => (
@@ -1055,7 +1050,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         >
                                             <Text style={styles.whyTableName}>{m.category}</Text>
                                             <Text style={styles.whyTableValue}>
-                                                {formatMoney(dollarSize)}/qtr
+                                                {t('product.perQtr', { money: formatMoney(dollarSize) })}
                                             </Text>
                                         </View>
                                     ))}
@@ -1100,7 +1095,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                             {pt.name}
                                         </Text>
                                         <Text style={styles.partnerMeta}>
-                                            ×{pt.costMultiplier.toFixed(2)} cost · quality ≤{pt.qualityCeiling}
+                                            {t('product.partnerMeta', { multiplier: pt.costMultiplier.toFixed(2), ceiling: pt.qualityCeiling })}
                                         </Text>
                                     </Pressable>
                                 ))}
@@ -1114,7 +1109,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                         color={theme.colors.textMuted}
                                     />
                                     <Text style={styles.partnerLocked}>
-                                        {pt.name} — needs brand {Math.round(pt.minBrand * BRAND_INDEX_SCALE)} (you have {Math.round(brandPoints)})
+                                        {t('product.partnerLocked', { name: pt.name, need: Math.round(pt.minBrand * BRAND_INDEX_SCALE), have: Math.round(brandPoints) })}
                                     </Text>
                                 </View>
                             ))}
@@ -1228,7 +1223,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                                 {formatNumber(contractUnits)}
                                             </Text>
                                             <Text style={styles.contractUnitLabel}>
-                                                units / quarter (±{formatNumber(contractStep)})
+                                                {t('product.unitsPerQuarterStep', { step: formatNumber(contractStep) })}
                                             </Text>
                                         </View>
                                         <Pressable
@@ -1263,13 +1258,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                             <View style={styles.cmRow}>
                                                 <Text style={styles.cmLabel}>{t('product.marginInHouse')}</Text>
                                                 <Text style={styles.compareGood}>
-                                                    {formatMoney(margins.ownMargin)} / unit
+                                                    {t('product.perUnit', { money: formatMoney(margins.ownMargin) })}
                                                 </Text>
                                             </View>
                                             <View style={styles.cmRow}>
                                                 <Text style={styles.cmLabel}>{t('product.marginOutsourced')}</Text>
                                                 <Text style={styles.compareBad}>
-                                                    {formatMoney(margins.contractMargin)} / unit
+                                                    {t('product.perUnit', { money: formatMoney(margins.contractMargin) })}
                                                 </Text>
                                             </View>
                                             <View style={styles.cmRow}>
@@ -1277,13 +1272,13 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                                 <Text style={styles.cmValue}>
                                                     {formatMoney(contractQuote?.cost || 0)}
                                                     {!product.contractSetupPaid &&
-                                                        ` + ${formatMoney(chosenPartner.setupCost)} setup`}
+                                                        t('product.plusSetup', { money: formatMoney(chosenPartner.setupCost) })}
                                                 </Text>
                                             </View>
                                             <View style={styles.cmRow}>
                                                 <Text style={styles.cmLabel}>{t('product.outsourcedShare')}</Text>
                                                 <Text style={styles.cmValue}>
-                                                    {outsourcedPercent.toFixed(0)}% of your units
+                                                    {t('product.percentOfYourUnits', { percent: outsourcedPercent.toFixed(0) })}
                                                 </Text>
                                             </View>
                                         </View>
@@ -1509,7 +1504,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                             disabled={!alerts.length}
                             onPress={() => setShowAlerts(v => !v)}>
                             <Text style={[styles.alertsBtnText, !alerts.length && styles.alertsBtnTextEmpty]}>
-                                {alerts.length ? `Alerts · ${alerts.length}` : 'No alerts'}
+                                {alerts.length ? t('product.alertsCount', { count: alerts.length }) : t('product.noAlerts')}
                             </Text>
                         </Pressable>
 

@@ -290,6 +290,30 @@ export const en: Record<string, string> = {
     'company.factoryOverhead': 'Factory Overhead',
     'company.finance': 'Finance',
     'company.equity': 'Equity',
+    // The subtitles on the department cards. They were template strings, so
+    // they were on screen in a place the sweep did not look.
+    // The product screens. All of these were spread across a <Text> element.
+    'product.marketDataHidden': '??? Market Data Hidden ???',
+    'product.categoryAndLevel': '{category} · Lvl {level}',
+    'product.levelArrow': 'Lvl {from} → {to}',
+    'product.marketSizeLine': '{units} units · {money} per quarter',
+    'product.standardUnits': '{count} standard units',
+    'product.capacityNote':
+        'Every product returns roughly the same revenue per unit of capacity. A cheap speaker uses very little of the line, an industrial arm uses a lot. What actually decides your earnings is which category you are in: the same share is worth far more in a category with a bigger dollar market. That is why moving up the tech tree matters more than optimising a small product.',
+    'product.perQtr': '{money}/qtr',
+    'product.partnerMeta': '×{multiplier} cost · quality ≤{ceiling}',
+    'product.partnerLocked': '{name} needs brand {need} (you have {have})',
+    'product.unitsPerQuarterStep': 'units / quarter (±{step})',
+    'product.perUnit': '{money} / unit',
+    'product.plusSetup': ' + {money} setup',
+    'product.percentOfYourUnits': '{percent}% of your units',
+    'product.alertsCount': 'Alerts · {count}',
+    'product.noAlerts': 'No alerts',
+
+    'company.debtSub': 'Debt: {v1}',
+    'company.activeSub': '{v1} active',
+    'company.rpSub': '{v1} RP',
+    'company.ownedSub': '{v1}% owned',
     'company.financing': 'Financing',
     'company.financialReport': 'Financial Report',
     'company.fixedCosts': 'Fixed Costs',
@@ -911,6 +935,18 @@ export const en: Record<string, string> = {
     'onb.companyName': 'Company name',
     'onb.namePlaceholder': 'John',
     'onb.companyPlaceholder': 'Northwind Industries',
+    'onb.kickerIdentity': 'Before we start',
+    'onb.kickerCompany': 'A new company',
+    'onb.titleIdentity': 'Who are you?',
+    'onb.titleCompany': 'What will you call it?',
+    'onb.ledeIdentity':
+        'You can change your name later from Profile. The company name is asked again every time you start over.',
+    'onb.ledeCompany':
+        'You keep your name. This is the company you are building this time.',
+    'onb.familyNote':
+        'Your father\'s name, and the company\'s. That part is not yours to choose.',
+    'onb.male': 'Man',
+    'onb.female': 'Woman',
     'fin.paidOn': 'Paid on',
     'fin.ownLine2': 'own line',
     'fin.earnedThisQ': 'earned this quarter',
@@ -1135,6 +1171,7 @@ export const en: Record<string, string> = {
     'ui.luxuryTax80': 'Luxury Tax (8.0%):',
     'ui.manageShareholdersEquity': 'Manage shareholders & equity',
     'ui.marketValue': 'Market Value',
+    'ui.needed': 'Needed',
     'ui.max': 'Max',
     'ui.memberSince2024': 'MEMBER SINCE 2024',
     'ui.min': 'Min',
@@ -1867,6 +1904,33 @@ export const en: Record<string, string> = {
     'fac.upgradeTo': 'Upgrade to {v1}?',
     'fac.needMoreCash': 'Need {v1} more',
     'fac.needMoreRp': 'Need {v1} more RP',
+    // The facility and laboratory panels. These were on screen all along; they
+    // were spread across a <Text> element, which the sweep did not read.
+    'fac.capacityAndCrew': '{units} units · crew {have}/{max}',
+    'fac.quartersLeftRunningAt': '{quarters} quarter(s) left · running at {percent}% until then',
+    'fac.peopleHired': '{count} people hired',
+    'fac.upgradeCostLine': '{cost} up front · {quarters} quarter(s) to build · {percent}% capacity while building',
+    'fac.rpShort': ' ({amount} short)',
+    'fac.rpCleared': ', cleared.',
+    'fac.nothingLeftToBuild':
+        'There is nothing left to build. From here, growth comes from products, pricing and acquisitions.',
+    'fac.noLineToWorkOn':
+        '{count} of these people have no line to work on. You pay them; they produce nothing. Upgrade the facility first.',
+    'fac.targetHeadcount': 'target headcount',
+    'fac.crew': 'Crew',
+    'fac.now': 'Now',
+
+    // The four states of the staffing button
+    'staff.confirm': 'CONFIRM',
+    'staff.arrivesInQ': 'ARRIVES IN Q{quarter}',
+    'staff.updatedInQ': 'UPDATED IN Q{quarter}',
+    'staff.noChange': 'NO CHANGE',
+
+    // Laboratory
+    'lab.researchersProduce': '{count} researchers produce',
+    'lab.perQuarterAt': 'per quarter, at {cost} each. Output scales with the power of 0.85, so doubling the team does not double the discoveries.',
+    'lab.researchersUnit': 'researchers',
+
     'fac.hiringCost': 'Hiring {v1} costs {v2} up front. They start next quarter.',
     'fac.layoffCost': 'Letting {v1} go costs {v2} in severance, plus a morale hit.',
     'fac.hiringCapWarn': 'You can only take on about {v1} people per quarter. The rest will follow in later quarters, a stronger brand and better morale raise that ceiling.',

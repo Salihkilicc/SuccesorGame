@@ -274,12 +274,11 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                         buyuyen tavan, 1/10/100 butonlari ve KUCUK yuzde
                         kisayollari. Bkz. components/common/StepperBar.tsx */}
                     <Text style={{ color: 'rgba(255,255,255,0.48)', fontSize: 11.5, lineHeight: 16, marginBottom: 10 }}>
-                        {formatNumber(tempCount)} researchers produce{' '}
+                        {t('lab.researchersProduce', { count: formatNumber(tempCount) })}{' '}
                         <Text style={{ color: theme.colors.rp, fontWeight: '800' }}>
                             {formatRP(researchOutput(tempCount))}
                         </Text>{' '}
-                        per quarter, at {formatMoney(perResearcher)} each. Output scales with the
-                        power of 0.85 — doubling the team does not double the discoveries.
+                        {t('lab.perQuarterAt', { cost: formatMoney(perResearcher) })}
                     </Text>
 
                     {/* The control the research lesson points at. */}
@@ -291,8 +290,8 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                             if (hiredNotice) setHiredNotice(null);
                         }}
                         max={facility.capacity}
-                        unit="researchers"
-                        markers={[{ value: researcherCount, label: 'Now', color: '#FFFFFF' }]}
+                        unit={t('lab.researchersUnit')}
+                        markers={[{ value: researcherCount, label: t('fac.now'), color: '#FFFFFF' }]}
                         steps={[1, 10, 100]}
                         fillColor={canAfford ? theme.colors.rp : '#FF8A8A'}
                     />
@@ -324,12 +323,12 @@ const LaboratoryScreen = ({ onBack }: { onBack?: () => void } = {}) => {
                                 !hasChanges && !hiredNotice && styles.confirmBtnTextDisabled,
                             ]}>
                                 {hasChanges
-                                    ? 'CONFIRM'
+                                    ? t('staff.confirm')
                                     : (hiredNotice
                                         ? (hiredNotice.type === 'hired'
-                                            ? `ARRIVES IN Q${hiredNotice.quarter}`
-                                            : `UPDATED IN Q${hiredNotice.quarter}`)
-                                        : 'NO CHANGE')}
+                                            ? t('staff.arrivesInQ', { quarter: hiredNotice.quarter })
+                                            : t('staff.updatedInQ', { quarter: hiredNotice.quarter }))
+                                        : t('staff.noChange'))}
                             </Text>
                         </Pressable>
                     </View>

@@ -188,15 +188,13 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                 keyboardShouldPersistTaps="handled">
 
                 <Text style={styles.kicker}>
-                    {wantsIdentity ? 'Before we start' : 'A new company'}
+                    {wantsIdentity ? t('onb.kickerIdentity') : t('onb.kickerCompany')}
                 </Text>
                 <Text style={styles.title}>
-                    {wantsIdentity ? 'Who are you?' : 'What will you call it?'}
+                    {wantsIdentity ? t('onb.titleIdentity') : t('onb.titleCompany')}
                 </Text>
                 <Text style={styles.lede}>
-                    {wantsIdentity
-                        ? 'You can change your name later from Profile. The company name is asked again every time you start over.'
-                        : 'You keep your name. This is the company you are building this time.'}
+                    {wantsIdentity ? t('onb.ledeIdentity') : t('onb.ledeCompany')}
                 </Text>
 
                 {wantsIdentity && (
@@ -227,9 +225,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                         <View style={styles.field}>
                             <Text style={styles.fieldLabel}>{t('onb.lastName')}</Text>
                             <Text style={styles.familyName}>{FAMILY_NAME}</Text>
-                            <Text style={styles.familyNote}>
-                                Your father's name, and the company's. That part is not yours to choose.
-                            </Text>
+                            <Text style={styles.familyNote}>{t('onb.familyNote')}</Text>
                         </View>
 
                         <View style={styles.field}>
@@ -247,7 +243,7 @@ const OnboardingScreen = ({ mode, onDone }: Props) => {
                                         accessibilityRole="button"
                                         accessibilityState={{ selected: gender === g }}>
                                         <Text style={[styles.genderText, gender === g && styles.genderTextOn]}>
-                                            {g === 'male' ? 'Man' : 'Woman'}
+                                            {g === 'male' ? t('onb.male') : t('onb.female')}
                                         </Text>
                                     </Pressable>
                                 ))}

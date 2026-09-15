@@ -265,6 +265,115 @@ const topLevelArgs = (inner) => {
     return parts;
 };
 
+// ---------------------------------------------------------------------------
+//  EVERYTHING INSIDE A <Text> ELEMENT
+// ---------------------------------------------------------------------------
+//  The line-based Text rule wanted `<Text` or `</Text>` on the SAME LINE as
+//  the words, and the sentences that matter are the ones long enough to wrap:
+//
+//      <Text style={...}>
+//          {formatNumber(tempCount)} researchers produce{' '}
+//          ...
+//          power of 0.85 - doubling the team does not double the discoveries.
+//      </Text>
+//
+//  Nine lines of English on the laboratory screen, invisible to a sweep
+//  reporting zero. The same rule missed the buttons, because their words are
+//  inside an expression rather than beside the tag:
+//
+//      <Text ...>{hasChanges ? 'CONFIRM' : `ARRIVES IN Q${q}`}</Text>
+//
+//  So the unit is the ELEMENT, not the line. A <Text> exists to put words on
+//  the screen, which makes everything between its tags a candidate and makes
+//  this precise rather than broad: the attributes of the opening tag, where
+//  the styles and the icon names live, are outside it by construction.
+// ---------------------------------------------------------------------------
+
+/** Walk to the index just past the `>` that closes a tag opened at `from`. */
+const endOfTag = (s, from) => {
+    let depth = 0, q = null;
+    for (let i = from; i < s.length; i++) {
+        const c = s[i], prev = s[i - 1];
+        if (q) { if (c === q && prev !== '\\') q = null; continue; }
+        if (c === '"' || c === "'" || c === '`') { q = c; continue; }
+        if (c === '{') depth++;
+        else if (c === '}') depth--;
+        else if (c === '>' && depth === 0) return i + 1;
+    }
+    return -1;
+};
+
+const scanTextElements = (source, push) => {
+    const OPEN = /<Text(\s|>)/g;
+    let m;
+    while ((m = OPEN.exec(source)) !== null) {
+        const openEnd = endOfTag(source, m.index);
+        if (openEnd === -1) continue;
+        // `<Text ... />` renders nothing of its own.
+        if (source[openEnd - 2] === '/') continue;
+
+        // Matching `</Text>`, counting nested ones.
+        let depth = 1, i = openEnd, close = -1;
+        while (i < source.length) {
+            const nextOpen = source.indexOf('<Text', i);
+            const nextClose = source.indexOf('</Text>', i);
+            if (nextClose === -1) break;
+            if (nextOpen !== -1 && nextOpen < nextClose) {
+                const e = endOfTag(source, nextOpen);
+                if (e !== -1 && source[e - 2] !== '/') depth++;
+                i = e === -1 ? nextOpen + 5 : e;
+                continue;
+            }
+            depth--;
+            if (depth === 0) { close = nextClose; break; }
+            i = nextClose + 7;
+        }
+        if (close === -1) continue;
+
+        const inner = source.slice(openEnd, close);
+
+        // Raw text, and the literals inside `{...}`. Nested tag markup is
+        // skipped whole, so a nested <Text style={...}> contributes its words
+        // and not its styling.
+        let j = 0;
+        let raw = '', rawAt = 0;
+        const flush = () => {
+            if (isSentence(raw)) push(openEnd + rawAt, raw.trim());
+            raw = '';
+        };
+        while (j < inner.length) {
+            const c = inner[j];
+            if (c === '<') {
+                flush();
+                const e = endOfTag(inner, j);
+                j = e === -1 ? j + 1 : e;
+                continue;
+            }
+            if (c === '{') {
+                flush();
+                let d = 0, k = j, q = null;
+                for (; k < inner.length; k++) {
+                    const ch = inner[k], prev = inner[k - 1];
+                    if (q) { if (ch === q && prev !== '\\') q = null; continue; }
+                    if (ch === '"' || ch === "'" || ch === '`') { q = ch; continue; }
+                    if (ch === '{') d++;
+                    else if (ch === '}') { d--; if (d === 0) break; }
+                }
+                const expr = inner.slice(j, k + 1);
+                for (const [where, text] of literals(expr)) {
+                    if (isSentence(text)) push(openEnd + j + where, text);
+                }
+                j = k + 1;
+                continue;
+            }
+            if (!raw) rawAt = j;
+            raw += c;
+            j++;
+        }
+        flush();
+    }
+};
+
 const scanAlerts = (source, push) => {
     let at = 0;
     while ((at = source.indexOf('Alert.alert', at)) !== -1) {
@@ -338,12 +447,19 @@ for (const file of walk(SRC)) {
     const lines = source.split('\n');
     if (fileExempt(lines)) continue;
 
-    // 3. The dialogs. Whole-call rather than line by line, see scanAlerts.
-    scanAlerts(blankComments(source), (index, text) => {
+    const clean = blankComments(source);
+    const report = (kind) => (index, text) => {
         const line = source.slice(0, index).split('\n').length;
         if (allowed(lines, line - 1)) return;
-        findings.push({ rel, line, text, kind: 'Alert' });
-    });
+        findings.push({ rel, line, text, kind });
+    };
+
+    // 3. The dialogs. Whole-call rather than line by line, see scanAlerts.
+    scanAlerts(clean, report('Alert'));
+
+    // 4. Whole <Text> elements, for the sentences long enough to wrap and the
+    //    button words that live inside an expression.
+    scanTextElements(clean, report('Text'));
 
     lines.forEach((line, i) => {
         if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;

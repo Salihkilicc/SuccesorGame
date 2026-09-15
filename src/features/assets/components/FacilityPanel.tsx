@@ -214,8 +214,11 @@ const FacilityPanel: React.FC = () => {
                     </Text>
                     <Text style={styles.tierName}>{tier.name}</Text>
                     <Text style={styles.stripeMeta}>
-                        {formatNumber(capacityNow)} units · crew {formatNumber(employeeCount)}/
-                        {formatNumber(tier.crew)}
+                        {t('fac.capacityAndCrew', {
+                            units: formatNumber(capacityNow),
+                            have: formatNumber(employeeCount),
+                            max: formatNumber(tier.crew),
+                        })}
                     </Text>
                     {/* ------------------------------------------------------
                         THE SECOND BUTTON'S HEADLINE, ON THE FIRST BUTTON
@@ -347,8 +350,10 @@ const FacilityPanel: React.FC = () => {
                                     {getTier(facilityBuild.targetTier).name}
                                 </Text>
                                 <Text style={styles.queueSub}>
-                                    {facilityBuild.quartersRemaining} quarter(s) left · running at{' '}
-                                    {Math.round(tier.retoolingRatio * 100)}% until then
+                                    {t('fac.quartersLeftRunningAt', {
+                                        quarters: facilityBuild.quartersRemaining,
+                                        percent: Math.round(tier.retoolingRatio * 100),
+                                    })}
                                 </Text>
                             </View>
                             <Pressable onPress={handleCancel} style={styles.cancelBtn}>
@@ -364,7 +369,7 @@ const FacilityPanel: React.FC = () => {
                             </View>
                             <View style={{ flex: 1, marginLeft: 10 }}>
                                 <Text style={styles.queueName}>
-                                    {formatNumber(incomingHires)} people hired
+                                    {t('fac.peopleHired', { count: formatNumber(incomingHires) })}
                                 </Text>
                                 <Text style={styles.queueSub}>{t('company.arrivingNextQuarterHalfProductivity')}</Text>
                             </View>
@@ -408,10 +413,12 @@ const FacilityPanel: React.FC = () => {
                     </View>
 
                     <Text style={styles.costLine}>
-                        {formatMoney(next.upgradeCost)}
-                        {next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''} up front ·{' '}
-                        {next.buildQuarters} quarter(s) to build ·{' '}
-                        {Math.round(tier.retoolingRatio * 100)}% capacity while building
+                        {t('fac.upgradeCostLine', {
+                            cost: formatMoney(next.upgradeCost)
+                                + (next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''),
+                            quarters: next.buildQuarters,
+                            percent: Math.round(tier.retoolingRatio * 100),
+                        })}
                     </Text>
 
                     {/* The research requirement, in the research colour when
@@ -422,8 +429,8 @@ const FacilityPanel: React.FC = () => {
                         <Text style={totalRP >= next.upgradeRP ? styles.rpLine : styles.rpLineShort}>
                             {t('fac.researchProgress', { v1: formatCompact(Math.floor(totalRP)), v2: formatCompact(next.upgradeRP) })}
                             {totalRP < next.upgradeRP
-                                ? ` (${formatCompact(next.upgradeRP - totalRP)} short)`
-                                : ', cleared.'}
+                                ? t('fac.rpShort', { amount: formatCompact(next.upgradeRP - totalRP) })
+                                : t('fac.rpCleared')}
                         </Text>
                     )}
 
@@ -457,10 +464,7 @@ const FacilityPanel: React.FC = () => {
             ) : (
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>{t('company.topTierReached')}</Text>
-                    <Text style={styles.tierDesc}>
-                        There is nothing left to build. From here, growth comes from products,
-                        pricing and acquisitions.
-                    </Text>
+                    <Text style={styles.tierDesc}>{t('fac.nothingLeftToBuild')}</Text>
                 </View>
             ))}
 
@@ -506,11 +510,11 @@ const FacilityPanel: React.FC = () => {
                         next ? next.crew : tier.crew,
                         employeeCount,
                     )}
-                    unit="target headcount"
+                    unit={t('fac.targetHeadcount')}
                     softLimit={tier.crew}
-                    softLimitLabel="Crew"
+                    softLimitLabel={t('fac.crew')}
                     markers={[
-                        { value: employeeCount, label: 'Now', color: '#FFFFFF' },
+                        { value: employeeCount, label: t('fac.now'), color: '#FFFFFF' },
                     ]}
                     steps={[1, 10, 100]}
                     percents={[]}
@@ -534,8 +538,7 @@ const FacilityPanel: React.FC = () => {
 
                 {target > tier.crew && (
                     <Text style={styles.warn}>
-                        {formatNumber(target - tier.crew)} of these people have no line to work on.
-                        You pay them; they produce nothing. Upgrade the facility first.
+                        {t('fac.noLineToWorkOn', { count: formatNumber(target - tier.crew) })}
                     </Text>
                 )}
 
@@ -554,12 +557,12 @@ const FacilityPanel: React.FC = () => {
                         !hasChanges && !confirmedHeadcount && styles.primaryBtnTextOff,
                     ]}>
                         {hasChanges
-                            ? 'CONFIRM'
+                            ? t('staff.confirm')
                             : (confirmedHeadcount
                                 ? (confirmedHeadcount.isHire
-                                    ? `ARRIVES IN Q${confirmedHeadcount.quarter}`
-                                    : `UPDATED IN Q${confirmedHeadcount.quarter}`)
-                                : 'NO CHANGE')}
+                                    ? t('staff.arrivesInQ', { quarter: confirmedHeadcount.quarter })
+                                    : t('staff.updatedInQ', { quarter: confirmedHeadcount.quarter }))
+                                : t('staff.noChange'))}
                     </Text>
                 </Pressable>
 
