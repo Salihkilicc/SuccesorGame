@@ -292,6 +292,29 @@ export const en: Record<string, string> = {
     'company.equity': 'Equity',
     // The subtitles on the department cards. They were template strings, so
     // they were on screen in a place the sweep did not look.
+    // Breaking up, and the relationship screen
+    'love.endedWith': 'You have ended your relationship with {name}.',
+    'love.settlementPaid': 'SETTLEMENT PAID: -{amount}',
+    'love.areYouSureEnd': 'Are you sure you want to end this?',
+    'love.reviewingNoPrenup': 'Reviewing your assets... You have no prenup.',
+    'love.costsHalf': 'This will cost you 50% of your wealth.',
+    'love.quarterlyLimit': 'Quarterly limit reached',
+    'love.intimateMoment': 'Intimate moment',
+    'love.giftFor': 'Gift for {name}',
+    'love.textTo': 'Text {name}',
+    'love.doesNotLoveEnough': '{name} does not love you enough yet. She said no.',
+
+    // The financial report
+    'fin.noQuarterYet':
+        'No quarter has been completed yet. Advance time from the Home screen to generate your first report.',
+    'fin.noDataYet': 'No data yet',
+    'fin.netSuffix': 'net ·',
+    'fin.grossSuffix': 'gross',
+    'fin.sellThroughNote':
+        'Sell-through is the share of available goods (opening stock plus production) that actually sold. Anything below 100% became inventory you now pay to store.',
+    'fin.soldPriceLine': '{units} sold · Price {price} · Cost {cost}',
+    'fin.marginPerUnitLine': '· Margin {margin}/unit',
+
     // The share control hub
     'hub.buybackDesc': 'Buy back shares using company cash',
     'hub.dividendDesc': 'Pay cash to shareholders',

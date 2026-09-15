@@ -469,7 +469,7 @@ const LoveScreen = () => {
     if (partner && partner.love < 30) {
       setProposalResult({
         success: false,
-        message: `${partner.name} doesn't love you enough yet... She said no.`
+        message: t('love.doesNotLoveEnough', { name: partner.name })
       });
       setProposalStep(3);
       return;
@@ -550,12 +550,12 @@ const LoveScreen = () => {
             <Text style={{ fontSize: 60 }}>🥀</Text>
             <Text style={[styles.modalSubtitle, { color: theme.colors.danger }]}>{t('love.itSOver')}</Text>
             <Text style={{ color: theme.colors.textPrimary, textAlign: 'center' }}>
-              You have ended your relationship with {partner.name}.
+              {t('love.endedWith', { name: partner.name })}
             </Text>
             {settlement > 0 && (
               <View style={{ backgroundColor: theme.colors.destructive, padding: 10, borderRadius: 8, marginTop: 10 }}>
                 <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                  SETTLEMENT PAID: -${settlement.toLocaleString()}
+                  {t('love.settlementPaid', { amount: `$${settlement.toLocaleString()}` })}
                 </Text>
               </View>
             )}
@@ -578,13 +578,13 @@ const LoveScreen = () => {
           <Text style={{ fontSize: 40, textAlign: 'center' }}>💔</Text>
           <Text style={[styles.modalSubtitle, { textAlign: 'center', color: theme.colors.danger }]}>{t('love.warning')}</Text>
           <Text style={{ textAlign: 'center', color: theme.colors.textSecondary }}>
-            Are you sure you want to end this?
+            {t('love.areYouSureEnd')}
             {partner.isMarried && !partner.hasPrenup && (
               <Text style={{ fontWeight: 'bold', color: theme.colors.danger }}>
                 {"\n\n"}
-                Reviewing your assets... You have no Prenup.
+                {t('love.reviewingNoPrenup')}
                 {"\n"}
-                This will cost you 50% of your wealth.
+                {t('love.costsHalf')}
                 {"\n"}
                 (~ ${settlement.toLocaleString()})
               </Text>
@@ -681,7 +681,7 @@ const LoveScreen = () => {
           </View>
           <Text style={[styles.gridTileLabel, alreadyMadeLove && { color: theme.colors.textPrimary }]}>{t('love.makeLove')}</Text>
           <Text style={styles.gridTileDesc}>
-            {alreadyMadeLove ? 'Quarterly limit reached' : 'Intimate moment'}
+            {alreadyMadeLove ? t('love.quarterlyLimit') : t('love.intimateMoment')}
           </Text>
         </Pressable>
 
@@ -733,7 +733,7 @@ const LoveScreen = () => {
     if (submenu === 'gift') {
       return (
         <View style={{ gap: 12 }}>
-          <Text style={styles.modalSubtitle}>Gift for {selectedItem?.name}</Text>
+          <Text style={styles.modalSubtitle}>{t('love.giftFor', { name: selectedItem?.name ?? '' })}</Text>
           {GIFTS.map((g, i) => (
             <Pressable key={i} style={styles.actionButton} onPress={() => handleGiftToOther(g)}>
               <Text style={styles.actionButtonText}>{translateGift(g.name)}</Text>
@@ -781,7 +781,7 @@ const LoveScreen = () => {
     if (submenu === 'text') {
       return (
         <View style={{ gap: 12 }}>
-          <Text style={styles.modalSubtitle}>Text {selectedItem?.name}</Text>
+          <Text style={styles.modalSubtitle}>{t('love.textTo', { name: selectedItem?.name ?? '' })}</Text>
           {TEXT_MESSAGES.map((msg, i) => (
             <Pressable key={i} style={styles.actionButton} onPress={() => handleSendText(msg)}>
               <Text style={styles.actionButtonText}>"{msg}"</Text>

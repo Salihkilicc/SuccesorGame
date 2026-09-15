@@ -591,7 +591,22 @@ for (const f of files.filter(f => !isDisabled(f) && !optedOut(f))) {
             if (/\*\//.test(line)) inBlockComment = false;
             if (wasComment || /^\s*(\/\/|\*)/.test(line)) return;
 
-            for (const m of line.matchAll(/\bt\(\s*'([^']+)'\s*[,)]/g)) {
+            // ----------------------------------------------------------
+            //  AND WHAT A KEY CAN ACTUALLY BE MADE OF
+            // ----------------------------------------------------------
+            //  `[^']+` matches anything that is not a quote, so a test that
+            //  BUILDS the call from a variable was reported as using a key
+            //  literally named `" + key + "`:
+            //
+            //      expect(src()).toContain("label: t('" + key + "')");
+            //
+            //  That is the same class this rule already declines to guess at
+            //  two comments above - a key built by concatenation - it just
+            //  did not recognise this spelling of it. A key is dotted word
+            //  characters and nothing else, so anything with a space, a plus
+            //  or a quote in it is a construction rather than a key.
+            // ----------------------------------------------------------
+            for (const m of line.matchAll(/\bt\(\s*'([A-Za-z0-9_.]+)'\s*[,)]/g)) {
                 if (!defined.has(m[1])) {
                     problems.i18n.push(`${rel(f)}:${i + 1}  ${m[1]}`);
                 }

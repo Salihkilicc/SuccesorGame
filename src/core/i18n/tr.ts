@@ -288,6 +288,29 @@ export const tr: Record<string, string> = {
     'company.equity': 'Hisse & Sahiplik',
     // Bolum kartlarinin alt satirlari. Sablon dizesi olarak yazilmislardi,
     // yani ekrandaydilar ama taramanin gormedigi yerde.
+    // Ayrilik ve iliski ekrani
+    'love.endedWith': '{name} ile ilişkini bitirdin.',
+    'love.settlementPaid': 'ÖDENEN TAZMİNAT: -{amount}',
+    'love.areYouSureEnd': 'Bunu bitirmek istediğine emin misin?',
+    'love.reviewingNoPrenup': 'Mal varlığın inceleniyor... Evlilik sözleşmen yok.',
+    'love.costsHalf': 'Bu sana servetinin yarısına mal olacak.',
+    'love.quarterlyLimit': 'Bu çeyreğin hakkı doldu',
+    'love.intimateMoment': 'Yakın bir an',
+    'love.giftFor': '{name} için hediye',
+    'love.textTo': '{name} kişisine mesaj',
+    'love.doesNotLoveEnough': '{name} seni henüz yeterince sevmiyor. Hayır dedi.',
+
+    // Finansal rapor
+    'fin.noQuarterYet':
+        'Henüz tamamlanmış bir çeyrek yok. Rapor oluşması için ana ekrandan zamanı ilerlet.',
+    'fin.noDataYet': 'Henüz veri yok',
+    'fin.netSuffix': 'net ·',
+    'fin.grossSuffix': 'brüt',
+    'fin.sellThroughNote':
+        'Satış oranı, eldeki malın (açılış stoğu + üretim) gerçekten satılan kısmı. %100\'ün altındaki her şey, artık depolamak için para ödediğin stok oldu.',
+    'fin.soldPriceLine': '{units} satıldı · Fiyat {price} · Maliyet {cost}',
+    'fin.marginPerUnitLine': '· Marj {margin}/birim',
+
     // Hisse kontrol merkezi
     'hub.buybackDesc': 'Şirket nakdiyle hisse geri al',
     'hub.dividendDesc': 'Hissedarlara nakit öde',

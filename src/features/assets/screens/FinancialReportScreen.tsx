@@ -80,7 +80,7 @@ const FinancialReportScreen = () => {
             subtitle={
                 report
                     ? (companyName ? `${companyName} · ${report.periodLabel}` : report.periodLabel)
-                    : 'No data yet'
+                    : t('fin.noDataYet')
             }
         />
     );
@@ -96,8 +96,7 @@ const FinancialReportScreen = () => {
                 <ScrollView contentContainerStyle={styles.container}>
                     <View style={styles.card}>
                         <Text style={styles.emptyText}>
-                            No quarter has been completed yet. Advance time from the Home screen to generate your
-                            first report.
+                            {t('fin.noQuarterYet')}
                         </Text>
                     </View>
                     <View style={styles.card}>
@@ -129,7 +128,7 @@ const FinancialReportScreen = () => {
                         {formatSignedMoney(report.netProfit)}
                     </Text>
                     <Text style={styles.heroSub}>
-                        {formatPercent(report.netMargin)} net · {formatPercent(report.grossMargin)} gross
+                        {formatPercent(report.netMargin)} {t('fin.netSuffix')} {formatPercent(report.grossMargin)} {t('fin.grossSuffix')}
                     </Text>
                 </View>
 
@@ -262,8 +261,7 @@ const FinancialReportScreen = () => {
                         </View>
                     </View>
                     <Text style={styles.explain}>
-                        Sell-through is the share of available goods (opening stock + production) that actually sold.
-                        Anything below 100% became inventory you now pay to store.
+                        {t('fin.sellThroughNote')}
                     </Text>
                 </CollapsibleSection>
 
@@ -311,8 +309,12 @@ const FinancialReportScreen = () => {
                                     </Text>
                                 </View>
                                 <Text style={styles.productEcon}>
-                                    {formatPercent(p.sellThrough)} sold · Price {formatMoney(p.unitPrice)} · Cost{' '}
-                                    {formatMoney(p.unitCost)} · Margin {formatMoney(p.unitPrice - p.unitCost)}/unit
+                                    {t('fin.soldPriceLine', {
+                                        units: formatPercent(p.sellThrough),
+                                        price: formatMoney(p.unitPrice),
+                                        cost: formatMoney(p.unitCost),
+                                    })}{' '}
+                                    {t('fin.marginPerUnitLine', { margin: formatMoney(p.unitPrice - p.unitCost) })}
                                 </Text>
                             </View>
                         ))

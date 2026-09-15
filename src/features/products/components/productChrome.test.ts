@@ -139,7 +139,12 @@ describe('rebuilding the plant', () => {
             'fac.capacityWhenItLands', 'fac.crewItNeeds', 'fac.unitCost',
             'fac.brandCeiling', 'fac.qualityCeiling',
         ]) {
-            expect(src()).toContain(`label: t('${key}')`);
+            // Built by concatenation rather than interpolated into a
+            // template. `t('${key}')` in the source reads as a translation
+            // call with the literal key `${key}`, and reachability.js counts
+            // keys nothing defines - correctly. This says the same thing
+            // without lying to the audit.
+            expect(src()).toContain("label: t('" + key + "')");
         }
     });
 });
