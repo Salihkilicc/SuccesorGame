@@ -292,6 +292,65 @@ export const en: Record<string, string> = {
     'company.equity': 'Equity',
     // The subtitles on the department cards. They were template strings, so
     // they were on screen in a place the sweep did not look.
+    // The share control hub
+    'hub.buybackDesc': 'Buy back shares using company cash',
+    'hub.dividendDesc': 'Pay cash to shareholders',
+    'hub.annualProfitTimes': 'Annual profit × {multiple}',
+    'hub.annualRevenueTimes': 'Annual revenue × {multiple}',
+    'hub.dividedByShares': '÷ {count} shares',
+    'hub.afterTheSplit': 'After the split',
+    'hub.splitNote':
+        'Your ownership percentage does not change. Twice as many shares at half the price is the same company.',
+    'hub.sellOwnSummary':
+        'Selling {count} of your own shares. The company gets nothing, these are yours, not new ones.',
+    'hub.gross': 'Gross',
+    'hub.capitalGainsTax': 'Capital gains tax',
+    'hub.blockDiscount': 'Block discount',
+    'hub.youReceive': 'You receive',
+    'hub.stakeAfter': 'Your stake after',
+    'hub.insiderSellingNote': 'The market reads insider selling as a warning.',
+
+    // The market position panel
+    'mkt.rankHash': 'rank #{rank}',
+    'mkt.throughSubsidiaries': 'through subsidiaries =',
+    'mkt.totalMarket': 'total market',
+    'mkt.youSoldUnits': 'You sold {units} units in this category last quarter.',
+    'mkt.marketGrows': 'Market grows {percent} a quarter.',
+
+    // The facility upgrade comparison
+    'fac.capacityWhileBuilding': 'Capacity while building',
+    'fac.capacityWhenItLands': 'Capacity when it lands',
+    'fac.crewItNeeds': 'Crew it needs',
+    'fac.unitCost': 'Unit cost',
+    'fac.brandCeiling': 'Brand ceiling',
+    'fac.qualityCeiling': 'Quality ceiling',
+    'fac.buildWarning':
+        'You will produce less while it is being built, and you may lose share.',
+
+    // The acquisition deal sheet
+    'acq.companyCapital': 'Company capital',
+    'acq.fairValue': 'Fair value',
+    'acq.premiumPercent': 'Premium ({percent}%)',
+    'acq.theirAnnualEbit': 'Their annual EBIT',
+    'acq.firstYearIntegration': 'First-year integration',
+    'acq.synergyAtFullRun': 'Synergy at full run',
+    'acq.firstYearEbitImpact': 'First-year EBIT impact',
+    'acq.steadyState': 'Steady state',
+    'acq.payback': 'Payback',
+    'acq.announcementImpact': 'Announcement impact',
+    'acq.agreedInThePost': 'Agreed in the post. Only the financing is left.',
+    'acq.hostileDesc': '{multiple}x market. No negotiation, and you pay for that.',
+
+    // The R&D modal
+    'rnd.notEnoughCapital': 'Your company does not have enough capital for this investment.',
+    'rnd.youUnlocked': 'You have unlocked: {title}',
+    'rnd.spent': 'Spent',
+    'rnd.unknown': 'Unknown',
+
+    // Unlocking a product
+    'unlock.weakestRequirement': 'Weakest requirement',
+    'unlock.successTitle': '🎉 Success',
+
     // The IPO modal
     'ipo.notReadyBody': 'Underwriters will not take a company public at this valuation.',
     'ipo.theyNeed': 'They need',
@@ -372,7 +431,6 @@ export const en: Record<string, string> = {
     'shark.maxLoanNote':
         'He will go up to {amount}, 30% of what your company is worth. Beyond that even he thinks you are a bad bet.',
     'shark.ratePerYear': '30% a year',
-    'shark.quartersPlain': '{count} quarters',
     'shark.quartersTitled': '{count} Quarters',
     'shark.collateralShares': '{amount} of your shares',
     'shark.seizureClause': 'of your personal shares equivalent to the debt value',
@@ -1284,6 +1342,7 @@ export const en: Record<string, string> = {
     'ui.luxuryTax80': 'Luxury Tax (8.0%):',
     'ui.manageShareholdersEquity': 'Manage shareholders & equity',
     'ui.marketValue': 'Market Value',
+    'ui.quarters': '{count} quarters',
     'ui.needed': 'Needed',
     // ------------------------------------------------------------------
     //  THE SHARED LABELS

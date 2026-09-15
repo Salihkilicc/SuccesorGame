@@ -249,10 +249,10 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
     setPanel({
       title: t('acq.howDoYouPay', { v1: selectedTarget.name }),
       lines: [
-        { label: 'Price', value: formatMoney(q.price) },
-        { label: 'Company capital', value: formatMoney(companyCapital) },
-        { label: 'Your valuation', value: formatMoney(acquirerValuation) },
-        { label: 'Relative size', value: `${(q.relativeSize * 100).toFixed(1)}%`, strong: true },
+        { label: t('ui.price'), value: formatMoney(q.price) },
+        { label: t('acq.companyCapital'), value: formatMoney(companyCapital) },
+        { label: t('ui.yourValuation'), value: formatMoney(acquirerValuation) },
+        { label: t('ui.relativeSize'), value: `${(q.relativeSize * 100).toFixed(1)}%`, strong: true },
       ],
       choices: options.map(o => ({
         label: o.method === 'cash' ? t('acq.payCash') : o.method === 'debt' ? t('acq.borrow') : t('acq.issueShares'),
@@ -278,20 +278,20 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
       // The deal sheet: twelve figures that used to be one interpolated
       // paragraph. Same numbers, one per row.
       lines: [
-        { label: 'Fair value', value: formatMoney(q.fairValue) },
-        { label: `Premium (${Math.round(q.premiumRatio * 100)}%)`, value: formatMoney(q.premium) },
-        { label: 'Price', value: formatMoney(q.price), strong: true },
-        { label: 'Their annual EBIT', value: formatMoney(q.targetAnnualEbit) },
-        { label: 'First-year integration', value: `−${formatMoney(q.firstYearIntegration)}`, tone: 'negative' },
-        { label: 'Synergy at full run', value: formatMoney(q.annualSynergyAtFullRun) },
+        { label: t('acq.fairValue'), value: formatMoney(q.fairValue) },
+        { label: t('acq.premiumPercent', { percent: Math.round(q.premiumRatio * 100) }), value: formatMoney(q.premium) },
+        { label: t('ui.price'), value: formatMoney(q.price), strong: true },
+        { label: t('acq.theirAnnualEbit'), value: formatMoney(q.targetAnnualEbit) },
+        { label: t('acq.firstYearIntegration'), value: `−${formatMoney(q.firstYearIntegration)}`, tone: 'negative' },
+        { label: t('acq.synergyAtFullRun'), value: formatMoney(q.annualSynergyAtFullRun) },
         {
-          label: 'First-year EBIT impact',
+          label: t('acq.firstYearEbitImpact'),
           value: (q.firstYearEbitImpact >= 0 ? '+' : '') + formatMoney(q.firstYearEbitImpact),
           tone: q.firstYearEbitImpact >= 0 ? 'positive' : 'negative',
         },
-        { label: 'Steady state', value: formatMoney(q.steadyStateEbitImpact) },
-        { label: 'Payback', value: isFinite(q.paybackYears) ? t('acq.paybackYears', { v1: q.paybackYears.toFixed(1) }) : t('acq.neverAtThisPrice') },
-        { label: 'Announcement impact', value: `${q.announcementImpactPercent.toFixed(1)}%` },
+        { label: t('acq.steadyState'), value: formatMoney(q.steadyStateEbitImpact) },
+        { label: t('acq.payback'), value: isFinite(q.paybackYears) ? t('acq.paybackYears', { v1: q.paybackYears.toFixed(1) }) : t('acq.neverAtThisPrice') },
+        { label: t('acq.announcementImpact'), value: `${q.announcementImpactPercent.toFixed(1)}%` },
         { label: q.accretive ? t('acq.accretive') : t('acq.dilutive'), value: '', strong: true },
       ],
       note:
@@ -557,7 +557,7 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
                         </View>
                         <Text style={styles.optionDesc}>
                           {lock ? lock.reason : negotiated
-                            ? 'Agreed in the post. Only the financing is left.'
+                            ? t('acq.agreedInThePost')
                             : t('action.purchaseAtFairMarketValue')}
                         </Text>
                         {!!lock && <Text style={styles.optionHint}>{lock.hint}</Text>}
@@ -578,7 +578,7 @@ export const AcquisitionModal = ({ visible, onClose, asScreen, acquire }: Acquis
                           </Text>
                         </View>
                         <Text style={[styles.optionDesc, styles.hostileDesc]}>
-                          {HOSTILE_MULTIPLE}x market. No negotiation, and you pay for that.
+                          {t('acq.hostileDesc', { multiple: HOSTILE_MULTIPLE })}
                         </Text>
                       </TouchableOpacity>
                     </View>

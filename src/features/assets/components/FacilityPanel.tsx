@@ -141,23 +141,23 @@ const FacilityPanel: React.FC = () => {
             // it cost, how long am I weakened, what do I get.
             lines: [
                 {
-                    label: 'Cost',
+                    label: t('ui.cost'),
                     value: formatMoney(next.upgradeCost)
                         + (next.upgradeRP > 0 ? ` + ${formatRP(next.upgradeRP)}` : ''),
                     strong: true,
                 },
-                { label: 'Build time', value: `${next.buildQuarters} quarter(s)` },
+                { label: t('ui.buildTime'), value: t('ui.quarters', { count: next.buildQuarters }) },
                 {
-                    label: 'Capacity while building',
+                    label: t('fac.capacityWhileBuilding'),
                     value: `${Math.round(tier.retoolingRatio * 100)}%`,
                 },
-                { label: 'Capacity when it lands', value: formatNumber(next.capacity), strong: true },
-                { label: 'Crew it needs', value: formatNumber(next.crew) },
-                { label: 'Unit cost', value: `x${next.unitCostMultiplier.toFixed(2)}` },
-                { label: 'Brand ceiling', value: String(next.brandCeiling) },
-                { label: 'Quality ceiling', value: String(next.qualityCeiling) },
+                { label: t('fac.capacityWhenItLands'), value: formatNumber(next.capacity), strong: true },
+                { label: t('fac.crewItNeeds'), value: formatNumber(next.crew) },
+                { label: t('fac.unitCost'), value: `x${next.unitCostMultiplier.toFixed(2)}` },
+                { label: t('fac.brandCeiling'), value: String(next.brandCeiling) },
+                { label: t('fac.qualityCeiling'), value: String(next.qualityCeiling) },
             ],
-            note: 'You will produce less while it is being built, and you may lose share.',
+            note: t('fac.buildWarning'),
             cancelLabel: t('company.cancel'),
             confirmLabel: t('company.confirm'),
             onConfirm: () => {

@@ -75,9 +75,9 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
                     v4: entryGate.required.toFixed(0),
                 }),
                 lines: [
-                    { label: 'Weakest requirement', value: entryGate.weakest || '-' },
-                    { label: 'You have', value: entryGate.have.toFixed(0) },
-                    { label: 'Needed', value: entryGate.required.toFixed(0), strong: true },
+                    { label: t('unlock.weakestRequirement'), value: entryGate.weakest || '-' },
+                    { label: t('ui.youHave'), value: entryGate.have.toFixed(0) },
+                    { label: t('ui.needed'), value: entryGate.required.toFixed(0), strong: true },
                 ],
                 confirmLabel: 'OK',
                 tone: 'danger',
@@ -125,7 +125,7 @@ const ProductUnlockModal = ({ product, visible, onClose }: Props) => {
 
         if (result.success) {
             setPanel({
-                title: '🎉 Success!',
+                title: t('unlock.successTitle'),
                 summary: t('product.v1HasBeenUnlockedN', { v1: product.name, v2: product.stockBoost }),
                 confirmLabel: t('product.continue'),
                 onDismiss: onClose,

@@ -101,6 +101,19 @@ const NOT_A_SENTENCE = [
     /^\$?[\d.,]+[KMBTQ%]?$/,             // 1.2M, 45%, $300
     /^[a-z0-9-]+$/,                      // icon names, ids, kebab keys
     /^\{.*\}$/,                          // an interpolation on its own
+    // ----------------------------------------------------------------------
+    //  A DICTIONARY KEY IS NOT A SENTENCE
+    // ----------------------------------------------------------------------
+    //  `t()` skips its own argument by looking at the two characters before
+    //  the quote, and that misses a FALLBACK key:
+    //
+    //      {t(s.lastNote?.key || 'empire.noteGrowing', ...)}
+    //
+    //  Reported as untranslated English on the quarterly report, where it is
+    //  the opposite: a correctly used key. No sentence in this game is two
+    //  words joined by a dot with no space in it.
+    // ----------------------------------------------------------------------
+    /^[a-z][a-zA-Z0-9]*(\.[a-zA-Z0-9]+)+$/,
 ];
 
 const isSentence = (s) => {

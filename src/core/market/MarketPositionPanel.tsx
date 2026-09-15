@@ -84,7 +84,7 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
                         <Text style={[styles.summaryValue, { color: playerShare > 0 ? theme.colors.primary : '#FFFFFF' }]}>
                             {formatShare(playerShare)}
                         </Text>
-                        <Text style={styles.summaryUnit}>rank #{playerRank}</Text>
+                        <Text style={styles.summaryUnit}>{t('mkt.rankHash', { rank: playerRank })}</Text>
                     </View>
                     <View style={styles.summaryCell}>
                         <Text style={styles.summaryLabel}>{t('brand.thisCategory')}</Text>
@@ -97,13 +97,13 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
 
                 {ownedShare > 0 && (
                     <Text style={styles.groupNote}>
-                        +{formatShare(ownedShare)} through subsidiaries = {formatShare(groupShare)} total market
+                        +{formatShare(ownedShare)} {t('mkt.throughSubsidiaries')} {formatShare(groupShare)} {t('mkt.totalMarket')}
                     </Text>
                 )}
 
                 {/* Satis Bilgisi */}
                 <Text style={styles.soldLine}>
-                    You sold {formatNumber(unitsSold)} units in this category last quarter.
+                    {t('mkt.youSoldUnits', { units: formatNumber(unitsSold) })}
                 </Text>
 
                 {/* Rakipler Siralamasi - Kompakt Liste */}
@@ -159,7 +159,7 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
                 )}
 
                 <Text style={styles.footnote}>
-                    Market grows {formatPercent(market.growthPerQuarter)} / quarter.
+                    {t('mkt.marketGrows', { percent: formatPercent(market.growthPerQuarter) })}
                 </Text>
             </View>
         </CollapsibleSection>

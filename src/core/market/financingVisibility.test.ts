@@ -110,6 +110,11 @@ describe('the acquisition panel', () => {
 
     it('and shows the pot the deal is actually paid from', () => {
         // "Param var" was true and about the other pot. The panel says which.
-        expect(code()).toMatch(/label:\s*'Company capital'/);
+        //
+        // The KEY, not the English. This read /label: 'Company capital'/ and
+        // went red the day the panel was translated, which is the third test
+        // this week caught pinning a word rather than a claim. The claim is
+        // that the panel names the pot; it survives being said in Turkish.
+        expect(code()).toMatch(/label:\s*t\('acq\.companyCapital'\)/);
     });
 });

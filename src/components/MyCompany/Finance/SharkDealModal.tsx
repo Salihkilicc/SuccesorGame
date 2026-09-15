@@ -201,7 +201,7 @@ const SharkDealModal = ({ visible, onClose, sharkMember, asScreen }: Props & { a
                     </View>
                     <View style={styles.termRow}>
                         <Text style={styles.termLabel}>{t('finance.dueIn')}</Text>
-                        <Text style={styles.termValue}>{t('shark.quartersPlain', { count: DEADLINE_QUARTERS })}</Text>
+                        <Text style={styles.termValue}>{t('ui.quarters', { count: DEADLINE_QUARTERS })}</Text>
                     </View>
                     <View style={styles.termRow}>
                         <Text style={styles.termLabel}>{t('finance.totalToRepay')}</Text>

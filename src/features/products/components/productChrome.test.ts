@@ -129,12 +129,17 @@ describe('rebuilding the plant', () => {
     });
 
     it('and the eight figures are rows rather than a paragraph', () => {
-        for (const label of [
-            'Cost', 'Build time', 'Capacity while building',
-            'Capacity when it lands', 'Crew it needs', 'Unit cost',
-            'Brand ceiling', 'Quality ceiling',
+        // Keys rather than English. The claim is that the upgrade decision is
+        // EIGHT NAMED ROWS instead of one interpolated paragraph, and that is
+        // a claim about structure. Checking it in English quietly made it a
+        // claim about vocabulary too, and broke the day the panel was
+        // translated. Same mistake the untranslated sweep was making.
+        for (const key of [
+            'ui.cost', 'ui.buildTime', 'fac.capacityWhileBuilding',
+            'fac.capacityWhenItLands', 'fac.crewItNeeds', 'fac.unitCost',
+            'fac.brandCeiling', 'fac.qualityCeiling',
         ]) {
-            expect(src()).toContain(`label: '${label}'`);
+            expect(src()).toContain(`label: t('${key}')`);
         }
     });
 });

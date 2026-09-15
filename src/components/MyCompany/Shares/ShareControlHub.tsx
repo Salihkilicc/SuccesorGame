@@ -286,11 +286,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
             summary: t('alert.thisWillDivideYourShare'),
             lines: [
                 { label: t('equity.currentStockPrice'), value: formatPrice(stockPrice) },
-                { label: 'After the split', value: formatPrice(stockPrice / 2) },
+                { label: t('hub.afterTheSplit'), value: formatPrice(stockPrice / 2) },
                 { label: t('equity.totalShares'), value: formatNumber(totalShares) },
-                { label: 'After the split', value: formatNumber(totalShares * 2), strong: true },
+                { label: t('hub.afterTheSplit'), value: formatNumber(totalShares * 2), strong: true },
             ],
-            note: 'Your ownership percentage does not change. Twice as many shares at half the price is the same company.',
+            note: t('hub.splitNote'),
             confirmLabel: t('equity.split'),
             onConfirm: () => {
                 performStockSplit();
@@ -385,11 +385,11 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                     <>
                                         <DetailLine label={t('equity.cashOnHand')} value={formatMoney(vb.cash)} />
                                         <DetailLine
-                                            label={`Annual profit × ${vb.earningsMultiple.toFixed(1)}`}
+                                            label={t('hub.annualProfitTimes', { multiple: vb.earningsMultiple.toFixed(1) })}
                                             value={formatMoney(vb.earnings)}
                                         />
                                         <DetailLine
-                                            label={`Annual revenue × ${vb.revenueMultiple.toFixed(2)}`}
+                                            label={t('hub.annualRevenueTimes', { multiple: vb.revenueMultiple.toFixed(2) })}
                                             value={formatMoney(vb.revenue)}
                                         />
                                         {vb.debt > 0 && (
@@ -402,7 +402,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                         <DetailRule />
                                         <DetailLine label={t('equity.valuation')} value={formatMoney(vb.total)} strong />
                                         <DetailLine
-                                            label={`÷ ${formatNumber(totalShares)} shares`}
+                                            label={t('hub.dividedByShares', { count: formatNumber(totalShares) })}
                                             value={formatPrice(vb.total / Math.max(1, totalShares))}
                                         />
                                         <DetailNote>{EQUITY_EXPLANATIONS.valuation}</DetailNote>
@@ -479,7 +479,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>{t('equity.stockBuyback')}</Text>
                                 <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
-                                    {isPublic ? 'Buy back shares using company cash' : t('equity.requiresIpo')}
+                                    {isPublic ? t('hub.buybackDesc') : t('equity.requiresIpo')}
                                 </Text>
                             </View>
                             <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>
@@ -519,15 +519,15 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                                 const q = quoteSecondarySale(chunk, price, eq.playerShares, cap);
                                 setPanel({
                                     title: t('equity.sellOwnConfirm'),
-                                    summary: `Selling ${formatNumber(chunk)} of your own shares — the company gets nothing, these are yours, not new ones.`,
+                                    summary: t('hub.sellOwnSummary', { count: formatNumber(chunk) }),
                                     lines: [
-                                        { label: 'Gross', value: formatMoney(q.grossProceeds) },
-                                        { label: 'Capital gains tax', value: `−${formatMoney(q.tax)}`, tone: 'negative' },
-                                        { label: 'Block discount', value: `−${q.discountPercent.toFixed(1)}%`, tone: 'negative' },
-                                        { label: 'You receive', value: formatMoney(q.netToFounder), strong: true },
-                                        { label: 'Your stake after', value: `${q.newOwnershipPercent.toFixed(1)}%` },
+                                        { label: t('hub.gross'), value: formatMoney(q.grossProceeds) },
+                                        { label: t('hub.capitalGainsTax'), value: `−${formatMoney(q.tax)}`, tone: 'negative' },
+                                        { label: t('hub.blockDiscount'), value: `−${q.discountPercent.toFixed(1)}%`, tone: 'negative' },
+                                        { label: t('hub.youReceive'), value: formatMoney(q.netToFounder), strong: true },
+                                        { label: t('hub.stakeAfter'), value: `${q.newOwnershipPercent.toFixed(1)}%` },
                                     ],
-                                    note: 'The market reads insider selling as a warning.',
+                                    note: t('hub.insiderSellingNote'),
                                     confirmLabel: t('equity.sell'),
                                     tone: 'danger',
                                     onConfirm: () => {
@@ -576,7 +576,7 @@ const ShareControlHub = ({ visible, onClose, onOpenIPO, onOpenDilution, onOpenDi
                             <View style={styles.actionContent}>
                                 <Text style={[styles.actionTitle, !isPublic && styles.textDisabled]}>{t('equity.distributeDividends')}</Text>
                                 <Text style={[styles.actionDescription, !isPublic && styles.textDisabled]}>
-                                    {isPublic ? 'Pay cash to shareholders' : t('equity.requiresIpo')}
+                                    {isPublic ? t('hub.dividendDesc') : t('equity.requiresIpo')}
                                 </Text>
                             </View>
                             <Text style={[styles.actionArrow, !isPublic && styles.textDisabled]}>›</Text>

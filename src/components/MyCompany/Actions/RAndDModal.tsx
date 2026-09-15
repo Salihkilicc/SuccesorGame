@@ -66,10 +66,10 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
     if (companyCapital < cost) {
       setPanel({
         title: t('alert.insufficientFunds'),
-        summary: "Your company doesn't have enough capital for this investment.",
+        summary: t('rnd.notEnoughCapital'),
         lines: [
-          { label: 'Cost', value: formatMoney(cost) },
-          { label: 'You have', value: formatMoney(companyCapital), strong: true },
+          { label: t('ui.cost'), value: formatMoney(cost) },
+          { label: t('ui.youHave'), value: formatMoney(companyCapital), strong: true },
         ],
         confirmLabel: 'OK',
         tone: 'danger',
@@ -85,8 +85,8 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
     if (upgradeInfo) {
       setPanel({
         title: t('alert.researchComplete'),
-        summary: `You have unlocked: ${upgradeInfo.title}`,
-        lines: [{ label: 'Spent', value: formatMoney(cost) }],
+        summary: t('rnd.youUnlocked', { title: upgradeInfo.title }),
+        lines: [{ label: t('rnd.spent'), value: formatMoney(cost) }],
         confirmLabel: 'OK',
       });
     }
@@ -143,7 +143,7 @@ const RAndDModal = ({ visible, onClose, onResult }: RAndDModalProps) => {
         <View style={styles.statusContainer}>
           <Text style={styles.currentStatusLabel}>{t('action.currentTech')}</Text>
           <Text style={styles.currentStatusValue}>
-            {upgrades.find(u => u.level === currentLevel)?.title || 'Unknown'}
+            {upgrades.find(u => u.level === currentLevel)?.title || t('rnd.unknown')}
           </Text>
         </View>
 
@@ -254,10 +254,10 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
     if (companyCapital < cost) {
       setPanel({
         title: t('alert.insufficientFunds'),
-        summary: "Your company doesn't have enough capital for this investment.",
+        summary: t('rnd.notEnoughCapital'),
         lines: [
-          { label: 'Cost', value: formatMoney(cost) },
-          { label: 'You have', value: formatMoney(companyCapital), strong: true },
+          { label: t('ui.cost'), value: formatMoney(cost) },
+          { label: t('ui.youHave'), value: formatMoney(companyCapital), strong: true },
         ],
         confirmLabel: 'OK',
         tone: 'danger',
@@ -273,8 +273,8 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
     if (upgradeInfo) {
       setPanel({
         title: t('alert.researchComplete'),
-        summary: `You have unlocked: ${upgradeInfo.title}`,
-        lines: [{ label: 'Spent', value: formatMoney(cost) }],
+        summary: t('rnd.youUnlocked', { title: upgradeInfo.title }),
+        lines: [{ label: t('rnd.spent'), value: formatMoney(cost) }],
         confirmLabel: 'OK',
       });
     }
@@ -322,7 +322,7 @@ const RAndDModalRevised = ({ visible, onClose, onResult }: RAndDModalProps) => {
         <View style={styles.statusContainer}>
           <Text style={styles.currentStatusLabel}>{t('action.currentTech')}</Text>
           <Text style={styles.currentStatusValue}>
-            {upgrades.find(u => u.level === currentLevel)?.title || 'Unknown'}
+            {upgrades.find(u => u.level === currentLevel)?.title || t('rnd.unknown')}
           </Text>
         </View>
 

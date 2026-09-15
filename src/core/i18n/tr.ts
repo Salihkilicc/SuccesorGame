@@ -288,6 +288,65 @@ export const tr: Record<string, string> = {
     'company.equity': 'Hisse & Sahiplik',
     // Bolum kartlarinin alt satirlari. Sablon dizesi olarak yazilmislardi,
     // yani ekrandaydilar ama taramanin gormedigi yerde.
+    // Hisse kontrol merkezi
+    'hub.buybackDesc': 'Şirket nakdiyle hisse geri al',
+    'hub.dividendDesc': 'Hissedarlara nakit öde',
+    'hub.annualProfitTimes': 'Yıllık kâr × {multiple}',
+    'hub.annualRevenueTimes': 'Yıllık gelir × {multiple}',
+    'hub.dividedByShares': '÷ {count} hisse',
+    'hub.afterTheSplit': 'Bölünmeden sonra',
+    'hub.splitNote':
+        'Sahiplik yüzden değişmez. Yarı fiyata iki kat hisse, aynı şirket.',
+    'hub.sellOwnSummary':
+        'Kendi hisselerinden {count} tanesini satıyorsun. Şirkete bir şey girmiyor, bunlar senin hisselerin, yeni ihraç değil.',
+    'hub.gross': 'Brüt',
+    'hub.capitalGainsTax': 'Değer artış vergisi',
+    'hub.blockDiscount': 'Blok satış iskontosu',
+    'hub.youReceive': 'Eline geçen',
+    'hub.stakeAfter': 'Sonraki payın',
+    'hub.insiderSellingNote': 'Piyasa, içeriden satışı uyarı olarak okur.',
+
+    // Pazar konumu paneli
+    'mkt.rankHash': '#{rank} sırada',
+    'mkt.throughSubsidiaries': 'iştirakler üzerinden =',
+    'mkt.totalMarket': 'toplam pazar',
+    'mkt.youSoldUnits': 'Geçen çeyrek bu kategoride {units} birim sattın.',
+    'mkt.marketGrows': 'Pazar çeyrekte {percent} büyüyor.',
+
+    // Tesis yukseltme karsilastirmasi
+    'fac.capacityWhileBuilding': 'İnşaat sırasında kapasite',
+    'fac.capacityWhenItLands': 'Bittiğindeki kapasite',
+    'fac.crewItNeeds': 'İstediği kadro',
+    'fac.unitCost': 'Birim maliyet',
+    'fac.brandCeiling': 'Marka tavanı',
+    'fac.qualityCeiling': 'Kalite tavanı',
+    'fac.buildWarning':
+        'İnşaat sürerken daha az üretirsin ve pazar payı kaybedebilirsin.',
+
+    // Satin alma anlasma sayfasi
+    'acq.companyCapital': 'Şirket sermayesi',
+    'acq.fairValue': 'Gerçek değer',
+    'acq.premiumPercent': 'Prim (%{percent})',
+    'acq.theirAnnualEbit': 'Yıllık FVÖK\'leri',
+    'acq.firstYearIntegration': 'İlk yıl entegrasyon',
+    'acq.synergyAtFullRun': 'Tam kapasitede sinerji',
+    'acq.firstYearEbitImpact': 'İlk yıl FVÖK etkisi',
+    'acq.steadyState': 'Oturmuş hali',
+    'acq.payback': 'Geri dönüş',
+    'acq.announcementImpact': 'Duyuru etkisi',
+    'acq.agreedInThePost': 'Mektupta anlaşıldı. Geriye yalnızca finansman kaldı.',
+    'acq.hostileDesc': 'Piyasanın {multiple} katı. Pazarlık yok, ve bunun bedelini ödüyorsun.',
+
+    // Ar-Ge modali
+    'rnd.notEnoughCapital': 'Şirketinin bu yatırım için yeterli sermayesi yok.',
+    'rnd.youUnlocked': 'Açtığın şey: {title}',
+    'rnd.spent': 'Harcanan',
+    'rnd.unknown': 'Bilinmiyor',
+
+    // Urun kilidi
+    'unlock.weakestRequirement': 'En zayıf koşul',
+    'unlock.successTitle': '🎉 Başardın',
+
     // Halka arz modali
     'ipo.notReadyBody': 'Aracı kurumlar bu değerlemeyle bir şirketi halka açmaz.',
     'ipo.theyNeed': 'İstedikleri',
@@ -368,7 +427,6 @@ export const tr: Record<string, string> = {
     'shark.maxLoanNote':
         'En fazla {amount} veriyor, yani şirketinin değerinin %30\'u. Ötesinde onun bile gözünde kötü bir bahis olursun.',
     'shark.ratePerYear': 'yılda %30',
-    'shark.quartersPlain': '{count} çeyrek',
     'shark.quartersTitled': '{count} Çeyrek',
     'shark.collateralShares': 'hisselerinden {amount}',
     'shark.seizureClause': 'kişisel hisselerinden borç değeri kadarı',
@@ -1287,6 +1345,7 @@ export const tr: Record<string, string> = {
     'ui.manageShareholdersEquity': 'Hissedarları ve özkaynağı yönet',
     'ui.marketValue': 'Piyasa Değeri',
     'ui.max': 'Maks',
+    'ui.quarters': '{count} çeyrek',
     'ui.needed': 'Gerekli',
     // ------------------------------------------------------------------
     //  ORTAK ETIKETLER
