@@ -62,7 +62,7 @@ const world = (over: Partial<World> = {}): World => ({
 
 const deal: AcquisitionDeal = {
     id: 'tech_skynet',
-    name: 'SkyNet AI',
+    name: 'Sentinel AI',
     price: 100_000_000,
     fairValue: 90_000_000,
     premium: 10_000_000,
@@ -191,9 +191,9 @@ describe('nobody offers to buy something you do not own', () => {
     });
 
     it('each one asks about ITS company', () => {
-        const holdingStreamify = world({ subsidiaries: ['tech_streamify'] });
-        expect(testAll(portfolioPearEvent.when, holdingStreamify)).toBe(true);
-        expect(testAll(portfolioVultureEvent.when, holdingStreamify)).toBe(false);
+        const holdingEarworm = world({ subsidiaries: ['tech_streamify'] });
+        expect(testAll(portfolioPearEvent.when, holdingEarworm)).toBe(true);
+        expect(testAll(portfolioVultureEvent.when, holdingEarworm)).toBe(false);
     });
 });
 

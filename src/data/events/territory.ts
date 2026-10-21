@@ -89,7 +89,7 @@ const fight = (category: string) => [
 ];
 
 // ============================================================================
-//  1. ROBOTICS — Edison Motors
+//  1. ROBOTICS — Dynamo Motors
 // ============================================================================
 //  The archetype. He never threatens: he describes an arrangement that already
 //  exists and lets the player work out that they are outside it.
@@ -171,17 +171,17 @@ export const territoryRoboticsEvent: GameEvent = {
     when: ROBOTICS,
     chance: 0.45,
     conversation: territoryRobotics,
-    headline: 'Edison Motors is understood to have written to Hale over the drivetrain category.',
+    headline: 'Dynamo Motors is understood to have written to Hale over the drivetrain category.',
     priority: 4,
 };
 
 // ============================================================================
-//  2. DEEP TECH — OpenAI-ish
+//  2. DEEP TECH — Cognita Labs
 // ============================================================================
 //  THE FIRST DRAFT OF THIS LETTER WAS FROM THE WRONG COMPANY. It came from
-//  Novidia and threatened chip allocation, which reads well and is the correct
-//  weapon for a chip business - and Novidia is not the giant of this category.
-//  OpenAI-ish holds 29 to their 26. The test that checks the four letters
+//  Lumenchip and threatened chip allocation, which reads well and is the correct
+//  weapon for a chip business - and Lumenchip is not the giant of this category.
+//  Cognita Labs holds 29 to their 26. The test that checks the four letters
 //  against PRODUCT_MARKETS caught it; nothing else would have.
 //
 //  So her weapon is the one a frontier lab actually has, and it is not
@@ -266,12 +266,12 @@ export const territoryDeepTechEvent: GameEvent = {
     when: DEEP_TECH,
     chance: 0.45,
     conversation: territoryDeepTech,
-    headline: 'OpenAI-ish has opened a research access programme. Two rivals have already signed.',
+    headline: 'Cognita Labs has opened a research access programme. Two rivals have already signed.',
     priority: 4,
 };
 
 // ============================================================================
-//  3. BIO-TECH — Johnson & Swanson
+//  3. BIO-TECH — Harper & Vance
 // ============================================================================
 //  The only one of the four that never threatens anything at all. They
 //  describe a process - trial sites, a regulator's queue, a standards

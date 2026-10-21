@@ -199,7 +199,7 @@ describe('he explains everything with somebody else in it', () => {
         // rather than a shape.
         const missing = CONVERSATIONS
             .filter(c => BLAMES.includes(c.id))
-            .filter(c => !/bank|supplier|board|competitor|California|Microhard|purchasing|grandfather|hourly rate/i
+            .filter(c => !/bank|supplier|board|competitor|California|Gigasoft|purchasing|grandfather|hourly rate/i
                 .test(c.nodes.map(n => n.text).join(' ')))
             .map(c => c.id);
         expect(missing).toEqual([]);

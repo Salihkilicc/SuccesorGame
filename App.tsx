@@ -3,6 +3,8 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BootSplash from 'react-native-bootsplash';
 import RootNavigator from './src/navigation/RootNavigator';
+import { bootstrapAds } from './src/core/ads/bootstrap';
+import AdFreeOfferHost from './src/features/os/components/AdFreeOfferHost';
 import { warmUpStorage } from './src/storage/warmUp';
 
 const App = () => {
@@ -36,6 +38,25 @@ const App = () => {
     warmUpStorage().then(() => { if (alive) setFullyHydrated(true); });
     return () => { alive = false; };
   }, []);
+
+  // ==========================================================================
+  //  ADVERTISING AND PURCHASES
+  // ==========================================================================
+  //  Deliberately NOT awaited and deliberately not part of the hydration gate
+  //  above. Two network-dependent SDKs stand between the player and the game
+  //  here, and a phone on a bad connection would otherwise sit on the splash
+  //  screen waiting for an advertising network.
+  //
+  //  Nothing is lost by letting it run late. `adFree` is mirrored locally and
+  //  has already rehydrated, so a paying player is ad free from the first
+  //  frame whether or not RevenueCat has answered yet; and until the ad SDK
+  //  registers, the gate's presenter is a no-op that shows nothing.
+  //
+  //  Its own effect rather than a line inside the one above, because those
+  //  two things fail for different reasons and only one of them is allowed to
+  //  stop the app from opening.
+  // ==========================================================================
+  useEffect(() => { void bootstrapAds(); }, []);
 
   useEffect(() => {
     // Sadece HER ŞEY yüklendiğinde splash screen'i gizle
@@ -75,6 +96,19 @@ const App = () => {
   // ==========================================================================
   return (
     <SafeAreaProvider style={{ flex: 1, backgroundColor: '#1C242C' }}>
+      {/* ====================================================================
+          THE PURCHASE OFFER, MOUNTED WHERE EVERY TRIGGER CAN REACH IT
+          ====================================================================
+          Four screens can earn an advertisement and any of them can be the
+          tenth. An offer owned by one screen would appear only while that
+          screen happened to be mounted, and the trigger that fires most is
+          the one the player is navigating away from.
+
+          It draws nothing until the gate asks. See core/ads/gate.ts for the
+          seam and core/ads/policy.ts for the cadence.
+         ==================================================================== */}
+      <AdFreeOfferHost />
+
       {/* ====================================================================
           THE STATUS BAR IS GONE, AND THAT IS THE FIX RATHER THAN A TASTE
           ====================================================================

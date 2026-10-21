@@ -58,14 +58,14 @@ describe('buying one of the six is noticed', () => {
 
     it('and buying anything else raises nothing', () => {
         fresh();
-        buy('tech_micro', 'Microhard', 5_000_000_000);
+        buy('tech_micro', 'Gigasoft', 5_000_000_000);
         const flags = useStoryStore.getState().flags;
         expect(Object.keys(flags).filter(f => f.startsWith('bought'))).toEqual([]);
     });
 
     it('the mapping is data, so a seventh company would be a line rather than a branch', () => {
         fresh();
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         buy('tech_planora', 'Planora', 640_000_000, 'High');
         const flags = useStoryStore.getState().flags;
         expect(flags.boughtSkynet).toBe(true);
@@ -77,7 +77,7 @@ describe('the two answers reach the deal', () => {
     it('absorbing writes the damage onto that deal and no other', () => {
         fresh();
         buy('ind_voltmotors', 'VoltMotors', 9_800_000_000);
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
 
         gameSink().raid('ind_voltmotors');
 
@@ -98,7 +98,7 @@ describe('the two answers reach the deal', () => {
 
     it('and the fund does less damage than the rival, from the data rather than the scene', () => {
         fresh();
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         gameSink().raid('tech_skynet');
         const sky = (useCorporateFinanceStore.getState().subsidiaries as any[])
             .find(d => d.id === 'tech_skynet');

@@ -71,14 +71,14 @@ describe('the story can see what the player holds', () => {
     it('an acquisition appears in the world the conditions read', () => {
         fresh();
         expect(readWorld().subsidiaries).toEqual([]);
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         expect(readWorld().subsidiaries).toContain('tech_skynet');
     });
 
     it('and a sale removes it, so the letter stops arriving', () => {
         // The whole reason `owns` is a condition and not a flag.
         fresh();
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         age('tech_skynet');
         useCorporateFinanceStore.getState().sellSubsidiary('tech_skynet');
         expect(readWorld().subsidiaries).not.toContain('tech_skynet');
@@ -93,7 +93,7 @@ describe('the story can see what the player holds', () => {
         // to do with what was being tested.
         fresh();
         useStoryStore.getState().raise('fatherDead');
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         useStatsStore.setState({ companyCapital: SQUEEZE_THRESHOLD - 1 } as any);
         expect(testAll(portfolioVultureEvent.when, readWorld())).toBe(true);
 
@@ -105,7 +105,7 @@ describe('the story can see what the player holds', () => {
 describe('the money that arrives is the money the letter promised', () => {
     it('the fund pays its number, not the market number', () => {
         fresh();
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         // Aged past the lock so there IS a market price to be worse than. A
         // locked holding quotes zero, and "worse than nothing" is not the
         // comparison this test is about.
@@ -127,7 +127,7 @@ describe('the money that arrives is the money the letter promised', () => {
 
     it('and Pear pays more than a market sale would, which is also the point', () => {
         fresh();
-        buy('tech_streamify', 'Streamify', 1_240_000_000, 'Medium');
+        buy('tech_streamify', 'Earworm', 1_240_000_000, 'Medium');
         age('tech_streamify');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
         // The same call the store makes. It takes the LIVE valuation now,
@@ -147,7 +147,7 @@ describe('the money that arrives is the money the letter promised', () => {
         // The multiple is optional and omitting it must mean exactly what it
         // meant before this prompt: fair value less the divestiture discount.
         fresh();
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         age('tech_skynet');
         const sub = (useCorporateFinanceStore.getState().subsidiaries as any[])[0];
         // The same call the store makes. It takes the LIVE valuation now,
@@ -168,7 +168,7 @@ describe('the money that arrives is the money the letter promised', () => {
 
     it('and the company leaves the portfolio either way', () => {
         fresh();
-        buy('tech_skynet', 'SkyNet AI', 44_000_000_000, 'Extreme');
+        buy('tech_skynet', 'Sentinel AI', 44_000_000_000, 'Extreme');
         gameSink().divest('tech_skynet', VULTURE_MULTIPLE);
         expect(useCorporateFinanceStore.getState().subsidiaries).toHaveLength(0);
     });

@@ -48,11 +48,11 @@
  * Above this, a company cannot be bought over the counter.
  *
  * Half a trillion. It catches six of the fifty-nine companies in the market:
- * Pear (3T), BitCash (1.2T), Microhard (950B), Berkshire Hat (700B), Edison
- * Motors (650B) and UnitedHealth (550B) - the trillion-dollar ones and the
+ * Pear (3T), Aurum Coin (1.2T), Gigasoft (950B), Oakmont Holdings (700B), Edison
+ * Motors (650B) and Meridian Health (550B) - the trillion-dollar ones and the
  * ones close enough to it that walking in with a chequebook is not a thing a
- * person does. Etherium at 400B is the first company below the line, and
- * buying Etherium outright should feel possible eventually.
+ * person does. Nexus Chain at 400B is the first company below the line, and
+ * buying Nexus Chain outright should feel possible eventually.
  */
 export const FRIENDLY_LOCK_MARKET_CAP = 500_000_000_000;
 

@@ -51,10 +51,18 @@ const ROOT = path.join(__dirname, '..', '..');
 const CATALOGUES = [
     'features/laboratory/data/laboratoryData.ts',
     'features/products/data/unlockableProductsData.ts',
+    'features/education/data/educationData.ts',
 ];
 
-/** Fields a player reads, as opposed to fields the engine reads. */
-const PLAYER_FACING = ['name', 'description'];
+/**
+ * Fields a player reads, as opposed to fields the engine reads.
+ *
+ * `title` joined the list with the fifty three degrees. `field` did not, and
+ * the difference is the whole point of keeping this list short: nothing
+ * renders `field`, it is the engine's category, and translating a key turns a
+ * lookup into prose.
+ */
+const PLAYER_FACING = ['name', 'description', 'title'];
 
 const source = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
@@ -82,7 +90,9 @@ describe('a catalogue the player reads goes through the door', () => {
             // then renders undefined - which is a worse bug wearing a green
             // tick.
             const src = source(rel);
-            expect(src).toContain("from '../../../core/i18n'");
+            // The depth differs per catalogue, so the assertion is that it
+            // imports the door at all rather than from one exact path.
+            expect(src).toMatch(/from '(\.\.\/)+core\/i18n'/);
             expect(src.split(/\bt\(/).length - 1).toBeGreaterThan(5);
         });
     }
@@ -123,5 +133,59 @@ describe('and every key those getters ask for exists in both languages', () => {
         ]) {
             expect([key, tr[key] === en[key]]).toEqual([key, false]);
         }
+    });
+});
+
+describe('and a key added to both files with the english pasted in is not a translation', () => {
+    const en = require('../../core/i18n/en').en as Record<string, string>;
+    const tr = require('../../core/i18n/tr').tr as Record<string, string>;
+
+    /** The ids the education catalogue actually defines. */
+    const degreeIds = (): string[] =>
+        Array.from(
+            source('features/education/data/educationData.ts')
+                .matchAll(/get title\(\) \{ return t\('edu\.([^']+)'\)/g),
+        ).map(m => m[1]);
+
+    const degreeKeys = (): string[] => degreeIds().map(id => `edu.${id}`);
+
+    it('every degree reads differently in the two languages', () => {
+        // ------------------------------------------------------------------
+        //  THE PROBE THAT STAYED GREEN
+        // ------------------------------------------------------------------
+        //  The shape tests above prove the literals became getters and the
+        //  keys exist in both files. Neither can tell a translated key from
+        //  one where somebody added the key to tr.ts and pasted the English
+        //  into it, which is the single easiest way to "finish" a translation
+        //  job while changing nothing a player sees.
+        //
+        //  Setting one Turkish degree back to its English text was tried as a
+        //  probe and the whole suite stayed green. This is that hole.
+        //
+        //  It holds for all fifty three because no degree is spelled the same
+        //  way in both languages. Somewhere with a genuine loan word - the
+        //  laboratory list has 'eVTOL' - this assertion would be wrong and the
+        //  file says so rather than quietly carving out an exception.
+        // ------------------------------------------------------------------
+        const same = degreeKeys().filter(k => en[k] === tr[k]);
+        expect(same).toEqual([]);
+    });
+
+    it('and one exists for every degree in the catalogue', () => {
+        // ------------------------------------------------------------------
+        //  DERIVED, NOT A NUMBER TYPED IN
+        // ------------------------------------------------------------------
+        //  This said `toHaveLength(53)` for about ten minutes and then went
+        //  red when two unrelated keys, `edu.graduated` and
+        //  `edu.progressMade`, were added for the graduation message. The
+        //  count was right and the thing it counted was wrong.
+        //
+        //  Reading the ids out of the catalogue means adding a degree fails
+        //  this until its key exists, which is the actual rule, and adding a
+        //  message key alongside it changes nothing.
+        // ------------------------------------------------------------------
+        const missing = degreeIds().filter(id => en[`edu.${id}`] === undefined);
+        expect(missing).toEqual([]);
+        expect(degreeIds().length).toBeGreaterThan(50);
     });
 });

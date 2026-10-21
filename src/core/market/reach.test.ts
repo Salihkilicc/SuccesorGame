@@ -116,7 +116,7 @@ describe('the friendly lock', () => {
         const locked = (INITIAL_MARKET_ITEMS as any[])
             .filter(i => i.marketCap > 0 && isOutOfReach(i.marketCap))
             .map(i => i.name);
-        expect(locked).toEqual(expect.arrayContaining(['Pear Inc.', 'BitCash']));
+        expect(locked).toEqual(expect.arrayContaining(['Pear Inc.', 'Aurum Coin']));
         // Six of fifty-nine. A lock that catches everything teaches nothing,
         // and the exception has to stay the exception.
         expect(locked.length).toBeGreaterThan(3);

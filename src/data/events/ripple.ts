@@ -70,7 +70,7 @@ const pay = (company: string) => [
 ];
 
 // ============================================================================
-//  1. VOLTMOTORS — Edison Motors wanted the batteries
+//  1. VOLTMOTORS — Dynamo Motors wanted the batteries
 // ============================================================================
 const VOLT: Condition[] = [{ kind: 'flag', flag: 'boughtVoltmotors' }];
 
@@ -130,16 +130,16 @@ export const rippleVoltmotorsEvent: GameEvent = {
     when: VOLT,
     chance: 0.40,
     conversation: rippleVoltmotors,
-    headline: 'Edison Motors is recruiting battery engineers. The timing is being noticed.',
+    headline: 'Dynamo Motors is recruiting battery engineers. The timing is being noticed.',
     priority: 3,
 };
 
 // ============================================================================
 //  2. STREAMIFY — Pear had been buying that shelf for a decade
 // ============================================================================
-const STREAMIFY: Condition[] = [{ kind: 'flag', flag: 'boughtStreamify' }];
+const STREAMIFY: Condition[] = [{ kind: 'flag', flag: 'boughtEarworm' }];
 
-export const rippleStreamify: Conversation = {
+export const rippleEarworm: Conversation = {
     id: 'event-ripple-streamify',
     channel: 'mail',
     from: 'pear',
@@ -189,21 +189,21 @@ export const rippleStreamify: Conversation = {
     ],
 };
 
-export const rippleStreamifyEvent: GameEvent = {
+export const rippleEarwormEvent: GameEvent = {
     id: 'ripple-streamify',
     when: STREAMIFY,
     chance: 0.40,
-    conversation: rippleStreamify,
-    headline: 'Seven senior hires move from Streamify to Pear in a fortnight.',
+    conversation: rippleEarworm,
+    headline: 'Seven senior hires move from Earworm to Pear in a fortnight.',
     priority: 3,
 };
 
 // ============================================================================
 //  3. NOVIDIA — the lab that depends on the chips watches somebody else buy them
 // ============================================================================
-const NOVIDIA: Condition[] = [{ kind: 'flag', flag: 'boughtNovidia' }];
+const NOVIDIA: Condition[] = [{ kind: 'flag', flag: 'boughtLumenchip' }];
 
-export const rippleNovidia: Conversation = {
+export const rippleLumenchip: Conversation = {
     id: 'event-ripple-novidia',
     channel: 'mail',
     from: 'openai',
@@ -252,12 +252,12 @@ export const rippleNovidia: Conversation = {
     ],
 };
 
-export const rippleNovidiaEvent: GameEvent = {
+export const rippleLumenchipEvent: GameEvent = {
     id: 'ripple-novidia',
     when: NOVIDIA,
     chance: 0.40,
-    conversation: rippleNovidia,
-    headline: 'OpenAI-ish opens a process design centre. Recruiters are working one address.',
+    conversation: rippleLumenchip,
+    headline: 'Cognita Labs opens a process design centre. Recruiters are working one address.',
     priority: 3,
 };
 
@@ -323,7 +323,7 @@ export const rippleBiogenEvent: GameEvent = {
     when: BIOGEN,
     chance: 0.40,
     conversation: rippleBiogen,
-    headline: 'Two BioGen investigators are in discussions with Johnson & Swanson.',
+    headline: 'Two BioGen investigators are in discussions with Harper & Vance.',
     priority: 3,
 };
 
@@ -493,11 +493,11 @@ export const ripplePlanoraEvent: GameEvent = {
 };
 
 export const RIPPLE_CONVERSATIONS = [
-    rippleVoltmotors, rippleStreamify, rippleNovidia,
+    rippleVoltmotors, rippleEarworm, rippleLumenchip,
     rippleBiogen, rippleSkynet, ripplePlanora,
 ];
 
 export const RIPPLE_EVENTS = [
-    rippleVoltmotorsEvent, rippleStreamifyEvent, rippleNovidiaEvent,
+    rippleVoltmotorsEvent, rippleEarwormEvent, rippleLumenchipEvent,
     rippleBiogenEvent, rippleSkynetEvent, ripplePlanoraEvent,
 ];

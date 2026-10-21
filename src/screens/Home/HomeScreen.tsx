@@ -20,6 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserStore, useGameStore, useStatsStore, useEventStore, useMarketStore } from '../../core/store';
 import { useLaboratoryStore } from '../../core/store/useLaboratoryStore';
+import RemoveAdsSheet from '../../features/os/components/RemoveAdsSheet';
 import { useProductStore } from '../../core/store/useProductStore';
 import { useAssetsLogic } from '../../features/assets/hooks/useAssetsLogic';
 import { theme } from '../../core/theme';
@@ -38,6 +39,7 @@ import { startNewQuarter } from '../../features/life/components/Sanctuary/store/
 // import { useEquityStore } from '../../features/finance/stores/useEquityStore';
 import { FEATURES, filterByFeature, type FeatureKey } from '../../core/featureFlags';
 import { startNewGameAsking, confirmNewGame } from '../../core/newGamePrompt';
+import { adGate } from '../../core/ads/gate';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
 import Portrait from '../../components/common/Portrait';
 import { portraitFor } from '../../core/portraits';
@@ -152,6 +154,16 @@ const NewsItem = ({ text }: { text: string }) => (
 );
 
 const HomeScreen = () => {
+  // ----------------------------------------------------------------------
+  //  THE ONE CONTROL ON THIS SCREEN THAT ASKS FOR MONEY
+  // ----------------------------------------------------------------------
+  //  Read from the store billing.ts writes, never decided here. An owner must
+  //  not be shown a button selling them what they already have, and this is
+  //  the only check that stops it.
+  // ----------------------------------------------------------------------
+  const adFree = useIdentityStore(s => s.adFree);
+  const [adsSheetOpen, setAdsSheetOpen] = useState(false);
+
   const navigation = useNavigation<HomeNavProp>();
   // ------------------------------------------------------------------
   //  THE NAME COMES FROM THE IDENTITY STORE, NOT FROM HERE
@@ -338,6 +350,30 @@ const HomeScreen = () => {
           lostUnits: result.data.lostUnits || 0,
           productBreakdown: result.data.productBreakdown || [], // PASS THE DATA!
         };
+        // ------------------------------------------------------------------
+        //  THE QUARTERLY ADVERTISEMENT, BEFORE THE REPORT AND NOT AFTER
+        // ------------------------------------------------------------------
+        //  One line, and it is the whole integration at this call site. What
+        //  happens, how often, and whether this player has paid are all
+        //  decided behind `adGate`; this file knows only the name of the
+        //  moment. See core/ads/gate.ts.
+        //
+        //  AWAITED, and placed before `setReportVisible`. An interstitial is
+        //  a full screen window: shown after the report opens it lands ON TOP
+        //  of it, and the player dismisses the ad to find a report they have
+        //  already half read. Awaiting it means the report is the first thing
+        //  they see when the ad closes, which is also the moment it is worth
+        //  reading.
+        //
+        //  NOT WHEN THE RUN HAS JUST ENDED. Bankruptcy and removal are the
+        //  two endings this button can produce, and an advertisement between
+        //  "you lost the company" and the closing screen would be the game at
+        //  its worst. Every fourth quarter, except that one.
+        // ------------------------------------------------------------------
+        if (result.status !== 'bankrupt' && result.status !== 'removed') {
+          await adGate('quarterAdvanced');
+        }
+
         setLastReportData(mappedData);
         setReportVisible(true);
 
@@ -546,6 +582,42 @@ const HomeScreen = () => {
                 while the screen itself sat behind an app icon further down.
                 Two half-copies of the same thing, and the drawer's version
                 was the poorer one. */}
+            {/* ================================================================
+                THE WAY OUT, BESIDE THE WAY IN
+                ================================================================
+                Until now the purchase lived at the bottom of Settings, which
+                is where somebody goes once they have already decided. This is
+                the other half: a person who has just watched an advertisement
+                has nowhere to go, and this is the nowhere, fixed.
+
+                `advertisements-off` rather than a drawn word with a line
+                through it. The glyph is in the icon set already and it reads
+                as "no ads" in every language, which the word ADS does not.
+
+                GOLD, AND THE ONLY GOLD ON THIS SCREEN. It has to be noticed
+                next to a gear that is deliberately faint, and it has to be
+                obvious that it is not another settings control.
+
+                GONE ONCE BOUGHT. An owner seeing a button that sells them
+                what they already own is the clearest possible signal that
+                nobody checked.
+               ================================================================ */}
+            <View style={styles.brandActions}>
+            {!adFree && (
+              <Pressable
+                onPress={() => setAdsSheetOpen(true)}
+                hitSlop={12}
+                style={styles.brandAdFreeButton}
+                accessibilityLabel={t('ads.removeTitle')}
+              >
+                <MaterialCommunityIcons
+                  name="advertisements-off"
+                  size={22}
+                  color={theme.colors.premium}
+                />
+              </Pressable>
+            )}
+
             <Pressable
               onPress={() => handleNavigateStack('Settings')}
               hitSlop={12}
@@ -554,7 +626,10 @@ const HomeScreen = () => {
             >
               <MaterialCommunityIcons name="cog-outline" size={22} color="rgba(255,255,255,0.55)" />
             </Pressable>
+            </View>
           </View>
+
+          <RemoveAdsSheet visible={adsSheetOpen} onClose={() => setAdsSheetOpen(false)} />
 
           {/* ── Premium Player Header ── */}
           <View style={styles.headerCard}>
@@ -1603,8 +1678,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  // `brandContainer` is space-between with the wordmark on the left. A third
+  // child would have been spread into the middle of the row, so the two
+  // controls share one box and stay a pair.
+  brandActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   brandSettingsButton: {
     padding: 4,
+  },
+  // The same box as the gear, so the pair reads as one row of controls
+  // rather than a button that has been dropped next to an icon.
+  brandAdFreeButton: {
+    padding: 4,
+    marginRight: 2,
   },
   brandText: {
     fontSize: 22,

@@ -32,7 +32,7 @@ import {
 } from './mergers';
 import { INITIAL_MARKET_ITEMS } from '../../features/assets/data/marketData';
 import {
-    rippleVoltmotors, rippleStreamify, rippleNovidia,
+    rippleVoltmotors, rippleEarworm, rippleLumenchip,
     rippleBiogen, rippleSkynet, ripplePlanora,
     RIPPLE_CONVERSATIONS, RIPPLE_EVENTS,
 } from '../../data/events/ripple';
@@ -301,7 +301,7 @@ describe('six letters, one decision each', () => {
 describe('the rivals and the vultures do not sound alike', () => {
     it('a rival has somewhere to put the people on Monday', () => {
         expect(rippleVoltmotors.nodes[0].text).toContain('I am going to hire his cell engineers');
-        expect(rippleNovidia.nodes[0].text).toContain('as many of them as will come');
+        expect(rippleLumenchip.nodes[0].text).toContain('as many of them as will come');
     });
 
     it('and a fund cannot be paid to go away, which is why it is worse', () => {
@@ -354,7 +354,7 @@ describe('the rivals and the vultures do not sound alike', () => {
     });
 
     it('and Pear still sends a form', () => {
-        expect(rippleStreamify.subject).toContain('Ref:');
-        expect(rippleStreamify.nodes[0].text).toContain('courtesy notification');
+        expect(rippleEarworm.subject).toContain('Ref:');
+        expect(rippleEarworm.nodes[0].text).toContain('courtesy notification');
     });
 });

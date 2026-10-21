@@ -98,8 +98,8 @@ export interface AcquisitionDeal {
 /**
  * Borsa verisindeki risk etiketleri. `marketData.ts` ile birebir ayni
  * olmali — ilk yazimda sadece uc tanesi vardi ve 'Extreme' ile
- * 'Medium-High' sessizce 'Medium' muamelesi goruyordu. Yani SafeMoonScam
- * ile Pfizero ayni karliligi veriyordu.
+ * 'Medium-High' sessizce 'Medium' muamelesi goruyordu. Yani MoonVault
+ * ile Zenorex Pharma ayni karliligi veriyordu.
  */
 export type TargetRisk =
     | 'Very Low'
@@ -113,7 +113,7 @@ export type TargetRisk =
  * Piyasa degerinin yuzde kaci yillik faaliyet kari olarak gelir.
  *
  * NEGATIF DEGER MUMKUN — ve olmali. Oyundaki 'Extreme' riskli sirketler
- * zaten SafeMoonScam, PepeFake, HerbalLife Scam gibi seyler. Bunlarin
+ * zaten MoonVault, Frogcoin, Pyramid Wellness gibi seyler. Bunlarin
  * kar etmesi degil, para YAKMASI gerekir. Boylece:
  *   - degerleme, satin aldiktan sonra duser
  *   - 8. ceyrekte serefiye deger dusuklugu tetiklenir
@@ -188,7 +188,7 @@ export const INTEGRATION_QUARTERS = 4;
  *
  *  Yani sinerji hedefin KALITESINDEN tamamen bagimsizdi. Sonucu:
  *
- *   1) Para YAKAN bir sirket (SafeMoonScam, yilda -1,5M) satin alindiginda
+ *   1) Para YAKAN bir sirket (MoonVault, yilda -1,5M) satin alindiginda
  *      +2,9M sinerji aliyordu ve NET KAR ediyordu. "Deger tuzagi" diye
  *      tasarladigim sey aslinda karli bir yatirimdi.
  *

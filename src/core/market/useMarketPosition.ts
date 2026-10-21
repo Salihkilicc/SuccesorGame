@@ -77,7 +77,7 @@ const buildRanking = (
     //
     // HATA BUYDU: motor payi dogru devrediyordu (attraction.ts icinde
     // satin alinan sirketin cekiciligi oyuncuya geciyor), ama BU EKRAN
-    // bunu bilmiyordu. StartApp IO'yu aldiktan sonra tabloda hala
+    // bunu bilmiyordu. Launchpad IO'yu aldiktan sonra tabloda hala
     // "rakip, %1.2" olarak duruyordu ve oyuncu "payini alamadim"
     // diye gordu.
     const owned = market.competitors.filter(c => acquiredIds.includes(c.stockId));

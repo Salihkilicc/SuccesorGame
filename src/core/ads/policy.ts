@@ -66,6 +66,14 @@ export type AdState = {
 
     /** Bets, spins, hits, presses - anything the player did in the casino. */
     casinoTapsSinceAd: number;
+
+    /**
+     * Advertisements shown since the purchase was last offered.
+     *
+     * Not persisted, like every counter here: the worst a reset can do is make
+     * the offer arrive later, which is the forgiving direction.
+     */
+    adsSinceOffer: number;
 };
 
 export const emptyAdState = (): AdState => ({
@@ -74,6 +82,7 @@ export const emptyAdState = (): AdState => ({
     datePressesSinceAd: 0,
     casinoMsSinceAd: 0,
     casinoTapsSinceAd: 0,
+    adsSinceOffer: 0,
 });
 
 // ---------------------------------------------------------------------------
@@ -125,6 +134,31 @@ export const CASINO_MS_PER_TAP = 1000;
  */
 export const CASINO_MIN_MS = 3 * 60 * 1000;
 
+/**
+ * How many advertisements a player sits through before being offered the way
+ * out of them.
+ *
+ * ---------------------------------------------------------------------------
+ *  TEN, AND THE NUMBER IS THE WHOLE DESIGN
+ * ---------------------------------------------------------------------------
+ *  The offer is worth making at the moment somebody is actually annoyed, and
+ *  worthless everywhere else: a person who has just closed an advertisement
+ *  knows exactly what they would be buying. Settings is where somebody goes
+ *  looking, which is a different and much smaller group.
+ *
+ *  Ten because it has to be rare enough that the offer is not itself a second
+ *  advertisement. At four it is nagging and the game feels like it is for
+ *  sale; at thirty nobody meets it in a session. Ten lands roughly once an
+ *  evening at this pacing.
+ *
+ *  AN OFFER IS NOT AN AD. It does not go through the presenter, it costs no
+ *  network call, and it must be dismissable with one tap. If it ever becomes
+ *  a thing somebody has to sit through, this number is wrong and so is the
+ *  design.
+ * ---------------------------------------------------------------------------
+ */
+export const ADS_PER_OFFER = 10;
+
 /** How long the player may stay before the next casino ad, given their pace. */
 export const casinoIntervalMs = (taps: number): number =>
     Math.max(CASINO_MIN_MS, CASINO_BASE_MS - Math.max(0, taps) * CASINO_MS_PER_TAP);
@@ -144,6 +178,14 @@ export type AdDecision = {
      * out loud rather than being a silent false.
      */
     reason: 'shown' | 'adFree' | 'notYet';
+    /**
+     * Offer the ad-free purchase once this advertisement is closed.
+     *
+     * Only ever true alongside `show`, because the offer is made to somebody
+     * who has just been interrupted. Offering it to a player who was NOT shown
+     * an advertisement is a sales pitch arriving out of nowhere.
+     */
+    offer: boolean;
 };
 
 /**
@@ -152,6 +194,34 @@ export type AdDecision = {
  * Pure. Given the same state and trigger it returns the same answer, which is
  * what lets the whole policy be tested without a device.
  */
+/**
+ * Count the advertisement about to be shown, and say whether it earns an offer.
+ *
+ * ---------------------------------------------------------------------------
+ *  ONE PLACE, NOT FIVE
+ * ---------------------------------------------------------------------------
+ *  `decide` has four branches that can return `show: true`. Incrementing the
+ *  counter inside each of them is four chances to miss one, and the branch
+ *  that would be missed is `leftPokerTable`, which is the only one that always
+ *  fires and therefore the one whose absence is hardest to notice.
+ *
+ *  So every return from the switch goes through here instead.
+ *
+ *  COUNTED WHEN THE DECISION IS MADE, not when the advertisement is confirmed
+ *  on screen. The gate already treats a failed presentation as a consumed
+ *  turn - see the note in gate.ts - and splitting the two would mean the offer
+ *  counter and the pacing counters disagreeing about what an ad is.
+ * ---------------------------------------------------------------------------
+ */
+const withOffer = (decision: Omit<AdDecision, 'offer'>): AdDecision => {
+    if (!decision.show) return { ...decision, offer: false };
+
+    const shown = decision.next.adsSinceOffer + 1;
+    return shown >= ADS_PER_OFFER
+        ? { ...decision, next: { ...decision.next, adsSinceOffer: 0 }, offer: true }
+        : { ...decision, next: { ...decision.next, adsSinceOffer: shown }, offer: false };
+};
+
 export const decide = (
     state: AdState,
     trigger: AdTrigger,
@@ -166,18 +236,18 @@ export const decide = (
     //  land somebody in a state where the next ad is owed immediately.
     // ----------------------------------------------------------------------
     const counted = count(state, trigger, elapsedMs);
-    if (state.adFree) return { show: false, next: counted, reason: 'adFree' };
+    if (state.adFree) return withOffer({ show: false, next: counted, reason: 'adFree' });
 
     switch (trigger) {
         case 'quarterAdvanced':
-            return counted.quartersSinceAd >= QUARTERS_PER_AD
+            return withOffer(counted.quartersSinceAd >= QUARTERS_PER_AD
                 ? { show: true, next: { ...counted, quartersSinceAd: 0 }, reason: 'shown' }
-                : { show: false, next: counted, reason: 'notYet' };
+                : { show: false, next: counted, reason: 'notYet' });
 
         case 'datePressed':
-            return counted.datePressesSinceAd >= DATE_PRESSES_PER_AD
+            return withOffer(counted.datePressesSinceAd >= DATE_PRESSES_PER_AD
                 ? { show: true, next: { ...counted, datePressesSinceAd: 0 }, reason: 'shown' }
-                : { show: false, next: counted, reason: 'notYet' };
+                : { show: false, next: counted, reason: 'notYet' });
 
         // ------------------------------------------------------------------
         //  LEAVING THE TABLE IS ITS OWN EVENT, AND IT RESETS THE CLOCK
@@ -191,16 +261,16 @@ export const decide = (
         //  seconds later because the interval had almost elapsed underneath.
         // ------------------------------------------------------------------
         case 'leftPokerTable':
-            return {
+            return withOffer({
                 show: true,
                 next: { ...counted, casinoMsSinceAd: 0, casinoTapsSinceAd: 0 },
                 reason: 'shown',
-            };
+            });
 
         case 'casinoTick':
-            return counted.casinoMsSinceAd >= casinoIntervalMs(counted.casinoTapsSinceAd)
+            return withOffer(counted.casinoMsSinceAd >= casinoIntervalMs(counted.casinoTapsSinceAd)
                 ? { show: true, next: { ...counted, casinoMsSinceAd: 0, casinoTapsSinceAd: 0 }, reason: 'shown' }
-                : { show: false, next: counted, reason: 'notYet' };
+                : { show: false, next: counted, reason: 'notYet' });
     }
 };
 

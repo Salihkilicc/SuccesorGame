@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { useCasinoAdClock } from '../../../core/ads/useCasinoAdClock';
 import { t, useLocale } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
 import { formatCompact } from '../../../core/utils';
@@ -30,6 +31,18 @@ import ConfirmPanel from '../../../components/common/ConfirmPanel';
 
 const CasinoScreen: React.FC = () => {
   useLocale();
+
+  // --------------------------------------------------------------------
+  //  THE CASINO CLOCK
+  // --------------------------------------------------------------------
+  //  Mounted HERE, on the hub, rather than on each of the four game
+  //  screens. The games are pushed on top of this screen and it stays
+  //  mounted underneath them, so one clock covers the slot machines, the
+  //  roulette table, blackjack and poker without restarting when the
+  //  player walks between them. The rule is about being inside the
+  //  casino, and this is the screen that means being inside it.
+  // --------------------------------------------------------------------
+  useCasinoAdClock();
 
   const { state, actions } = useCasinoHomeLogic();
   /**

@@ -100,9 +100,26 @@ describeAndroid('android boots under the name javascript registered', () => {
         expect(read('IDENTITY.md')).toContain(APPLICATION_ID);
     });
 
-    it('the name under the icon is the game, not the throwaway project', () => {
-        expect(read(`${ANDROID}/app/src/main/res/values/strings.xml`))
-            .toContain(`<string name="app_name">${APP_NAME}</string>`);
+    it('the gradle project is the game, not the throwaway project', () => {
+        // ------------------------------------------------------------------
+        //  THIS ASSERTION USED TO INCLUDE strings.xml app_name, AND THAT WAS
+        //  A CONFLATION OF TWO DIFFERENT NAMES
+        // ------------------------------------------------------------------
+        //  SHELVED, left here because the mistake is worth seeing:
+        //
+        //      expect(read(`${ANDROID}/app/src/main/res/values/strings.xml`))
+        //          .toContain(`<string name="app_name">${APP_NAME}</string>`);
+        //
+        //  `APP_NAME` is the AppRegistry component id and nothing else. It has
+        //  to match MainActivity, which is what the test above is for. The
+        //  launcher LABEL is a separate thing that has to match the two store
+        //  listings, and both of those say "Successor" with the second s.
+        //
+        //  Holding them to one constant meant the home screen was pinned to a
+        //  misspelling of the store's own name, and the test agreed with it.
+        //  The label is now asserted in appIcons.test.ts, against the store
+        //  name, and the two are deliberately allowed to differ.
+        // ------------------------------------------------------------------
         expect(read(`${ANDROID}/settings.gradle`))
             .toContain(`rootProject.name = '${APP_NAME}'`);
     });
@@ -211,6 +228,169 @@ describeAndroid('the things that fail without failing', () => {
             .filter(d => !fs.existsSync(path.join(
                 ROOT, ANDROID, 'app/src/main/res', `drawable-${d}`, 'bootsplash_logo.png')));
         expect(missing).toEqual([]);
+    });
+});
+
+describeAndroid('the release build is signed with a key Play will accept', () => {
+    // ------------------------------------------------------------------
+    //  THE LINE THAT KEPT THE PROJECT OFF THE STORE
+    // ------------------------------------------------------------------
+    //  React Native's template ships `release { signingConfig
+    //  signingConfigs.debug }` with a comment warning you about it, and
+    //  nothing ever enforces the warning. The build succeeds, the AAB
+    //  appears where it is supposed to, and Play refuses it.
+    //
+    //  That is this repository's signature failure in a build file: a
+    //  check that passes because it is not looking. Here is the look.
+    // ------------------------------------------------------------------
+    const gradle = () => read(`${ANDROID}/app/build.gradle`);
+
+    /**
+     * The release buildType block, without the signingConfigs above it, and
+     * without its own comments.
+     *
+     * The comment stripping is not tidiness. The first run of this test failed
+     * on the sentence explaining what the line used to say, exactly the way
+     * the reachability audit once counted a hex colour quoted inside a JSX
+     * comment. A test that reads source has to read the code, not the prose
+     * about the code.
+     */
+    const releaseBuildType = (): string => {
+        const src = gradle();
+        const types = src.indexOf('buildTypes {');
+        expect(types).toBeGreaterThan(-1);
+        const start = src.indexOf('release {', types);
+        expect(start).toBeGreaterThan(-1);
+        return src.slice(start, src.indexOf('\n        }', start))
+            .split('\n')
+            .filter(line => !line.trim().startsWith('//'))
+            .join('\n');
+    };
+
+    it('release does not reach for the debug key', () => {
+        // Scoped to the release buildType on purpose. A file-wide
+        // `not.toContain('signingConfigs.debug')` would be a lie: the
+        // debug buildType uses it legitimately, so the assertion would
+        // have to be deleted rather than kept, and a file-wide claim for
+        // a block-level fact is how newGamePrompt.test.ts passed for the
+        // wrong reason.
+        expect(releaseBuildType()).not.toContain('signingConfigs.debug');
+    });
+
+    it('and uses the upload key instead', () => {
+        expect(releaseBuildType()).toContain('signingConfig signingConfigs.release');
+    });
+
+    it('which reads its passwords from outside the repository', () => {
+        const src = gradle();
+        expect(src).toContain("project.hasProperty('SUCCESOR_UPLOAD_STORE_FILE')");
+        for (const prop of [
+            'SUCCESOR_UPLOAD_STORE_FILE',
+            'SUCCESOR_UPLOAD_STORE_PASSWORD',
+            'SUCCESOR_UPLOAD_KEY_ALIAS',
+            'SUCCESOR_UPLOAD_KEY_PASSWORD',
+        ]) {
+            expect([prop, src.includes(prop)]).toEqual([prop, true]);
+        }
+    });
+
+    it('and no committed file carries the value of any of them', () => {
+        // ------------------------------------------------------------------
+        //  THE ONE THAT CANNOT BE UNDONE BY FIXING IT
+        // ------------------------------------------------------------------
+        //  A password committed once is in the history forever, and the
+        //  usual repair - change the password - does not apply here,
+        //  because the key it protects is frozen by Play at first upload.
+        //
+        //  So this looks for an ASSIGNMENT, `SUCCESOR_..._PASSWORD=value`,
+        //  rather than for the name. The names are supposed to be here;
+        //  a value next to one is the accident.
+        //
+        //  NARROWED, AFTER IT FIRED ON ITS OWN INSTRUCTIONS
+        //  ------------------------------------------------
+        //  The first version also matched ALIAS and STORE_FILE, and went red
+        //  the moment build.gradle's error message spelled out the four lines
+        //  the user has to paste. That was the test being wrong, not the
+        //  file: an alias and a filename are not secrets - both are readable
+        //  straight out of the signed artifact - and a check that forbids
+        //  printing them is a check that forbids the error message from
+        //  being useful.
+        //
+        //  The password is the only one that cannot be printed, so it is the
+        //  only one this looks for. `<...>` is excluded because that is the
+        //  placeholder shape the message uses.
+        // ------------------------------------------------------------------
+        const committed = [
+            `${ANDROID}/app/build.gradle`,
+            `${ANDROID}/gradle.properties`,
+            `${ANDROID}/build.gradle`,
+            'gradle.properties',
+        ].filter(f => fs.existsSync(path.join(ROOT, f)));
+
+        const leaked = committed.filter(f =>
+            /SUCCESOR_UPLOAD_[A-Z_]*PASSWORD\s*=\s*(?!<)\S/.test(read(f)));
+        expect(leaked).toEqual([]);
+    });
+
+    it('the kotlin metadata gap is bridged for the ads module and nothing else', () => {
+        // ------------------------------------------------------------------
+        //  MEASURED FROM TWO FAILED BUILDS, NOT FROM A GUESS
+        // ------------------------------------------------------------------
+        //  play-services-ads 25.4.0 carries Kotlin metadata 2.3.0 and this
+        //  project compiles with 2.1.20, which reads up to 2.2.
+        //
+        //  The first attempt raised `kotlinVersion` to 2.3.21. That property
+        //  moves the stdlib COORDINATES, not the compiler - React Native's
+        //  gradle plugin owns the Kotlin Gradle Plugin version - so it handed
+        //  a 2.3 stdlib to a 2.1 compiler and five modules failed instead of
+        //  one.
+        //
+        //  So two things are pinned here, and the second matters more than
+        //  the first: the flag exists, AND it is confined to the advertising
+        //  module. A future hand that lifts it to `allprojects` would be
+        //  silencing the check for react-native-purchases too, and that is
+        //  the module that takes money.
+        // ------------------------------------------------------------------
+        const gradle = read(`${ANDROID}/build.gradle`);
+        expect(gradle).toContain('-Xskip-metadata-version-check');
+        expect(gradle).toMatch(
+            /subproject\.name == "react-native-google-mobile-ads"[\s\S]{0,200}-Xskip-metadata-version-check/,
+        );
+
+        // And the version that was tried and reverted stays reverted.
+        expect(gradle).toContain('kotlinVersion = "2.1.20"');
+    });
+
+    it('and a missing password says so instead of throwing a null', () => {
+        // ------------------------------------------------------------------
+        //  MEASURED, NOT ASSUMED
+        // ------------------------------------------------------------------
+        //  The first real `./gradlew bundleRelease` on this project ended:
+        //
+        //      > Task :app:signReleaseBundle FAILED
+        //      > java.lang.NullPointerException (no error message)
+        //
+        //  after four and a half minutes of compiling. No property name, no
+        //  file name, no mention of signing at all. This pins the check that
+        //  turns that into a sentence, and pins the two things that make the
+        //  check safe: it reads the task GRAPH, so it cannot break a debug
+        //  build, and it names the file the passwords actually go in.
+        // ------------------------------------------------------------------
+        const src = gradle();
+        expect(src).toContain('gradle.taskGraph.whenReady');
+        expect(src).toContain('throw new GradleException');
+        expect(src).toContain('~/.gradle/gradle.properties');
+    });
+
+    it('and the key itself can never be added by accident', () => {
+        // The file exists on his machine and must not exist in git. The
+        // rule that catches it is `*.keystore`, with `!debug.keystore`
+        // letting the one harmless key through.
+        const ignore = read('.gitignore');
+        expect(ignore).toContain('*.keystore');
+        expect(ignore).toContain('!debug.keystore');
+        // A re-include for the upload key would silently undo all of it.
+        expect(ignore).not.toContain('!succesor-upload.keystore');
     });
 });
 

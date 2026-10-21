@@ -5,6 +5,38 @@ buildscript {
         compileSdkVersion = 36
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
+        // ====================================================================
+        //  DO NOT RAISE THIS TO FIX AN ADVERTISING SDK. IT WAS TRIED.
+        // ====================================================================
+        //  play-services-ads 25.4.0 carries Kotlin metadata 2.3.0, and
+        //  :react-native-google-mobile-ads:compileReleaseKotlin refuses it:
+        //
+        //      The binary version of its metadata is 2.3.0, expected 2.1.0.
+        //
+        //  The obvious reading is "the compiler is too old, raise it", and
+        //  this line was set to 2.3.21 to do exactly that. IT MADE THINGS
+        //  WORSE, and the build said why:
+        //
+        //      [AsyncStorage] Could not find ksp version for 2.3.21.
+        //      ksp-2.1.0-1.0.28 is too old for kotlin-2.1.20.
+        //      ...kotlin-stdlib-2.3.21.jar!/META-INF/kotlin-stdlib.kotlin_module
+        //      Module was compiled with an incompatible version of Kotlin.
+        //      The binary version of its metadata is 2.3.0, expected 2.1.0.
+        //
+        //  Read those two together. The STDLIB moved to 2.3.21, because this
+        //  property feeds the dependency coordinates. The COMPILER stayed at
+        //  2.1.20, because the Kotlin Gradle Plugin version comes from React
+        //  Native's gradle plugin and not from here - `classpath(
+        //  "org.jetbrains.kotlin:kotlin-gradle-plugin")` below carries no
+        //  version on purpose.
+        //
+        //  So the change raised the library the compiler had to READ without
+        //  raising the compiler, and one failing module became five: ads,
+        //  purchases, pager-view, safe-area-context, and async-storage's KSP.
+        //
+        //  The fix lives at the bottom of this file instead, and it is scoped
+        //  to the single module that has the problem.
+        // ====================================================================
         kotlinVersion = "2.1.20"
     }
     repositories {
@@ -62,6 +94,68 @@ allprojects {
         maven {
             url = uri(asyncStorageRepo)
             content { includeGroup("org.asyncstorage.shared_storage") }
+        }
+    }
+}
+
+// ============================================================================
+//  ONE MODULE IS ALLOWED TO READ METADATA FROM A NEWER KOTLIN. ONLY ONE.
+// ============================================================================
+//
+//  THE PROBLEM, measured:
+//
+//      play-services-ads-25.4.0-api.jar!/META-INF/...kotlin_module
+//      Module was compiled with an incompatible version of Kotlin.
+//      The binary version of its metadata is 2.3.0, expected version is 2.1.0.
+//      ...the compiler version 2.1.0 can read versions up to 2.2.0.
+//
+//  Google built the advertising SDK with Kotlin 2.3. This project compiles
+//  with 2.1.20, which reads up to 2.2. One minor version apart.
+//
+//  ---------------------------------------------------------------------------
+//  WHY NOT RAISE THE COMPILER: BECAUSE IT WAS TRIED, AND IT DOES NOT
+//  ---------------------------------------------------------------------------
+//  See the note on `kotlinVersion` above. That property sets the stdlib
+//  COORDINATES and not the compiler; React Native's gradle plugin owns the
+//  Kotlin Gradle Plugin version. Setting it to 2.3.21 handed a 2.3 stdlib to a
+//  2.1 compiler and turned one failing module into five.
+//
+//  ---------------------------------------------------------------------------
+//  WHY NOT DOWNGRADE THE ADVERTISING SDK
+//  ---------------------------------------------------------------------------
+//  It is the other honest option and it may still be the answer. It needs a
+//  version number: which play-services-ads was the last built with Kotlin 2.2
+//  or older. Google does not publish this artifact to Maven Central and its
+//  own repository could not be read from here, so that number would be a
+//  GUESS, and a guess that downgrades an SDK underneath a wrapper written
+//  against 25.4 can fail at runtime rather than at compile time.
+//
+//  ---------------------------------------------------------------------------
+//  AND WHY THIS FLAG, HAVING ARGUED AGAINST IT
+//  ---------------------------------------------------------------------------
+//  The first instinct was to refuse `-Xskip-metadata-version-check` on the
+//  grounds that it "usually works", which is not a standard for code that
+//  takes people's money. Two things changed that reading:
+//
+//    1. IT IS SCOPED TO ONE MODULE. Not the app, not RevenueCat, not the
+//       fourteen other Kotlin libraries. Only the advertising wrapper, whose
+//       entire job is to forward calls to a Java SDK. The purchase path -
+//       react-native-purchases - compiles untouched at 2.1.20, and did so
+//       successfully before any of this was tried.
+//
+//    2. THE GAP IS ONE MINOR VERSION, which is the case this flag exists for.
+//       And if it were not readable in a way that mattered, the failure would
+//       be loud: a compile error now, or a NoSuchMethodError the first time
+//       an ad is requested. It is not the silent kind.
+//
+//  THIS LINE DISAPPEARS when React Native ships a Kotlin the ads SDK was
+//  built with, or when the wrapper pins an older SDK. It is a bridge over a
+//  version gap, not a design.
+// ============================================================================
+subprojects { subproject ->
+    if (subproject.name == "react-native-google-mobile-ads") {
+        subproject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            compilerOptions.freeCompilerArgs.add("-Xskip-metadata-version-check")
         }
     }
 }

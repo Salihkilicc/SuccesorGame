@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">Succesor</string>
+    <!--
+      THE LABEL UNDER THE ICON, AND THE ONE NAME THAT IS NOT THIS ONE.
+
+      This is the visible name and it must match the App Store and Play
+      listings, which are both "Successor". It read "Succesor" until the icon
+      pass, so the home screen carried a misspelling of the store's own name.
+
+      DO NOT make index.js or MainActivity.kt agree with this string. Those
+      two carry "Succesor" as the AppRegistry component id: an internal key
+      that only has to match ITSELF on both sides. Changing one of them opens
+      a white screen with nothing in the log, which is what
+      src/core/androidBoot.test.ts exists to prevent.
+    -->
+    <string name="app_name">Successor</string>
 </resources>

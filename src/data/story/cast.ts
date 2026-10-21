@@ -160,13 +160,13 @@ export const CAST: Cast = {
     edison: {
         id: 'edison',
         name: 'Hal Brennerman',
-        role: 'Chief Executive, Edison Motors',
+        role: 'Chief Executive, Dynamo Motors',
         channels: 'mail',
         email: 'h.brennerman@edisonmotors.com',
         tone: 'Thirty-one years in a business of dealers and service bays, and he talks like it: parts, counties, contract terms, people who answer phones at two in the morning. Never threatens, describes an arrangement that already exists and lets you work out that you are outside it. Agrees with your accusations, which is worse than denying them.',
     },
 
-    // The Deep Tech incumbent, and she is at OpenAI-ish rather than Novidia
+    // The Deep Tech incumbent, and she is at Cognita Labs rather than Lumenchip
     // because the giant of a market is whoever holds the most of it and the
     // data says 29 against 26. A first draft had this letter coming from the
     // chip company and threatening allocation, which read well and was about
@@ -175,7 +175,7 @@ export const CAST: Cast = {
     openai: {
         id: 'openai',
         name: 'Wen Zhao-Lindqvist',
-        role: 'Head of Research Operations, OpenAI-ish',
+        role: 'Head of Research Operations, Cognita Labs',
         channels: 'mail',
         email: 'research-ops@openaiish.com',
         tone: 'Writes an HR email about an existential threat and does not appear to notice the difference. Short paragraphs, scheduling language, no adjectives. Sincere congratulations followed immediately by terms. Never says the word "poach" and never needs to.',

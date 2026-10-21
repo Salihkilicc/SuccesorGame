@@ -82,3 +82,13 @@ build/
 # Python tooling
 __pycache__/
 *.pyc
+
+# Keystore file
+#
+# The upload key, named explicitly. It is ALREADY covered by the `*.keystore`
+# rule further up, which is why `git check-ignore` matched line 34 rather than
+# this one. Both are kept: the rule up there is the net, this line is the
+# reason. Whoever reads the rule later should not be able to mistake it for
+# dead weight and remove it, because the file it catches is the one thing in
+# this repository that cannot be regenerated.
+succesor-upload.keystore

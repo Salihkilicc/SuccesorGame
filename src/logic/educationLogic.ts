@@ -1,3 +1,4 @@
+import { t } from '../core/i18n';
 import { EDUCATION_DATA } from '../features/education/data/educationData';
 import { PlayerState } from '../core/store/usePlayerStore';
 import { EducationItem } from '../features/education/educationTypes';
@@ -79,13 +80,21 @@ export const advanceEducation = (
     if (newProgress >= 100) {
         return {
             status: 'graduated',
-            message: `Congratulations! You have completed ${program.title}!`,
+            // ------------------------------------------------------------------
+            //  TWO SENTENCES THE SWEEP COULD NOT SEE
+            // ------------------------------------------------------------------
+            //  `scripts/untranslated.js` reads .tsx files, and these are in a
+            //  .ts logic module, interpolated into a template literal. They
+            //  reached the player in English behind a green sweep for as long
+            //  as the degrees did.
+            // ------------------------------------------------------------------
+            message: t('edu.graduated', { title: program.title }),
         };
     }
 
     return {
         status: 'in_progress',
-        message: 'You made progress in your studies.',
+        message: t('edu.progressMade'),
         progressChange: actualProgress
     };
 };

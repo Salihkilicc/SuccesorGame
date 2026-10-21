@@ -71,7 +71,7 @@ export const SQUEEZE_THRESHOLD = 1_200_000;
 // ============================================================================
 //  1. PEAR — the tactical purchase
 // ============================================================================
-//  He tried to hire Streamify's people the week you bought it (see ripple.ts).
+//  He tried to hire Earworm's people the week you bought it (see ripple.ts).
 //  This is the other approach, and it is the one that should worry the player
 //  more, because it is generous.
 //

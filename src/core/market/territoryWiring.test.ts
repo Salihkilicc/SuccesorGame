@@ -53,7 +53,7 @@ describe('the effects reach the store', () => {
         // The name of whoever you agreed with, resolved from the market data
         // rather than passed in by the scene - so a rebalance cannot leave the
         // player owing money to somebody who is no longer the incumbent.
-        expect(term.giant).toBe('Edison Motors');
+        expect(term.giant).toBe('Dynamo Motors');
     });
 
     it('and signing the same category twice does not stack two cuts', () => {

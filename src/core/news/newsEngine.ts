@@ -88,7 +88,7 @@ const getProductLaunchTemplate = (productName: string, category?: string): NewsT
       type: 'rival',
       category: 'Market',
       source: 'Wall St Journal',
-      text: `Pear and Microhard engineering teams initiate urgent tear-downs of Hale's newly released '${productName}'.`,
+      text: `Pear and Gigasoft engineering teams initiate urgent tear-downs of Hale's newly released '${productName}'.`,
     },
   ];
   return sampleRandomItems(templates, 1)[0];
@@ -109,7 +109,7 @@ const getAcquisitionTemplate = (subsidiaryName: string): NewsTemplate => {
       type: 'rival',
       category: 'Corporate',
       source: 'Bloomberg Markets',
-      text: `Pear and Microhard executives express deep boardroom anxiety following Hale's strategic buyout of ${subsidiaryName}.`,
+      text: `Pear and Gigasoft executives express deep boardroom anxiety following Hale's strategic buyout of ${subsidiaryName}.`,
     },
     {
       type: 'world',
@@ -194,7 +194,7 @@ export const generateQuarterlyNews = (currentQuarter: number): NewsPayload[] => 
     selectedTemplates.push(...sampleRandomItems(pearStories.length > 0 ? pearStories : PEAR_RIVAL_NEWS_POOL, 1));
   }
 
-  // --- SECONDARY RIVAL MOVE (Microhard / Apex / Titan) ---
+  // --- SECONDARY RIVAL MOVE (Gigasoft / Apex / Titan) ---
   if (selectedTemplates.length < 3) {
     const otherRivals = [
       ...LIVING_WORLD_NEWS_POOL.filter((t) => t.type === 'rival' && !t.text.toLowerCase().includes('pear')),

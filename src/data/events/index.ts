@@ -42,7 +42,7 @@ import {
     territoryBioTechEvent, territoryConsumerEvent,
 } from './territory';
 import {
-    rippleVoltmotorsEvent, rippleStreamifyEvent, rippleNovidiaEvent,
+    rippleVoltmotorsEvent, rippleEarwormEvent, rippleLumenchipEvent,
     rippleBiogenEvent, rippleSkynetEvent, ripplePlanoraEvent,
 } from './ripple';
 import {
@@ -142,8 +142,8 @@ export const EVENTS: GameEvent[] = [
     // Buying a company is not a private transaction. Four rivals who wanted
     // the same business and one fund that wanted two of them cheap.
     rippleVoltmotorsEvent,
-    rippleStreamifyEvent,
-    rippleNovidiaEvent,
+    rippleEarwormEvent,
+    rippleLumenchipEvent,
     rippleBiogenEvent,
     rippleSkynetEvent,
     ripplePlanoraEvent,

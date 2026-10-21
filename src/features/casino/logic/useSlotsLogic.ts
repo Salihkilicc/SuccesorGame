@@ -1,3 +1,4 @@
+import { countCasinoTap } from '../../../core/ads/gate';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
@@ -234,6 +235,12 @@ export const useSlotsLogic = (
     if (bet <= 0) return casinoAlert('Place Bet', 'Select a chip to play!');
     if (isSpinning) return;
     if (!spendMoney(bet)) return casinoAlert('Funds', "You don't have enough cash!");
+
+    // One casino action. It NEVER produces an advertisement; it only brings
+    // the casino clock's next one closer. "her tiklama biraz dussun cok degil
+    // ama dussun". Counted after the money is taken, so a refused spin does
+    // not count as playing. See core/ads/policy.ts.
+    countCasinoTap();
 
     // DECIDED HERE, BEFORE ANYTHING MOVES. See core/casino/slots.ts.
     const spin = spinSlot(config);

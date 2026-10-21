@@ -9,9 +9,14 @@ import {
     StatusBar,
     ScrollView,
     Switch,
+    Linking,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { appVersionLabel } from '../../../core/appVersion';
+import { PRIVACY_POLICY_URL, SUPPORT_URL, TERMS_OF_USE_URL } from '../../../core/legal';
+import AdDiagnosticsSection from '../components/AdDiagnosticsSection';
+import RemoveAdsSection from '../components/RemoveAdsSection';
 import { theme } from '../../../core/theme';
 import { t } from '../../../core/i18n';
 import { useSettingsLogic } from '../logic/useSettingsLogic';
@@ -270,13 +275,35 @@ const SettingsScreen: React.FC = () => {
                         />
                     </View>
 
+                    {/* ── Section: Advertising ──
+                        Above About and below Preferences, because it is a
+                        thing the player can DO rather than a document they can
+                        read. A purchase control buried under the legal links
+                        is a purchase control nobody finds. */}
+                    <RemoveAdsSection />
+
                     {/* ── Section: About / Legal ── */}
                     <Text style={styles.sectionTitle}>{t('os.about').toUpperCase()}</Text>
                     <View style={styles.group}>
-                        <SettingsRow
+{/* ====================================================================
+                            ALL THREE OF THESE REPORTED THEMSELVES UNAVAILABLE,
+                            AND TWO OF THEM ARE REQUIRED TO SUBMIT AT ALL
+                            ====================================================
+                            App Store Connect makes a privacy policy URL and a
+                            support URL required fields on a submission; Play
+                            Console requires the policy and a contact address.
+                            These three rows shipped as dead controls the whole
+                            time, so a reviewer pressing one met "unavailable"
+                            on the way to approving a paid feature.
+
+                            The addresses live in core/legal.ts, so this screen,
+                            the purchase sheet and the store listings cannot
+                            drift apart. See legal.test.ts.
+                           ==================================================== */}
+                                                <SettingsRow
                             icon="file-document-outline"
                             label={t('os.termsConditions')}
-                            onPress={() => actions.handleUnavailable(t('os.termsConditions'))}
+                            onPress={() => { void Linking.openURL(TERMS_OF_USE_URL); }}
                             isFirst
                             iconColor={theme.categories.products}
                         />
@@ -284,14 +311,14 @@ const SettingsScreen: React.FC = () => {
                         <SettingsRow
                             icon="shield-check-outline"
                             label={t('os.privacyPolicy')}
-                            onPress={() => actions.handleUnavailable(t('os.privacyPolicy'))}
+                            onPress={() => { void Linking.openURL(PRIVACY_POLICY_URL); }}
                             iconColor={theme.categories.market}
                         />
                         <View style={styles.divider} />
                         <SettingsRow
                             icon="help-circle-outline"
                             label={t('os.helpSupport')}
-                            onPress={() => actions.handleUnavailable(t('os.helpSupport'))}
+                            onPress={() => { void Linking.openURL(SUPPORT_URL); }}
                             isLast
                             iconColor={theme.categories.finance}
                         />
@@ -360,6 +387,21 @@ const SettingsScreen: React.FC = () => {
                                     iconColor={theme.colors.warning}
                                 />
                             </View>
+
+                            {/* ──────────────────────────────────────────────
+                                AND THE ONE THING A RELEASE BUILD CANNOT SAY
+
+                                Google Play Billing only works in an app
+                                installed from Play, which is a release build,
+                                which has no console. Every log in core/ads is
+                                behind __DEV__ and so is silent in the only
+                                build where a purchase can be made.
+
+                                This section is that information, on the
+                                device. It sits inside the admin block, so it
+                                is seven taps away and invisible until then.
+                               ────────────────────────────────────────────── */}
+                            <AdDiagnosticsSection />
                         </>
                     )}
 
@@ -378,7 +420,7 @@ const SettingsScreen: React.FC = () => {
                        ────────────────────────────────────────────────────── */}
                     <View style={styles.footer}>
                         <Pressable onPress={actions.tapVersion} hitSlop={12}>
-                            <Text style={styles.footerVersion}>{t('os.successorOsV100')}</Text>
+                            <Text style={styles.footerVersion}>{t('os.successorOsV100', { version: appVersionLabel() })}</Text>
                         </Pressable>
                         {state.adminTapsLeft !== null && (
                             <Text style={styles.footerVersion}>

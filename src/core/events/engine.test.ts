@@ -342,8 +342,8 @@ describe('the events that actually ship', () => {
                 capital: 400_000_000,
                 flags: {
                     fatherDead: true,
-                    boughtVoltmotors: true, boughtStreamify: true,
-                    boughtNovidia: true, boughtBiogen: true,
+                    boughtVoltmotors: true, boughtEarworm: true,
+                    boughtLumenchip: true, boughtBiogen: true,
                     boughtSkynet: true, boughtPlanora: true,
                 },
             }],

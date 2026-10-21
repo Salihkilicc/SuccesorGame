@@ -212,8 +212,8 @@ export type StoryFlag =
     //     company is a line of data rather than a change here and a change
     //     there. See core/market/ripple.ts.
     | 'boughtVoltmotors'
-    | 'boughtStreamify'
-    | 'boughtNovidia'
+    | 'boughtEarworm'
+    | 'boughtLumenchip'
     | 'boughtBiogen'
     | 'boughtSkynet'
     | 'boughtPlanora'

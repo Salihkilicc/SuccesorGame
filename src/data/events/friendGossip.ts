@@ -89,7 +89,7 @@ export const friendGossipSmallEvent: GameEvent = {
     chance: 0.15,
     cooldown: 5,
     conversation: friendGossipSmall,
-    headline: 'Trade press picks up talk of a strategic review at Microhard.',
+    headline: 'Trade press picks up talk of a strategic review at Gigasoft.',
     priority: 1,
 };
 
@@ -134,7 +134,7 @@ export const friendGossipReal: Conversation = {
                         { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
-                            headline: 'FaceSpace is preparing a push into consumer hardware, according to people familiar.',
+                            headline: 'Circles is preparing a push into consumer hardware, according to people familiar.',
                         },
                     ],
                 },
@@ -156,7 +156,7 @@ export const friendGossipReal: Conversation = {
                         { kind: 'brand', amount: 13 },
                         {
                             kind: 'news',
-                            headline: 'FaceSpace is preparing a push into consumer hardware, according to people familiar.',
+                            headline: 'Circles is preparing a push into consumer hardware, according to people familiar.',
                         },
                     ],
                 },

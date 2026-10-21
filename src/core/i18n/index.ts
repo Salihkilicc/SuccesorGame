@@ -37,6 +37,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '../../storage/persist';
+import { resolveInitialLocale } from './deviceLocale';
 import { en } from './en';
 import { tr } from './tr';
 
@@ -46,6 +47,25 @@ export const LOCALES: { code: Locale; label: string; native: string }[] = [
     { code: 'en', label: 'English', native: 'English' },
     { code: 'tr', label: 'Turkish', native: 'Türkçe' },
 ];
+
+/**
+ * The language the game falls back to, and the only one guaranteed complete.
+ *
+ * `t()` already falls through to the English catalogue for a missing key, so
+ * this is the same choice stated twice deliberately: English is both the last
+ * resort for a single string and the last resort for a whole device.
+ */
+export const FALLBACK_LOCALE: Locale = 'en';
+
+/**
+ * Derived, never written out by hand.
+ *
+ * A second list of codes beside LOCALES is two sources that drift, which is
+ * the failure this project keeps meeting. Adding a language is then one row in
+ * LOCALES and a catalogue, and the device resolver picks it up with no further
+ * edit anywhere.
+ */
+const SUPPORTED_CODES: readonly Locale[] = LOCALES.map(l => l.code);
 
 const CATALOGS: Record<Locale, Record<string, string>> = { en, tr };
 
@@ -57,7 +77,22 @@ interface LocaleState {
 export const useLocaleStore = create<LocaleState>()(
     persist(
         (set) => ({
-            locale: 'en',
+            // SHELVED, and kept here because the reason it was wrong is not
+            // obvious from the line that replaced it:
+            //
+            //     locale: 'en',
+            //
+            // A literal here is the right default for one audience and the
+            // wrong one for the primary market. It is not a bug that reports
+            // itself either: the game works perfectly, in English, for someone
+            // who owns 3037 Turkish strings they never see.
+            //
+            // READ ONCE, AT MODULE INIT, AND ONLY LOAD-BEARING WHEN THE DISK IS
+            // EMPTY. `persist` rehydrates over the top of this, so a player who
+            // has chosen a language keeps it even if they later change their
+            // phone's language. See deviceLocale.ts for why that ordering is
+            // the entire safety property.
+            locale: resolveInitialLocale(SUPPORTED_CODES, FALLBACK_LOCALE),
             setLocale: (locale) => set({ locale }),
         }),
         { name: 'succesor_locale', storage: createJSONStorage(() => zustandStorage) },

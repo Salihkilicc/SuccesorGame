@@ -117,15 +117,15 @@ export const realizationAfter = (kind: RippleKind): number =>
 // ============================================================================
 
 export const RIPPLES: Ripple[] = [
-    // Edison Motors is the Robotics incumbent and VoltMotors makes batteries.
+    // Dynamo Motors is the Robotics incumbent and VoltMotors makes batteries.
     // He was not going to let a drivetrain supplier go to somebody else.
     { company: 'ind_voltmotors', kind: 'rival', from: 'edison', flag: 'boughtVoltmotors' },
-    // Streamify is music streaming in the Consumer category. Vogel has been
+    // Earworm is music streaming in the Consumer category. Vogel has been
     // buying that shelf for a decade.
-    { company: 'tech_streamify', kind: 'rival', from: 'pear', flag: 'boughtStreamify' },
+    { company: 'tech_streamify', kind: 'rival', from: 'pear', flag: 'boughtEarworm' },
     // A chip company, taken by somebody who is not an AI lab, in front of the
     // AI lab that depends on it.
-    { company: 'tech_chip', kind: 'rival', from: 'openai', flag: 'boughtNovidia' },
+    { company: 'tech_chip', kind: 'rival', from: 'openai', flag: 'boughtLumenchip' },
     // A device startup inside the standards committee's category.
     { company: 'health_bio', kind: 'rival', from: 'swanson', flag: 'boughtBiogen' },
     // Halberd was waiting for her runway to run out, and it was going to.

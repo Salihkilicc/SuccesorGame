@@ -18,7 +18,7 @@
 //  ---------------------------------------------------------------------------
 //  Every SHOP in the same files is invented - Velocity Motors, Poseidon Yards,
 //  Dynasty 8 Elite, Chronos Swiss - and so is every rival company in the rest
-//  of the project: Pear Inc., Microhard, FaceSpace. So the tone was already
+//  of the project: Pear Inc., Gigasoft, Circles. So the tone was already
 //  set and settled everywhere except on the items themselves, where somebody
 //  reached for the real list because it was quicker.
 //

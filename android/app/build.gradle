@@ -99,9 +99,61 @@ android {
         applicationId "com.salihkilic.successor"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // ====================================================================
+        //  THE NUMBER PLAY KEYS ON, AND THE NUMBER PEOPLE READ
+        // ====================================================================
+        //  versionCode is an integer Play uses to order builds. It must go up
+        //  by at least one for every upload; the same number twice is rejected
+        //  at the point of upload with a message about the file, not about
+        //  this line.
+        //
+        //  versionName is a string and Play does not care about it. It is what
+        //  shows in the store listing and in the app's own About row, so it
+        //  moves when there is something to tell a player about.
+        //
+        //  2: the first upload carried a silent purchase bug. The entitlement
+        //  identifier in src/core/ads/config.ts was `ad_free` while the
+        //  RevenueCat dashboard grants `premium`, which means that build takes
+        //  a payment and grants nothing, with no error anywhere. Nothing a
+        //  tester could see, which is exactly why the number moves rather than
+        //  the build being quietly replaced.
+        // ====================================================================
+        //  3: the diagnostics panel. And versionName moves with it, which it
+        //  should have done at 2 and did not. Leaving it at "1.0" for both
+        //  builds meant the phone could not say which one it was running, and
+        //  the question "is this the fixed binary" needed `adb dumpsys`
+        //  instead of the About row. That was a real cost during a real bug.
+        //  4: the entitlement identifier, corrected to the dashboard's exact
+        //  string. `Premium`, with the capital. 3 only worked because of the
+        //  fallback in billing.ts, which is a net rather than a design.
+        //  5: Play reported 4 as already used. A versionCode is consumed by
+        //  the UPLOAD, not by the release: a bundle that was sent and then
+        //  abandoned still burns its number forever.
+        //
+        //  6: the About row now shows these two numbers instead of a frozen
+        //  "v1.0.0". src/core/appVersion.ts carries the copy and
+        //  appVersion.test.ts proves the two files agree, so BOTH move
+        //  together or the suite goes red.
+        //  7: the purchase sheet, the price on the button, and the offer
+        //  after every tenth advertisement. Also the market catalogue's names
+        //  and tickers, which changed in a way a player will notice.
+        versionCode 7
+        versionName "1.0.4"
     }
+    // ========================================================================
+    //  SIGNING
+    // ========================================================================
+    //  The template shipped `release` signed with the DEBUG key, with its own
+    //  warning sitting on the line. Google Play rejects that, so until this
+    //  block existed there was no way to upload anything at all.
+    //
+    //  The passwords are NOT here and never will be. They live in
+    //  ~/.gradle/gradle.properties, which is outside the repository, because
+    //  android/gradle.properties is committed and a secret that reaches git
+    //  history is a secret that has to be replaced. The upload key cannot be
+    //  replaced: Play freezes it at the first upload the same way it freezes
+    //  applicationId, so losing or burning it costs the listing.
+    // ========================================================================
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -109,19 +161,96 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            // Guarded, because a machine without the properties still has to
+            // be able to CONFIGURE this project - `assembleDebug`, `tasks`,
+            // and every Gradle invocation reads this block whether or not it
+            // is building a release.
+            //
+            // What the guard leaves behind is a signing config with a null
+            // storeFile, and the first real run of `bundleRelease` showed
+            // exactly what that costs:
+            //
+            //     > Task :app:signReleaseBundle FAILED
+            //     > java.lang.NullPointerException (no error message)
+            //
+            //  Four and a half minutes of compiling, and then a stack-free
+            //  null pointer naming nothing. `checkUploadSigningProperties`
+            //  at the bottom of this file turns that into a sentence.
+            if (project.hasProperty('SUCCESOR_UPLOAD_STORE_FILE')) {
+                storeFile file(SUCCESOR_UPLOAD_STORE_FILE)
+                storePassword SUCCESOR_UPLOAD_STORE_PASSWORD
+                keyAlias SUCCESOR_UPLOAD_KEY_ALIAS
+                keyPassword SUCCESOR_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // Was `signingConfigs.debug`. That is the single line standing
+            // between this project and the Play Console.
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+}
+
+// ============================================================================
+//  SAY WHY THE RELEASE BUILD CANNOT BE SIGNED, INSTEAD OF THROWING A NULL
+// ============================================================================
+//  Gradle reaches the signing task LAST, after every module has compiled. So
+//  a missing password does not fail in the first second, it fails at minute
+//  four with `java.lang.NullPointerException (no error message)` - which
+//  names neither the property, nor the file, nor the fact that a password is
+//  involved at all. Measured, not assumed: that is the literal output of the
+//  first `./gradlew bundleRelease` run on this project.
+//
+//  This is the check that was missing, not a second way to sign. The build
+//  still fails; it just says something.
+//
+//  Deliberately scoped to the task GRAPH rather than to configuration. A
+//  hard `throw` in the signingConfigs block would break `assembleDebug`,
+//  `./gradlew tasks` and Android Studio's sync on any machine without the
+//  properties, which is every machine but one.
+// ============================================================================
+gradle.taskGraph.whenReady { graph ->
+    if (project.hasProperty('SUCCESOR_UPLOAD_STORE_FILE')) return
+
+    def signingRelease = graph.allTasks.any { task ->
+        task.path.startsWith(":${project.name}:") &&
+            task.name ==~ /(?i)(sign|package).*release.*/
+    }
+    if (!signingRelease) return
+
+    throw new GradleException("""
+
+  The release build has no upload key.
+
+  Gradle would fail at :app:signReleaseBundle with a bare
+  NullPointerException, four minutes from now, naming none of this.
+
+  These four properties are missing. They belong in
+
+      ~/.gradle/gradle.properties
+
+  which is OUTSIDE this repository on purpose, because
+  android/gradle.properties is committed:
+
+      SUCCESOR_UPLOAD_STORE_FILE=succesor-upload.keystore
+      SUCCESOR_UPLOAD_KEY_ALIAS=succesor-upload
+      SUCCESOR_UPLOAD_STORE_PASSWORD=<the password you chose>
+      SUCCESOR_UPLOAD_KEY_PASSWORD=<the same password>
+
+  STORE_FILE is resolved relative to android/app/, so the bare
+  filename is correct as long as the keystore sits next to
+  debug.keystore.
+
+  Debug builds are unaffected and need none of this.
+""")
 }
 
 dependencies {

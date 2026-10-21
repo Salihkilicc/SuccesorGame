@@ -72,7 +72,7 @@ import {
     territoryRobotics, territoryDeepTech, territoryBioTech, territoryConsumer,
 } from '../events/territory';
 import {
-    rippleVoltmotors, rippleStreamify, rippleNovidia,
+    rippleVoltmotors, rippleEarworm, rippleLumenchip,
     rippleBiogen, rippleSkynet, ripplePlanora,
 } from '../events/ripple';
 import {
@@ -196,7 +196,7 @@ export const CONVERSATIONS: Conversation[] = [
     territoryRobotics, territoryDeepTech, territoryBioTech, territoryConsumer,
     // And the six people who wanted the company you just bought. Listed for
     // the same reason - a spread stops the audit reading this module at all.
-    rippleVoltmotors, rippleStreamify, rippleNovidia,
+    rippleVoltmotors, rippleEarworm, rippleLumenchip,
     rippleBiogen, rippleSkynet, ripplePlanora,
     // And the three who would like to buy something back off you.
     portfolioPear, portfolioVulture, portfolioFriend,

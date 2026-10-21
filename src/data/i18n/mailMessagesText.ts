@@ -9,7 +9,7 @@
 //   - Initial seed threads (Dana Whitfield)
 //   - Neglect lines (10 characters: father, brother, cfo, friend, coo, cto, pear, vulture, fbi, regulator)
 //   - Partner strain, departure, and courtship refusal lines
-//   - Negotiation replies (SkyNet, VoltMotors, Novidia, Planora, Pear, generic boards)
+//   - Negotiation replies (SkyNet, VoltMotors, Lumenchip, Planora, Pear, generic boards)
 //   - Sponsorship letters
 //   - Roles & sender titles (Founder, CFO, COO, CTO, Head of Production, etc.)
 //
@@ -39,8 +39,8 @@ export const ROLES_TR: Record<string, string> = {
     'CEO, Planora': "Planora CEO'su",
     'CEO, Pear': "Pear CEO'su",
     'Special Situations Fund': 'Özel Durumlar Fonu',
-    'Chief Executive, Edison Motors': 'Edison Motors Genel Müdürü',
-    'Head of Research Operations, OpenAI-ish': 'Araştırma Operasyonları Başkanı',
+    'Chief Executive, Dynamo Motors': 'Dynamo Motors Genel Müdürü',
+    'Head of Research Operations, Cognita Labs': 'Araştırma Operasyonları Başkanı',
     'Chair, Category Standards Committee': 'Kategori Standartları Komitesi Başkanı',
     'Compliance Division': 'Uyum Birimi',
     'Federal Bureau of Investigation': 'Federal Soruşturma Bürosu',

@@ -1,4 +1,5 @@
 // src/features/casino/logic/useBlackjackLogic.ts
+import { countCasinoTap } from '../../../core/ads/gate';
 import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
@@ -261,6 +262,10 @@ export const useBlackjackLogic = (initialBet: number = 500000) => {
                 casinoAlert('Not enough cash', 'Lower your bet or build more bankroll.');
                 return;
             }
+
+            // One casino action. Shortens the wait to the casino clock's next
+            // ad and can never produce one itself. See core/ads/policy.ts.
+            countCasinoTap();
 
             clearTimers();
             const dealt = shuffle(freshDeck());

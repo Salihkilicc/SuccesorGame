@@ -8,7 +8,49 @@
         address, and FINE triggers a second, harsher permission dialog plus a
         Play Console declaration.
     -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- ====================================================================
+         LOCATION IS DECLARED NOWHERE, BECAUSE IT IS COLLECTED NOWHERE
+         ====================================================================
+         ACCESS_COARSE_LOCATION was declared here and the only code that ever
+         used it is `features/life/hooks/useWeatherLogic.ts`, reached from
+         `WeatherScreen`, inside the `life` module - which has been
+         `life: false` in core/featureFlags.ts for a long time.
+
+         So the app asked for a permission it could not use. That is not a
+         harmless leftover:
+
+           - Play Console's Data Safety form has to agree with the manifest,
+             and a declared permission with no matching disclosure is a
+             mismatch Google rejects for.
+           - Apple's privacy label would be wrong whichever way it was filled
+             in, and a reviewer who reads "location" and finds no prompt asks
+             why.
+           - A privacy policy that says location is not collected is
+             contradicted by the manifest, and one that says it is would be a
+             lie about an app that never asks.
+
+         SHELVED RATHER THAN DELETED, like the code it belongs to. Turning
+         `life` back on means putting this line back, and
+         androidPermissions.test.ts fails until somebody does, so the pair
+         cannot drift apart again.
+
+         <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+         ==================================================================== -->
+
+    <!--
+        THE ADVERTISING ID, AND WHY IT HAS TO BE DECLARED
+
+        From Android 13 the advertising ID is a permission rather than
+        something every app simply has. Google Play Services does not fail
+        loudly when it is missing: the ad SDK carries on, requests a
+        non-personalised ad instead, and fills at a much lower rate. So the
+        symptom is not a crash or a log line, it is revenue that is quietly a
+        fraction of what it should be, which is unfalsifiable from the sofa.
+
+        Declaring it also obliges a Data Safety answer in the Play Console.
+        That is a form to fill in, not a reason to leave the permission out.
+    -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
       android:name=".MainApplication"
@@ -19,6 +61,34 @@
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="${usesCleartextTraffic}"
       android:supportsRtl="true">
+
+      <!--
+          THE ADMOB APPLICATION ID IS NOT WRITTEN HERE. IT COMES FROM app.json.
+
+          SHELVED, and kept with its reasoning rather than removed, because
+          this is what every AdMob guide tells you to do and the next person
+          to read those guides will be me.
+
+              <meta-data
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="ca-app-pub-9881104469619624~7205239960" />
+
+          That is correct for the bare Google SDK and WRONG for this library.
+          react-native-google-mobile-ads declares the very same meta-data name
+          in its own manifest, with the value as a placeholder it fills from
+          the "react-native-google-mobile-ads" key in app.json. Two manifests
+          declaring one meta-data name with two different values is a merger
+          conflict, and the build fails asking for tools:replace.
+
+          Worse if it had not conflicted: the library ALSO feeds the iOS
+          Info.plist from that same app.json block, through a CocoaPods build
+          script. So a hand-written value here would have been one of two
+          sources of truth, and the other one is the one that ships.
+
+          One place now: app.json. src/core/ads/config.test.ts checks that it
+          agrees with config.ts.
+      -->
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

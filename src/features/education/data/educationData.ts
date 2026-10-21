@@ -1,3 +1,26 @@
+// src/features/education/data/educationData.ts
+//
+// ============================================================================
+//  THE DEGREES ARE READ BY A PLAYER, SO THEY GO THROUGH THE DOOR
+// ============================================================================
+//
+//  Fifty three titles sat here as English literals and reached the enrolment
+//  screen through a variable, which is the one shape `scripts/untranslated.js`
+//  cannot see: it reads .tsx files, and a string that arrives from a .ts
+//  catalogue sails past a green sweep. The same blind spot hid the laboratory
+//  tiers and the magnate lines before this.
+//
+//  A GETTER RATHER THAN A VALUE, for the reason written out in
+//  src/data/i18n/catalogueText.test.ts: a value is evaluated once at module
+//  load, in whatever language happened to be active then, and does not follow
+//  the player when they change language in Settings. A getter is read at the
+//  moment it is drawn.
+//
+//  `field` is deliberately NOT translated. Nothing renders it; it is the
+//  engine's category and translating it would turn a key into prose.
+// ============================================================================
+
+import { t } from '../../../core/i18n';
 import { EducationItem } from '../educationTypes';
 
 export const EDUCATION_DATA: EducationItem[] = [
@@ -9,7 +32,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 1. Computer Science - Tech Focus
     {
         id: 'degree_cs',
-        title: 'B.S. Computer Science',
+        get title() { return t('edu.degree_cs'); },
         type: 'degree',
         field: 'Technology',
         cost: 7500,
@@ -33,7 +56,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 2. Business Administration - Business Focus
     {
         id: 'degree_business',
-        title: 'B.S. Business Administration',
+        get title() { return t('edu.degree_business'); },
         type: 'degree',
         field: 'Business',
         cost: 7500,
@@ -58,7 +81,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 3. Fine Arts - Arts Focus
     {
         id: 'degree_fine_arts',
-        title: 'B.A. Fine Arts',
+        get title() { return t('edu.degree_fine_arts'); },
         type: 'degree',
         field: 'Arts',
         cost: 7500,
@@ -83,7 +106,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 4. Psychology - Science/Social Focus
     {
         id: 'degree_psychology',
-        title: 'B.S. Psychology',
+        get title() { return t('edu.degree_psychology'); },
         type: 'degree',
         field: 'Science',
         cost: 7500,
@@ -108,7 +131,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 5. Political Science - Law Prep
     {
         id: 'degree_polsci',
-        title: 'B.A. Political Science',
+        get title() { return t('edu.degree_polsci'); },
         type: 'degree',
         field: 'Social Sciences',
         cost: 7500,
@@ -133,7 +156,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 6. Biology - Medical Prep
     {
         id: 'degree_biology',
-        title: 'B.S. Biology',
+        get title() { return t('edu.degree_biology'); },
         type: 'degree',
         field: 'Science',
         cost: 7500,
@@ -158,7 +181,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 7. Engineering - Tech/Business Focus
     {
         id: 'degree_engineering',
-        title: 'B.S. Engineering',
+        get title() { return t('edu.degree_engineering'); },
         type: 'degree',
         field: 'Technology',
         cost: 7500,
@@ -183,7 +206,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 8. Marketing - Business/Social Focus
     {
         id: 'degree_marketing',
-        title: 'B.S. Marketing',
+        get title() { return t('edu.degree_marketing'); },
         type: 'degree',
         field: 'Business',
         cost: 7500,
@@ -208,7 +231,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 9. Physics - Pure Science Focus
     {
         id: 'degree_physics',
-        title: 'B.S. Physics',
+        get title() { return t('edu.degree_physics'); },
         type: 'degree',
         field: 'Science',
         cost: 7500,
@@ -233,7 +256,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 10. Economics - Business/Analytics Focus
     {
         id: 'degree_economics',
-        title: 'B.S. Economics',
+        get title() { return t('edu.degree_economics'); },
         type: 'degree',
         field: 'Business',
         cost: 7500,
@@ -258,7 +281,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 11. Nursing - Health/Care Focus
     {
         id: 'degree_nursing',
-        title: 'B.S. Nursing',
+        get title() { return t('edu.degree_nursing'); },
         type: 'degree',
         field: 'Health',
         cost: 7500,
@@ -283,7 +306,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 12. Architecture - Design/Tech Focus
     {
         id: 'degree_architecture',
-        title: 'B.Arch. Architecture',
+        get title() { return t('edu.degree_architecture'); },
         type: 'degree',
         field: 'Arts',
         cost: 7500,
@@ -314,7 +337,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 1. MBA - Business Leadership
     {
         id: 'master_mba',
-        title: 'MBA (Master of Business Administration)',
+        get title() { return t('edu.master_mba'); },
         type: 'master',
         field: 'Business',
         cost: 7500,
@@ -340,7 +363,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 2. M.S. Data Science
     {
         id: 'master_data_science',
-        title: 'M.S. Data Science',
+        get title() { return t('edu.master_data_science'); },
         type: 'master',
         field: 'Technology',
         cost: 7500,
@@ -366,7 +389,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 3. M.S. Clinical Psychology
     {
         id: 'master_clinical_psych',
-        title: 'M.S. Clinical Psychology',
+        get title() { return t('edu.master_clinical_psych'); },
         type: 'master',
         field: 'Science',
         cost: 7500,
@@ -392,7 +415,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 4. J.D. (Law School)
     {
         id: 'master_law',
-        title: 'J.D. (Juris Doctor)',
+        get title() { return t('edu.master_law'); },
         type: 'master',
         field: 'Law',
         cost: 7500,
@@ -418,7 +441,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 5. M.D. (Medical School)
     {
         id: 'master_medicine',
-        title: 'M.D. (Doctor of Medicine)',
+        get title() { return t('edu.master_medicine'); },
         type: 'master',
         field: 'Health',
         cost: 7500,
@@ -444,7 +467,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 6. M.S. Civil Engineering
     {
         id: 'master_civil_eng',
-        title: 'M.S. Civil Engineering',
+        get title() { return t('edu.master_civil_eng'); },
         type: 'master',
         field: 'Technology',
         cost: 7500,
@@ -470,7 +493,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 7. MFA (Master of Fine Arts)
     {
         id: 'master_fine_arts',
-        title: 'MFA (Master of Fine Arts)',
+        get title() { return t('edu.master_fine_arts'); },
         type: 'master',
         field: 'Arts',
         cost: 7500,
@@ -496,7 +519,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 8. M.S. Marketing Analytics
     {
         id: 'master_marketing',
-        title: 'M.S. Marketing Analytics',
+        get title() { return t('edu.master_marketing'); },
         type: 'master',
         field: 'Business',
         cost: 7500,
@@ -522,7 +545,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 9. M.S. Physics
     {
         id: 'master_physics',
-        title: 'M.S. Physics',
+        get title() { return t('edu.master_physics'); },
         type: 'master',
         field: 'Science',
         cost: 7500,
@@ -548,7 +571,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 10. M.S. Economics
     {
         id: 'master_economics',
-        title: 'M.S. Economics',
+        get title() { return t('edu.master_economics'); },
         type: 'master',
         field: 'Business',
         cost: 7500,
@@ -574,7 +597,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 11. M.S. Nursing (Nurse Practitioner)
     {
         id: 'master_nursing',
-        title: 'M.S. Nursing (NP)',
+        get title() { return t('edu.master_nursing'); },
         type: 'master',
         field: 'Health',
         cost: 7500,
@@ -600,7 +623,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 12. M.Arch (Master of Architecture)
     {
         id: 'master_architecture',
-        title: 'M.Arch (Master of Architecture)',
+        get title() { return t('edu.master_architecture'); },
         type: 'master',
         field: 'Arts',
         cost: 7500,
@@ -633,7 +656,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 1. PhD in Artificial Intelligence
     {
         id: 'phd_ai',
-        title: 'PhD in Artificial Intelligence',
+        get title() { return t('edu.phd_ai'); },
         type: 'phd',
         field: 'Technology',
         cost: 7500,
@@ -659,7 +682,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 2. PhD in Economics
     {
         id: 'phd_economics',
-        title: 'PhD in Economics',
+        get title() { return t('edu.phd_economics'); },
         type: 'phd',
         field: 'Business',
         cost: 7500,
@@ -685,7 +708,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 3. PhD in Neuroscience
     {
         id: 'phd_neuroscience',
-        title: 'PhD in Neuroscience',
+        get title() { return t('edu.phd_neuroscience'); },
         type: 'phd',
         field: 'Science',
         cost: 7500,
@@ -711,7 +734,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 4. PhD in Theoretical Physics
     {
         id: 'phd_physics',
-        title: 'PhD in Theoretical Physics',
+        get title() { return t('edu.phd_physics'); },
         type: 'phd',
         field: 'Science',
         cost: 7500,
@@ -737,7 +760,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 5. PhD in Political Philosophy
     {
         id: 'phd_political_philosophy',
-        title: 'PhD in Political Philosophy',
+        get title() { return t('edu.phd_political_philosophy'); },
         type: 'phd',
         field: 'Social Sciences',
         cost: 7500,
@@ -763,7 +786,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 6. PhD in Psychology
     {
         id: 'phd_psychology',
-        title: 'PhD in Psychology',
+        get title() { return t('edu.phd_psychology'); },
         type: 'phd',
         field: 'Science',
         cost: 7500,
@@ -795,7 +818,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 1. Martial Arts - White Belt
     {
         id: 'cert_martial_white',
-        title: 'Martial Arts Certification (White Belt)',
+        get title() { return t('edu.cert_martial_white'); },
         type: 'certificate',
         field: 'Combat',
         cost: 8000,
@@ -816,7 +839,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 2. Martial Arts - Black Belt
     {
         id: 'cert_martial_black',
-        title: 'Martial Arts Certification (Black Belt)',
+        get title() { return t('edu.cert_martial_black'); },
         type: 'certificate',
         field: 'Combat',
         cost: 25000,
@@ -837,7 +860,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 3. Private Security License
     {
         id: 'cert_private_security',
-        title: 'Private Security License',
+        get title() { return t('edu.cert_private_security'); },
         type: 'certificate',
         field: 'Security',
         cost: 12000,
@@ -858,7 +881,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 4. Executive Protection (Bodyguard)
     {
         id: 'cert_bodyguard',
-        title: 'Executive Protection Specialist',
+        get title() { return t('edu.cert_bodyguard'); },
         type: 'certificate',
         field: 'Security',
         cost: 30000,
@@ -880,7 +903,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 5. Ethical Hacking Certificate
     {
         id: 'cert_ethical_hacking',
-        title: 'Certified Ethical Hacker (CEH)',
+        get title() { return t('edu.cert_ethical_hacking'); },
         type: 'certificate',
         field: 'Technology',
         cost: 18000,
@@ -901,7 +924,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 6. Commercial Pilot License
     {
         id: 'cert_pilot',
-        title: 'Commercial Pilot License',
+        get title() { return t('edu.cert_pilot'); },
         type: 'certificate',
         field: 'Luxury',
         cost: 90000,
@@ -923,7 +946,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 7. Real Estate License
     {
         id: 'cert_real_estate',
-        title: 'Real Estate License',
+        get title() { return t('edu.cert_real_estate'); },
         type: 'certificate',
         field: 'Business',
         cost: 5000,
@@ -944,7 +967,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 8. Certified Personal Trainer
     {
         id: 'cert_personal_trainer',
-        title: 'Certified Personal Trainer',
+        get title() { return t('edu.cert_personal_trainer'); },
         type: 'certificate',
         field: 'Health',
         cost: 10000,
@@ -966,7 +989,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 9. Acting Workshop Certificate
     {
         id: 'cert_acting',
-        title: 'Professional Acting Workshop',
+        get title() { return t('edu.cert_acting'); },
         type: 'certificate',
         field: 'Arts',
         cost: 8000,
@@ -987,7 +1010,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 10. Bartending Certificate
     {
         id: 'cert_bartending',
-        title: 'Professional Bartending Certificate',
+        get title() { return t('edu.cert_bartending'); },
         type: 'certificate',
         field: 'Service',
         cost: 3000,
@@ -1008,7 +1031,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 11. Barista Certification
     {
         id: 'cert_barista',
-        title: 'Professional Barista Certification',
+        get title() { return t('edu.cert_barista'); },
         type: 'certificate',
         field: 'Service',
         cost: 2500,
@@ -1029,7 +1052,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 12. Welding Certification
     {
         id: 'cert_welding',
-        title: 'Certified Welder',
+        get title() { return t('edu.cert_welding'); },
         type: 'certificate',
         field: 'Trades',
         cost: 12000,
@@ -1050,7 +1073,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 13. Electrician License
     {
         id: 'cert_electrician',
-        title: 'Licensed Electrician',
+        get title() { return t('edu.cert_electrician'); },
         type: 'certificate',
         field: 'Trades',
         cost: 15000,
@@ -1072,7 +1095,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 14. First Aid Certification
     {
         id: 'cert_first_aid',
-        title: 'First Aid Certification',
+        get title() { return t('edu.cert_first_aid'); },
         type: 'certificate',
         field: 'Health',
         cost: 2000,
@@ -1093,7 +1116,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 15. EMT Certification
     {
         id: 'cert_emt',
-        title: 'Emergency Medical Technician (EMT)',
+        get title() { return t('edu.cert_emt'); },
         type: 'certificate',
         field: 'Health',
         cost: 8000,
@@ -1115,7 +1138,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 16. Social Media Marketing
     {
         id: 'cert_social_media',
-        title: 'Social Media Marketing Certificate',
+        get title() { return t('edu.cert_social_media'); },
         type: 'certificate',
         field: 'Business',
         cost: 6000,
@@ -1137,7 +1160,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 17. Cryptocurrency Trading Course
     {
         id: 'cert_crypto_trading',
-        title: 'Cryptocurrency Trading Certification',
+        get title() { return t('edu.cert_crypto_trading'); },
         type: 'certificate',
         field: 'Finance',
         cost: 10000,
@@ -1159,7 +1182,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 18. Sommelier Certification
     {
         id: 'cert_sommelier',
-        title: 'Certified Sommelier',
+        get title() { return t('edu.cert_sommelier'); },
         type: 'certificate',
         field: 'Luxury',
         cost: 15000,
@@ -1180,7 +1203,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 19. Photography Certificate
     {
         id: 'cert_photography',
-        title: 'Professional Photography Certificate',
+        get title() { return t('edu.cert_photography'); },
         type: 'certificate',
         field: 'Arts',
         cost: 7000,
@@ -1202,7 +1225,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 20. Yoga Instructor Certification
     {
         id: 'cert_yoga',
-        title: 'Certified Yoga Instructor',
+        get title() { return t('edu.cert_yoga'); },
         type: 'certificate',
         field: 'Health',
         cost: 5000,
@@ -1224,7 +1247,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 21. Project Management (PMP)
     {
         id: 'cert_pmp',
-        title: 'Project Management Professional (PMP)',
+        get title() { return t('edu.cert_pmp'); },
         type: 'certificate',
         field: 'Business',
         cost: 12000,
@@ -1245,7 +1268,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 22. Automotive Mechanic
     {
         id: 'cert_mechanic',
-        title: 'Certified Automotive Technician',
+        get title() { return t('edu.cert_mechanic'); },
         type: 'certificate',
         field: 'Trades',
         cost: 10000,
@@ -1267,7 +1290,7 @@ export const EDUCATION_DATA: EducationItem[] = [
     // 23. Culinary Arts Certificate
     {
         id: 'cert_culinary',
-        title: 'Culinary Arts Certificate',
+        get title() { return t('edu.cert_culinary'); },
         type: 'certificate',
         field: 'Arts',
         cost: 14000,

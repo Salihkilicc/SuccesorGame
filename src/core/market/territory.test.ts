@@ -100,14 +100,14 @@ describe('the giant of a category is whoever the data says', () => {
 
     it('the four letters are written to the four actual incumbents', () => {
         // The claim that stops the fiction and the data drifting apart. If a
-        // rebalance makes OpenAI-ish larger than Novidia in Deep Tech, this
+        // rebalance makes Cognita Labs larger than Lumenchip in Deep Tech, this
         // fails and names the letter that has become wrong.
-        expect(giantOf('Robotics')!.name).toBe('Edison Motors');
-        // NOT Novidia, whose strength is higher (94 against 90) and whose
+        expect(giantOf('Robotics')!.name).toBe('Dynamo Motors');
+        // NOT Lumenchip, whose strength is higher (94 against 90) and whose
         // share is not. The first draft of the Deep Tech letter was written to
         // them and this line is what caught it.
-        expect(giantOf('Deep Tech')!.name).toBe('OpenAI-ish');
-        expect(giantOf('Bio-Tech')!.name).toBe('Johnson & Swanson');
+        expect(giantOf('Deep Tech')!.name).toBe('Cognita Labs');
+        expect(giantOf('Bio-Tech')!.name).toBe('Harper & Vance');
         expect(giantOf('Consumer')!.name).toBe('Pear Inc.');
     });
 
@@ -153,7 +153,7 @@ describe('what counts as walking into a market', () => {
 // ============================================================================
 describe('deferring costs nothing today and grows forever', () => {
     const term: RoyaltyTerm[] = [
-        { category: 'Robotics', rate: ROYALTY_RATE, since: 12, giant: 'Edison Motors' },
+        { category: 'Robotics', rate: ROYALTY_RATE, since: 12, giant: 'Dynamo Motors' },
     ];
 
     it('nothing at all in a quarter you sold nothing', () => {

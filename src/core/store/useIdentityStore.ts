@@ -132,6 +132,33 @@ export type IdentityState = {
      * game puts it back.
      */
     ownFirstName: string;
+    /**
+     * Has this person bought their way out of the advertising?
+     *
+     * -----------------------------------------------------------------------
+     *  IT IS HERE FOR THE SAME REASON THE PLAYER'S NAME IS
+     * -----------------------------------------------------------------------
+     *  Money changed hands. Nothing this game does to a SAVE is allowed to
+     *  take that back, and starting a new company is something the game does
+     *  to a save.
+     *
+     *  Putting it on any other store would have made it a run-scoped fact,
+     *  because every other persisted store is listed in newGame's
+     *  PERSIST_KEYS and is wiped by name. This store is deliberately not in
+     *  that list, which is the whole reason it exists separately - see the
+     *  header. So `adFree` needs no exception carved into the wipe, and an
+     *  exception inside a wipe is exactly the shape of bug that list ended.
+     *
+     *  The counters that PACE the ads are not here. They are session state in
+     *  core/ads/gate.ts and they may reset freely; what must not reset is the
+     *  purchase.
+     *
+     *  RevenueCat remains the authority: this is a local mirror so the game
+     *  can answer "is this player ad free" synchronously, on a cold start,
+     *  with no network. `applyEntitlement` is how the authority writes to it.
+     * -----------------------------------------------------------------------
+     */
+    adFree: boolean;
     _hasHydrated: boolean;
 };
 
@@ -188,6 +215,18 @@ type IdentityStore = IdentityState & {
      * one", which is why it is safe to show a total next to it.
      */
     markEndingSeen: (id: string) => void;
+    /**
+     * Write what the store says this player owns.
+     *
+     * Takes a boolean rather than being two functions, because the store can
+     * also say NO: a refund, a chargeback, a family-sharing revocation. A
+     * `grantAdFree()` with no way back would make the app unable to follow the
+     * authority it is mirroring.
+     *
+     * Called by the billing adapter after a purchase, after a restore, and on
+     * every launch once the customer info arrives.
+     */
+    applyEntitlement: (adFree: boolean) => void;
 };
 
 export const initialIdentityState: IdentityState = {
@@ -203,6 +242,8 @@ export const initialIdentityState: IdentityState = {
     runsStarted: 0,
     endingsSeen: [],
     ownFirstName: '',
+    // Nobody has paid until the store says they have.
+    adFree: false,
     _hasHydrated: false,
 };
 
@@ -244,6 +285,7 @@ export const useIdentityStore = create<IdentityStore>()(
                     ? state
                     : { endingsSeen: [...state.endingsSeen, id] }
             )),
+            applyEntitlement: (adFree) => set({ adFree: !!adFree }),
         }),
         {
             name: 'succesor_identity_v1',
@@ -262,6 +304,10 @@ export const useIdentityStore = create<IdentityStore>()(
                 runsStarted: state.runsStarted,
                 endingsSeen: state.endingsSeen,
                 ownFirstName: state.ownFirstName,
+                // The purchase. Mirrored locally so the very first frame of a
+                // cold start already knows not to show an ad, before any
+                // network call to RevenueCat has come back.
+                adFree: state.adFree,
             }),
             onRehydrateStorage: () => (state) => {
                 // A save written before this field existed rehydrates without
@@ -298,6 +344,12 @@ export const useIdentityStore = create<IdentityStore>()(
                     state.runsStarted = 1;
                 }
                 if (state && typeof state.runsStarted !== 'number') state.runsStarted = 0;
+
+                // Every save written before the purchase existed rehydrates
+                // without the field. Undefined is falsy and would work by
+                // accident, but `decide()` takes a boolean and a store whose
+                // type says boolean should not hand out undefined.
+                if (state && typeof state.adFree !== 'boolean') state.adFree = false;
 
                 state?.setHasHydrated(true);
             },

@@ -20,6 +20,7 @@
 import React from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { adGate } from '../../../core/ads/gate';
 import { t, useLocale } from '../../../core/i18n';
 import { theme } from '../../../core/theme';
 import CasinoHeader from '../components/CasinoHeader';
@@ -65,6 +66,29 @@ const money = (n: number): string => {
 const PokerGameScreen = () => {
     useLocale();
     const navigation = useNavigation();
+
+    // ----------------------------------------------------------------------
+    //  STANDING UP FROM THE TABLE
+    // ----------------------------------------------------------------------
+    //  "pokerden cikista olsun". A poker hand is the longest single thing in
+    //  the casino, and standing up from it is a real act break - the one
+    //  moment an interruption is not an interruption.
+    //
+    //  ON `beforeRemove` RATHER THAN ON THE BACK BUTTON.
+    //  The header's arrow is one of three ways off this screen; Android's
+    //  hardware back is a second and the edge swipe is a third. Hanging this
+    //  on `onBack` would have wired the exit the developer uses and missed
+    //  the two the player actually uses, which is this codebase's signature
+    //  failure - a check that passes because it is not looking.
+    //
+    //  Not awaited: the navigation must not wait on an advertisement, and the
+    //  interstitial is a native window that draws over whatever comes next
+    //  perfectly well.
+    // ----------------------------------------------------------------------
+    React.useEffect(
+        () => navigation.addListener('beforeRemove', () => { void adGate('leftPokerTable'); }),
+        [navigation],
+    );
     const route = useRoute<any>();
     const { currentLocation, casinoReputation, currentLocationId } = useCasinoSystem();
 

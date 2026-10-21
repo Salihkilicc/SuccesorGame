@@ -21,7 +21,7 @@ export type NewsSpecialCondition = 'hated_but_rich' | 'loved_but_poor';
 
 /**
  * Living World & Arch-Rival News Pool:
- * Deeply focuses on primary nemesis 'Pear' (Cupertino titan) and rivals (Microhard, Apex Dynamics, Titan Global)
+ * Deeply focuses on primary nemesis 'Pear' (Cupertino titan) and rivals (Gigasoft, Apex Dynamics, Titan Global)
  * alongside global semiconductor foundries, AI labs, and macro shifts.
  */
 export const PEAR_RIVAL_NEWS_POOL: NewsTemplate[] = [
@@ -123,7 +123,7 @@ export const LIVING_WORLD_NEWS_POOL: NewsTemplate[] = [
     type: 'rival',
     category: 'Corporate',
     source: 'Bloomberg Tech',
-    text: 'Microhard signs a $12 billion cloud hosting partnership with European defense ministries, boosting enterprise revenue.',
+    text: 'Gigasoft signs a $12 billion cloud hosting partnership with European defense ministries, boosting enterprise revenue.',
   },
   {
     type: 'rival',
@@ -141,13 +141,13 @@ export const LIVING_WORLD_NEWS_POOL: NewsTemplate[] = [
     type: 'rival',
     category: 'Tech',
     source: 'Ars Technica',
-    text: 'Microhard quietly patches zero-day vulnerability in legacy database servers after security researchers expose flaw.',
+    text: 'Gigasoft quietly patches zero-day vulnerability in legacy database servers after security researchers expose flaw.',
   },
   {
     type: 'rival',
     category: 'Exclusive',
     source: 'The Information',
-    text: 'Microhard expands enterprise enterprise licensing discounts to protect its corporate desktop market share.',
+    text: 'Gigasoft expands enterprise enterprise licensing discounts to protect its corporate desktop market share.',
   },
   {
     type: 'rival',
@@ -337,7 +337,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: "Microhard announces a $10 billion cloud expansion, noting their executive cafeteria budget exceeds Hale's entire market cap.",
+      text: "Gigasoft announces a $10 billion cloud expansion, noting their executive cafeteria budget exceeds Hale's entire market cap.",
     },
     {
       type: 'rival',
@@ -349,7 +349,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'Financial Times',
-      text: 'Microhard Chairman tells reporters he forgot Hale was still operating until an accountant discovered an unpaid licensing invoice.',
+      text: 'Gigasoft Chairman tells reporters he forgot Hale was still operating until an accountant discovered an unpaid licensing invoice.',
     },
     {
       type: 'rival',
@@ -361,7 +361,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'TechCrunch',
-      text: "Microhard rolls out an aggressive enterprise bundle explicitly engineered to wipe out Hale's microscopic market footprint.",
+      text: "Gigasoft rolls out an aggressive enterprise bundle explicitly engineered to wipe out Hale's microscopic market footprint.",
     },
     {
       type: 'rival',
@@ -373,7 +373,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: 'Microhard acquires a boutique AI lab with spare pocket change just to showcase dominance over struggling industry minnows.',
+      text: 'Gigasoft acquires a boutique AI lab with spare pocket change just to showcase dominance over struggling industry minnows.',
     },
     {
       type: 'rival',
@@ -385,7 +385,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Tech',
       source: 'Ars Technica',
-      text: 'Microhard software update effortlessly clones Hale’s single proprietary feature, rendering it totally obsolete overnight.',
+      text: 'Gigasoft software update effortlessly clones Hale’s single proprietary feature, rendering it totally obsolete overnight.',
     },
     {
       type: 'rival',
@@ -397,7 +397,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'Silicon Daily',
-      text: 'Microhard executives caught on hot mic chuckling over benchmarks showing their cheapest discontinued model outperforming Hale.',
+      text: 'Gigasoft executives caught on hot mic chuckling over benchmarks showing their cheapest discontinued model outperforming Hale.',
     },
     {
       type: 'world',
@@ -579,7 +579,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'The Information',
-      text: "Microhard leaks an internal memo instructing enterprise division heads to ignore Hale's blip and focus on legitimate threats.",
+      text: "Gigasoft leaks an internal memo instructing enterprise division heads to ignore Hale's blip and focus on legitimate threats.",
     },
     {
       type: 'rival',
@@ -591,7 +591,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Market',
       source: 'Bloomberg Tech',
-      text: "Microhard announces aggressive price slashes across Hale’s core category, with staff calling it a 'mild disciplinary swat'.",
+      text: "Gigasoft announces aggressive price slashes across Hale’s core category, with staff calling it a 'mild disciplinary swat'.",
     },
     {
       type: 'rival',
@@ -603,7 +603,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: "Microhard CEO condescendingly offers to acquire Hale’s core patents for a modest discount 'before market reality reasserts itself'.",
+      text: "Gigasoft CEO condescendingly offers to acquire Hale’s core patents for a modest discount 'before market reality reasserts itself'.",
     },
     {
       type: 'rival',
@@ -615,7 +615,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Market',
       source: 'Financial Times',
-      text: "Microhard sales chiefs boast that their quarterly software rounding errors exceeded Hale's total annual gross revenue.",
+      text: "Gigasoft sales chiefs boast that their quarterly software rounding errors exceeded Hale's total annual gross revenue.",
     },
     {
       type: 'rival',
@@ -627,7 +627,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Bloomberg Markets',
-      text: "Microhard launches a competitive mid-tier product line backed by a promotional budget larger than Hale’s whole enterprise valuation.",
+      text: "Gigasoft launches a competitive mid-tier product line backed by a promotional budget larger than Hale’s whole enterprise valuation.",
     },
     {
       type: 'rival',
@@ -639,7 +639,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Legal',
       source: 'The Information',
-      text: 'Microhard sends a blistering cease-and-desist letter to Hale regarding aggressive recruitment of third-party contracting talent.',
+      text: 'Gigasoft sends a blistering cease-and-desist letter to Hale regarding aggressive recruitment of third-party contracting talent.',
     },
     {
       type: 'world',
@@ -737,7 +737,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'player',
       category: 'Corporate',
       source: 'Financial Times',
-      text: "Hale secures lucrative enterprise government contracts, pulling massive legacy revenue right out of Microhard's hands.",
+      text: "Hale secures lucrative enterprise government contracts, pulling massive legacy revenue right out of Gigasoft's hands.",
     },
     {
       type: 'player',
@@ -821,7 +821,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: 'Microhard convenes emergency executive summits following reports of corporate clients abandoning their cloud suites for Hale.',
+      text: 'Gigasoft convenes emergency executive summits following reports of corporate clients abandoning their cloud suites for Hale.',
     },
     {
       type: 'rival',
@@ -833,7 +833,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'The Information',
-      text: "Microhard CEO issues defensive internal memo insisting that Hale's rapid expansion is 'unsustainable and overheated'.",
+      text: "Gigasoft CEO issues defensive internal memo insisting that Hale's rapid expansion is 'unsustainable and overheated'.",
     },
     {
       type: 'rival',
@@ -845,7 +845,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'Silicon Daily',
-      text: 'Leaked audio from Microhard board meeting reveals directors openly questioning why leadership failed to take Hale seriously.',
+      text: 'Leaked audio from Gigasoft board meeting reveals directors openly questioning why leadership failed to take Hale seriously.',
     },
     {
       type: 'rival',
@@ -857,7 +857,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: "Microhard attempts a hostile takeover bid on Hale's key component supplier, only to be outbid by Hale's cash reserves.",
+      text: "Gigasoft attempts a hostile takeover bid on Hale's key component supplier, only to be outbid by Hale's cash reserves.",
     },
     {
       type: 'rival',
@@ -869,7 +869,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Market',
       source: 'Reuters Tech',
-      text: 'Microhard stock tumbles 4% after a key automotive partner dumps their software stack to sign an exclusive deal with Hale.',
+      text: 'Gigasoft stock tumbles 4% after a key automotive partner dumps their software stack to sign an exclusive deal with Hale.',
     },
     {
       type: 'rival',
@@ -881,7 +881,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Tech',
       source: 'Ars Technica',
-      text: "Microhard rushes an unpolished hardware update to market in a desperate attempt to preempt Hale's upcoming launch.",
+      text: "Gigasoft rushes an unpolished hardware update to market in a desperate attempt to preempt Hale's upcoming launch.",
     },
     {
       type: 'rival',
@@ -893,7 +893,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Legal',
       source: 'Financial Times',
-      text: "Microhard PR team caught secretly funding smear campaigns questioning Hale's enterprise cybersecurity standards.",
+      text: "Gigasoft PR team caught secretly funding smear campaigns questioning Hale's enterprise cybersecurity standards.",
     },
     {
       type: 'world',
@@ -979,7 +979,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'player',
       category: 'Tech',
       source: 'MIT Tech Review',
-      text: 'Hale engineers develop breakthrough quantum chip architecture, leaving Microhard’s entire research roadmap obsolete.',
+      text: 'Hale engineers develop breakthrough quantum chip architecture, leaving Gigasoft’s entire research roadmap obsolete.',
     },
     {
       type: 'player',
@@ -1063,7 +1063,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Market',
       source: 'Bloomberg Markets',
-      text: 'Microhard stock plunges into bear market territory as enterprise customers flee en masse to Hale’s unified ecosystem.',
+      text: 'Gigasoft stock plunges into bear market territory as enterprise customers flee en masse to Hale’s unified ecosystem.',
     },
     {
       type: 'rival',
@@ -1075,7 +1075,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'The Information',
-      text: "Microhard board fires three top executive vice presidents overnight in desperate bid to halt Hale's enterprise momentum.",
+      text: "Gigasoft board fires three top executive vice presidents overnight in desperate bid to halt Hale's enterprise momentum.",
     },
     {
       type: 'rival',
@@ -1087,7 +1087,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Reuters Tech',
-      text: 'Microhard abandons entire consumer hardware division, completely surrendering the market to Hale’s relentless onslaught.',
+      text: 'Gigasoft abandons entire consumer hardware division, completely surrendering the market to Hale’s relentless onslaught.',
     },
     {
       type: 'rival',
@@ -1099,7 +1099,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Legal',
       source: 'Wall St Journal',
-      text: 'Microhard attempts a desperate defensive mega-merger, which antitrust authorities immediately freeze for investigation.',
+      text: 'Gigasoft attempts a desperate defensive mega-merger, which antitrust authorities immediately freeze for investigation.',
     },
     {
       type: 'rival',
@@ -1111,7 +1111,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'The Information',
-      text: "Microhard shareholders demand immediate strategic overhaul as Hale's revenue run rate approaches their core enterprise business.",
+      text: "Gigasoft shareholders demand immediate strategic overhaul as Hale's revenue run rate approaches their core enterprise business.",
     },
     {
       type: 'rival',
@@ -1123,7 +1123,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'Silicon Daily',
-      text: "Microhard CEO reportedly bursts into tears during closed-door emergency board meeting regarding Hale's cloud takeover.",
+      text: "Gigasoft CEO reportedly bursts into tears during closed-door emergency board meeting regarding Hale's cloud takeover.",
     },
     {
       type: 'rival',
@@ -1135,7 +1135,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'TechCrunch',
-      text: 'Microhard engineers stage mass walkout after leadership announces severe compensation cuts to fund defense against Hale.',
+      text: 'Gigasoft engineers stage mass walkout after leadership announces severe compensation cuts to fund defense against Hale.',
     },
     {
       type: 'world',
@@ -1305,7 +1305,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Breaking',
       source: 'Bloomberg Tech',
-      text: 'Microhard formally files for Chapter 11 bankruptcy restructuring, begging Hale to acquire its remaining cloud assets.',
+      text: 'Gigasoft formally files for Chapter 11 bankruptcy restructuring, begging Hale to acquire its remaining cloud assets.',
     },
     {
       type: 'rival',
@@ -1317,7 +1317,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Market',
       source: 'Reuters Tech',
-      text: 'Desperate Microhard shareholders vote 94% in favor of selling the entire company to Hale at a massive distressed discount.',
+      text: 'Desperate Gigasoft shareholders vote 94% in favor of selling the entire company to Hale at a massive distressed discount.',
     },
     {
       type: 'rival',
@@ -1329,7 +1329,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Tech',
       source: 'Ars Technica',
-      text: 'Microhard’s legacy software suite officially open-sourced after enterprise clients abandon it completely for Hale Core.',
+      text: 'Gigasoft’s legacy software suite officially open-sourced after enterprise clients abandon it completely for Hale Core.',
     },
     {
       type: 'rival',
@@ -1341,7 +1341,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'Silicon Daily',
-      text: "Former Microhard executives publish tell-all memoirs detailing the sheer panic inside leadership during Hale’s rise.",
+      text: "Former Gigasoft executives publish tell-all memoirs detailing the sheer panic inside leadership during Hale’s rise.",
     },
     {
       type: 'rival',
@@ -1353,7 +1353,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Market',
       source: 'Bloomberg Markets',
-      text: "Microhard stock delisted from major index after market capitalization drops below Hale's quarterly advertising budget.",
+      text: "Gigasoft stock delisted from major index after market capitalization drops below Hale's quarterly advertising budget.",
     },
     {
       type: 'rival',
@@ -1451,7 +1451,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'player',
       category: 'Corporate',
       source: 'Bloomberg Tech',
-      text: 'Hale acquires the remnants of Pear and Microhard for nominal fees, retiring both historic brands to museum archives.',
+      text: 'Hale acquires the remnants of Pear and Gigasoft for nominal fees, retiring both historic brands to museum archives.',
     },
     {
       type: 'player',
@@ -1553,7 +1553,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Tech',
       source: 'Smithsonian Tech',
-      text: "A single remaining Microhard server rack is donated to the Smithsonian Museum under the placard 'Extinct Tech Era'.",
+      text: "A single remaining Gigasoft server rack is donated to the Smithsonian Museum under the placard 'Extinct Tech Era'.",
     },
     {
       type: 'rival',
@@ -1565,7 +1565,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Exclusive',
       source: 'Harvard Review',
-      text: "Microhard's former billionaire founders seen giving lectures on 'How Hale Completely Erased Our 40-Year Legacy'.",
+      text: "Gigasoft's former billionaire founders seen giving lectures on 'How Hale Completely Erased Our 40-Year Legacy'.",
     },
     {
       type: 'rival',
@@ -1583,7 +1583,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Analysis',
       source: 'Stanford Press',
-      text: 'Business school textbooks rewrite corporate strategy chapters to study the total surrender of Pear and Microhard.',
+      text: 'Business school textbooks rewrite corporate strategy chapters to study the total surrender of Pear and Gigasoft.',
     },
     {
       type: 'rival',
@@ -1601,7 +1601,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'TechCrunch',
-      text: 'Microhard’s former flagship campus in Redmond converted into a Hale employee wellness and recreation retreat.',
+      text: 'Gigasoft’s former flagship campus in Redmond converted into a Hale employee wellness and recreation retreat.',
     },
     {
       type: 'rival',
@@ -1843,7 +1843,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Analysis',
       source: 'Oxford Historical Press',
-      text: 'Historians at Oxford publish a ten-volume chronicle examining how ancient giants like Pear and Microhard vanished from human memory.',
+      text: 'Historians at Oxford publish a ten-volume chronicle examining how ancient giants like Pear and Gigasoft vanished from human memory.',
     },
     {
       type: 'rival',
@@ -1861,7 +1861,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Redmond Sanctuary Desk',
-      text: 'Microhard’s former corporate headquarters in Redmond is transformed into a protected historical bird sanctuary funded by Hale.',
+      text: 'Gigasoft’s former corporate headquarters in Redmond is transformed into a protected historical bird sanctuary funded by Hale.',
     },
     {
       type: 'rival',
@@ -1879,7 +1879,7 @@ export const SILICON_NEWS_POOL: Record<NewsTier, NewsTemplate[]> = {
       type: 'rival',
       category: 'Tech',
       source: 'Smithsonian Archives',
-      text: "Hale’s automated museum catalog acquires the last existing Microhard enterprise server for display in the 'Dead Platforms' gallery.",
+      text: "Hale’s automated museum catalog acquires the last existing Gigasoft enterprise server for display in the 'Dead Platforms' gallery.",
     },
     {
       type: 'rival',
@@ -2046,7 +2046,7 @@ export const SPECIAL_NEWS_POOL: Record<NewsSpecialCondition, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: "Microhard executives call Hale's business model 'grotesque and predatory' before frantically trying to copy it.",
+      text: "Gigasoft executives call Hale's business model 'grotesque and predatory' before frantically trying to copy it.",
     },
     {
       type: 'rival',
@@ -2168,7 +2168,7 @@ export const SPECIAL_NEWS_POOL: Record<NewsSpecialCondition, NewsTemplate[]> = {
       type: 'rival',
       category: 'Corporate',
       source: 'Wall St Journal',
-      text: 'Microhard considers acquiring Hale just to put its beloved industrial design team in charge of their own ugly hardware.',
+      text: 'Gigasoft considers acquiring Hale just to put its beloved industrial design team in charge of their own ugly hardware.',
     },
     {
       type: 'rival',

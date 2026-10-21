@@ -39,9 +39,26 @@ require 'json'
 #  project has been running on the new architecture the whole time and one of
 #  its dependencies requires it. The file says so now.
 #
-#  The device crash is still real and is still a TurboModule throwing. It
-#  needs finding by name rather than by turning the architecture off
-#  underneath it.
+#  ---------------------------------------------------------------------------
+#  AND THE DEVICE CRASH IS GONE
+#  ---------------------------------------------------------------------------
+#  This note used to end by saying the crash was still real and still needed
+#  finding by name. It is not, and it does not.
+#
+#  Measured rather than assumed: a Debug-iphoneos build was installed on a
+#  physical iPhone after the advertising work, with the new architecture ON,
+#  and it opened and ran. No EXC_CRASH, no SIGABRT, nothing on the TurboModule
+#  queue.
+#
+#  WHAT IS NOT KNOWN is which change fixed it. The pods were reinstalled with
+#  `--repo-update` and several moved version in the process, so the honest
+#  answer is that it stopped reproducing and nobody found the cause. That
+#  matters: it could come back with the next pod bump, and if it does, this
+#  paragraph is the record that it was once here and once went away on its own.
+#
+#  Kept in full above rather than deleted, because the reasoning about
+#  pager-view and Fabric is still the reason `newArchEnabled` cannot be turned
+#  off, whatever the crash was doing.
 #
 #  Flip the JSON and `pod install` to switch.
 # ----------------------------------------------------------------------------
@@ -69,6 +86,33 @@ ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '
 #  number and CocoaPods only rewrites them when it regenerates the project.
 # ----------------------------------------------------------------------------
 platform :ios, '15.1'
+
+# ----------------------------------------------------------------------------
+#  THE ADVERTISING POD HAS TO AGREE WITH `use_frameworks! :linkage => :static`
+# ----------------------------------------------------------------------------
+#  Measured from the library, not guessed:
+#
+#      node_modules/react-native-google-mobile-ads/RNGoogleMobileAds.podspec:68
+#        if defined?($RNGoogleMobileAdsAsStaticFramework)
+#          s.static_framework = $RNGoogleMobileAdsAsStaticFramework
+#        else
+#          s.static_framework = false
+#
+#  It defaults to FALSE, and this project links everything statically (see the
+#  `use_frameworks!` line in the target below). Google-Mobile-Ads-SDK itself
+#  ships as a static binary, so leaving the wrapper as a dynamic framework puts
+#  a statically linked binary inside a dynamic one, and CocoaPods refuses:
+#
+#      The 'Pods-Succesor' target has transitive dependencies that include
+#      statically linked binaries
+#
+#  The global is the library's own documented switch for exactly this. It has
+#  to be set BEFORE the target block, because the podspec reads it while
+#  CocoaPods is resolving.
+#
+#  RUN `pod install` AFTER CHANGING THIS.
+# ----------------------------------------------------------------------------
+$RNGoogleMobileAdsAsStaticFramework = true
 
 prepare_react_native_project!
 

@@ -88,21 +88,21 @@ describe('it is a real scene in the game', () => {
 });
 
 describe('he is watching the wrong company', () => {
-    it('names Microhard as the threat', () => {
-        expect(text).toContain('Microhard');
+    it('names Gigasoft as the threat', () => {
+        expect(text).toContain('Gigasoft');
     });
 
     it('while Pear is the one with more of the market', () => {
         // The fact that makes him wrong, read from the market data rather
         // than repeated here - if the shares are ever rebalanced so that
-        // Microhard really is ahead, this fails and the scene needs rewriting.
+        // Gigasoft really is ahead, this fails and the scene needs rewriting.
         const consumer = PRODUCT_MARKETS.find(m => m.category === 'Consumer')!;
         const pear = consumer.competitors.find(c => c.stockId === 'tech_pear')!;
         const micro = consumer.competitors.find(c => c.stockId === 'tech_micro')!;
         expect(pear.share).toBeGreaterThan(micro.share);
     });
 
-    it('and Microhard is nonetheless large, so he is not being a fool', () => {
+    it('and Gigasoft is nonetheless large, so he is not being a fool', () => {
         // If the company he named were trivial the scene would read as
         // senility rather than as a man who stopped updating.
         const consumer = PRODUCT_MARKETS.find(m => m.category === 'Consumer')!;

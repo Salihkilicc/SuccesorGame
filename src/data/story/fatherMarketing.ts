@@ -26,7 +26,7 @@
 //     accelerates the fall. He never mentions delivery, because in his market
 //     demand was the scarce thing and capacity was not.
 //
-//  3. HE IS WATCHING THE WRONG COMPANY. He is fixed on Microhard - 24% share,
+//  3. HE IS WATCHING THE WRONG COMPANY. He is fixed on Gigasoft - 24% share,
 //     strength 85, genuinely large, and the incumbent who beat him once. Pear
 //     is at 31% and rising and is the antagonist of the entire story. He
 //     dismisses them as a shop that sells telephones to people who like the
@@ -88,12 +88,12 @@ export const fatherMarketing: Conversation = {
         {
             id: 'who',
             speaker: 'father',
-            // THE WRONG RIVAL. Microhard is real, large and strong - 24% and
+            // THE WRONG RIVAL. Gigasoft is real, large and strong - 24% and
             // 85 strength - so this is not a foolish answer. It is simply the
             // answer of a man who stopped updating in about 2012.
-            text: 'Microhard. It is always Microhard. They have been the wall in this market since before you could read, and every man who ever thought he had got past them found out he had been let past.\n\nWe were in three of their catalogues once. Then a purchasing director none of us had met retired, and the man who replaced him had his own people, and that was the end of eleven years of work. No meeting. No letter. The orders simply stopped arriving and we found out from the numbers.',
+            text: 'Gigasoft. It is always Gigasoft. They have been the wall in this market since before you could read, and every man who ever thought he had got past them found out he had been let past.\n\nWe were in three of their catalogues once. Then a purchasing director none of us had met retired, and the man who replaced him had his own people, and that was the end of eleven years of work. No meeting. No letter. The orders simply stopped arriving and we found out from the numbers.',
             choices: [
-                { text: 'Pear is bigger than Microhard now.', next: 'pear' },
+                { text: 'Pear is bigger than Gigasoft now.', next: 'pear' },
                 { text: 'So what do we do about them?', next: 'spend' },
             ],
         },
@@ -104,7 +104,7 @@ export const fatherMarketing: Conversation = {
             // He is fluent, confident, and wrong. Nothing in the scene
             // contradicts him - the player will find out from the share
             // numbers, or from the next eight years.
-            text: 'Pear is a shop. A very good shop, that sells telephones to people who enjoy being in the shop, and one day those people will want a telephone instead.\n\nMicrohard sells to companies. Companies do not change their minds because a window display is nice. Watch the wall, not the weather.',
+            text: 'Pear is a shop. A very good shop, that sells telephones to people who enjoy being in the shop, and one day those people will want a telephone instead.\n\nGigasoft sells to companies. Companies do not change their minds because a window display is nice. Watch the wall, not the weather.',
             choices: [
                 { text: 'What do we do?', next: 'spend' },
                 { text: 'The weather has thirty-one percent.', next: 'thirtyOne' },

@@ -170,7 +170,7 @@ describe('answering them', () => {
 
     it('OKONJO raises when you agree instantly', () => {
         grownCompany();
-        sendTo('tech_streamify', 'Streamify', { quarter: currentQuarter() - 1 });
+        sendTo('tech_streamify', 'Earworm', { quarter: currentQuarter() - 1 });
         const [offer] = postDueReplies();
         const opening = (offer.reply as any).demand.extraPremium;
 
@@ -180,7 +180,7 @@ describe('answering them', () => {
 
     it('VANE closes the door for good, and compose cannot reopen it', () => {
         grownCompany();
-        sendTo('tech_skynet', 'SkyNet AI', {
+        sendTo('tech_skynet', 'Sentinel AI', {
             quarter: currentQuarter() - 1, marketCap: 200_000_000, risk: 'Extreme',
         });
         const [offer] = postDueReplies();
@@ -188,7 +188,7 @@ describe('answering them', () => {
 
         useNegotiationStore.getState().answer(offer.id, false, world);
         expect(useNegotiationStore.getState().closedForever['tech_skynet']).toBe(true);
-        expect(sendTo('tech_skynet', 'SkyNet AI').ok).toBe(false);
+        expect(sendTo('tech_skynet', 'Sentinel AI').ok).toBe(false);
     });
 
     it('and the reputation floor holds the letter open rather than ending it', () => {
@@ -215,7 +215,7 @@ describe('answering them', () => {
 
     it('refusing is remembered, so coming back is harder', () => {
         grownCompany();
-        sendTo('tech_streamify', 'Streamify', { quarter: currentQuarter() - 1 });
+        sendTo('tech_streamify', 'Earworm', { quarter: currentQuarter() - 1 });
         const [offer] = postDueReplies();
         useNegotiationStore.getState().answer(offer.id, false, world);
         expect(useNegotiationStore.getState().refusalsByTarget['tech_streamify'])

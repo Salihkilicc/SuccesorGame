@@ -150,6 +150,30 @@ export const theme = {
         secondary: '#0C6C9C',
         secondaryText: '#FFFFFF',
 
+        // --- The purchase, and the only gold in the game ------------------
+        //  ---------------------------------------------------------------
+        //  WHY GOLD AND WHY THIS GOLD
+        //  ---------------------------------------------------------------
+        //  Asked for as "lighter, with a crown, and white text". Those three
+        //  fight: white on the bright primary #05A8F6 measures 2.65 against
+        //  white, and the contrast audit in scripts/reachability.js refuses
+        //  anything under 3.
+        //
+        //  Measured rather than chosen by eye:
+        //      #05A8F6  white 2.65   fails
+        //      #B8860B  white 3.25   passes, tight
+        //      #A6791C  white 3.91   passes
+        //
+        //  So the fill is a MID gold: warmer and lighter than the dark
+        //  surfaces around it, dark enough to carry white, and the one colour
+        //  that reads as a crown without a label.
+        //
+        //  IT IS USED IN EXACTLY ONE PLACE. The moment a second control is
+        //  gold, gold stops meaning "this is the paid thing" and becomes
+        //  decoration, which is how a palette loses a rank.
+        premium: '#A6791C',
+        premiumText: '#FFFFFF',
+
         /** Selected / active state. Light, so black text. */
         highlight: '#7DD3FC',
         highlightText: '#000000',

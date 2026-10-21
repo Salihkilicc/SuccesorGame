@@ -30,7 +30,7 @@ export const ACQUISITION_TARGETS: AcquisitionTarget[] = [
     // 1. MEDIA & SERVICES
     {
         id: 'streamify',
-        name: 'Streamify',
+        name: 'Earworm',
         category: 'Media',
         marketCap: 2_500_000_000,
         acquisitionPremium: 1.20,
@@ -63,7 +63,7 @@ export const ACQUISITION_TARGETS: AcquisitionTarget[] = [
     },
     {
         id: 'skyNet',
-        name: 'SkyNet AI',
+        name: 'Sentinel AI',
         category: 'Technology',
         marketCap: 120_000_000_000,
         acquisitionPremium: 1.40,

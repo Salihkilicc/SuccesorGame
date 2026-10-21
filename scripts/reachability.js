@@ -61,6 +61,28 @@ const files = [];
     }
 })(SRC);
 
+// ===========================================================================
+//  AND THE ROOT, WHICH IS NOT INSIDE src
+// ===========================================================================
+//  This walked `src` and nothing else, so App.tsx was invisible to every pass
+//  in this file. The consequence is specific and it bit immediately: a
+//  component mounted at the root was reported as "Components nothing renders",
+//  because nothing the script could see rendered it.
+//
+//  That is the worst kind of audit failure. A false positive sends somebody to
+//  delete a component that is running, and this list is read as a to-do.
+//
+//  Anything mounted at the root is exactly the kind of thing that is mounted
+//  ONCE and forever - a provider, an error boundary, a modal host that four
+//  different screens can trigger - so the root is where the app's most
+//  load-bearing and least visible wiring lives. It is the last place that
+//  should be unscanned.
+// ===========================================================================
+for (const rootFile of ['App.tsx', 'App.ts', 'index.js']) {
+    const p = path.join(__dirname, '..', rootFile);
+    if (fs.existsSync(p) && /\.tsx?$/.test(rootFile)) files.push(p);
+}
+
 const read = f => fs.readFileSync(f, 'utf8');
 const body = new Map(files.map(f => [f, read(f)]));
 const rel = f => path.relative(SRC, f);
@@ -1662,9 +1684,19 @@ for (const f of files.filter(f =>
 // what renders it is jest. This project's first .tsx test file appeared as a
 // finding the moment it was written, which would have taught whoever wrote
 // the second one that the audit punishes rendering tests.
+//  AND THE ROOT ITSELF IS NOT AN ORPHAN
+//  ------------------------------------------------------------------------
+//  App.tsx is mounted by `AppRegistry.registerComponent` in index.js, which is
+//  plain JavaScript and deliberately outside the TypeScript program. Nothing
+//  in here can see that, and teaching the script about React Native's registry
+//  to answer a question with one known answer would be a worse trade than
+//  naming the one file.
+const ROOT_COMPONENT = path.resolve(__dirname, '..', 'App.tsx');
+
 for (const f of files.filter(f =>
     f.endsWith('.tsx') && !/\.test\.tsx$/.test(f) && !isDisabled(f))) {
     if (optedOut(f)) continue;
+    if (path.resolve(f) === ROOT_COMPONENT) continue;
     const base = path.basename(f).replace(/\.tsx$/, '');
     const imported = [...REFERENCE_INDEX.importsOf].some(([g, specs]) =>
         path.resolve(g) !== path.resolve(f) && [...specs].some(s => path.basename(s) === base));

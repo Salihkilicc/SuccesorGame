@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { adGate } from '../../../core/ads/gate';
 import { useStatsStore } from '../../../core/store';
 import { useFamilyStore } from '../../../core/store/useFamilyStore';
 import { t } from '../../../core/i18n';
@@ -318,6 +319,21 @@ export const useEncounterSystem = () => {
         // B. Start New Relationship
         setPartner(candidate);
         setIsVisible(false);
+
+        // ------------------------------------------------------------------
+        //  THE DATE IS OVER
+        // ------------------------------------------------------------------
+        //  The fourth trigger. Placed after `setIsVisible(false)`, so the
+        //  encounter card is already off the screen: an interstitial that
+        //  arrives while the card is still up covers the one thing the player
+        //  pressed the button to see.
+        //
+        //  Every third one, not every one - see DATE_PRESSES_PER_AD in
+        //  core/ads/policy.ts. Not awaited, because nothing after this line
+        //  depends on the advertisement and the caller is expecting its
+        //  result synchronously.
+        // ------------------------------------------------------------------
+        void adGate('datePressed');
 
         return {
             success: true,

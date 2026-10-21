@@ -45,7 +45,7 @@ import { REFUSAL_THRESHOLD } from '../../core/market/mergers';
 import { FOUNDER_BY_COMPANY } from './founders';
 
 // ============================================================================
-//  1. DR. MARISOL VANE — SkyNet AI
+//  1. DR. MARISOL VANE — Sentinel AI
 // ============================================================================
 //  The Visionary. Her company burns money and has no product, so on any
 //  ordinary reading she should be desperate to sell; she is not, and that is
@@ -120,7 +120,7 @@ const kohl: Negotiator = {
 };
 
 // ============================================================================
-//  3. RUI OKONJO — Streamify
+//  3. RUI OKONJO — Earworm
 // ============================================================================
 //  The Shark, and his mechanic is the cruellest thing in the file: agreeing to
 //  his number makes it go up.

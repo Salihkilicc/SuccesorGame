@@ -1081,7 +1081,7 @@ export const useGameStore = create<GameStore>()(
         //  sayiliyordu: borcun kazancinin ustundeyse HER CEYREK en kucuk
         //  istirakin satiliyordu.
         //
-        //  Oyuncu StartApp IO'yu aldi, bir sonraki ceyrek sirket yeniden
+        //  Oyuncu Launchpad IO'yu aldi, bir sonraki ceyrek sirket yeniden
         //  borsada satin alinabilir haldeydi. Sebep buydu — en ucuz
         //  istirak oldugu icin ilk o gidiyordu.
         //

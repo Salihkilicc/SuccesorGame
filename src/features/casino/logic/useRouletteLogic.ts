@@ -1,4 +1,5 @@
 // src/features/casino/logic/useRouletteLogic.ts
+import { countCasinoTap } from '../../../core/ads/gate';
 import { useState, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
@@ -241,6 +242,10 @@ export const useRouletteLogic = (initialChip?: number) => {
     // Deduct total bet
     const afterDeduct = money - totalBetAmount;
     setField('money', afterDeduct);
+
+    // One casino action. Shortens the wait to the casino clock's next ad and
+    // can never produce one itself. See core/ads/policy.ts.
+    countCasinoTap();
 
     // DECIDED HERE, BEFORE ANYTHING TURNS. The three seconds below are the
     // telling of it. This is the whole engine and show split.

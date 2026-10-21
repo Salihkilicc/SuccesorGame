@@ -17,7 +17,7 @@
 //
 //  A NOTE ON WHY THESE THREE. They are the ones written into
 //  data/AcquisitionData.ts - a file whose data is imported by nothing, so
-//  SkyNet, VoltMotors and Streamify have never been buyable in a shipped
+//  SkyNet, VoltMotors and Earworm have never been buyable in a shipped
 //  game. Their entries in the market list are new; this is where their people
 //  live.
 // ============================================================================

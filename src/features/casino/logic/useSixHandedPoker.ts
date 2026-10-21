@@ -15,6 +15,7 @@
 //  entire "playing against people" feeling. See pokerBots.thinkTime.
 // ============================================================================
 
+import { countCasinoTap } from '../../../core/ads/gate';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStatsStore, usePlayerStore } from '../../../core/store';
 import { REPUTATION_CEILING, reputationForBet } from '../data/casinoData';
@@ -349,6 +350,10 @@ export const useSixHandedPoker = (initialBet: number, vip: boolean, roomBuyIn?: 
             return casinoAlert('Out of chips', 'Leave the table to cash out, or buy in again.');
         }
         if (!canDeal(current)) return;
+
+        // One casino action. Shortens the wait to the casino clock's next ad
+        // and can never produce one itself. See core/ads/policy.ts.
+        countCasinoTap();
 
         clearTimers();
         setResultPopup(null);
