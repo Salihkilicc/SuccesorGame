@@ -16,6 +16,7 @@ import ScreenHost from '../../common/ScreenHost';
 import ScreenHeader from '../../common/ScreenHeader';
 import { theme } from '../../../core/theme';
 import { getCompanyVisual } from '../../../core/market/companyVisuals';
+import { categoryLabel } from '../../../core/i18n/categoryLabel';
 
 type Props = {
     /** Render as a route rather than a popup - see components/common/ScreenHost. */
@@ -61,7 +62,7 @@ const ExistingCompaniesModal = ({ visible, onClose, asScreen }: Props) => {
                                             <View style={[styles.tierTag, { borderColor: `${visual.tierColor}40`, backgroundColor: `${visual.tierColor}15` }]}>
                                                 <Text style={[styles.tierTagText, { color: visual.tierColor }]}>{visual.tierLabel}</Text>
                                             </View>
-                                            <Text style={styles.sector} numberOfLines={1}>{item.sector}</Text>
+                                            <Text style={styles.sector} numberOfLines={1}>{categoryLabel(item.sector)}</Text>
                                         </View>
                                     </View>
                                 </View>

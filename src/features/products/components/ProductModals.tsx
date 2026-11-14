@@ -43,6 +43,7 @@ import InfoDot from '../../../components/common/InfoDot';
 import MarketPositionPanel from '../../../core/market/MarketPositionPanel';
 import CollapsibleSection from '../../../components/common/CollapsibleSection';
 import ScreenHeader from '../../../components/common/ScreenHeader';
+import { categoryLabel } from '../../../core/i18n/categoryLabel';
 // Removed obsolete imports
 // import { ... } from '../../../features/products/logic/productUpgrades';
 
@@ -679,7 +680,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                 <View style={styles.content}>
                     <ScreenHeader
                         title={displayName}
-                        subtitle={product.category}
+                        subtitle={categoryLabel(product.category)}
                         onBack={onClose}
                         right={
                             <View style={styles.rpBadge}>
@@ -1009,7 +1010,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                 title={t('product.whyThisProductEarnsWhat')}
                                 note={t('product.categorySizeCapacityCostAnd')}
                                 info={t('product.twoProductsCanHaveThe')}
-                                summary={market.category}
+                                summary={categoryLabel(market.category)}
                             >
                                 <View style={styles.whyRow}>
                                     <Text style={styles.whyLabel}>{t('product.categoryMarket')}</Text>
@@ -1048,7 +1049,7 @@ export const ProductDetailModal = ({ visible, product: initialProduct, onClose, 
                                                 m.category === market.category && styles.whyTableRowActive,
                                             ]}
                                         >
-                                            <Text style={styles.whyTableName}>{m.category}</Text>
+                                            <Text style={styles.whyTableName}>{categoryLabel(m.category)}</Text>
                                             <Text style={styles.whyTableValue}>
                                                 {t('product.perQtr', { money: formatMoney(dollarSize) })}
                                             </Text>

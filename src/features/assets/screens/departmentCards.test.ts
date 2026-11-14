@@ -84,6 +84,54 @@ describe('the department cards do not grow with their words', () => {
         expect(body).toMatch(/numberOfLines=\{1\}[\s\S]*?adjustsFontSizeToFit/);
     });
 
+    // ----------------------------------------------------------------------
+    //  AND IT HAS TO BE READABLE, WHICH IS A DIFFERENT PROPERTY
+    // ----------------------------------------------------------------------
+    //  Every assertion above is about the card's SHAPE, and the card passed
+    //  all of them while the figure on it could not be read. Reported from a
+    //  device: you could not tell what the debt was.
+    //
+    //  Two causes, compounding. The colour was a hardcoded
+    //  `rgba(255,255,255,0.48)`, which measures 3.42 against surfaceRaised and
+    //  is the audit's floor for LARGE text. And `minimumFontScale: 0.7` let
+    //  twelve points shrink to 8.4.
+    //
+    //  The subtitle is the information on the card. The title says
+    //  "Financing"; this says how much the debt is.
+    // ----------------------------------------------------------------------
+    it('the figure is not styled as a footnote', () => {
+        const sub = style('deptSub');
+
+        // No hardcoded white. The theme's own `textSecondary` is 0.72 and
+        // measures 5.56 there; the rgba it replaced was the same idea at an
+        // opacity nobody had measured.
+        expect(sub).not.toMatch(/rgba\(255,\s*255,\s*255/);
+        expect(sub).toMatch(/theme\.colors\.textSecondary/);
+
+        // It carries a number, so it reads as one.
+        expect(numberIn(sub, 'fontSize')).toBeGreaterThanOrEqual(13);
+        expect(sub).toMatch(/fontWeight/);
+    });
+
+    it('does not let the figure shrink below readable', () => {
+        const card = source();
+        const at = card.indexOf('const DepartmentCard');
+        const body = card.slice(at, card.indexOf('const formatCompactNumber', at));
+
+        // The subtitle's own scale, which is the second of the two in here.
+        const scales = [...body.matchAll(/minimumFontScale=\{([\d.]+)\}/g)]
+            .map(m => Number(m[1]));
+        expect(scales).toHaveLength(2);
+
+        const subScale = scales[1];
+        const subSize = numberIn(style('deptSub'), 'fontSize')!;
+
+        // 8.4 points was the floor. Eleven is a number somebody can read at
+        // arm's length, and the strings are short enough never to need less:
+        // the longest is about thirteen characters.
+        expect(subSize * subScale).toBeGreaterThanOrEqual(11);
+    });
+
     it('and every subtitle comes from the catalogue', () => {
         // They were template literals: `${n} Active`, `${n}% Owned`. On screen,
         // in English, invisible to a sweep that reported zero.

@@ -75,11 +75,16 @@ const DepartmentCard = ({ icon, iconColor = theme.colors.textPrimary, title, sub
       minimumFontScale={0.75}>
       {title}
     </Text>
+    {/* 0.85 rather than 0.7. The floor was 8.4 points, which is below the
+        size at which a number can be read at arm's length, and the shrink
+        was not even needed: the longest of these four strings is around
+        thirteen characters ("Debt: $999.9M") against roughly 110 points of
+        text width on the narrowest phone this ships to. */}
     <Text
       style={styles.deptSub}
       numberOfLines={1}
       adjustsFontSizeToFit
-      minimumFontScale={0.7}>
+      minimumFontScale={0.85}>
       {subtitle}
     </Text>
   </Pressable>
@@ -633,12 +638,34 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     height: 38,
   },
+  // ------------------------------------------------------------------
+  //  THIS LINE IS THE INFORMATION, NOT THE CAPTION
+  // ------------------------------------------------------------------
+  //  The title says "Financing" and this says how much the debt actually
+  //  is. The figure is the reason anybody looks at the card, and it was
+  //  styled as though it were a footnote: twelve points, at a hardcoded
+  //  48% white, which measures 3.42 against surfaceRaised.
+  //
+  //  Worse, `adjustsFontSizeToFit` with `minimumFontScale: 0.7` let it
+  //  shrink to 8.4 points. Reported from a device as not being able to
+  //  tell what the debt was, which is exactly right: 3.42 is the audit's
+  //  floor for LARGE text and this was the smallest text on the screen.
+  //
+  //  textSecondary measures 5.56 there. It is not a new colour - white
+  //  turned down is documented as still being white in core/theme.ts -
+  //  and the hardcoded rgba it replaces was the same idea written worse.
+  //
+  //  The fixed `height` stays. The four cards are the same height by
+  //  construction and the note on deptTitle explains why that must not
+  //  become a thing that depends on how long a word is.
+  // ------------------------------------------------------------------
   deptSub: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.48)',
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 16,
-    height: 16,
+    lineHeight: 17,
+    height: 17,
   },
   sharePrice: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
 });

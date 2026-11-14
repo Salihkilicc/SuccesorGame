@@ -43,11 +43,16 @@ import { useIsFocused } from '@react-navigation/native';
 import { useTutorialTargets } from './targets';
 
 /**
- * How often a focused target checks whether it has moved.
+ * How often a focused target that is NOT being pointed at re-measures.
  *
- * Fast enough that the ring keeps up with a flick-scroll, slow enough to be
- * free. The store ignores an identical measurement, so a screen that is not
- * moving does not re-render at all.
+ * This is the cheap timer, and it exists only so the overlay can find out a
+ * control is on screen at all. The store ignores an identical measurement, so
+ * a screen that is not moving does not re-render.
+ *
+ * It used to be the only timer, for every target, including the one with a
+ * ring around it. See the note on `activeKey` in targets.ts: a quarter second
+ * is far too slow to track a scroll, and the ring trailed the control in
+ * visible steps.
  */
 const MEASURE_EVERY_MS = 250;
 
@@ -61,6 +66,11 @@ type Props = {
 const TutorialTarget = ({ tutorialKey, style, children }: Props) => {
     const setRect = useTutorialTargets(s => s.setRect);
     const clearRect = useTutorialTargets(s => s.clearRect);
+
+    // A boolean, derived in the selector, so this component re-renders when it
+    // becomes the ringed target and not every time some OTHER key does.
+    const ringed = useTutorialTargets(s => s.activeKey === tutorialKey);
+
     const ref = useRef<View>(null);
     const focused = useIsFocused();
 
@@ -107,12 +117,40 @@ const TutorialTarget = ({ tutorialKey, style, children }: Props) => {
         //  identical measurements, so a still screen costs one native
         //  measurement every quarter second and re-renders nothing.
         // ------------------------------------------------------------------
-        const tick = setInterval(measure, MEASURE_EVERY_MS);
+        //  AND A QUARTER SECOND IS NOT A SCROLL
+        // ------------------------------------------------------------------
+        //  The poll above is right for finding out that a control exists and
+        //  wrong for following one. At 250ms the ring lands four times a
+        //  second while the finger moves the control continuously, so it
+        //  arrives late and in steps: the highlight looks unanchored, as if it
+        //  were sliding along behind the content rather than sitting on it.
+        //
+        //  The target that currently has the ring therefore follows per FRAME.
+        //  requestAnimationFrame rather than a faster interval: a timer that
+        //  does not line up with the frame produces the same stutter at a
+        //  higher price, and rAF stops on its own when nothing is drawing.
+        //
+        //  This is affordable for exactly one reason, and it is the reason
+        //  `activeKey` exists: one target is ringed at a time. Per frame for
+        //  every target on the screen was never on the table.
+        // ------------------------------------------------------------------
+        if (!ringed) {
+            const tick = setInterval(measure, MEASURE_EVERY_MS);
+            return () => {
+                clearInterval(tick);
+                clearRect(tutorialKey);
+            };
+        }
+
+        let frame = requestAnimationFrame(function follow() {
+            measure();
+            frame = requestAnimationFrame(follow);
+        });
         return () => {
-            clearInterval(tick);
+            cancelAnimationFrame(frame);
             clearRect(tutorialKey);
         };
-    }, [focused, tutorialKey, measure, clearRect]);
+    }, [focused, ringed, tutorialKey, measure, clearRect]);
 
     return (
         <View ref={ref} style={style} onLayout={onLayout} collapsable={false}>

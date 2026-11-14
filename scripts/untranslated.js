@@ -34,6 +34,29 @@
 //  which is a screen built in English and translated later.
 //
 //  ---------------------------------------------------------------------------
+//  WHAT IT CANNOT SEE, WRITTEN DOWN BECAUSE IT ALREADY COST A REPORT
+//  ---------------------------------------------------------------------------
+//  ENGLISH THAT IS NOT A LITERAL IN A SCREEN. This script reported zero while
+//  the filters on the hostile takeover screen and the headings in the research
+//  centre were both in English, and both reports were correct. The words were
+//  never in a .tsx file: they sat in a data file as
+//
+//      category: 'Robotics',
+//
+//  and reached the player through `<Text>{category}</Text>`.
+//
+//  Following an identifier back to the literal it came from is a type
+//  checker's job rather than a regex's, so this script does NOT try. The gap
+//  is closed from the other end instead, by a test that reads the category
+//  literals out of the data files and fails if any lacks a translation, plus
+//  a sweep for a raw category rendered without going through `categoryLabel`.
+//  See src/core/i18n/categoryLabel.test.ts.
+//
+//  The lesson generalises and is worth more than the instance: a zero here
+//  means "no untranslated sentence is written into a screen". It does not
+//  mean "nothing on screen is in English".
+//
+//  ---------------------------------------------------------------------------
 //  THE TWO HOLES THIS NET HAD, AND WHAT WAS SITTING IN THEM
 //  ---------------------------------------------------------------------------
 //  It reported zero for weeks while a Turkish player was being asked, in

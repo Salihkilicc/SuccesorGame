@@ -41,6 +41,12 @@ import { CAST } from '../../data/story/cast';
 import { castNow } from '../../core/story/castNow';
 import { t, useLocale } from '../../core/i18n';
 import { line, lockKey } from '../../data/i18n/storyText';
+// From the metrics module rather than from CrystalNavBar itself. Importing the
+// component for one number pulled in the blur view, the gradient and
+// `navigationRef`, and this file's test suite stopped loading on a navigation
+// ref it has no interest in. See navigation/components/navBarMetrics.ts.
+import { NAV_BAR_CLEARANCE } from '../../navigation/components/navBarMetrics';
+import Portrait from '../common/Portrait';
 
 /**
  * Breathing room around the highlighted control.
@@ -101,7 +107,67 @@ export const holeFor = (
  * on the product sheet that put the first line of the instruction behind the
  * header - the card was there and could not be read.
  */
-const CARD_TOP = 132;
+export const CARD_TOP = 132;
+
+/**
+ * Where the card sits when it hangs below the highlight.
+ *
+ * ---------------------------------------------------------------------------
+ *  IT WAS 120, WHICH IS LESS THAN THE BAR IT WAS SUPPOSED TO CLEAR
+ * ---------------------------------------------------------------------------
+ *  `NAV_BAR_CLEARANCE` is derived from the floating bar's own geometry and
+ *  comes out at 138 on iOS and 126 on Android. A hardcoded 120 is under both,
+ *  so the card sat ON the bar on iOS and flush against it on Android, which is
+ *  how it was reported: the card grazing the tab bar.
+ *
+ *  The constant exists precisely because every screen that ends in a control
+ *  was guessing this number, and its own note says so. The tutorial card was
+ *  one more guesser. Imported rather than copied, so the card cannot come
+ *  adrift again the next time the bar changes height.
+ * ---------------------------------------------------------------------------
+ */
+export const CARD_BOTTOM = NAV_BAR_CLEARANCE + theme.spacing.md;
+
+/**
+ * The little triangle that joins the card to the thing it is about.
+ *
+ * The card and the ring were two unconnected objects on a dimmed screen: one
+ * floating sentence and one glowing rectangle, with nothing saying they were
+ * the same thought. The pointer is the cheapest possible way to say it.
+ *
+ * It tracks the hole horizontally and is clamped inside the card's corners, so
+ * it never hangs off the rounded end pointing at nothing.
+ */
+export const POINTER = 9;
+
+/**
+ * Where the pointer sits horizontally, in the CARD's own coordinates.
+ *
+ * The card is inset by `spacing.lg` on both sides, so the hole's centre has to
+ * come back by that much. Then it is clamped to the straight part of the card's
+ * edge: `radius.lg` is twenty points of curve at each end, and a triangle
+ * sitting on the curve points into space rather than at anything.
+ *
+ * Pure and exported for the same reason `holeFor` is. Under the test renderer
+ * `measureInWindow` never calls back, so a rendered tree has no hole to point
+ * at and a component test would pass whatever the arithmetic said.
+ */
+export const pointerXFor = (
+    hole: { x: number; w: number },
+    windowWidth: number,
+    inset: number = theme.spacing.lg,
+    corner: number = theme.radius.lg,
+): number => {
+    const cardWidth = windowWidth - inset * 2;
+    const centred = hole.x + hole.w / 2 - inset - POINTER;
+
+    // The clamp is applied low end first so that a card narrower than its own
+    // two corners collapses to the left corner rather than to a negative.
+    return Math.min(
+        Math.max(centred, corner),
+        Math.max(corner, cardWidth - corner - POINTER * 2),
+    );
+};
 
 const TutorialOverlay = () => {
     // ------------------------------------------------------------------
@@ -148,6 +214,7 @@ const TutorialOverlay = () => {
     const seenBefore = useIdentityStore(s => s.tutorialCompleted);
     const markDone = useIdentityStore(s => s.markTutorialCompleted);
     const rects = useTutorialTargets(s => s.rects);
+    const setActiveKey = useTutorialTargets(s => s.setActiveKey);
 
     // ------------------------------------------------------------------
     //  SUBSCRIPTIONS, NOT READS. `readWorld` IS STILL THE ONLY READER
@@ -198,6 +265,26 @@ const TutorialOverlay = () => {
         const id = setTimeout(() => setEscapeVisible(true), ESCAPE_AFTER_MS);
         return () => clearTimeout(id);
     }, [lock?.id]);
+
+    // ------------------------------------------------------------------
+    //  TELLING THE TARGET IT IS THE ONE WITH THE RING
+    // ------------------------------------------------------------------
+    //  This overlay is the only thing in the app that knows which control is
+    //  being pointed at, and the target is the only thing that can measure
+    //  where that control currently is. The key is the one fact that has to
+    //  travel between them.
+    //
+    //  What it buys is the ring tracking a scroll per frame instead of four
+    //  times a second. See the note on `activeKey` in targets.ts for why that
+    //  cannot simply be done for every target.
+    //
+    //  Cleared on the way out, so a finished tutorial does not leave one
+    //  target running an animation frame loop for the rest of the session.
+    // ------------------------------------------------------------------
+    useEffect(() => {
+        setActiveKey(lock?.highlight ?? null);
+        return () => setActiveKey(null);
+    }, [lock?.highlight, setActiveKey]);
 
     // ------------------------------------------------------------------
     //  THE WORDS ARRIVE WITH THE DIM
@@ -361,6 +448,45 @@ const TutorialOverlay = () => {
     // In THIS overlay's coordinates rather than the window's. See holeFor.
     const hole = rect && holeFor(rect, origin);
 
+    // ------------------------------------------------------------------
+    //  WHAT THE CARD NEEDS TO KNOW
+    // ------------------------------------------------------------------
+    //  Derived here rather than inside the JSX so that `hole` is read once
+    //  and the three facts that depend on it are obviously the same three
+    //  facts. All of them tolerate `hole` being undefined, because the
+    //  branch below renders nothing in that case.
+    // ------------------------------------------------------------------
+
+    /** The highlight is low, so the card goes above it. */
+    const above = !!hole && hole.y > H / 2;
+
+    /** See pointerXFor. */
+    const pointerLeft = hole ? pointerXFor(hole, W) : 0;
+
+    /**
+     * Who is talking.
+     *
+     * The seat id is what the sequence authored and what the threads are keyed
+     * on; `portraitId` is the second id that says which face this particular
+     * holder of the seat has. Both are needed: the seat alone would give the
+     * fourth person to hold it the first person's photograph.
+     */
+    const speakerSeat = lock?.speaker ?? 'father';
+    const speaker = castNow(speakerSeat);
+    const speakerName = speaker?.name ?? '';
+
+    /**
+     * Which step this is, counted in the order the sequence was authored.
+     *
+     * Position rather than progress. `activeLock` walks past anything already
+     * satisfied, so "how many have I finished" and "where am I in the list"
+     * are different numbers, and the one a player wants from a dimmed screen
+     * is how far through the list they are.
+     */
+    const stepNumber = lock
+        ? TUTORIAL_SEQUENCE.findIndex(l => l.id === lock.id) + 1
+        : 0;
+
     return (
         <View
             ref={rootRef}
@@ -433,15 +559,30 @@ const TutorialOverlay = () => {
             <View
                 // ------------------------------------------------------
                 //  IT FLIPS SO IT DOES NOT COVER WHAT IT IS POINTING AT,
-                //  AND THE TOP FIGURE WAS TOO SMALL
+                //  AND NEITHER FIGURE WAS RIGHT
                 // ------------------------------------------------------
                 //  80 put the card under the status bar and the sheet's
                 //  own header on a notched phone - the first line of what
                 //  the father says was simply not readable. CARD_TOP
                 //  clears both.
+                //
+                //  And the other branch was a bare 120, under the floating
+                //  nav bar's own clearance on both platforms. See the note
+                //  on CARD_BOTTOM.
                 // ------------------------------------------------------
-                style={[styles.card, hole.y > H / 2 ? { top: CARD_TOP } : { bottom: 120 }]}
+                style={[styles.card, above ? { top: CARD_TOP } : { bottom: CARD_BOTTOM }]}
                 pointerEvents="box-none">
+
+                {/* The join between the card and the ring. See POINTER. */}
+                <View
+                    pointerEvents="none"
+                    style={[
+                        styles.pointer,
+                        above ? styles.pointerDown : styles.pointerUp,
+                        { left: pointerLeft },
+                    ]}
+                />
+
                 {/* ------------------------------------------------------
                     SOMEBODY IS SAYING THIS
 
@@ -451,10 +592,41 @@ const TutorialOverlay = () => {
                     a character was already standing. The conversation that
                     arrives with the lock is the father's; the card is his
                     too, and now says so.
+
+                    AND NOW SHOWS HIM. The name alone still read as a label
+                    on a dialog box. Every other place a character speaks in
+                    this game - the inbox, the mail detail, the status
+                    header - puts their face beside the words, and the
+                    tutorial was the one surface that did not, which made it
+                    feel like a manual rather than like him. The portrait is
+                    the same component and the same lookup those use, so a
+                    speaker without a file gets the same initials circle
+                    rather than a gap.
                    ------------------------------------------------------ */}
-                <Text style={styles.speaker}>
-                    {(castNow(lock.speaker ?? 'father')?.name ?? '').toUpperCase()}
-                </Text>
+                <View style={styles.header}>
+                    <Portrait
+                        id={speaker?.portraitId ?? speakerSeat}
+                        name={speakerName}
+                        size={40}
+                        borderWidth={0}
+                    />
+                    <View style={styles.who}>
+                        <Text style={styles.speaker} numberOfLines={1}>
+                            {speakerName.toUpperCase()}
+                        </Text>
+                        {/* ----------------------------------------------
+                            HOW MUCH OF THIS IS LEFT
+
+                            A dimmed screen with no end in sight is why
+                            people reach for the skip. Eight steps is
+                            nothing; not knowing it is eight is the problem.
+                           ---------------------------------------------- */}
+                        <Text style={styles.step}>
+                            {t('tut.stepOf', { n: stepNumber, total: TUTORIAL_SEQUENCE.length })}
+                        </Text>
+                    </View>
+                </View>
+
                 <Text style={styles.instruction}>
                     {line(lockKey(lock.id), lock.instruction)}
                 </Text>
@@ -522,6 +694,63 @@ const styles = StyleSheet.create({
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.borderStrong,
         gap: theme.spacing.md,
+
+        // Lifted off the dim rather than sitting flat on it. On a screen where
+        // everything else has been pushed back, a card with no shadow reads as
+        // part of the same flat sheet.
+        shadowColor: theme.colors.onLight,
+        shadowOpacity: 0.35,
+        shadowRadius: 16,
+        shadowOffset: { width: 0, height: 8 },
+        elevation: 12,
+    },
+
+    /**
+     * The triangle, built from borders because that is how RN draws one.
+     *
+     * Three transparent sides and one coloured: the coloured border fills the
+     * wedge left over, which points away from it. So `borderBottomColor` makes
+     * a triangle pointing UP.
+     */
+    pointer: {
+        position: 'absolute',
+        width: 0,
+        height: 0,
+        borderLeftWidth: POINTER,
+        borderRightWidth: POINTER,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+    },
+    pointerUp: {
+        top: -POINTER,
+        borderBottomWidth: POINTER,
+        borderBottomColor: theme.colors.guidance,
+    },
+    pointerDown: {
+        bottom: -POINTER,
+        borderTopWidth: POINTER,
+        borderTopColor: theme.colors.guidance,
+    },
+
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.md,
+    },
+    /** Takes the remaining width so a long name truncates instead of wrapping. */
+    who: { flex: 1, gap: 1 },
+
+    /**
+     * How far through the eight steps this is.
+     *
+     * guidanceText, which is the light violet already paired with this ground
+     * in core/theme.ts, rather than a fourth tint invented for one label.
+     */
+    step: {
+        color: theme.colors.guidanceText,
+        fontSize: theme.typography.micro,
+        fontWeight: '600',
+        letterSpacing: 0.4,
     },
     /**
      * His name.
@@ -537,11 +766,10 @@ const styles = StyleSheet.create({
      * card's own ground, so nothing is lost by the label stepping back.
      */
     speaker: {
-        color: theme.colors.textSecondary,
-        fontSize: theme.typography.micro,
+        color: theme.colors.textPrimary,
+        fontSize: theme.typography.caption,
         fontWeight: '700',
         letterSpacing: 0.8,
-        marginBottom: -4,
     },
     instruction: {
         color: theme.colors.textPrimary,

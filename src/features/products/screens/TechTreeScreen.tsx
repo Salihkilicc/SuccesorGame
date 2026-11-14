@@ -16,6 +16,7 @@ import { ProductIconBadge, getCategoryColor, getCategoryIconName } from '../comp
 import { formatNumber, formatMoney, formatRP, formatCompact } from '../../../core/utils';
 import ScreenHeader from '../../../components/common/ScreenHeader';
 import InfoDot from '../../../components/common/InfoDot';
+import { categoryLabel } from '../../../core/i18n/categoryLabel';
 
 const TechTreeScreen = () => {
     useLocale();
@@ -121,7 +122,7 @@ const TechTreeScreen = () => {
                             const fill = Math.min(100, (points / CATEGORY_UNLOCK_BRAND) * 100);
                             return (
                                 <View key={cat} style={styles.gateRow}>
-                                    <Text style={styles.gateRowName} numberOfLines={1}>{cat}</Text>
+                                    <Text style={styles.gateRowName} numberOfLines={1}>{categoryLabel(cat)}</Text>
                                     <View style={styles.gateTrack}>
                                         {/* Blue when it is there, brand orange while it
                                             climbs. Neither is green: clearing a gate is
@@ -162,7 +163,7 @@ const TechTreeScreen = () => {
                                 <View style={[styles.categoryIconBadge, { backgroundColor: `${catColor}18`, borderColor: `${catColor}38` }]}>
                                     <MaterialCommunityIcons name={catIconName} size={18} color={catColor} />
                                 </View>
-                                <Text style={styles.categoryTitle}>{category}</Text>
+                                <Text style={styles.categoryTitle}>{categoryLabel(category)}</Text>
                             </View>
 
                             {/* Say WHY a category is shut before the player

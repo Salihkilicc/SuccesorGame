@@ -29,20 +29,29 @@ const { width } = Dimensions.get('window');
 //  cannot grow without the space under it growing with it.
 // ===========================================================================
 
-/** How far the bar floats off the bottom edge. */
-const BAR_LIFT = Platform.OS === 'ios' ? 44 : 32;
-
-/** Breathing room inside the bar, above the icon and below the label. */
-const BAR_PAD_V = 20;
-
-/** The glyph, and the word under it. */
-const BAR_ICON = 28;
-const BAR_LABEL = 11;
-const BAR_LABEL_GAP = 4;
-
-/** What the bar actually measures, derived rather than estimated. */
-const BAR_HEIGHT =
-    BAR_PAD_V * 2 + BAR_ICON + BAR_LABEL_GAP + Math.round(BAR_LABEL * 1.3);
+// MOVED, not changed. These seven numbers now live in ./navBarMetrics, which
+// has no imports of its own. Anything that is not a screen and only wants the
+// clearance was otherwise pulling this entire component in behind it, blur view
+// and navigation ref included. See the note at the top of that file.
+//
+// SHELVED here so the move is visible from the place it moved from:
+//
+//     const BAR_LIFT = Platform.OS === 'ios' ? 44 : 32;
+//     const BAR_PAD_V = 20;
+//     const BAR_ICON = 28;
+//     const BAR_LABEL = 11;
+//     const BAR_LABEL_GAP = 4;
+//     const BAR_HEIGHT =
+//         BAR_PAD_V * 2 + BAR_ICON + BAR_LABEL_GAP + Math.round(BAR_LABEL * 1.3);
+import {
+    BAR_LIFT,
+    BAR_PAD_V,
+    BAR_ICON,
+    BAR_LABEL,
+    BAR_LABEL_GAP,
+    BAR_HEIGHT,
+    NAV_BAR_CLEARANCE,
+} from './navBarMetrics';
 
 // ===========================================================================
 //  ANDROID PAINTS SIXTY FOUR PER CENT BLACK OVER THIS BAR
@@ -71,13 +80,13 @@ const BAR_HEIGHT =
 const ANDROID_BLUR_OVERLAY = 'rgba(28,36,44,0.28)';
 
 /**
- * How much room the floating bar takes at the bottom of every screen.
+ * Re-exported so the 73 callers that import it from here keep working.
  *
- * Screens that end in a button need to clear it, and every one of them was
- * guessing a number. One constant, derived from the bar's own geometry, plus
- * eight points so a button does not sit flush against it.
+ * It is DEFINED in ./navBarMetrics now. Changing that was the whole point of
+ * the move and changing the import path of 73 files was not, so this line
+ * stays: the definition is in one place and the old address still answers.
  */
-export const NAV_BAR_CLEARANCE = BAR_LIFT + BAR_HEIGHT + 8;
+export { NAV_BAR_CLEARANCE };
 
 interface CrystalNavBarProps {
     activeTab: NavTab;

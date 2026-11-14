@@ -14,6 +14,7 @@ import SimpleLineChart from '../../../components/Market/SimpleLineChart';
 import { getFakeChartData } from '../data/chartData';
 import { INITIAL_MARKET_ITEMS } from '../data/marketData';
 import { formatPrice } from '../../../core/utils';
+import { categoryLabel } from '../../../core/i18n/categoryLabel';
 
 const StockDetailScreen = () => {
     const route = useRoute<any>();
@@ -70,7 +71,7 @@ const StockDetailScreen = () => {
                     <View style={styles.headerCard}>
                         <View>
                             <Text style={styles.symbolText}>{symbol}</Text>
-                            <Text style={styles.categoryText}>{category}</Text>
+                            <Text style={styles.categoryText}>{categoryLabel(category)}</Text>
                         </View>
                         <View style={{ alignItems: 'flex-end' }}>
                             <Text style={styles.priceText}>

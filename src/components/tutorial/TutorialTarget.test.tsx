@@ -53,7 +53,7 @@ const rects = () => useTutorialTargets.getState().rects;
 beforeEach(() => {
     jest.useFakeTimers();
     mockFocused = true;
-    useTutorialTargets.setState({ rects: {} });
+    useTutorialTargets.setState({ rects: {}, activeKey: null });
 });
 
 afterEach(() => {
@@ -120,5 +120,136 @@ describe('a target', () => {
         act(() => { tree = mount(); });
         act(() => { tree!.unmount(); });
         expect(jest.getTimerCount()).toBe(0);
+    });
+});
+
+// ============================================================================
+//  THE ONE WITH THE RING FOLLOWS PER FRAME; THE REST KEEP THE CHEAP TIMER
+// ============================================================================
+//
+//  Reported from a device: the highlight did not look fixed to the control, it
+//  looked like it was sliding. That is what a 250ms poll looks like against a
+//  finger moving a list continuously - the ring lands four times a second,
+//  always behind, always in steps.
+//
+//  The timer cannot simply be made faster. It runs on EVERY focused target,
+//  and most of them are not being pointed at; per frame for all of them is a
+//  native measurement per view per frame for nothing. So the overlay publishes
+//  which key has the ring and only that one upgrades.
+//
+//  WHAT THIS FILE IS DEFENDING is that split. Both halves are easy to lose:
+//  drop the rAF branch and the lag comes back, drop the interval branch and
+//  the overlay never learns a control exists, and NEITHER shows up as a
+//  failure anywhere else. The second one is the nastier regression, because
+//  the tutorial then simply never appears, which is a bug this project has
+//  already shipped once.
+// ============================================================================
+
+describe('how often a target re-measures', () => {
+    /**
+     * Counting the two mechanisms rather than counting measurements.
+     *
+     * `measureInWindow` never calls back under the test renderer, so the
+     * measurements themselves are unobservable. What IS observable is which
+     * scheduler the component reached for, and that is the decision under
+     * test.
+     */
+    const spies = () => {
+        const raf = jest.spyOn(global, 'requestAnimationFrame');
+        const interval = jest.spyOn(global, 'setInterval');
+        return {
+            raf,
+            interval,
+            restore: () => { raf.mockRestore(); interval.mockRestore(); },
+        };
+    };
+
+    it('uses the cheap timer when it is not the one being pointed at', () => {
+        const s = spies();
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+
+        expect(s.interval).toHaveBeenCalled();
+        expect(s.raf).not.toHaveBeenCalled();
+
+        act(() => { tree!.unmount(); });
+        s.restore();
+    });
+
+    it('follows per frame once the overlay names it', () => {
+        act(() => { useTutorialTargets.getState().setActiveKey('products'); });
+
+        const s = spies();
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+
+        // The assertion that the reported bug is fixed.
+        expect(s.raf).toHaveBeenCalled();
+        expect(s.interval).not.toHaveBeenCalled();
+
+        act(() => { tree!.unmount(); });
+        s.restore();
+    });
+
+    it('switches over when the ring arrives while it is already mounted', () => {
+        // The ordinary case in the game: the player is on the screen and a
+        // lock engages underneath them. The target must not stay on the slow
+        // timer just because it mounted before the lock.
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+
+        const s = spies();
+        act(() => { useTutorialTargets.getState().setActiveKey('products'); });
+
+        expect(s.raf).toHaveBeenCalled();
+
+        act(() => { tree!.unmount(); });
+        s.restore();
+    });
+
+    it('does not follow a ring that belongs to a different control', () => {
+        act(() => { useTutorialTargets.getState().setActiveKey('rndLab'); });
+
+        const s = spies();
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+
+        expect(s.raf).not.toHaveBeenCalled();
+        expect(s.interval).toHaveBeenCalled();
+
+        act(() => { tree!.unmount(); });
+        s.restore();
+    });
+
+    it('stops the frame loop on unmount', () => {
+        act(() => { useTutorialTargets.getState().setActiveKey('products'); });
+
+        const cancel = jest.spyOn(global, 'cancelAnimationFrame');
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+        act(() => { tree!.unmount(); });
+
+        // A loop left running re-measures a view that is gone, forever.
+        expect(cancel).toHaveBeenCalled();
+        cancel.mockRestore();
+    });
+
+    it('stops following and withdraws when the screen loses focus', () => {
+        act(() => { useTutorialTargets.getState().setActiveKey('products'); });
+        let tree: renderer.ReactTestRenderer;
+        act(() => { tree = mount(); });
+        publish();
+
+        const cancel = jest.spyOn(global, 'cancelAnimationFrame');
+        mockFocused = false;
+        act(() => { tree!.update(
+            <TutorialTarget tutorialKey="products"><Text>tile</Text></TutorialTarget>,
+        ); });
+
+        expect(cancel).toHaveBeenCalled();
+        expect(rects()).not.toHaveProperty('products');
+
+        cancel.mockRestore();
+        act(() => { tree!.unmount(); });
     });
 });

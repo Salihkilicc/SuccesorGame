@@ -8,6 +8,7 @@ import { formatNumber, formatPercent } from '../utils';
 import CollapsibleSection from '../../components/common/CollapsibleSection';
 import InfoDot from '../../components/common/InfoDot';
 import { theme } from '../theme';
+import { categoryLabel } from '../i18n/categoryLabel';
 
 // ============================================================================
 //  PAZAR KONUMU PANELI
@@ -50,7 +51,7 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
     if (compact) {
         return (
             <Text style={styles.compactLine} numberOfLines={1}>
-                {market.category} · {formatShare(playerShare)}
+                {categoryLabel(market.category)} · {formatShare(playerShare)}
             </Text>
         );
     }
@@ -146,7 +147,7 @@ export const MarketPositionPanel = ({ category, compact, defaultOpen = false }: 
                     <View style={styles.brandRow}>
                         {Object.entries(brandByCategory || {}).map(([cat, v]) => (
                             <View key={cat} style={styles.brandChip}>
-                                <Text style={styles.brandChipCat}>{cat}</Text>
+                                <Text style={styles.brandChipCat}>{categoryLabel(cat)}</Text>
                                 <Text style={[
                                     styles.brandChipVal,
                                     { color: (v as number) >= 200 ? theme.colors.textPrimary : theme.colors.warning },

@@ -29,7 +29,13 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 
-import TutorialOverlay, { holeFor, HALO } from './TutorialOverlay';
+import TutorialOverlay, {
+    holeFor, HALO, pointerXFor, POINTER, CARD_TOP, CARD_BOTTOM,
+} from './TutorialOverlay';
+import { NAV_BAR_CLEARANCE } from '../../navigation/components/navBarMetrics';
+import Portrait from '../common/Portrait';
+import { theme } from '../../core/theme';
+import { t } from '../../core/i18n';
 import { useTutorialTargets } from './targets';
 import { useStoryStore } from '../../core/store/useStoryStore';
 import { useIdentityStore } from '../../core/store/useIdentityStore';
@@ -149,7 +155,10 @@ afterEach(() => {
 });
 
 beforeEach(() => {
-    useTutorialTargets.setState({ rects: {} });
+    // activeKey as well as rects. It was only rects, and the key leaked
+    // between tests: the first test to raise a lock left its key behind, and
+    // every later test's TutorialTarget believed it was the ringed one.
+    useTutorialTargets.setState({ rects: {}, activeKey: null });
     useStoryStore.setState({
         locks: emptyLockState(),
         flags: {},
@@ -311,5 +320,203 @@ describe('the overlay', () => {
         });
         draw();
         expect(useStoryStore.getState().locks.completed).toContain('rnd-lab');
+    });
+});
+
+// ============================================================================
+//  THE CARD, AND THE THREE THINGS WRONG WITH IT
+// ============================================================================
+//  Reported together, from a device: the highlight looked like it was sliding
+//  rather than sitting on the control, the card grazed the bottom tab bar, and
+//  the card itself was too plain to read as somebody speaking.
+//
+//  The first of those lives in TutorialTarget and is pinned in its own file.
+//  The other two are here.
+// ============================================================================
+
+describe('the card clears the navigation bar', () => {
+    // ------------------------------------------------------------------
+    //  IT WAS A HARDCODED 120 AND THE BAR IS TALLER THAN THAT
+    // ------------------------------------------------------------------
+    //  NAV_BAR_CLEARANCE comes out at 138 on iOS and 126 on Android, both
+    //  above 120, so the card sat on the bar on one platform and flush
+    //  against it on the other.
+    //
+    //  Asserted against the constant rather than against a number, because
+    //  a number here would be the same mistake written twice: the whole
+    //  reason that constant exists is that the bar's height and the space
+    //  under it kept being changed separately.
+    // ------------------------------------------------------------------
+    it('sits above the bar rather than on it', () => {
+        expect(CARD_BOTTOM).toBeGreaterThan(NAV_BAR_CLEARANCE);
+    });
+
+    it('leaves a visible gap and not just a hairline', () => {
+        expect(CARD_BOTTOM - NAV_BAR_CLEARANCE).toBeGreaterThanOrEqual(theme.spacing.md);
+    });
+
+    it('still clears a status bar and a header when it flips to the top', () => {
+        expect(CARD_TOP).toBeGreaterThanOrEqual(132);
+    });
+
+    it('renders the bottom placement when the highlight is high up', () => {
+        act(() => { useStoryStore.setState({ flags: { rndOpened: true } } as any); });
+        // A control near the top of the screen: the card hangs below it.
+        act(() => {
+            useTutorialTargets.getState().setRect(
+                'rndLab', { x: 40, y: 80, width: 200, height: 60 });
+        });
+
+        const json = text(draw());
+        expect(json).toContain(`"bottom":${CARD_BOTTOM}`);
+        expect(json).not.toContain('"bottom":120');
+    });
+});
+
+// ============================================================================
+//  THE POINTER THAT JOINS THE CARD TO THE RING
+// ============================================================================
+//  Pure, and tested as arithmetic for the same reason `holeFor` is: under the
+//  test renderer measureInWindow never calls back, so a rendered tree has no
+//  hole to point at and the sums would never run.
+// ============================================================================
+
+describe('pointerXFor', () => {
+    const W = 390;                       // a 6.1 inch iPhone
+    const inset = theme.spacing.lg;
+    const corner = theme.radius.lg;
+    const cardWidth = W - inset * 2;
+
+    it('centres the triangle under the middle of the hole', () => {
+        // Hole centred at 195, which is the middle of the screen.
+        const x = pointerXFor({ x: 145, w: 100 }, W, inset, corner);
+        expect(x).toBe(195 - inset - POINTER);
+    });
+
+    it('does not let the triangle sit on the left corner curve', () => {
+        // A control hard against the left edge. Uncllamped this is negative.
+        const x = pointerXFor({ x: 0, w: 40 }, W, inset, corner);
+        expect(x).toBe(corner);
+    });
+
+    it('does not let the triangle sit on the right corner curve', () => {
+        const x = pointerXFor({ x: W - 40, w: 40 }, W, inset, corner);
+        expect(x).toBe(cardWidth - corner - POINTER * 2);
+    });
+
+    it('stays inside the card for every position across the screen', () => {
+        for (let left = -20; left <= W + 20; left += 7) {
+            const x = pointerXFor({ x: left, w: 48 }, W, inset, corner);
+            expect(x).toBeGreaterThanOrEqual(corner);
+            expect(x + POINTER * 2).toBeLessThanOrEqual(cardWidth - corner + 0.001);
+        }
+    });
+
+    it('collapses to the left corner rather than going negative on a tiny screen', () => {
+        // Narrower than its own two corners. Nonsense input, and it must not
+        // produce a pointer hanging off the left of the card.
+        const x = pointerXFor({ x: 10, w: 10 }, 60, inset, corner);
+        expect(x).toBe(corner);
+    });
+});
+
+// ============================================================================
+//  AND THE CARD LOOKS LIKE SOMEBODY SPEAKING
+// ============================================================================
+
+describe('who is on the card', () => {
+    const raiseLab = () => {
+        act(() => { useStoryStore.setState({ flags: { rndOpened: true } } as any); });
+        act(() => { useTutorialTargets.getState().setRect('rndLab', RECT); });
+    };
+
+    it('shows the speaker face, through the same component the inbox uses', () => {
+        raiseLab();
+        // Exactly one. Two would mean the header had been duplicated by a
+        // flip branch, which is the obvious way to get this wrong.
+        expect(draw().root.findAllByType(Portrait)).toHaveLength(1);
+    });
+
+    it('looks the face up by the holder of the seat, not by the seat', () => {
+        raiseLab();
+        const [portrait] = draw().root.findAllByType(Portrait);
+        const who = castNow('cto');
+        expect(portrait.props.id).toBe(who?.portraitId ?? 'cto');
+        expect(portrait.props.name).toBe(who?.name);
+    });
+
+    it('says how far through the sequence this is', () => {
+        raiseLab();
+        const step = TUTORIAL_SEQUENCE.findIndex(l => l.id === 'rnd-lab') + 1;
+        expect(step).toBeGreaterThan(0);
+        expect(text(draw())).toContain(
+            t('tut.stepOf', { n: step, total: TUTORIAL_SEQUENCE.length }));
+    });
+
+    it('counts position in the authored order, not completions', () => {
+        // Two steps already done. The counter must still report where this
+        // lock sits in the list rather than "step 1", which is what counting
+        // outstanding locks would give.
+        act(() => {
+            useStoryStore.setState({
+                locks: { ...emptyLockState(), completed: ['q1-open-product'] },
+                flags: { rndOpened: true },
+            } as any);
+        });
+        act(() => { useTutorialTargets.getState().setRect('rndLab', RECT); });
+
+        const step = TUTORIAL_SEQUENCE.findIndex(l => l.id === 'rnd-lab') + 1;
+        expect(text(draw())).toContain(
+            t('tut.stepOf', { n: step, total: TUTORIAL_SEQUENCE.length }));
+    });
+});
+
+// ============================================================================
+//  THE OVERLAY TELLS THE TARGET WHICH ONE HAS THE RING
+// ============================================================================
+//  This is the hinge the scroll fix hangs on. If the overlay stops publishing
+//  the key, nothing breaks visibly: the ring goes back to arriving four times
+//  a second, which is precisely the bug that was reported and precisely the
+//  kind of regression that would not be noticed again until a device.
+// ============================================================================
+
+describe('the active highlight key', () => {
+    it('is published while a lock is up', () => {
+        act(() => { useStoryStore.setState({ flags: { rndOpened: true } } as any); });
+        act(() => { useTutorialTargets.getState().setRect('rndLab', RECT); });
+        draw();
+        expect(useTutorialTargets.getState().activeKey).toBe('rndLab');
+    });
+
+    it('is published even before the control has reported where it is', () => {
+        // The target has to know it is the ringed one in order to start
+        // following per frame, and that has to be true from the first
+        // measurement rather than from the second.
+        act(() => { useStoryStore.setState({ flags: { rndOpened: true } } as any); });
+        draw();
+        expect(useTutorialTargets.getState().activeKey).toBe('rndLab');
+    });
+
+    it('is cleared when the overlay goes away', () => {
+        act(() => { useStoryStore.setState({ flags: { rndOpened: true } } as any); });
+        act(() => { useTutorialTargets.getState().setRect('rndLab', RECT); });
+        const tree = draw();
+        expect(useTutorialTargets.getState().activeKey).toBe('rndLab');
+
+        // Otherwise one target is left running an animation frame loop for
+        // the rest of the session.
+        act(() => { tree.unmount(); mounted.splice(mounted.indexOf(tree), 1); });
+        expect(useTutorialTargets.getState().activeKey).toBeNull();
+    });
+
+    it('is null when the tutorial is switched off', () => {
+        act(() => {
+            useStoryStore.setState({
+                locks: { ...emptyLockState(), disabled: true },
+                flags: { rndOpened: true },
+            } as any);
+        });
+        draw();
+        expect(useTutorialTargets.getState().activeKey).toBeNull();
     });
 });
