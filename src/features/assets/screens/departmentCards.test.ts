@@ -73,15 +73,69 @@ describe('the department cards do not grow with their words', () => {
         expect(sub).not.toMatch(/minHeight/);
     });
 
-    it('and both shrink to fit rather than wrapping past their box', () => {
-        // A fixed height without this clips a long word instead of growing,
-        // which trades one visible bug for a worse one.
+    it('lets the TITLE shrink, because Turkish wraps it and English does not', () => {
+        // Two lines are reserved and the words that fill them vary by a lot:
+        // "Equity" against "Hisse & Sahiplik". This one earns the shrink.
         const card = source();
         const at = card.indexOf('const DepartmentCard');
         const body = card.slice(at, card.indexOf('const formatCompactNumber', at));
 
         expect(body).toMatch(/numberOfLines=\{2\}[\s\S]*?adjustsFontSizeToFit/);
-        expect(body).toMatch(/numberOfLines=\{1\}[\s\S]*?adjustsFontSizeToFit/);
+    });
+
+    // ----------------------------------------------------------------------
+    //  AND DOES NOT LET THE FIGURE SHRINK AT ALL
+    // ----------------------------------------------------------------------
+    //  This is the assertion that was wrong, not just absent, and it is worth
+    //  saying how. It used to require `adjustsFontSizeToFit` on BOTH lines,
+    //  on the reasoning that a fixed height without it clips instead of
+    //  growing. The reasoning was fine and the conclusion was backwards.
+    //
+    //  `adjustsFontSizeToFit` fits text to the box in BOTH DIRECTIONS. The
+    //  box was `height: 17`; a fourteen point font wants about twenty points
+    //  of line. So the prop did exactly what it was told and shrank the text
+    //  until the HEIGHT fitted, throwing away every font size set above it.
+    //
+    //  The figure was reported as ant sized twice, and raising the point size
+    //  changed nothing either time, because font size was never the lever.
+    //  The box is cut for the font now, and the prop is gone.
+    // ----------------------------------------------------------------------
+    it('does not let the figure shrink at all', () => {
+        const card = source();
+        const at = card.indexOf('const DepartmentCard');
+        const body = card.slice(at, card.indexOf('const formatCompactNumber', at));
+
+        // The subtitle is the Text that follows the title's closing tag.
+        const sub = body.slice(body.indexOf('styles.deptSub'));
+        expect(sub).not.toMatch(/adjustsFontSizeToFit/);
+        expect(sub).not.toMatch(/minimumFontScale/);
+
+        // The safety valve stays: one ellipsis beats one taller card.
+        expect(sub).toMatch(/numberOfLines=\{1\}/);
+    });
+
+    it('gives the title a box its own font fits inside too', () => {
+        // Found by measuring, not by a report: at 19 against 15 the title was
+        // being shrunk on every card in every language by the same mechanism,
+        // and stayed legible only because it is white and heavy. The shrink
+        // should answer long words, never a tight box.
+        const title = style('deptTitle');
+        const fontSize = numberIn(title, 'fontSize')!;
+        const lineHeight = numberIn(title, 'lineHeight')!;
+
+        expect(lineHeight / fontSize).toBeGreaterThanOrEqual(1.33);
+    });
+
+    it('gives the figure a box its own font fits inside', () => {
+        // The general form of the bug. A fixed height below what the font
+        // actually occupies is a squeeze whether or not anything is currently
+        // reading it, and it is invisible in the stylesheet: 17 looks like a
+        // deliberate number next to a 13.
+        const sub = style('deptSub');
+        const fontSize = numberIn(sub, 'fontSize')!;
+        const lineHeight = numberIn(sub, 'lineHeight')!;
+
+        expect(lineHeight / fontSize).toBeGreaterThanOrEqual(1.35);
     });
 
     // ----------------------------------------------------------------------
@@ -113,23 +167,10 @@ describe('the department cards do not grow with their words', () => {
         expect(sub).toMatch(/fontWeight/);
     });
 
-    it('does not let the figure shrink below readable', () => {
-        const card = source();
-        const at = card.indexOf('const DepartmentCard');
-        const body = card.slice(at, card.indexOf('const formatCompactNumber', at));
-
-        // The subtitle's own scale, which is the second of the two in here.
-        const scales = [...body.matchAll(/minimumFontScale=\{([\d.]+)\}/g)]
-            .map(m => Number(m[1]));
-        expect(scales).toHaveLength(2);
-
-        const subScale = scales[1];
-        const subSize = numberIn(style('deptSub'), 'fontSize')!;
-
-        // 8.4 points was the floor. Eleven is a number somebody can read at
-        // arm's length, and the strings are short enough never to need less:
-        // the longest is about thirteen characters.
-        expect(subSize * subScale).toBeGreaterThanOrEqual(11);
+    it('renders the figure at the size the stylesheet says', () => {
+        // With nothing able to override it, the declared size IS the size on
+        // screen. That was not true before and it is the whole point.
+        expect(numberIn(style('deptSub'), 'fontSize')).toBeGreaterThanOrEqual(14);
     });
 
     it('and every subtitle comes from the catalogue', () => {

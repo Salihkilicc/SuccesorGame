@@ -75,16 +75,30 @@ const DepartmentCard = ({ icon, iconColor = theme.colors.textPrimary, title, sub
       minimumFontScale={0.75}>
       {title}
     </Text>
-    {/* 0.85 rather than 0.7. The floor was 8.4 points, which is below the
-        size at which a number can be read at arm's length, and the shrink
-        was not even needed: the longest of these four strings is around
-        thirteen characters ("Debt: $999.9M") against roughly 110 points of
-        text width on the narrowest phone this ships to. */}
-    <Text
-      style={styles.deptSub}
-      numberOfLines={1}
-      adjustsFontSizeToFit
-      minimumFontScale={0.85}>
+    {/* ------------------------------------------------------------------
+        NO adjustsFontSizeToFit HERE, AND THAT IS THE FIX
+        ------------------------------------------------------------------
+        Raising the point size did nothing on the device, and the reason is
+        that this prop fits text to the BOX IN BOTH DIRECTIONS. The box was
+        `height: 17` and a fourteen point font wants about twenty points of
+        line, so the system did what it was told: it shrank the text until
+        the height fitted, and threw away the larger size on the way.
+
+        So the figure stayed ant sized through two attempts at making it
+        bigger, which is what was reported both times. Font size was never
+        the lever; the lever was the prop that overrides it.
+
+        The cards still cannot grow with their words, because the box is
+        still fixed. What changed is which way round it is sized: the box is
+        now cut for the font instead of the font being cut for the box.
+
+        `numberOfLines={1}` stays as the safety valve. Nothing here should
+        ever reach it - the longest string is about thirteen characters
+        ("Debt: $999.9M") against roughly 110 points of width on the
+        narrowest phone this ships to - but if something does, one ellipsis
+        is better than a card that is taller than the three beside it.
+       ------------------------------------------------------------------ */}
+    <Text style={styles.deptSub} numberOfLines={1}>
       {subtitle}
     </Text>
   </Pressable>
@@ -629,14 +643,31 @@ const styles = StyleSheet.create({
   },
   // `height` rather than `minHeight`: the point is that a card with a short
   // title occupies exactly as much room as one with a long title.
+  // ------------------------------------------------------------------
+  //  THE SAME SQUEEZE, ONE RUNG MILDER
+  // ------------------------------------------------------------------
+  //  `lineHeight: 19` against `fontSize: 15` is a ratio of 1.27, which is
+  //  under what the glyphs occupy, so `adjustsFontSizeToFit` was shrinking
+  //  this line on every card in every language rather than only on the one
+  //  Turkish title that genuinely needs two lines.
+  //
+  //  Nobody reported it, because these four words are white and heavy and
+  //  stay legible at eleven points where the grey figure under them did not.
+  //  It is the same defect and it was found by measuring the one next to it.
+  //
+  //  The prop STAYS here. "Hisse & Sahiplik" really does wrap where "Equity"
+  //  does not, and reserving two lines is what keeps the four cards level.
+  //  What changes is that the shrink is now a response to long words rather
+  //  than to a box that was too tight for its own font.
+  // ------------------------------------------------------------------
   deptTitle: {
     fontSize: 15,
     fontWeight: '800',
     color: theme.colors.textPrimary,
     textAlign: 'center',
     letterSpacing: 0.3,
-    lineHeight: 19,
-    height: 38,
+    lineHeight: 20,
+    height: 40,
   },
   // ------------------------------------------------------------------
   //  THIS LINE IS THE INFORMATION, NOT THE CAPTION
@@ -659,13 +690,18 @@ const styles = StyleSheet.create({
   //  construction and the note on deptTitle explains why that must not
   //  become a thing that depends on how long a word is.
   // ------------------------------------------------------------------
+  //  The box is cut for the font. `lineHeight` is what a fourteen point font
+  //  actually occupies rather than the smallest number it fits in, and
+  //  `height` matches it so the four cards stay level. Seventeen was the
+  //  smallest number, which is how `adjustsFontSizeToFit` ended up shrinking
+  //  the text to reach it.
   deptSub: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
     color: theme.colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 17,
-    height: 17,
+    lineHeight: 20,
+    height: 20,
   },
   sharePrice: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
 });
