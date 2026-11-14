@@ -270,7 +270,7 @@ const seedThreads = (): Thread[] => [
         // ------------------------------------------------------------------
         id: 'coo',
         name: 'Dana Whitfield',
-        role: 'Head of Production',
+        role: 'COO',
         initials: 'DW',
         unread: 1,
         messages: [

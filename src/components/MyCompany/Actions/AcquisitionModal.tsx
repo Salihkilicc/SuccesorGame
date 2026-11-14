@@ -783,6 +783,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
+  sectorAndTierRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
   itemSector: {
     color: theme.colors.textMuted,
     fontSize: 11,

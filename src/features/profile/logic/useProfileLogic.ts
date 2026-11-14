@@ -11,6 +11,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { fullName } from '../../../core/identity';
 import { useIdentityStore } from '../../../core/store/useIdentityStore';
 import { usePlayerStore } from '../../../core/store/usePlayerStore';
 import { useStatsStore } from '../../../core/store/useStatsStore';
@@ -30,7 +31,28 @@ import {
 import { SelectedMember } from '../components/FamilyMemberDetailModal';
 import { useEncounterSystem } from '../../love/components/useEncounterSystem';
 
+/**
+ * Exactly the fields the one construction site below can actually fill.
+ *
+ * ---------------------------------------------------------------------------
+ *  RESOLVED DURING THE MERGE, AND THE AUTO MERGE HAD IT WRONG
+ * ---------------------------------------------------------------------------
+ *  The branch this merged with declared `energy`, `looks` and `smarts` here as
+ *  well. Git took that interface and the newer construction site at the same
+ *  time, which type checked to a contradiction: a shape requiring six fields,
+ *  built from four.
+ *
+ *  The narrow version is the deliberate one. There is no source in the player
+ *  store for those three, nothing in the app reads them, and `FormattedVitals`
+ *  is not used outside this file - all three checked rather than assumed. A
+ *  field declared with nothing behind it is the shape of bug this project
+ *  keeps meeting: correct looking data that nothing fills and nothing reads.
+ *
+ *  `age` stays, because unlike the other three it has a real source.
+ * ---------------------------------------------------------------------------
+ */
 export interface FormattedVitals {
+    age: number;
     health: number;
     happiness: number;
     stress: number;
@@ -46,7 +68,7 @@ export const useProfileLogic = () => {
     // --- Navigation ---
     const navigation = useNavigation<any>();
 
-    // --- Store Selectors ---
+    // --- Global Stores ---
     const identity = useIdentityStore();
     const player = usePlayerStore();
     const stats = useStatsStore();
@@ -62,10 +84,10 @@ export const useProfileLogic = () => {
 
     // --- Formatted Strings & Computed Values ---
     const ceoFullName = useMemo(() => {
-        const first = (identity.firstName || 'Salih').trim();
-        // Dynasty surname is strictly Hale
-        return `${first} Hale`;
-    }, [identity.firstName]);
+        const first = identity.firstName || 'Salih';
+        const last = identity.lastName || 'Hale';
+        return fullName(first, last);
+    }, [identity.firstName, identity.lastName]);
 
     const children = useMemo(() => {
         return family.children.map((c) => {
